@@ -43,6 +43,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            // A debug build installs next to the signed release instead of replacing it.
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+        }
         release {
             // Without a key the release APK stays unsigned and cannot be installed.
             signingConfigs.findByName("release")?.let { signingConfig = it }

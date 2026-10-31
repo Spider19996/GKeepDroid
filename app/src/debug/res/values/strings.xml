@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The debug build is a separate app next to the release, so it carries its own name. -->
+<resources>
+    <string name="app_name" translatable="false">GKeepDroid Debug</string>
+</resources>
