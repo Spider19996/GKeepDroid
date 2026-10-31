@@ -274,4 +274,6 @@
     <string name="reminder_reliability">الموثوقية</string>
     <string name="reminder_allowed">مسموح</string>
     <string name="reminder_not_allowed">غير مسموح</string>
+    <string name="reminder_notifications_off">الإشعارات متوقفة، لذلك لن تظهر التذكيرات. فعّلها من الإعدادات.</string>
+    <string name="reminder_save_first">احفظ الملاحظة أولًا ثم أضف التذكيرات.</string>
 </resources>

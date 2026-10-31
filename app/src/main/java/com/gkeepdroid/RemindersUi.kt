@@ -268,11 +268,27 @@ internal fun RemindersDialog(
         )
         return
     }
+    // Checked again whenever the screen comes back, e.g. from the permission dialog or the settings.
+    var notificationsOn by remember { mutableStateOf(Reminders.canNotify(activity)) }
+    androidx.compose.runtime.DisposableEffect(activity) {
+        val lifecycle = (activity as androidx.lifecycle.LifecycleOwner).lifecycle
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) notificationsOn = Reminders.canNotify(activity)
+        }
+        lifecycle.addObserver(observer)
+        onDispose { lifecycle.removeObserver(observer) }
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.reminders_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                if (!notificationsOn) {
+                    Text(stringResource(R.string.reminder_notifications_off), color = MaterialTheme.colorScheme.error)
+                    TextButton(onClick = { activity.startActivity(Reminders.notificationSettings(activity)) }) {
+                        Text(stringResource(R.string.reminder_open_settings))
+                    }
+                }
                 if (reminders.isEmpty()) Text(stringResource(R.string.reminders_none))
                 reminders.forEach { reminder ->
                     Row(verticalAlignment = Alignment.CenterVertically) {

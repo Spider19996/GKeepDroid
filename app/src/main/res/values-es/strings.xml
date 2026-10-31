@@ -274,4 +274,6 @@
     <string name="reminder_reliability">Fiabilidad</string>
     <string name="reminder_allowed">Permitido</string>
     <string name="reminder_not_allowed">No permitido</string>
+    <string name="reminder_notifications_off">Las notificaciones están desactivadas, así que los recordatorios no pueden aparecer. Actívalas en los ajustes.</string>
+    <string name="reminder_save_first">Guarda primero la nota y luego podrás añadir recordatorios.</string>
 </resources>

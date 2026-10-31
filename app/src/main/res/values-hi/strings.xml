@@ -274,4 +274,6 @@
     <string name="reminder_reliability">विश्वसनीयता</string>
     <string name="reminder_allowed">अनुमति है</string>
     <string name="reminder_not_allowed">अनुमति नहीं है</string>
+    <string name="reminder_notifications_off">सूचनाएँ बंद हैं, इसलिए रिमाइंडर नहीं दिखेंगे। उन्हें सेटिंग में चालू करें।</string>
+    <string name="reminder_save_first">पहले नोट सहेजें, फिर रिमाइंडर जोड़ सकते हैं।</string>
 </resources>

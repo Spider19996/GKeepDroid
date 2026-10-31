@@ -277,4 +277,6 @@
     <string name="reminder_reliability">Reliability</string>
     <string name="reminder_allowed">Allowed</string>
     <string name="reminder_not_allowed">Not allowed</string>
+    <string name="reminder_notifications_off">Notifications are off, so reminders cannot show. Turn them on in the settings.</string>
+    <string name="reminder_save_first">Save the note first, then you can add reminders.</string>
 </resources>

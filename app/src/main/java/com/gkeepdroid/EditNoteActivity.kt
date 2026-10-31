@@ -717,7 +717,15 @@ class EditNoteActivity : ComponentActivity() {
                 OutlinedButton(
                     modifier = Modifier.weight(1f).fillMaxHeight(), enabled = !saving, onClick = { finish() },
                 ) { Text(stringResource(R.string.cancel)) }
-                if (existing != null) Box(Modifier.align(Alignment.CenterVertically)) {
+                if (existing == null) Box(Modifier.align(Alignment.CenterVertically)) {
+                    // A new note has no id yet, so it cannot have a reminder; the button says so.
+                    FilledTonalIconToggleButton(
+                        checked = false,
+                        onCheckedChange = { Toast.makeText(this@EditNoteActivity, R.string.reminder_save_first, Toast.LENGTH_SHORT).show() },
+                    ) {
+                        Icon(painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminders_title))
+                    }
+                } else Box(Modifier.align(Alignment.CenterVertically)) {
                     // Set: the accent color with a matching icon. None set: a quiet button.
                     FilledTonalIconToggleButton(
                         checked = reminders.isNotEmpty(),

@@ -13,6 +13,7 @@ An unofficial Android app for your Google Keep notes: home screen widgets with a
 - **Two widgets**: *Keep Notes* lists all notes of an account (optionally only one label), *Keep Note* shows a single note or checklist, such as a shopping list
 - **Widget look**: background opacity from 0 to 100 %, text size and color, Keep's note colors, cards for notes without a color (transparent, gray or with a border)
 - **Button bar**: every button (refresh, new note, search, ...) can be hidden or dragged to any side of the widget, in any order, with an adjustable size
+- **Reminders**: several per note, each with its own sound, vibration and silent-mode setting, snooze, quick times you define, shown on the cards and in the widgets. They live on the phone only, Keep's own reminders are not synced
 - **Checklists**: tick items right in the widget, checked items move to the end, "3/7" progress, drag items to re-order them
 - **Full app**: grid or list of all notes, search, label filter, archive and trash, undo, long-press to re-order notes (also in archive and trash) in Keep's order, images, sharing
 - **Labels**: create, assign, delete and filter by them
@@ -41,7 +42,8 @@ Google Keep has no public API for personal Google accounts. GKeepDroid uses the 
 > - Signing in gives the app a **master token**, which grants broad access to your Google account, not just Keep. Never share it. It is stored encrypted on your phone and is not part of any export.
 
 **Limitations**
-- Images can be opened and removed, but not added: use the Keep app for that. Audio, reminders and shared notes are not supported.
+- Images can be opened and removed, but not added: use the Keep app for that. Audio and shared notes are not supported.
+- Reminders are local to the phone: they do not appear in Keep, and reminders set in Keep are not shown here. A new note gets reminders once it is saved.
 - Widgets show the first image of a note as a thumbnail and hide archived and trashed notes.
 
 ## Building

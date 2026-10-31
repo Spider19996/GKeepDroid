@@ -274,4 +274,6 @@
     <string name="reminder_reliability">안정성</string>
     <string name="reminder_allowed">허용됨</string>
     <string name="reminder_not_allowed">허용되지 않음</string>
+    <string name="reminder_notifications_off">알림이 꺼져 있어 리마인더를 표시할 수 없습니다. 설정에서 켜 주세요.</string>
+    <string name="reminder_save_first">먼저 메모를 저장하면 알림을 추가할 수 있습니다.</string>
 </resources>

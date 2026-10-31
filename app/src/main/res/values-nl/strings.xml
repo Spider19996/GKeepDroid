@@ -274,4 +274,6 @@
     <string name="reminder_reliability">Betrouwbaarheid</string>
     <string name="reminder_allowed">Toegestaan</string>
     <string name="reminder_not_allowed">Niet toegestaan</string>
+    <string name="reminder_notifications_off">Meldingen staan uit, dus herinneringen kunnen niet verschijnen. Zet ze aan in de instellingen.</string>
+    <string name="reminder_save_first">Sla de notitie eerst op, dan kun je herinneringen toevoegen.</string>
 </resources>

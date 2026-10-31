@@ -1,6 +1,5 @@
 package com.gkeepdroid
 
-import android.Manifest
 import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -8,7 +7,6 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.RingtoneManager
@@ -19,7 +17,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
+import androidx.core.app.NotificationManagerCompat
 import org.json.JSONArray
 import org.json.JSONObject
 import kotlinx.coroutines.CoroutineScope
@@ -165,10 +163,13 @@ object Reminders {
     /** Android's list of apps that are exempt from battery optimization. */
     fun batterySettings(): Intent = Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
 
-    /** True when notifications may be shown; below Android 13 they always may. */
-    fun canNotify(context: Context): Boolean =
-        android.os.Build.VERSION.SDK_INT < 33 ||
-            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+    /** True when notifications may be shown: the permission is given (Android 13+) and they are not switched off. */
+    fun canNotify(context: Context): Boolean = NotificationManagerCompat.from(context).areNotificationsEnabled()
+
+    /** Android's notification settings of this app. */
+    fun notificationSettings(context: Context): Intent =
+        Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+            .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, context.packageName)
 
     /** Shows the notification and plays the sound and vibration of one reminder; [done] runs once they are over. */
     internal fun fire(context: Context, account: String, noteId: String, reminderId: String, finished: () -> Unit) {

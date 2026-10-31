@@ -274,4 +274,6 @@
     <string name="reminder_reliability">可靠性</string>
     <string name="reminder_allowed">已允许</string>
     <string name="reminder_not_allowed">未允许</string>
+    <string name="reminder_notifications_off">通知已关闭,因此无法显示提醒。请在设置中开启。</string>
+    <string name="reminder_save_first">请先保存笔记,然后再添加提醒。</string>
 </resources>

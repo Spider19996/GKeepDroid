@@ -274,4 +274,6 @@
     <string name="reminder_reliability">Affidabilità</string>
     <string name="reminder_allowed">Consentito</string>
     <string name="reminder_not_allowed">Non consentito</string>
+    <string name="reminder_notifications_off">Le notifiche sono disattivate, quindi i promemoria non possono comparire. Attivale nelle impostazioni.</string>
+    <string name="reminder_save_first">Salva prima la nota, poi potrai aggiungere promemoria.</string>
 </resources>

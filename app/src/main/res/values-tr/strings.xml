@@ -274,4 +274,6 @@
     <string name="reminder_reliability">Güvenilirlik</string>
     <string name="reminder_allowed">İzin verildi</string>
     <string name="reminder_not_allowed">İzin verilmedi</string>
+    <string name="reminder_notifications_off">Bildirimler kapalı, bu yüzden hatırlatıcılar görünemez. Ayarlardan açın.</string>
+    <string name="reminder_save_first">Önce notu kaydedin, sonra hatırlatıcı ekleyebilirsiniz.</string>
 </resources>
