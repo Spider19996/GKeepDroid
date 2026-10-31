@@ -625,7 +625,8 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
-            Reminders.list(context, account, note.id).let { reminders ->
+            // Read again whenever the screen comes back, as reminders are changed in the editor.
+            remember(resumeKey, note.id) { Reminders.list(context, account, note.id) }.let { reminders ->
                 if (reminders.isNotEmpty()) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Icon(painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminder), tint = textColor, modifier = Modifier.size(14.dp))
                     Text(
