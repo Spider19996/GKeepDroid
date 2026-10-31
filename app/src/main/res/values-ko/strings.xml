@@ -265,4 +265,6 @@
     <string name="sign_in_expired">%s의 로그인이 만료되었습니다</string>
     <string name="sign_in_again">다시 로그인</string>
     <string name="demo_mode">데모 모드(스크린샷용 샘플 메모)</string>
+    <string name="language">언어</string>
+    <string name="language_system">시스템 언어</string>
 </resources>

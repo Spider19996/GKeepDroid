@@ -265,4 +265,6 @@
     <string name="sign_in_expired">%s 的登录已过期</string>
     <string name="sign_in_again">重新登录</string>
     <string name="demo_mode">演示模式（用于截图的示例笔记）</string>
+    <string name="language">语言</string>
+    <string name="language_system">系统语言</string>
 </resources>

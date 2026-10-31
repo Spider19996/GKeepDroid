@@ -265,4 +265,6 @@
     <string name="sign_in_expired">Logowanie dla %s wygasło</string>
     <string name="sign_in_again">Zaloguj się ponownie</string>
     <string name="demo_mode">Tryb demo (przykładowe notatki do zrzutów)</string>
+    <string name="language">Język</string>
+    <string name="language_system">Język systemu</string>
 </resources>

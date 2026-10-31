@@ -265,4 +265,6 @@
     <string name="sign_in_expired">La connexion de %s a expiré</string>
     <string name="sign_in_again">Se reconnecter</string>
     <string name="demo_mode">Mode démo (notes d’exemple pour les captures)</string>
+    <string name="language">Langue</string>
+    <string name="language_system">Langue du système</string>
 </resources>

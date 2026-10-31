@@ -265,4 +265,6 @@
     <string name="sign_in_expired">%s का साइन-इन समाप्त हो गया</string>
     <string name="sign_in_again">फिर से साइन इन करें</string>
     <string name="demo_mode">डेमो मोड (स्क्रीनशॉट के लिए नमूना नोट)</string>
+    <string name="language">भाषा</string>
+    <string name="language_system">सिस्टम भाषा</string>
 </resources>

@@ -184,6 +184,8 @@ data class GlobalSettings(
     val wifiOnly: Boolean = false,
     /** Shows sample notes instead of the real ones, for screenshots. */
     val demoMode: Boolean = false,
+    /** Language tag such as "de"; empty follows the system language. */
+    val language: String = "",
 )
 
 object SettingsStore {
@@ -209,6 +211,7 @@ object SettingsStore {
             backgroundIntervalMin = p.getInt("background_interval_min", d.backgroundIntervalMin),
             wifiOnly = p.getBoolean("wifi_only", d.wifiOnly),
             demoMode = p.getBoolean("demo_mode", d.demoMode),
+            language = p.getString("language", d.language).orEmpty(),
         )
     }
 
@@ -223,6 +226,7 @@ object SettingsStore {
             .putInt("background_interval_min", s.backgroundIntervalMin)
             .putBoolean("wifi_only", s.wifiOnly)
             .putBoolean("demo_mode", s.demoMode)
+            .putString("language", s.language)
             .apply()
     }
 

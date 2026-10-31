@@ -265,4 +265,6 @@
     <string name="sign_in_expired">%s için oturum süresi doldu</string>
     <string name="sign_in_again">Yeniden giriş yap</string>
     <string name="demo_mode">Demo modu (ekran görüntüleri için örnek notlar)</string>
+    <string name="language">Dil</string>
+    <string name="language_system">Sistem dili</string>
 </resources>

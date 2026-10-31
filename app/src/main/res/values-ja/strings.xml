@@ -265,4 +265,6 @@
     <string name="sign_in_expired">%s のログインの有効期限が切れました</string>
     <string name="sign_in_again">再ログイン</string>
     <string name="demo_mode">デモモード（スクリーンショット用のサンプルノート）</string>
+    <string name="language">言語</string>
+    <string name="language_system">システムの言語</string>
 </resources>

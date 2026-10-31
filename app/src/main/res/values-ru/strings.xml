@@ -265,4 +265,6 @@
     <string name="sign_in_expired">Вход для %s истёк</string>
     <string name="sign_in_again">Войти снова</string>
     <string name="demo_mode">Демо-режим (примеры заметок для скриншотов)</string>
+    <string name="language">Язык</string>
+    <string name="language_system">Язык системы</string>
 </resources>

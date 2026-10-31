@@ -265,4 +265,6 @@
     <string name="sign_in_expired">La sesión de %s ha caducado</string>
     <string name="sign_in_again">Iniciar sesión de nuevo</string>
     <string name="demo_mode">Modo demo (notas de ejemplo para capturas)</string>
+    <string name="language">Idioma</string>
+    <string name="language_system">Idioma del sistema</string>
 </resources>

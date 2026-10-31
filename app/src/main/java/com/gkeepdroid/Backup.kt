@@ -44,7 +44,8 @@ object Backup {
                     .put("minGapSec", global.minGapSec)
                     .put("backgroundSync", global.backgroundSync)
                     .put("backgroundIntervalMin", global.backgroundIntervalMin)
-                    .put("wifiOnly", global.wifiOnly),
+                    .put("wifiOnly", global.wifiOnly)
+                    .put("language", global.language),
             )
             .put(
                 "widget",
@@ -95,6 +96,7 @@ object Backup {
                 backgroundSync = g.optBoolean("backgroundSync", dg.backgroundSync),
                 backgroundIntervalMin = g.optInt("backgroundIntervalMin", dg.backgroundIntervalMin).coerceAtLeast(1),
                 wifiOnly = g.optBoolean("wifiOnly", dg.wifiOnly),
+                language = g.optString("language", dg.language),
             ),
             widget = WidgetSettings(
                 backgroundAlpha = w.optDouble("backgroundAlpha", dw.backgroundAlpha.toDouble()).toFloat().coerceIn(0f, 1f),

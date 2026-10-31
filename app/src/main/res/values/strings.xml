@@ -268,4 +268,6 @@
     <string name="sign_in_expired">Sign-in for %s expired</string>
     <string name="sign_in_again">Sign in again</string>
     <string name="demo_mode">Demo mode (sample notes for screenshots)</string>
+    <string name="language">Language</string>
+    <string name="language_system">System language</string>
 </resources>

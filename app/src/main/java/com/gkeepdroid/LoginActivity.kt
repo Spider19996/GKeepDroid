@@ -49,6 +49,10 @@ import kotlin.random.Random
  * e-mail address is read from the signed-in session, so it does not have to be typed twice.
  */
 class LoginActivity : ComponentActivity() {
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(LocaleHelper.wrap(newBase))
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

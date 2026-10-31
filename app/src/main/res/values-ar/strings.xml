@@ -265,4 +265,6 @@
     <string name="sign_in_expired">انتهت صلاحية تسجيل الدخول لـ %s</string>
     <string name="sign_in_again">سجّل الدخول مجددًا</string>
     <string name="demo_mode">وضع العرض (ملاحظات نموذجية للقطات الشاشة)</string>
+    <string name="language">اللغة</string>
+    <string name="language_system">لغة النظام</string>
 </resources>

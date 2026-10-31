@@ -109,6 +109,10 @@ private enum class Page(val title: Int) {
  * global and app settings and the placed widgets.
  */
 class SettingsActivity : ComponentActivity() {
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(LocaleHelper.wrap(newBase))
+    }
+
 
     companion object {
         /** Opens the settings on a given page; "accounts" shows the accounts to sign in again. */
@@ -228,6 +232,7 @@ class SettingsActivity : ComponentActivity() {
         var backgroundInterval by remember { mutableIntStateOf(initialGlobal.backgroundIntervalMin) }
         var wifiOnly by remember { mutableStateOf(initialGlobal.wifiOnly) }
         var demoMode by remember { mutableStateOf(initialGlobal.demoMode) }
+        var language by remember { mutableStateOf(initialGlobal.language) }
         var showColorPicker by remember { mutableStateOf(false) }
         var showTokenForm by remember { mutableStateOf(false) }
         var mdEnabled by remember { mutableStateOf(MarkdownSync.isEnabled(context)) }
@@ -314,8 +319,17 @@ class SettingsActivity : ComponentActivity() {
         fun currentGlobal() = GlobalSettings(
             themeMode = themeMode, syncIntervalMin = interval, syncOnUnlock = syncOnUnlock, syncOnOpen = syncOnOpen,
             minGapSec = minGapSec, backgroundSync = backgroundSync, backgroundIntervalMin = backgroundInterval, wifiOnly = wifiOnly,
-            demoMode = demoMode,
+            demoMode = demoMode, language = language,
         )
+
+        /** Saves the language at once and reopens this screen in it. */
+        fun changeLanguage(tag: String) {
+            language = tag
+            SettingsStore.saveGlobal(context, currentGlobal())
+            LocaleHelper.applyToApp(context)
+            scope.launch { WidgetRefresh.all(context) }
+            recreate()
+        }
 
         fun currentApp() = AppSettings(
             appLayout, appSort, appPinnedSection, appShowImages, appShowColors, appPlainStyle, appPreviewLines, appShowEdited, appEditedAsDate, appShowLabels, appShowProgress, appLockPrivate,
@@ -620,6 +634,16 @@ class SettingsActivity : ComponentActivity() {
                                 themeLabel(themeMode),
                                 listOf(THEME_SYSTEM, THEME_LIGHT, THEME_DARK, THEME_OLED).map { mode ->
                                     ((if (mode == themeMode) "✓ " else "") + themeLabel(mode)) to { themeMode = mode }
+                                },
+                            )
+                            PopupRow(
+                                pendingPopup == "language", { pendingPopup = null },
+                                stringResource(R.string.language),
+                                LocaleHelper.languages.firstOrNull { it.first == language }?.second ?: stringResource(R.string.language_system),
+                                listOf(
+                                    ((if (language.isEmpty()) "✓ " else "") + stringResource(R.string.language_system)) to { changeLanguage("") },
+                                ) + LocaleHelper.languages.map { (tag, name) ->
+                                    ((if (tag == language) "✓ " else "") + name) to { changeLanguage(tag) }
                                 },
                             )
                             MenuRow(stringResource(R.string.tab_backup), if (mdEnabled) mdFolder else null) { page = Page.Backup }
@@ -1460,6 +1484,7 @@ private fun settingEntries(isSingleNote: Boolean): List<SettingEntry> = buildLis
     add(SettingEntry(R.string.md_sync_choose, Page.Backup))
     add(SettingEntry(R.string.md_sync_now, Page.Backup))
     add(SettingEntry(R.string.demo_mode, Page.Main))
+    add(SettingEntry(R.string.language, Page.Main, popup = "language"))
     add(SettingEntry(R.string.tab_backup, Page.Backup))
     add(SettingEntry(R.string.export_settings, Page.Backup))
     add(SettingEntry(R.string.import_settings, Page.Backup))

@@ -45,6 +45,10 @@ import androidx.compose.ui.unit.dp
  * bar opens this screen; a tap on a result opens the note in the editor.
  */
 class SearchActivity : ComponentActivity() {
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(LocaleHelper.wrap(newBase))
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

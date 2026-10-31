@@ -265,4 +265,6 @@
     <string name="sign_in_expired">O login de %s expirou</string>
     <string name="sign_in_again">Entrar novamente</string>
     <string name="demo_mode">Modo demo (notas de exemplo para capturas)</string>
+    <string name="language">Idioma</string>
+    <string name="language_system">Idioma do sistema</string>
 </resources>

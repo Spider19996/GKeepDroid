@@ -85,6 +85,10 @@ private enum class AppScreen { Notes, Archive, Trash }
 
 /** The app itself: all notes in full screen, with search, new notes, archive and trash. */
 class MainActivity : ComponentActivity() {
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(LocaleHelper.wrap(newBase))
+    }
+
     private var reloadKey by mutableIntStateOf(0)
     private var resumeKey by mutableIntStateOf(0)
     private var themeMode by mutableIntStateOf(THEME_SYSTEM)

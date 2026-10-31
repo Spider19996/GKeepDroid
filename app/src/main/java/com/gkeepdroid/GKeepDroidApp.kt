@@ -5,6 +5,7 @@ import android.app.Application
 class GKeepDroidApp : Application() {
     override fun onCreate() {
         super.onCreate()
+        LocaleHelper.applyToApp(this)
         // Watch the Markdown folder for edits made by other apps while the process lives.
         if (MarkdownSync.isEnabled(this)) MarkdownSync.startObserving(this)
         ScreenSync.start(this)

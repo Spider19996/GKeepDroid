@@ -45,6 +45,10 @@ import kotlinx.coroutines.launch
  * Without a connection the item is kept and sent later.
  */
 class AddItemActivity : ComponentActivity() {
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(LocaleHelper.wrap(newBase))
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
