@@ -264,4 +264,14 @@
     <string name="reminder_preset_clock">في وقت محدد</string>
     <string name="reminder_preset_minutes">دقائق</string>
     <string name="reminder_show_widget">إظهار التذكيرات</string>
+    <string name="reminder_done">تم</string>
+    <string name="reminder_exact_title">المنبّهات الدقيقة</string>
+    <string name="reminder_exact_hint">بدون إذن «المنبّهات والتذكيرات» قد يؤخّر أندرويد التذكيرات عدة دقائق. اسمح به لـ GKeepDroid.</string>
+    <string name="reminder_open_settings">فتح الإعدادات</string>
+    <string name="reminder_not_now">ليس الآن</string>
+    <string name="reminder_battery_title">تحسين البطارية</string>
+    <string name="reminder_battery_hint">بعض الهواتف (مثل Xiaomi أو Samsung) توقف التطبيقات في الخلفية فقد لا تصل التذكيرات. اسمح لـ GKeepDroid بالعمل دون قيود.</string>
+    <string name="reminder_reliability">الموثوقية</string>
+    <string name="reminder_allowed">مسموح</string>
+    <string name="reminder_not_allowed">غير مسموح</string>
 </resources>

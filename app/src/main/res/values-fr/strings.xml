@@ -264,4 +264,14 @@
     <string name="reminder_preset_clock">À une heure précise</string>
     <string name="reminder_preset_minutes">Minutes</string>
     <string name="reminder_show_widget">Afficher les rappels</string>
+    <string name="reminder_done">Terminé</string>
+    <string name="reminder_exact_title">Alarmes exactes</string>
+    <string name="reminder_exact_hint">Sans l’autorisation « Alarmes et rappels », Android peut retarder les rappels de plusieurs minutes. Autorisez-la pour GKeepDroid.</string>
+    <string name="reminder_open_settings">Ouvrir les réglages</string>
+    <string name="reminder_not_now">Pas maintenant</string>
+    <string name="reminder_battery_title">Optimisation de la batterie</string>
+    <string name="reminder_battery_hint">Certains téléphones (par exemple Xiaomi ou Samsung) arrêtent les applis en arrière-plan, et les rappels peuvent échouer. Autorisez GKeepDroid à fonctionner sans restriction.</string>
+    <string name="reminder_reliability">Fiabilité</string>
+    <string name="reminder_allowed">Autorisé</string>
+    <string name="reminder_not_allowed">Non autorisé</string>
 </resources>

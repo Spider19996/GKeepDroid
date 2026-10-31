@@ -264,4 +264,14 @@
     <string name="reminder_preset_clock">दिन के किसी समय</string>
     <string name="reminder_preset_minutes">मिनट</string>
     <string name="reminder_show_widget">रिमाइंडर दिखाएँ</string>
+    <string name="reminder_done">हो गया</string>
+    <string name="reminder_exact_title">सटीक अलार्म</string>
+    <string name="reminder_exact_hint">“अलार्म और रिमाइंडर” अनुमति के बिना Android रिमाइंडर को कई मिनट देर कर सकता है। GKeepDroid के लिए इसे अनुमति दें।</string>
+    <string name="reminder_open_settings">सेटिंग खोलें</string>
+    <string name="reminder_not_now">अभी नहीं</string>
+    <string name="reminder_battery_title">बैटरी ऑप्टिमाइज़ेशन</string>
+    <string name="reminder_battery_hint">कुछ फ़ोन (जैसे Xiaomi या Samsung) बैकग्राउंड में ऐप्स बंद कर देते हैं, जिससे रिमाइंडर नहीं आ सकते। GKeepDroid को बिना प्रतिबंध चलने दें।</string>
+    <string name="reminder_reliability">विश्वसनीयता</string>
+    <string name="reminder_allowed">अनुमति है</string>
+    <string name="reminder_not_allowed">अनुमति नहीं है</string>
 </resources>

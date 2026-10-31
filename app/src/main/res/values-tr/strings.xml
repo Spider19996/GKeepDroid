@@ -264,4 +264,14 @@
     <string name="reminder_preset_clock">Günün bir saatinde</string>
     <string name="reminder_preset_minutes">Dakika</string>
     <string name="reminder_show_widget">Hatırlatıcıları göster</string>
+    <string name="reminder_done">Bitti</string>
+    <string name="reminder_exact_title">Tam zamanlı alarmlar</string>
+    <string name="reminder_exact_hint">“Alarmlar ve hatırlatıcılar” izni olmadan Android hatırlatıcıları birkaç dakika geciktirebilir. GKeepDroid için izin verin.</string>
+    <string name="reminder_open_settings">Ayarları aç</string>
+    <string name="reminder_not_now">Şimdi değil</string>
+    <string name="reminder_battery_title">Pil optimizasyonu</string>
+    <string name="reminder_battery_hint">Bazı telefonlar (örneğin Xiaomi veya Samsung) uygulamaları arka planda durdurur ve hatırlatıcılar gelmeyebilir. GKeepDroid’in kısıtlama olmadan çalışmasına izin verin.</string>
+    <string name="reminder_reliability">Güvenilirlik</string>
+    <string name="reminder_allowed">İzin verildi</string>
+    <string name="reminder_not_allowed">İzin verilmedi</string>
 </resources>

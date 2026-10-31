@@ -264,4 +264,14 @@
     <string name="reminder_preset_clock">A un orario del giorno</string>
     <string name="reminder_preset_minutes">Minuti</string>
     <string name="reminder_show_widget">Mostra promemoria</string>
+    <string name="reminder_done">Fatto</string>
+    <string name="reminder_exact_title">Sveglie esatte</string>
+    <string name="reminder_exact_hint">Senza l’autorizzazione «Sveglie e promemoria», Android può ritardare i promemoria di diversi minuti. Consentila per GKeepDroid.</string>
+    <string name="reminder_open_settings">Apri impostazioni</string>
+    <string name="reminder_not_now">Non ora</string>
+    <string name="reminder_battery_title">Ottimizzazione batteria</string>
+    <string name="reminder_battery_hint">Alcuni telefoni (ad esempio Xiaomi o Samsung) interrompono le app in background e i promemoria possono non arrivare. Consenti a GKeepDroid di funzionare senza restrizioni.</string>
+    <string name="reminder_reliability">Affidabilità</string>
+    <string name="reminder_allowed">Consentito</string>
+    <string name="reminder_not_allowed">Non consentito</string>
 </resources>

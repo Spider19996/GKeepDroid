@@ -264,4 +264,14 @@
     <string name="reminder_preset_clock">В определённое время</string>
     <string name="reminder_preset_minutes">Минуты</string>
     <string name="reminder_show_widget">Показывать напоминания</string>
+    <string name="reminder_done">Готово</string>
+    <string name="reminder_exact_title">Точные будильники</string>
+    <string name="reminder_exact_hint">Без разрешения «Будильники и напоминания» Android может задерживать напоминания на несколько минут. Разрешите его для GKeepDroid.</string>
+    <string name="reminder_open_settings">Открыть настройки</string>
+    <string name="reminder_not_now">Не сейчас</string>
+    <string name="reminder_battery_title">Оптимизация батареи</string>
+    <string name="reminder_battery_hint">Некоторые телефоны (например, Xiaomi или Samsung) останавливают приложения в фоне, и напоминания могут не приходить. Разрешите GKeepDroid работать без ограничений.</string>
+    <string name="reminder_reliability">Надёжность</string>
+    <string name="reminder_allowed">Разрешено</string>
+    <string name="reminder_not_allowed">Не разрешено</string>
 </resources>

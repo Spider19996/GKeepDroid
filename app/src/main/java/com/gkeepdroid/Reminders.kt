@@ -146,12 +146,24 @@ object Reminders {
         val alarms = context.getSystemService(AlarmManager::class.java)
         val operation = pending(context, account, noteId, reminder.id)
         // Exact alarms need a permission the user can withdraw; without it Android may delay the reminder a little.
-        if (alarms.canScheduleExactAlarms()) {
+        if (canScheduleExact(context)) {
             alarms.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, reminder.at, operation)
         } else {
             alarms.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, reminder.at, operation)
         }
     }
+
+    /** True when alarms may fire on the minute; below Android 12 they always may. */
+    fun canScheduleExact(context: Context): Boolean =
+        android.os.Build.VERSION.SDK_INT < 31 || context.getSystemService(AlarmManager::class.java).canScheduleExactAlarms()
+
+    /** Android's screen for the "Alarms & reminders" permission, or null where there is none. */
+    fun exactAlarmSettings(context: Context): Intent? =
+        if (android.os.Build.VERSION.SDK_INT < 31) null
+        else Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:" + context.packageName))
+
+    /** Android's list of apps that are exempt from battery optimization. */
+    fun batterySettings(): Intent = Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
 
     /** True when notifications may be shown; below Android 13 they always may. */
     fun canNotify(context: Context): Boolean =
@@ -159,12 +171,12 @@ object Reminders {
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
 
     /** Shows the notification and plays the sound and vibration of one reminder; [done] runs once they are over. */
-    internal fun fire(context: Context, account: String, noteId: String, reminderId: String, done: () -> Unit) {
+    internal fun fire(context: Context, account: String, noteId: String, reminderId: String, finished: () -> Unit) {
         val reminder = list(context, account, noteId).firstOrNull { it.id == reminderId }
         remove(context, account, noteId, reminderId)
         // A note that was trashed or deleted in the meantime no longer reminds.
-        val note = NotesCache.readAll(context, account).firstOrNull { it.id == noteId }
-        if (reminder == null || note == null || !canNotify(context)) return done()
+        val note = NotesCache.readAll(context, account).firstOrNull { it.id == noteId && it.state != "trashed" }
+        if (reminder == null || note == null || !canNotify(context)) return finished()
 
         val manager = context.getSystemService(NotificationManager::class.java)
         // The channel is silent: sound and vibration are played below, so each reminder can have its own.
@@ -187,6 +199,13 @@ object Reminders {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
         val notificationId = (key(account, noteId) + reminderId).hashCode()
+        val done = PendingIntent.getBroadcast(
+            context, 0,
+            Intent(context, DoneReceiver::class.java)
+                .setData(Uri.parse("gkeepdroid://done/" + Uri.encode(key(account, noteId) + "|" + reminderId)))
+                .putExtra(SnoozeReceiver.EXTRA_NOTIFICATION_ID, notificationId),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
         val snoozeMinutes = reminder.snooze ?: SettingsStore.loadGlobal(context).reminderSnoozeMin
         val snooze = PendingIntent.getBroadcast(
             context, 0,
@@ -208,9 +227,54 @@ object Reminders {
                 .setContentIntent(open)
                 .setAutoCancel(true)
                 .addAction(0, context.getString(R.string.reminder_snooze_action, snoozeMinutes), snooze)
+                .addAction(0, context.getString(R.string.reminder_done), done)
                 .build()
         )
-        alert(context, reminder, done)
+        alert(context, reminder, finished)
+    }
+
+    /**
+     * Forgets the reminders of notes that no longer exist, are in the trash, or belong to an account
+     * that was removed. A note list that is empty (not loaded yet) is never taken as proof.
+     */
+    fun cleanup(context: Context) {
+        if (DemoNotes.enabled(context)) return
+        val accounts = CredentialStore.accounts(context).map { it.lowercase() }
+        var changed = false
+        prefs(context).all.keys.toList().forEach { k ->
+            val (account, noteId) = k.split("|", limit = 2).takeIf { it.size == 2 } ?: return@forEach
+            val notes = if (account.lowercase() in accounts) NotesCache.readAll(context, account) else emptyList()
+            val gone = account.lowercase() !in accounts ||
+                (notes.isNotEmpty() && notes.none { it.id == noteId && it.state != "trashed" })
+            if (gone) {
+                list(context, account, noteId).forEach { r ->
+                    context.getSystemService(AlarmManager::class.java).cancel(pending(context, account, noteId, r.id))
+                }
+                write(context, account, noteId, emptyList())
+                changed = true
+            }
+        }
+        if (changed) refreshWidgets(context)
+    }
+
+    /** Every reminder as JSON for the settings backup: "account|note" to its list. */
+    fun exportAll(context: Context): JSONObject = JSONObject().also { all ->
+        prefs(context).all.keys.forEach { k ->
+            val (account, noteId) = k.split("|", limit = 2).takeIf { it.size == 2 } ?: return@forEach
+            all.put(k, JSONArray().also { array -> list(context, account, noteId).forEach { array.put(it.toJson()) } })
+        }
+    }
+
+    /** Takes back the reminders of a backup; those that are already past are left out. */
+    fun importAll(context: Context, all: JSONObject) {
+        val now = System.currentTimeMillis()
+        all.keys().forEach { k ->
+            val (account, noteId) = k.split("|", limit = 2).takeIf { it.size == 2 } ?: return@forEach
+            val array = all.optJSONArray(k) ?: return@forEach
+            (0 until array.length()).map { Reminder.fromJson(array.getJSONObject(it)) }
+                .filter { it.at > now }
+                .forEach { put(context, account, noteId, it) }
+        }
     }
 
     /** The widgets show the next reminder, so they are drawn again whenever a reminder changes or fires. */
@@ -329,5 +393,12 @@ object ReminderPresets {
                 android.text.format.DateUtils.formatDateTime(context, at(preset) ?: 0L, android.text.format.DateUtils.FORMAT_SHOW_TIME),
             )
         }
+    }
+}
+
+/** "Done" in the notification: it only goes away, the reminder already ended when it fired. */
+class DoneReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        context.getSystemService(NotificationManager::class.java).cancel(intent.getIntExtra(SnoozeReceiver.EXTRA_NOTIFICATION_ID, 0))
     }
 }

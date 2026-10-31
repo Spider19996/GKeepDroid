@@ -118,6 +118,18 @@ internal fun ColumnScope.RemindersPage(s: SettingsState) {
         Hint(R.string.reminder_override_hint)
         NumberRow(R.string.reminder_snooze, reminderSnoozeMin, "min") { reminderSnoozeMin = it.coerceAtLeast(1) }
 
+        // Two things Android may take away from a reminder: exact timing and background running.
+        SectionTitle(stringResource(R.string.reminder_reliability))
+        Reminders.exactAlarmSettings(context)?.let { intent ->
+            MenuRow(
+                stringResource(R.string.reminder_exact_title),
+                stringResource(if (Reminders.canScheduleExact(context)) R.string.reminder_allowed else R.string.reminder_not_allowed),
+            ) { startActivity(intent) }
+            Hint(R.string.reminder_exact_hint)
+        }
+        MenuRow(stringResource(R.string.reminder_battery_title), null) { startActivity(Reminders.batterySettings()) }
+        Hint(R.string.reminder_battery_hint)
+
         SectionTitle(stringResource(R.string.reminder_presets))
         val presets = ReminderPresets.parse(reminderPresets)
         presets.forEach { preset ->
@@ -209,6 +221,29 @@ internal fun RemindersDialog(
     onChange: () -> Unit, onDismiss: () -> Unit, askNotifications: () -> Unit,
 ) {
     var editing by remember { mutableStateOf<Reminder?>(null) }
+    var exactHint by remember { mutableStateOf(false) }
+    fun newReminder() {
+        editing = Reminder(at = System.currentTimeMillis() + 3_600_000L)
+    }
+    if (exactHint) {
+        // Shown once: without the permission Android may delay reminders by minutes.
+        AlertDialog(
+            onDismissRequest = { exactHint = false; newReminder() },
+            title = { Text(stringResource(R.string.reminder_exact_title)) },
+            text = { Text(stringResource(R.string.reminder_exact_hint)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    exactHint = false
+                    Reminders.exactAlarmSettings(activity)?.let { activity.startActivity(it) }
+                    newReminder()
+                }) { Text(stringResource(R.string.reminder_open_settings)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { exactHint = false; newReminder() }) { Text(stringResource(R.string.reminder_not_now)) }
+            },
+        )
+        return
+    }
     editing?.let { reminder ->
         ReminderEditor(
             activity, reminder,
@@ -246,8 +281,13 @@ internal fun RemindersDialog(
         confirmButton = {
             TextButton(onClick = {
                 askNotifications()
-                // The first reminder asks for a time at once, the default being in an hour.
-                editing = Reminder(at = System.currentTimeMillis() + 3_600_000L)
+                val prefs = activity.getSharedPreferences("reminder_hints", android.content.Context.MODE_PRIVATE)
+                if (!Reminders.canScheduleExact(activity) && !prefs.getBoolean("exact_asked", false)) {
+                    prefs.edit().putBoolean("exact_asked", true).apply()
+                    exactHint = true
+                } else {
+                    newReminder()
+                }
             }) { Text(stringResource(R.string.reminder_add)) }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.ok)) } },

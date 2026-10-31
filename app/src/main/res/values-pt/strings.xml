@@ -264,4 +264,14 @@
     <string name="reminder_preset_clock">A uma hora do dia</string>
     <string name="reminder_preset_minutes">Minutos</string>
     <string name="reminder_show_widget">Mostrar lembretes</string>
+    <string name="reminder_done">Concluído</string>
+    <string name="reminder_exact_title">Alarmes exatos</string>
+    <string name="reminder_exact_hint">Sem a permissão “Alarmes e lembretes”, o Android pode atrasar os lembretes por vários minutos. Permita para o GKeepDroid.</string>
+    <string name="reminder_open_settings">Abrir configurações</string>
+    <string name="reminder_not_now">Agora não</string>
+    <string name="reminder_battery_title">Otimização de bateria</string>
+    <string name="reminder_battery_hint">Alguns telefones (por exemplo Xiaomi ou Samsung) encerram apps em segundo plano e os lembretes podem falhar. Permita que o GKeepDroid funcione sem restrições.</string>
+    <string name="reminder_reliability">Confiabilidade</string>
+    <string name="reminder_allowed">Permitido</string>
+    <string name="reminder_not_allowed">Não permitido</string>
 </resources>

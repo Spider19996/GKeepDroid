@@ -264,4 +264,14 @@
     <string name="reminder_preset_clock">Zu einer Uhrzeit</string>
     <string name="reminder_preset_minutes">Minuten</string>
     <string name="reminder_show_widget">Erinnerungen anzeigen</string>
+    <string name="reminder_done">Erledigt</string>
+    <string name="reminder_exact_title">Exakte Alarme</string>
+    <string name="reminder_exact_hint">Ohne die Berechtigung „Wecker &amp; Erinnerungen“ kann Android Erinnerungen um mehrere Minuten verzögern. Erlaube sie für GKeepDroid.</string>
+    <string name="reminder_open_settings">Einstellungen öffnen</string>
+    <string name="reminder_not_now">Nicht jetzt</string>
+    <string name="reminder_battery_title">Akku-Optimierung</string>
+    <string name="reminder_battery_hint">Manche Handys (zum Beispiel Xiaomi oder Samsung) beenden Apps im Hintergrund, dann können Erinnerungen ausfallen. Erlaube GKeepDroid, ohne Einschränkungen zu laufen.</string>
+    <string name="reminder_reliability">Zuverlässigkeit</string>
+    <string name="reminder_allowed">Erlaubt</string>
+    <string name="reminder_not_allowed">Nicht erlaubt</string>
 </resources>

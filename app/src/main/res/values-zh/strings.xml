@@ -264,4 +264,14 @@
     <string name="reminder_preset_clock">每天某个时刻</string>
     <string name="reminder_preset_minutes">分钟</string>
     <string name="reminder_show_widget">显示提醒</string>
+    <string name="reminder_done">完成</string>
+    <string name="reminder_exact_title">精确闹钟</string>
+    <string name="reminder_exact_hint">没有“闹钟和提醒”权限时,Android 可能将提醒延迟数分钟。请为 GKeepDroid 允许此权限。</string>
+    <string name="reminder_open_settings">打开设置</string>
+    <string name="reminder_not_now">暂不</string>
+    <string name="reminder_battery_title">电池优化</string>
+    <string name="reminder_battery_hint">部分手机(如小米、三星)会在后台停止应用,导致提醒无法送达。请允许 GKeepDroid 不受限制地运行。</string>
+    <string name="reminder_reliability">可靠性</string>
+    <string name="reminder_allowed">已允许</string>
+    <string name="reminder_not_allowed">未允许</string>
 </resources>

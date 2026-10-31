@@ -34,6 +34,7 @@ object KeepRepository {
             }
         }
         SyncPolicy.recordSync(context, error, expired)
+        Reminders.cleanup(context)
         return allOk
     }
 

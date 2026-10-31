@@ -264,4 +264,14 @@
     <string name="reminder_preset_clock">O określonej godzinie</string>
     <string name="reminder_preset_minutes">Minuty</string>
     <string name="reminder_show_widget">Pokaż przypomnienia</string>
+    <string name="reminder_done">Gotowe</string>
+    <string name="reminder_exact_title">Dokładne alarmy</string>
+    <string name="reminder_exact_hint">Bez uprawnienia „Alarmy i przypomnienia” Android może opóźnić przypomnienia o kilka minut. Zezwól na to dla GKeepDroid.</string>
+    <string name="reminder_open_settings">Otwórz ustawienia</string>
+    <string name="reminder_not_now">Nie teraz</string>
+    <string name="reminder_battery_title">Optymalizacja baterii</string>
+    <string name="reminder_battery_hint">Niektóre telefony (np. Xiaomi lub Samsung) zatrzymują aplikacje w tle, przez co przypomnienia mogą nie dotrzeć. Pozwól GKeepDroid działać bez ograniczeń.</string>
+    <string name="reminder_reliability">Niezawodność</string>
+    <string name="reminder_allowed">Dozwolone</string>
+    <string name="reminder_not_allowed">Niedozwolone</string>
 </resources>

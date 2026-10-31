@@ -264,4 +264,14 @@
     <string name="reminder_preset_clock">특정 시각에</string>
     <string name="reminder_preset_minutes">분</string>
     <string name="reminder_show_widget">알림 표시</string>
+    <string name="reminder_done">완료</string>
+    <string name="reminder_exact_title">정확한 알람</string>
+    <string name="reminder_exact_hint">“알람 및 리마인더” 권한이 없으면 Android가 알림을 몇 분 늦출 수 있습니다. GKeepDroid에 허용해 주세요.</string>
+    <string name="reminder_open_settings">설정 열기</string>
+    <string name="reminder_not_now">나중에</string>
+    <string name="reminder_battery_title">배터리 최적화</string>
+    <string name="reminder_battery_hint">일부 휴대폰(예: Xiaomi, Samsung)은 백그라운드 앱을 종료해 알림이 오지 않을 수 있습니다. GKeepDroid를 제한 없이 실행하도록 허용해 주세요.</string>
+    <string name="reminder_reliability">안정성</string>
+    <string name="reminder_allowed">허용됨</string>
+    <string name="reminder_not_allowed">허용되지 않음</string>
 </resources>

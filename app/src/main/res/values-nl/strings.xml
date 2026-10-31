@@ -264,4 +264,14 @@
     <string name="reminder_preset_clock">Op een tijdstip</string>
     <string name="reminder_preset_minutes">Minuten</string>
     <string name="reminder_show_widget">Herinneringen tonen</string>
+    <string name="reminder_done">Klaar</string>
+    <string name="reminder_exact_title">Exacte alarmen</string>
+    <string name="reminder_exact_hint">Zonder de toestemming “Alarmen en herinneringen” kan Android herinneringen enkele minuten uitstellen. Sta het toe voor GKeepDroid.</string>
+    <string name="reminder_open_settings">Instellingen openen</string>
+    <string name="reminder_not_now">Niet nu</string>
+    <string name="reminder_battery_title">Batterijoptimalisatie</string>
+    <string name="reminder_battery_hint">Sommige telefoons (bijvoorbeeld Xiaomi of Samsung) stoppen apps op de achtergrond, waardoor herinneringen kunnen uitblijven. Sta toe dat GKeepDroid zonder beperkingen draait.</string>
+    <string name="reminder_reliability">Betrouwbaarheid</string>
+    <string name="reminder_allowed">Toegestaan</string>
+    <string name="reminder_not_allowed">Niet toegestaan</string>
 </resources>

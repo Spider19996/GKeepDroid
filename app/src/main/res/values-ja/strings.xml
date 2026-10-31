@@ -264,4 +264,14 @@
     <string name="reminder_preset_clock">時刻を指定</string>
     <string name="reminder_preset_minutes">分</string>
     <string name="reminder_show_widget">リマインダーを表示</string>
+    <string name="reminder_done">完了</string>
+    <string name="reminder_exact_title">正確なアラーム</string>
+    <string name="reminder_exact_hint">「アラームとリマインダー」の権限がないと、Androidがリマインダーを数分遅らせることがあります。GKeepDroidに許可してください。</string>
+    <string name="reminder_open_settings">設定を開く</string>
+    <string name="reminder_not_now">今はしない</string>
+    <string name="reminder_battery_title">バッテリーの最適化</string>
+    <string name="reminder_battery_hint">一部の端末(XiaomiやSamsungなど)はバックグラウンドのアプリを停止するため、リマインダーが届かないことがあります。GKeepDroidを制限なしで動作させてください。</string>
+    <string name="reminder_reliability">信頼性</string>
+    <string name="reminder_allowed">許可済み</string>
+    <string name="reminder_not_allowed">許可されていません</string>
 </resources>
