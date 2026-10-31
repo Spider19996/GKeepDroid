@@ -48,7 +48,9 @@ object Backup {
                     .put("language", global.language)
                     .put("reminderSound", global.reminderSound)
                     .put("reminderVibrate", global.reminderVibrate)
-                    .put("reminderOverride", global.reminderOverride),
+                    .put("reminderOverride", global.reminderOverride)
+                    .put("reminderSnoozeMin", global.reminderSnoozeMin)
+                    .put("reminderPresets", global.reminderPresets),
             )
             .put(
                 "widget",
@@ -77,6 +79,7 @@ object Backup {
                     .put("textColorAuto", widget.textColorAuto)
                     .put("showEditedTime", widget.showEditedTime)
                     .put("showLabels", widget.showLabels)
+                    .put("showReminders", widget.showReminders)
                     .put("labelFilter", widget.labelFilter)
                     .put("showProgress", widget.showProgress),
             )
@@ -103,6 +106,8 @@ object Backup {
                 reminderSound = g.optString("reminderSound", dg.reminderSound),
                 reminderVibrate = g.optBoolean("reminderVibrate", dg.reminderVibrate),
                 reminderOverride = g.optBoolean("reminderOverride", dg.reminderOverride),
+                reminderSnoozeMin = g.optInt("reminderSnoozeMin", dg.reminderSnoozeMin),
+                reminderPresets = g.optString("reminderPresets", dg.reminderPresets),
             ),
             widget = WidgetSettings(
                 backgroundAlpha = w.optDouble("backgroundAlpha", dw.backgroundAlpha.toDouble()).toFloat().coerceIn(0f, 1f),
@@ -129,6 +134,7 @@ object Backup {
                 textColorAuto = w.optBoolean("textColorAuto", dw.textColorAuto),
                 showEditedTime = w.optBoolean("showEditedTime", dw.showEditedTime),
                 showLabels = w.optBoolean("showLabels", dw.showLabels),
+                showReminders = w.optBoolean("showReminders", dw.showReminders),
                 labelFilter = w.optString("labelFilter", dw.labelFilter),
                 showProgress = w.optBoolean("showProgress", dw.showProgress),
             ),

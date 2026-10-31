@@ -256,4 +256,15 @@
     <string name="reminders_title">Reminders</string>
     <string name="reminders_none">No reminders</string>
     <string name="reminder_past">Pick a time in the future.</string>
+    <string name="reminder_snooze">Snooze duration</string>
+    <string name="reminder_snooze_action">Snooze (%d min)</string>
+    <string name="reminder_presets">Quick times</string>
+    <string name="reminder_preset_add">Add quick time</string>
+    <string name="reminder_preset_in">In %d min</string>
+    <string name="reminder_preset_in_h">In %d h</string>
+    <string name="reminder_preset_at">At %s</string>
+    <string name="reminder_preset_relative">After a delay</string>
+    <string name="reminder_preset_clock">At a time of day</string>
+    <string name="reminder_preset_minutes">Minutes</string>
+    <string name="reminder_show_widget">Show reminders</string>
 </resources>

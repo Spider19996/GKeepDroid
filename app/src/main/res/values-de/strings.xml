@@ -253,4 +253,15 @@
     <string name="reminders_title">Erinnerungen</string>
     <string name="reminders_none">Keine Erinnerungen</string>
     <string name="reminder_past">Bitte eine Zeit in der Zukunft wählen.</string>
+    <string name="reminder_snooze">Schlummern-Dauer</string>
+    <string name="reminder_snooze_action">Schlummern (%d Min.)</string>
+    <string name="reminder_presets">Schnellauswahl</string>
+    <string name="reminder_preset_add">Schnellauswahl hinzufügen</string>
+    <string name="reminder_preset_in">In %d Min.</string>
+    <string name="reminder_preset_in_h">In %d Std.</string>
+    <string name="reminder_preset_at">Um %s</string>
+    <string name="reminder_preset_relative">Nach einer Verzögerung</string>
+    <string name="reminder_preset_clock">Zu einer Uhrzeit</string>
+    <string name="reminder_preset_minutes">Minuten</string>
+    <string name="reminder_show_widget">Erinnerungen anzeigen</string>
 </resources>

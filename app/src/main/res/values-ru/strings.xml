@@ -253,4 +253,15 @@
     <string name="reminders_title">Напоминания</string>
     <string name="reminders_none">Нет напоминаний</string>
     <string name="reminder_past">Выберите время в будущем.</string>
+    <string name="reminder_snooze">Длительность отсрочки</string>
+    <string name="reminder_snooze_action">Отложить (%d мин)</string>
+    <string name="reminder_presets">Быстрое время</string>
+    <string name="reminder_preset_add">Добавить быстрое время</string>
+    <string name="reminder_preset_in">Через %d мин</string>
+    <string name="reminder_preset_in_h">Через %d ч</string>
+    <string name="reminder_preset_at">В %s</string>
+    <string name="reminder_preset_relative">Через заданное время</string>
+    <string name="reminder_preset_clock">В определённое время</string>
+    <string name="reminder_preset_minutes">Минуты</string>
+    <string name="reminder_show_widget">Показывать напоминания</string>
 </resources>

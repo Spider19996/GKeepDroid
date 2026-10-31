@@ -208,6 +208,29 @@ internal fun LabelsLine(note: KeepNote, settings: WidgetSettings, palette: TextP
     )
 }
 
+/** The next reminder of a note, with a small bell, when the widget is set to show it. */
+@Composable
+internal fun ReminderLine(note: KeepNote, account: String, settings: WidgetSettings, palette: TextPalette) {
+    if (!settings.showReminders) return
+    val context = LocalContext.current
+    val reminders = Reminders.list(context, account, note.id)
+    val next = reminders.firstOrNull() ?: return
+    val size = (settings.textSizeSp - 2).coerceAtLeast(9)
+    Row(GlanceModifier.padding(bottom = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+        Image(
+            provider = ImageProvider(R.drawable.ic_alarm),
+            contentDescription = context.getString(R.string.reminder),
+            colorFilter = ColorFilter.tint(palette.provider(0.7f)),
+            modifier = GlanceModifier.size((size + 2).dp),
+        )
+        Text(
+            Reminders.label(context, next.at) + if (reminders.size > 1) "  (+${reminders.size - 1})" else "",
+            style = TextStyle(color = palette.provider(0.7f), fontSize = size.sp),
+            modifier = GlanceModifier.padding(start = 4.dp),
+        )
+    }
+}
+
 /** "Edited 2 days ago" below a note, when the setting is on. */
 @Composable
 internal fun EditedTime(note: KeepNote, settings: WidgetSettings, palette: TextPalette) {

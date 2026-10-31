@@ -718,7 +718,13 @@ class EditNoteActivity : ComponentActivity() {
                 ) { Text(stringResource(R.string.cancel)) }
                 if (existing != null) Box(Modifier.align(Alignment.CenterVertically)) {
                     FilledTonalIconToggleButton(checked = reminders.isNotEmpty(), onCheckedChange = { remindersOpen = true }) {
-                        Icon(painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminders_title))
+                        // The bell is colored when the note has a reminder and muted when it has none.
+                        Icon(
+                            painterResource(R.drawable.ic_alarm),
+                            contentDescription = stringResource(R.string.reminders_title),
+                            tint = if (reminders.isNotEmpty()) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        )
                     }
                 }
                 Button(

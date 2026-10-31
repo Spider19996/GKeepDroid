@@ -253,4 +253,15 @@
     <string name="reminders_title">提醒</string>
     <string name="reminders_none">没有提醒</string>
     <string name="reminder_past">请选择未来的时间。</string>
+    <string name="reminder_snooze">延后时长</string>
+    <string name="reminder_snooze_action">延后(%d 分钟)</string>
+    <string name="reminder_presets">快捷时间</string>
+    <string name="reminder_preset_add">添加快捷时间</string>
+    <string name="reminder_preset_in">%d 分钟后</string>
+    <string name="reminder_preset_in_h">%d 小时后</string>
+    <string name="reminder_preset_at">在 %s</string>
+    <string name="reminder_preset_relative">延迟后</string>
+    <string name="reminder_preset_clock">每天某个时刻</string>
+    <string name="reminder_preset_minutes">分钟</string>
+    <string name="reminder_show_widget">显示提醒</string>
 </resources>

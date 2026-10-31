@@ -163,6 +163,7 @@ class SingleNoteWidget : GlanceAppWidget() {
                 item(itemId = 7L) { PrivateHint(settings, palette) }
             } else {
                 item(itemId = 9L) { LabelsLine(note, settings, palette) }
+                item(itemId = 10L) { ReminderLine(note, account, settings, palette) }
                 if (thumb == null && note.hasNoContent()) item(itemId = 5L) { EmptyNoteHint(settings, palette) }
                 if (note.isList) {
                     items(unchecked, itemId = { stableId("i", it.id) }) { ItemRow(note, it, account, settings, palette) }

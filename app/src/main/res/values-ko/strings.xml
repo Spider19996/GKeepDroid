@@ -253,4 +253,15 @@
     <string name="reminders_title">알림</string>
     <string name="reminders_none">알림 없음</string>
     <string name="reminder_past">미래의 시간을 선택하세요.</string>
+    <string name="reminder_snooze">다시 알림 간격</string>
+    <string name="reminder_snooze_action">다시 알림(%d분)</string>
+    <string name="reminder_presets">빠른 시간</string>
+    <string name="reminder_preset_add">빠른 시간 추가</string>
+    <string name="reminder_preset_in">%d분 후</string>
+    <string name="reminder_preset_in_h">%d시간 후</string>
+    <string name="reminder_preset_at">%s에</string>
+    <string name="reminder_preset_relative">지연 후</string>
+    <string name="reminder_preset_clock">특정 시각에</string>
+    <string name="reminder_preset_minutes">분</string>
+    <string name="reminder_show_widget">알림 표시</string>
 </resources>

@@ -253,4 +253,15 @@
     <string name="reminders_title">Hatırlatıcılar</string>
     <string name="reminders_none">Hatırlatıcı yok</string>
     <string name="reminder_past">Gelecekte bir zaman seçin.</string>
+    <string name="reminder_snooze">Ertelenme süresi</string>
+    <string name="reminder_snooze_action">Ertele (%d dk)</string>
+    <string name="reminder_presets">Hızlı zamanlar</string>
+    <string name="reminder_preset_add">Hızlı zaman ekle</string>
+    <string name="reminder_preset_in">%d dk sonra</string>
+    <string name="reminder_preset_in_h">%d sa sonra</string>
+    <string name="reminder_preset_at">Saat %s</string>
+    <string name="reminder_preset_relative">Gecikmeden sonra</string>
+    <string name="reminder_preset_clock">Günün bir saatinde</string>
+    <string name="reminder_preset_minutes">Dakika</string>
+    <string name="reminder_show_widget">Hatırlatıcıları göster</string>
 </resources>

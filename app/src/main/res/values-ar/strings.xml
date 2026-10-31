@@ -253,4 +253,15 @@
     <string name="reminders_title">التذكيرات</string>
     <string name="reminders_none">لا توجد تذكيرات</string>
     <string name="reminder_past">اختر وقتًا في المستقبل.</string>
+    <string name="reminder_snooze">مدة الغفوة</string>
+    <string name="reminder_snooze_action">غفوة (%d د)</string>
+    <string name="reminder_presets">أوقات سريعة</string>
+    <string name="reminder_preset_add">إضافة وقت سريع</string>
+    <string name="reminder_preset_in">بعد %d د</string>
+    <string name="reminder_preset_in_h">بعد %d س</string>
+    <string name="reminder_preset_at">في %s</string>
+    <string name="reminder_preset_relative">بعد مهلة</string>
+    <string name="reminder_preset_clock">في وقت محدد</string>
+    <string name="reminder_preset_minutes">دقائق</string>
+    <string name="reminder_show_widget">إظهار التذكيرات</string>
 </resources>

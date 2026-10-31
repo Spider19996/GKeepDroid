@@ -253,4 +253,15 @@
     <string name="reminders_title">Lembretes</string>
     <string name="reminders_none">Sem lembretes</string>
     <string name="reminder_past">Escolha um horário no futuro.</string>
+    <string name="reminder_snooze">Duração do adiamento</string>
+    <string name="reminder_snooze_action">Adiar (%d min)</string>
+    <string name="reminder_presets">Horários rápidos</string>
+    <string name="reminder_preset_add">Adicionar horário rápido</string>
+    <string name="reminder_preset_in">Em %d min</string>
+    <string name="reminder_preset_in_h">Em %d h</string>
+    <string name="reminder_preset_at">Às %s</string>
+    <string name="reminder_preset_relative">Após um atraso</string>
+    <string name="reminder_preset_clock">A uma hora do dia</string>
+    <string name="reminder_preset_minutes">Minutos</string>
+    <string name="reminder_show_widget">Mostrar lembretes</string>
 </resources>

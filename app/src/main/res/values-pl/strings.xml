@@ -253,4 +253,15 @@
     <string name="reminders_title">Przypomnienia</string>
     <string name="reminders_none">Brak przypomnień</string>
     <string name="reminder_past">Wybierz godzinę w przyszłości.</string>
+    <string name="reminder_snooze">Czas drzemki</string>
+    <string name="reminder_snooze_action">Drzemka (%d min)</string>
+    <string name="reminder_presets">Szybkie godziny</string>
+    <string name="reminder_preset_add">Dodaj szybką godzinę</string>
+    <string name="reminder_preset_in">Za %d min</string>
+    <string name="reminder_preset_in_h">Za %d godz.</string>
+    <string name="reminder_preset_at">O %s</string>
+    <string name="reminder_preset_relative">Po opóźnieniu</string>
+    <string name="reminder_preset_clock">O określonej godzinie</string>
+    <string name="reminder_preset_minutes">Minuty</string>
+    <string name="reminder_show_widget">Pokaż przypomnienia</string>
 </resources>

@@ -225,6 +225,7 @@ class SettingsActivity : ComponentActivity() {
                     textColorAuto = w.textColorAuto
                     showEditedTime = w.showEditedTime
                     showLabels = w.showLabels
+                    showReminders = w.showReminders
                     labelFilter = w.labelFilter
                     showProgress = w.showProgress
                     status = importDone

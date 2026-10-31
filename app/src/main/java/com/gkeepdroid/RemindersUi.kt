@@ -18,7 +18,13 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -109,7 +115,74 @@ internal fun ColumnScope.RemindersPage(s: SettingsState) {
         SwitchRow(R.string.reminder_vibrate, reminderVibrate) { reminderVibrate = it }
         SwitchRow(R.string.reminder_override, reminderOverride) { reminderOverride = it }
         Hint(R.string.reminder_override_hint)
+        NumberRow(R.string.reminder_snooze, reminderSnoozeMin, "min") { reminderSnoozeMin = it.coerceAtLeast(1) }
+
+        SectionTitle(stringResource(R.string.reminder_presets))
+        val presets = ReminderPresets.parse(reminderPresets)
+        presets.forEach { preset ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(ReminderPresets.label(context, preset), Modifier.weight(1f))
+                IconButton(onClick = { reminderPresets = (presets - preset).joinToString(",") }) {
+                    Icon(painterResource(R.drawable.ic_delete), contentDescription = stringResource(R.string.reminder_remove))
+                }
+            }
+        }
+        var adding by remember { mutableStateOf(false) }
+        OutlinedButton(onClick = { adding = true }, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.reminder_preset_add)) }
+        if (adding) PresetDialog(
+            activity = context,
+            onAdd = { preset ->
+                if (preset !in presets) reminderPresets = (presets + preset).joinToString(",")
+                adding = false
+            },
+            onCancel = { adding = false },
+        )
     }
+}
+
+/** Adds a quick time: a delay in minutes, or a time of day. */
+@Composable
+private fun PresetDialog(activity: Activity, onAdd: (String) -> Unit, onCancel: () -> Unit) {
+    var relative by remember { mutableStateOf(true) }
+    var minutes by remember { mutableStateOf("30") }
+    var clock by remember { mutableStateOf("08:00") }
+    AlertDialog(
+        onDismissRequest = onCancel,
+        title = { Text(stringResource(R.string.reminder_preset_add)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(relative, { relative = true }, { Text(stringResource(R.string.reminder_preset_relative)) })
+                    FilterChip(!relative, { relative = false }, { Text(stringResource(R.string.reminder_preset_clock)) })
+                }
+                if (relative) {
+                    OutlinedTextField(
+                        value = minutes,
+                        onValueChange = { minutes = it.filter(Char::isDigit).take(5) },
+                        label = { Text(stringResource(R.string.reminder_preset_minutes)) },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    )
+                } else {
+                    OutlinedButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            val (hour, minute) = clock.split(":").map { it.toInt() }
+                            android.app.TimePickerDialog(activity, { _, h, m -> clock = "%02d:%02d".format(h, m) }, hour, minute,
+                                android.text.format.DateFormat.is24HourFormat(activity)).show()
+                        },
+                    ) { Text(ReminderPresets.label(activity, "t:$clock")) }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = !relative || (minutes.toIntOrNull() ?: 0) > 0,
+                onClick = { onAdd(if (relative) "r:${minutes.toInt()}" else "t:$clock") },
+            ) { Text(stringResource(android.R.string.ok)) }
+        },
+        dismissButton = { TextButton(onClick = onCancel) { Text(stringResource(android.R.string.cancel)) } },
+    )
 }
 
 /** Default, On or Off for one reminder; Default follows the setting. */
@@ -190,7 +263,16 @@ private fun ReminderEditor(activity: Activity, initial: Reminder, onSave: (Remin
         onDismissRequest = onCancel,
         title = { Text(stringResource(R.string.reminder)) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.verticalScroll(rememberScrollState())) {
+                // Quick times from the settings; the button below picks any other date and time.
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    ReminderPresets.parse(global.reminderPresets).forEach { preset ->
+                        AssistChip(
+                            onClick = { ReminderPresets.at(preset)?.let { reminder = reminder.copy(at = it) } },
+                            label = { Text(ReminderPresets.label(activity, preset)) },
+                        )
+                    }
+                }
                 OutlinedButton(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { pickDateTime(activity, reminder.at) { reminder = reminder.copy(at = it) } },
@@ -211,6 +293,15 @@ private fun ReminderEditor(activity: Activity, initial: Reminder, onSave: (Remin
                 }
                 TriState(R.string.reminder_vibrate, reminder.vibrate) { reminder = reminder.copy(vibrate = it) }
                 TriState(R.string.reminder_override, reminder.override) { reminder = reminder.copy(override = it) }
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(stringResource(R.string.reminder_snooze), style = MaterialTheme.typography.bodyMedium)
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilterChip(reminder.snooze == null, { reminder = reminder.copy(snooze = null) }, { Text(stringResource(R.string.reminder_default)) })
+                        listOf(5, 10, 30, 60).forEach { minutes ->
+                            FilterChip(reminder.snooze == minutes, { reminder = reminder.copy(snooze = minutes) }, { Text("$minutes min") })
+                        }
+                    }
+                }
             }
         },
         confirmButton = { TextButton(onClick = { onSave(reminder) }) { Text(stringResource(android.R.string.ok)) } },

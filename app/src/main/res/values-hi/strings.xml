@@ -253,4 +253,15 @@
     <string name="reminders_title">रिमाइंडर</string>
     <string name="reminders_none">कोई रिमाइंडर नहीं</string>
     <string name="reminder_past">भविष्य का समय चुनें।</string>
+    <string name="reminder_snooze">स्नूज़ अवधि</string>
+    <string name="reminder_snooze_action">स्नूज़ (%d मिनट)</string>
+    <string name="reminder_presets">त्वरित समय</string>
+    <string name="reminder_preset_add">त्वरित समय जोड़ें</string>
+    <string name="reminder_preset_in">%d मिनट में</string>
+    <string name="reminder_preset_in_h">%d घंटे में</string>
+    <string name="reminder_preset_at">%s पर</string>
+    <string name="reminder_preset_relative">देरी के बाद</string>
+    <string name="reminder_preset_clock">दिन के किसी समय</string>
+    <string name="reminder_preset_minutes">मिनट</string>
+    <string name="reminder_show_widget">रिमाइंडर दिखाएँ</string>
 </resources>

@@ -152,6 +152,7 @@ internal fun ColumnScope.NotesPage(s: SettingsState) {
         SwitchRow(R.string.show_images, showImages) { showImages = it }
         SwitchRow(R.string.show_edited_time, showEditedTime) { showEditedTime = it }
         SwitchRow(R.string.show_labels, showLabels) { showLabels = it }
+        SwitchRow(R.string.reminder_show_widget, showReminders) { showReminders = it }
         if (!isSingleNote) {
             // Only the notes with one label: the labels of the account this widget shows.
             val labelChoices = remember(widgetAccount, accounts.size) {

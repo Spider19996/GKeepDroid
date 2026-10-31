@@ -253,4 +253,15 @@
     <string name="reminders_title">Promemoria</string>
     <string name="reminders_none">Nessun promemoria</string>
     <string name="reminder_past">Scegli un orario futuro.</string>
+    <string name="reminder_snooze">Durata del rinvio</string>
+    <string name="reminder_snooze_action">Rinvia (%d min)</string>
+    <string name="reminder_presets">Orari rapidi</string>
+    <string name="reminder_preset_add">Aggiungi orario rapido</string>
+    <string name="reminder_preset_in">Tra %d min</string>
+    <string name="reminder_preset_in_h">Tra %d h</string>
+    <string name="reminder_preset_at">Alle %s</string>
+    <string name="reminder_preset_relative">Dopo un ritardo</string>
+    <string name="reminder_preset_clock">A un orario del giorno</string>
+    <string name="reminder_preset_minutes">Minuti</string>
+    <string name="reminder_show_widget">Mostra promemoria</string>
 </resources>

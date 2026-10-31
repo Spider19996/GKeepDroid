@@ -253,4 +253,15 @@
     <string name="reminders_title">Recordatorios</string>
     <string name="reminders_none">Sin recordatorios</string>
     <string name="reminder_past">Elige una hora futura.</string>
+    <string name="reminder_snooze">Duración de la pausa</string>
+    <string name="reminder_snooze_action">Posponer (%d min)</string>
+    <string name="reminder_presets">Horas rápidas</string>
+    <string name="reminder_preset_add">Añadir hora rápida</string>
+    <string name="reminder_preset_in">En %d min</string>
+    <string name="reminder_preset_in_h">En %d h</string>
+    <string name="reminder_preset_at">A las %s</string>
+    <string name="reminder_preset_relative">Tras un retraso</string>
+    <string name="reminder_preset_clock">A una hora del día</string>
+    <string name="reminder_preset_minutes">Minutos</string>
+    <string name="reminder_show_widget">Mostrar recordatorios</string>
 </resources>

@@ -90,6 +90,7 @@ internal class SettingsState(val context: SettingsActivity) {
     var textColorAuto by mutableStateOf(initialWidget.textColorAuto)
     var showEditedTime by mutableStateOf(initialWidget.showEditedTime)
     var showLabels by mutableStateOf(initialWidget.showLabels)
+    var showReminders by mutableStateOf(initialWidget.showReminders)
     var labelFilter by mutableStateOf(initialWidget.labelFilter)
     var showProgress by mutableStateOf(initialWidget.showProgress)
     var settingsQuery by mutableStateOf("")
@@ -107,6 +108,8 @@ internal class SettingsState(val context: SettingsActivity) {
     var reminderSound by mutableStateOf(initialGlobal.reminderSound)
     var reminderVibrate by mutableStateOf(initialGlobal.reminderVibrate)
     var reminderOverride by mutableStateOf(initialGlobal.reminderOverride)
+    var reminderSnoozeMin by mutableIntStateOf(initialGlobal.reminderSnoozeMin)
+    var reminderPresets by mutableStateOf(initialGlobal.reminderPresets)
     var showColorPicker by mutableStateOf(false)
     var showTokenForm by mutableStateOf(false)
     var mdEnabled by mutableStateOf(MarkdownSync.isEnabled(context))
@@ -156,6 +159,7 @@ internal class SettingsState(val context: SettingsActivity) {
         textColorAuto = textColorAuto,
         showEditedTime = showEditedTime,
         showLabels = showLabels,
+        showReminders = showReminders,
         labelFilter = labelFilter,
         showProgress = showProgress,
     )
@@ -176,6 +180,7 @@ internal class SettingsState(val context: SettingsActivity) {
         minGapSec = minGapSec, backgroundSync = backgroundSync, backgroundIntervalMin = backgroundInterval, wifiOnly = wifiOnly,
         demoMode = demoMode, language = language,
         reminderSound = reminderSound, reminderVibrate = reminderVibrate, reminderOverride = reminderOverride,
+        reminderSnoozeMin = reminderSnoozeMin, reminderPresets = reminderPresets,
     )
 
     /** Saves the language at once and reopens this screen in it. */

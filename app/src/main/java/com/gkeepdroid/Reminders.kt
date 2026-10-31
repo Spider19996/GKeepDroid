@@ -22,6 +22,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import org.json.JSONArray
 import org.json.JSONObject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 /**
@@ -34,7 +37,27 @@ data class Reminder(
     val sound: String? = null,
     val vibrate: Boolean? = null,
     val override: Boolean? = null,
-)
+    /** Minutes that "Snooze" puts it off; null follows the setting. */
+    val snooze: Int? = null,
+) {
+    fun toJson(): JSONObject = JSONObject().put("id", id).put("at", at).also { o ->
+        sound?.let { o.put("sound", it) }
+        vibrate?.let { o.put("vibrate", it) }
+        override?.let { o.put("override", it) }
+        snooze?.let { o.put("snooze", it) }
+    }
+
+    companion object {
+        fun fromJson(o: JSONObject) = Reminder(
+            id = o.getString("id"),
+            at = o.getLong("at"),
+            sound = if (o.has("sound")) o.getString("sound") else null,
+            vibrate = if (o.has("vibrate")) o.getBoolean("vibrate") else null,
+            override = if (o.has("override")) o.getBoolean("override") else null,
+            snooze = if (o.has("snooze")) o.getInt("snooze") else null,
+        )
+    }
+}
 
 const val SOUND_NONE = "none"
 
@@ -57,15 +80,7 @@ object Reminders {
         val raw = prefs(context).getString(key(account, noteId), null) ?: return emptyList()
         return try {
             val array = JSONArray(raw)
-            (0 until array.length()).map { array.getJSONObject(it) }.map { o ->
-                Reminder(
-                    id = o.getString("id"),
-                    at = o.getLong("at"),
-                    sound = if (o.has("sound")) o.getString("sound") else null,
-                    vibrate = if (o.has("vibrate")) o.getBoolean("vibrate") else null,
-                    override = if (o.has("override")) o.getBoolean("override") else null,
-                )
-            }.sortedBy { it.at }
+            (0 until array.length()).map { Reminder.fromJson(array.getJSONObject(it)) }.sortedBy { it.at }
         } catch (e: Exception) {
             emptyList()
         }
@@ -73,13 +88,7 @@ object Reminders {
 
     private fun write(context: Context, account: String, noteId: String, reminders: List<Reminder>) {
         val array = JSONArray()
-        reminders.forEach { r ->
-            val o = JSONObject().put("id", r.id).put("at", r.at)
-            r.sound?.let { o.put("sound", it) }
-            r.vibrate?.let { o.put("vibrate", it) }
-            r.override?.let { o.put("override", it) }
-            array.put(o)
-        }
+        reminders.forEach { array.put(it.toJson()) }
         val editor = prefs(context).edit()
         if (reminders.isEmpty()) editor.remove(key(account, noteId)) else editor.putString(key(account, noteId), array.toString())
         editor.apply()
@@ -89,11 +98,13 @@ object Reminders {
     fun put(context: Context, account: String, noteId: String, reminder: Reminder) {
         write(context, account, noteId, list(context, account, noteId).filter { it.id != reminder.id } + reminder)
         schedule(context, account, noteId, reminder)
+        refreshWidgets(context)
     }
 
     fun remove(context: Context, account: String, noteId: String, reminderId: String) {
         write(context, account, noteId, list(context, account, noteId).filter { it.id != reminderId })
         context.getSystemService(AlarmManager::class.java).cancel(pending(context, account, noteId, reminderId))
+        refreshWidgets(context)
     }
 
     /** Sets every stored alarm again; one that fell due while the phone was off fires at once. */
@@ -175,8 +186,20 @@ object Reminders {
                 .putExtra(EditNoteActivity.EXTRA_NOTE_ID, noteId),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
+        val notificationId = (key(account, noteId) + reminderId).hashCode()
+        val snoozeMinutes = reminder.snooze ?: SettingsStore.loadGlobal(context).reminderSnoozeMin
+        val snooze = PendingIntent.getBroadcast(
+            context, 0,
+            Intent(context, SnoozeReceiver::class.java)
+                .setData(Uri.parse("gkeepdroid://snooze/" + Uri.encode(key(account, noteId) + "|" + reminderId)))
+                .putExtra(EditNoteActivity.EXTRA_ACCOUNT, account)
+                .putExtra(EditNoteActivity.EXTRA_NOTE_ID, noteId)
+                .putExtra(SnoozeReceiver.EXTRA_REMINDER, reminder.toJson().toString())
+                .putExtra(SnoozeReceiver.EXTRA_NOTIFICATION_ID, notificationId),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
         manager.notify(
-            (key(account, noteId) + reminderId).hashCode(),
+            notificationId,
             NotificationCompat.Builder(context, CHANNEL)
                 .setSmallIcon(R.drawable.ic_alarm)
                 .setContentTitle(title)
@@ -184,9 +207,15 @@ object Reminders {
                 .setStyle(NotificationCompat.BigTextStyle().bigText(body))
                 .setContentIntent(open)
                 .setAutoCancel(true)
+                .addAction(0, context.getString(R.string.reminder_snooze_action, snoozeMinutes), snooze)
                 .build()
         )
         alert(context, reminder, done)
+    }
+
+    /** The widgets show the next reminder, so they are drawn again whenever a reminder changes or fires. */
+    fun refreshWidgets(context: Context) {
+        CoroutineScope(Dispatchers.Default).launch { WidgetRefresh.all(context) }
     }
 
     /**
@@ -237,5 +266,68 @@ class ReminderReceiver : BroadcastReceiver() {
 
     companion object {
         const val EXTRA_REMINDER_ID = "reminder_id"
+    }
+}
+
+/** "Snooze" in the notification: the same reminder again, a few minutes later. */
+class SnoozeReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        val account = intent.getStringExtra(EditNoteActivity.EXTRA_ACCOUNT) ?: return
+        val noteId = intent.getStringExtra(EditNoteActivity.EXTRA_NOTE_ID) ?: return
+        val reminder = try {
+            Reminder.fromJson(JSONObject(intent.getStringExtra(EXTRA_REMINDER) ?: return))
+        } catch (e: Exception) {
+            return
+        }
+        val minutes = reminder.snooze ?: SettingsStore.loadGlobal(context).reminderSnoozeMin
+        Reminders.put(context, account, noteId, reminder.copy(at = System.currentTimeMillis() + minutes.coerceAtLeast(1) * 60_000L))
+        context.getSystemService(NotificationManager::class.java).cancel(intent.getIntExtra(EXTRA_NOTIFICATION_ID, 0))
+    }
+
+    companion object {
+        const val EXTRA_REMINDER = "reminder"
+        const val EXTRA_NOTIFICATION_ID = "notification_id"
+    }
+}
+
+/** The quick times offered for a reminder, as set in the settings: "r:60" is in 60 minutes, "t:18:00" the next 18:00. */
+object ReminderPresets {
+    fun parse(spec: String): List<String> = spec.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+
+    /** The time a preset stands for, counted from [now]. */
+    fun at(preset: String, now: Long = System.currentTimeMillis()): Long? {
+        val value = preset.substringAfter(':', "")
+        return when (preset.substringBefore(':')) {
+            "r" -> value.toIntOrNull()?.let { now + it * 60_000L }
+            "t" -> {
+                val hour = value.substringBefore(':').toIntOrNull() ?: return null
+                val minute = value.substringAfter(':', "0").toIntOrNull() ?: return null
+                java.util.Calendar.getInstance().apply {
+                    timeInMillis = now
+                    set(java.util.Calendar.HOUR_OF_DAY, hour)
+                    set(java.util.Calendar.MINUTE, minute)
+                    set(java.util.Calendar.SECOND, 0)
+                    set(java.util.Calendar.MILLISECOND, 0)
+                    if (timeInMillis <= now) add(java.util.Calendar.DAY_OF_YEAR, 1)
+                }.timeInMillis
+            }
+            else -> null
+        }
+    }
+
+    /** "In 1 h", "In 30 min" or "At 18:00". */
+    fun label(context: Context, preset: String): String {
+        val value = preset.substringAfter(':', "")
+        return when (preset.substringBefore(':')) {
+            "r" -> {
+                val minutes = value.toIntOrNull() ?: 0
+                if (minutes >= 60 && minutes % 60 == 0) context.getString(R.string.reminder_preset_in_h, minutes / 60)
+                else context.getString(R.string.reminder_preset_in, minutes)
+            }
+            else -> context.getString(
+                R.string.reminder_preset_at,
+                android.text.format.DateUtils.formatDateTime(context, at(preset) ?: 0L, android.text.format.DateUtils.FORMAT_SHOW_TIME),
+            )
+        }
     }
 }

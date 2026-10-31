@@ -155,6 +155,8 @@ data class WidgetSettings(
     val showEditedTime: Boolean = false,
     /** Shows the labels of a note on its card. */
     val showLabels: Boolean = true,
+    /** Shows a note's next reminder on its card. */
+    val showReminders: Boolean = true,
     /** The list widget shows only notes with this label; empty means all notes. */
     val labelFilter: String = "",
     /** Shows how many checklist items are ticked, such as 3/7, in the title line. */
@@ -192,6 +194,10 @@ data class GlobalSettings(
     val reminderVibrate: Boolean = true,
     /** Sounds even when the phone is silent or on vibrate (at alarm volume). */
     val reminderOverride: Boolean = false,
+    /** Minutes a reminder is put off by "Snooze" in its notification. */
+    val reminderSnoozeMin: Int = 10,
+    /** The quick times offered for a reminder: "r:60" is in 60 minutes, "t:18:00" the next 18:00. */
+    val reminderPresets: String = "r:60,t:18:00,t:08:00",
 )
 
 object SettingsStore {
@@ -221,6 +227,8 @@ object SettingsStore {
             reminderSound = p.getString("reminder_sound", d.reminderSound).orEmpty(),
             reminderVibrate = p.getBoolean("reminder_vibrate", d.reminderVibrate),
             reminderOverride = p.getBoolean("reminder_override", d.reminderOverride),
+            reminderSnoozeMin = p.getInt("reminder_snooze_min", d.reminderSnoozeMin),
+            reminderPresets = p.getString("reminder_presets", d.reminderPresets).orEmpty(),
         )
     }
 
@@ -239,6 +247,8 @@ object SettingsStore {
             .putString("reminder_sound", s.reminderSound)
             .putBoolean("reminder_vibrate", s.reminderVibrate)
             .putBoolean("reminder_override", s.reminderOverride)
+            .putInt("reminder_snooze_min", s.reminderSnoozeMin)
+            .putString("reminder_presets", s.reminderPresets)
             .apply()
     }
 
@@ -312,6 +322,7 @@ object SettingsStore {
             textColorAuto = p.getBoolean("text_color_auto", d.textColorAuto),
             showEditedTime = p.getBoolean("show_edited_time", d.showEditedTime),
             showLabels = p.getBoolean("show_labels", d.showLabels),
+            showReminders = p.getBoolean("show_reminders", d.showReminders),
             labelFilter = p.getString("label_filter", d.labelFilter).orEmpty(),
             showProgress = p.getBoolean("show_progress", d.showProgress),
         )
@@ -348,6 +359,7 @@ object SettingsStore {
             .putBoolean("text_color_auto", s.textColorAuto)
             .putBoolean("show_edited_time", s.showEditedTime)
             .putBoolean("show_labels", s.showLabels)
+            .putBoolean("show_reminders", s.showReminders)
             .putString("label_filter", s.labelFilter)
             .putBoolean("show_progress", s.showProgress)
             .apply()

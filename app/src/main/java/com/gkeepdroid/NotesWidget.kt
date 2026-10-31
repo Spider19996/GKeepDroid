@@ -212,6 +212,7 @@ class NotesWidget : GlanceAppWidget() {
                         PrivateHint(settings, palette)
                     } else {
                         LabelsLine(note, settings, palette)
+                        ReminderLine(note, account, settings, palette)
                         if (thumb == null && note.hasNoContent()) EmptyNoteHint(settings, palette)
                         if (note.isList) {
                             val collapsed = collapsedByNote[CollapseStore.key(account, note.id)] ?: settings.collapseChecked

@@ -253,4 +253,15 @@
     <string name="reminders_title">Herinneringen</string>
     <string name="reminders_none">Geen herinneringen</string>
     <string name="reminder_past">Kies een tijdstip in de toekomst.</string>
+    <string name="reminder_snooze">Sluimerduur</string>
+    <string name="reminder_snooze_action">Sluimeren (%d min)</string>
+    <string name="reminder_presets">Snelle tijden</string>
+    <string name="reminder_preset_add">Snelle tijd toevoegen</string>
+    <string name="reminder_preset_in">Over %d min</string>
+    <string name="reminder_preset_in_h">Over %d u</string>
+    <string name="reminder_preset_at">Om %s</string>
+    <string name="reminder_preset_relative">Na een vertraging</string>
+    <string name="reminder_preset_clock">Op een tijdstip</string>
+    <string name="reminder_preset_minutes">Minuten</string>
+    <string name="reminder_show_widget">Herinneringen tonen</string>
 </resources>

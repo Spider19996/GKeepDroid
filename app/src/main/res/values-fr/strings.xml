@@ -253,4 +253,15 @@
     <string name="reminders_title">Rappels</string>
     <string name="reminders_none">Aucun rappel</string>
     <string name="reminder_past">Choisissez une heure dans le futur.</string>
+    <string name="reminder_snooze">Durée du report</string>
+    <string name="reminder_snooze_action">Reporter (%d min)</string>
+    <string name="reminder_presets">Heures rapides</string>
+    <string name="reminder_preset_add">Ajouter une heure rapide</string>
+    <string name="reminder_preset_in">Dans %d min</string>
+    <string name="reminder_preset_in_h">Dans %d h</string>
+    <string name="reminder_preset_at">À %s</string>
+    <string name="reminder_preset_relative">Après un délai</string>
+    <string name="reminder_preset_clock">À une heure précise</string>
+    <string name="reminder_preset_minutes">Minutes</string>
+    <string name="reminder_show_widget">Afficher les rappels</string>
 </resources>

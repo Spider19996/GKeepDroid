@@ -253,4 +253,15 @@
     <string name="reminders_title">リマインダー</string>
     <string name="reminders_none">リマインダーなし</string>
     <string name="reminder_past">未来の時刻を選んでください。</string>
+    <string name="reminder_snooze">スヌーズ時間</string>
+    <string name="reminder_snooze_action">スヌーズ(%d分)</string>
+    <string name="reminder_presets">クイック時刻</string>
+    <string name="reminder_preset_add">クイック時刻を追加</string>
+    <string name="reminder_preset_in">%d分後</string>
+    <string name="reminder_preset_in_h">%d時間後</string>
+    <string name="reminder_preset_at">%s に</string>
+    <string name="reminder_preset_relative">一定時間後</string>
+    <string name="reminder_preset_clock">時刻を指定</string>
+    <string name="reminder_preset_minutes">分</string>
+    <string name="reminder_show_widget">リマインダーを表示</string>
 </resources>
