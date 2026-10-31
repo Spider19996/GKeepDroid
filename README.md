@@ -63,7 +63,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 The debug build is its own app (`com.gkeepdroid.debug`, named "GKeepDroid Debug"), so it installs next to the signed release without touching its data.
 
-Pushing a tag such as `v0.2.0` builds a signed release APK on GitHub Actions and attaches it to a release. The workflow needs the secrets `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS` and `KEY_PASSWORD`.
+Pushing a tag such as `v1.0.0` (it has to match `versionName`) builds the signed release APK `gkeepdroid-1.0.0.apk` on GitHub Actions and attaches it to a release. The workflow needs the secrets `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS` and `KEY_PASSWORD`.
 
 ## License
 

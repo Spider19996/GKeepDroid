@@ -36,6 +36,17 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v5
 
+      # The file names carry the version from app/build.gradle.kts, for example gkeepdroid-1.0.0.apk.
+      - name: Read the version
+        run: |
+          VERSION=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts | head -1)
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          # A release tag has to match, so the file name never promises another version than the app has.
+          if [[ "$GITHUB_REF" == refs/tags/v* && "$GITHUB_REF_NAME" != "v$VERSION" ]]; then
+            echo "::error::The tag $GITHUB_REF_NAME does not match versionName $VERSION in app/build.gradle.kts."
+            exit 1
+          fi
+
       - name: Point the build at the Python and the Android SDK
         run: |
           {
@@ -54,7 +65,7 @@ jobs:
       - uses: actions/upload-artifact@v6
         if: env.SIGNED != 'true'
         with:
-          name: gkeepdroid-debug-apk
+          name: gkeepdroid-${{ env.VERSION }}-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
 
       # The key lives in the repository secrets KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS and KEY_PASSWORD.
@@ -83,18 +94,18 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           KEYSTORE_PATH="$RUNNER_TEMP/release.jks" ./gradlew :app:assembleRelease -Pabis=arm64-v8a --console=plain
-          mv app/build/outputs/apk/release/app-release.apk "gkeepdroid-${GITHUB_REF_NAME}.apk"
+          mv app/build/outputs/apk/release/app-release.apk "gkeepdroid-${VERSION}.apk"
 
       - name: Keep the signed APK as a download
         if: env.SIGNED == 'true' && !startsWith(github.ref, 'refs/tags/v')
         uses: actions/upload-artifact@v6
         with:
-          name: gkeepdroid-signed-apk
-          path: gkeepdroid-*.apk
+          name: gkeepdroid-${{ env.VERSION }}-signed-apk
+          path: gkeepdroid-${{ env.VERSION }}.apk
 
       - name: Attach the APK to the release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: gkeepdroid-${{ github.ref_name }}.apk
+          files: gkeepdroid-${{ env.VERSION }}.apk
           generate_release_notes: true
