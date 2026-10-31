@@ -240,6 +240,8 @@ class SettingsActivity : ComponentActivity() {
         var confirmRemoveLocal by remember { mutableStateOf(false) }
         var confirmSettingsButtonOff by remember { mutableStateOf(false) }
         var confirmLayoutReset by remember { mutableStateOf(false) }
+        // After adding an account: a note that the first sync takes a while.
+        var showFirstSync by remember { mutableStateOf(false) }
         var layoutResetShown by remember { mutableStateOf(false) }
         // After a reset the button reads "restored" and stays grayed out for a moment.
         LaunchedEffect(layoutResetShown) {
@@ -253,7 +255,6 @@ class SettingsActivity : ComponentActivity() {
         val credentialsRequired = stringResource(R.string.credentials_required)
         val exportDone = stringResource(R.string.export_done)
         val importDone = stringResource(R.string.import_done)
-        val firstSyncHint = stringResource(R.string.first_sync_hint)
         val layoutSaved = stringResource(R.string.layout_saved)
         val layoutLoaded = stringResource(R.string.layout_loaded)
         val layoutFailed = stringResource(R.string.layout_failed)
@@ -353,13 +354,14 @@ class SettingsActivity : ComponentActivity() {
             if (widgetAccount.isBlank()) widgetAccount = address
             email = ""
             token = ""
-            status = firstSyncHint
+            status = ""
+            showFirstSync = true
             SyncWorker.syncNow(context)
         }
 
         val loginLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             // A finished Google sign-in has stored the account itself.
-            if (result.resultCode == RESULT_OK) status = firstSyncHint
+            if (result.resultCode == RESULT_OK) showFirstSync = true
             refreshAccounts()
             if (widgetAccount.isBlank()) widgetAccount = accounts.firstOrNull().orEmpty()
         }
@@ -514,6 +516,8 @@ class SettingsActivity : ComponentActivity() {
                 },
             )
         }
+
+        if (showFirstSync) FirstSyncDialog { showFirstSync = false }
 
         if (confirmLayoutReset) {
             AlertDialog(
@@ -1322,6 +1326,28 @@ class SettingsActivity : ComponentActivity() {
             }
         }
     }
+}
+
+/** Says that the first sync takes a while; OK works after a short countdown, so the note is not tapped away unread. */
+@Composable
+private fun FirstSyncDialog(onConfirm: () -> Unit) {
+    var left by remember { mutableIntStateOf(3) }
+    LaunchedEffect(Unit) {
+        while (left > 0) {
+            delay(1000)
+            left--
+        }
+    }
+    AlertDialog(
+        onDismissRequest = { if (left == 0) onConfirm() },
+        title = { Text(stringResource(R.string.sync_section)) },
+        text = { Text(stringResource(R.string.first_sync_hint)) },
+        confirmButton = {
+            TextButton(enabled = left == 0, onClick = onConfirm) {
+                Text(if (left > 0) "${stringResource(android.R.string.ok)} ($left)" else stringResource(android.R.string.ok))
+            }
+        },
+    )
 }
 
 /** A whole number typed in, such as minutes between two syncs: the name on the left, a small field on the right. */
