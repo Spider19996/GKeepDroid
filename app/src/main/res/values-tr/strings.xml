@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="widget_description">Google Keep notlarınızı ayarlanabilir bir arka planla gösterir.</string>
-    <string name="account">Hesap</string>
     <string name="email_label">Google hesabı e-postası</string>
     <string name="token_label">Ana jeton (aas_et/...)</string>
     <string name="token_label_saved">Ana jeton (kaydedildi, korumak için boş bırakın)</string>
@@ -12,12 +11,8 @@
     <string name="show_note_colors">Not renklerini göster</string>
     <string name="note_opacity">Not kartı opaklığı: %1$d%%</string>
     <string name="sync_section">Senkronizasyon</string>
-    <string name="sync_interval">Değişiklikleri kontrol et</string>
     <string name="sync_manual">Yalnızca elle</string>
     <string name="save">Kaydet</string>
-    <string name="save_and_sync">Kaydet ve senkronize et</string>
-    <string name="saved">Kaydedildi.</string>
-    <string name="saved_syncing">Kaydedildi. Notlar arka planda senkronize ediliyor...</string>
     <string name="credentials_required">E-posta ve ana jeton gereklidir.</string>
     <string name="no_notes">Henüz not yok. Giriş yapmak için ayarları (⚙) açın.</string>
     <string name="new_note">Yeni not</string>
@@ -36,8 +31,6 @@
     <string name="theme_light">Açık</string>
     <string name="theme_dark">Koyu</string>
     <string name="theme_oled">OLED siyahı</string>
-    <string name="tab_sync">Senkron</string>
-    <string name="tab_widget">Widget</string>
     <string name="tab_accounts">Hesaplar</string>
     <string name="tab_backup">Yedek</string>
     <string name="plain_style">Renksiz notlar</string>
@@ -54,23 +47,17 @@
     <string name="import_done">Ayarlar içe aktarıldı.</string>
     <string name="import_failed">İçe aktarma başarısız: %1$s</string>
     <string name="backup_note">Ne ana jeton ne de e-posta adresleri dışa aktarılır. İçe aktardıktan sonra hesaplarınızı yeniden ekleyin.</string>
-    <string name="tab_general">Genel</string>
     <string name="color_picker_title">Özel renk</string>
     <string name="color_hue">Ton</string>
     <string name="color_saturation">Doygunluk</string>
     <string name="color_brightness">Parlaklık</string>
     <string name="header_position">Düğme çubuğu konumu</string>
-    <string name="position_top">Üst</string>
-    <string name="position_bottom">Alt</string>
     <string name="header_size">Düğme boyutu: %1$d dp</string>
     <string name="list_section">Kontrol listeleri</string>
     <string name="check_in_widget">Öğeleri doğrudan widget\'ta işaretle</string>
     <string name="checked_to_end">İşaretli öğeleri sona taşı</string>
     <string name="collapse_checked">İşaretli öğeleri varsayılan olarak daralt</string>
     <string name="list_spacing">Öğe aralığı</string>
-    <string name="spacing_compact">Sıkışık</string>
-    <string name="spacing_normal">Normal</string>
-    <string name="spacing_comfortable">Ferah</string>
     <string name="checked_count">%1$d işaretli</string>
     <string name="note_gone">Bu not artık yok.</string>
     <string name="offline_note">Çevrimdışı: bilinen son sürüm gösteriliyor.</string>
@@ -80,7 +67,6 @@
     <string name="sort_edited">Son düzenleme</string>
     <string name="sort_created">Oluşturma tarihi</string>
     <string name="sort_title">Başlık (A–Z)</string>
-    <string name="pinned_first">Önce sabitlenen notlar</string>
     <string name="show_images">Görselleri göster</string>
     <string name="show_keep_button">\"Google Keep\'i aç\" düğmesini göster</string>
     <string name="select_note">Bu widget\'taki not</string>
@@ -103,13 +89,9 @@
     <string name="checkbox_style">Onay kutusu stili</string>
     <string name="checkbox_size">Onay kutusu boyutu: %1$d dp</string>
     <string name="tap_whole_row">Satırın herhangi bir yerine dokunarak işaretle</string>
-    <string name="pin_off">Widget\'ta sabitle</string>
-    <string name="pin_top">Üstte sabitlendi</string>
-    <string name="pin_bottom">Altta sabitlendi</string>
     <string name="delete_checked">İşaretli öğeleri hemen sil</string>
     <string name="image_open_gallery">Galeride aç</string>
     <string name="image_remove">Görseli kaldır</string>
-    <string name="image_remove_confirm">Bu görsel nottan kaldırılsın mı? Bu işlem geri alınamaz.</string>
     <string name="image_add_keep">Google Keep\'te görsel ekle</string>
     <string name="search_notes_hint">Notlarda ara</string>
     <string name="show_search_bar">Arama düğmesini göster</string>
@@ -121,7 +103,6 @@
     <string name="image_removal_pending">Görsel, kaydettiğinizde kaldırılacak.</string>
     <string name="image_undo">Geri al</string>
     <string name="delete_note">Notu sil</string>
-    <string name="delete_note_confirm">Bu not çöp kutusuna taşınsın mı? Google Keep\'te geri yükleyebilirsiniz.</string>
     <string name="move_to_trash">Çöp kutusuna taşı</string>
     <string name="archive_note">Arşivle</string>
     <string name="more_actions">Diğer işlemler</string>
@@ -131,9 +112,6 @@
     <string name="show_sort_button">Sıralama düğmesini göster (elle sıralama)</string>
     <string name="show_settings_button">Ayarlar düğmesini göster</string>
     <string name="settings_button_hint">Bunu kapatırsanız ayarları Android Ayarlar › Uygulamalar › GKeepDroid › Uygulama ayarları üzerinden açın ya da ana ekranda widget\'a uzun basıp Yeniden yapılandır\'ı seçin (launcher\'a bağlı).</string>
-    <string name="choose_widget">Hangi widget\'ı yapılandırmak istiyorsunuz?</string>
-    <string name="position_left">Sol</string>
-    <string name="position_right">Sağ</string>
     <string name="turn_off">Kapat</string>
     <string name="text_color_auto">Metin rengi sistem temasını izler</string>
     <string name="show_edited_time">Notun son düzenlenme zamanını göster</string>
@@ -155,18 +133,12 @@
     <string name="hide_token_form">Ana jeton formunu gizle</string>
     <string name="local_account_name">Yerel (bu cihaz)</string>
     <string name="local_account_hint">Yerel mod notları yalnızca bu cihazda tutar. Google hesabına göre eksikler:\n• Google Keep veya diğer cihazlarla senkronizasyon yok\n• Görsel veya çizim yok\n• Arşiv ve çöp kutusu yok: silme kalıcıdır\n• \"Google Keep\'te aç\" yok\n• Uygulamayı kaldırmak tüm notları siler</string>
-    <string name="login_intro">Google hesabınızın e-postasını girin, ardından sonraki sayfada giriş yapın. Uygulama yalnızca bir jeton saklar, şifrenizi asla.</string>
     <string name="login_continue">Devam</string>
     <string name="login_failed">Giriş başarısız: %1$s</string>
     <string name="login_working">Giriş tamamlanıyor…</string>
     <string name="remove_local_confirm">Yerel hesap kaldırılsın mı? Tüm yerel notlar kalıcı olarak silinir.</string>
     <string name="delete_local_confirm">Bu not kalıcı olarak silinsin mi?</string>
     <string name="login_need_email">E-posta adresi otomatik okunamadı. Tamamlamak için lütfen girin.</string>
-    <string name="export_notes_md">Tüm notları Markdown olarak dışa aktar</string>
-    <string name="export_notes_hint">Her notu bir kez, kendi Markdown dosyası olarak (görselleriyle) Belgeler/GKeepDroid altına kaydeder, her hesap için bir klasör. Senkron kalan dosyalar için Markdown klasörünü kullanın.</string>
-    <string name="export_notes_done">%1$d not Belgeler/GKeepDroid klasörüne aktarıldı.</string>
-    <string name="export_notes_none">Henüz dışa aktarılacak not yok.</string>
-    <string name="export_failed">Dışa aktarma başarısız: %1$s</string>
     <string name="md_sync_title">Markdown klasörü (iki yönlü senkronizasyon)</string>
     <string name="md_sync_enable">Notları Markdown dosyaları olarak tut</string>
     <string name="md_sync_choose">Klasör seç</string>
@@ -208,10 +180,8 @@
     <string name="google_disclaimer">GKeepDroid resmi olmayan, bağımsız bir uygulamadır; Google ile bağlantılı değildir ve Google tarafından desteklenmez. Google ve Google Keep, Google LLC’nin ticari markalarıdır.</string>
     <string name="sync_now">Şimdi eşitle</string>
     <string name="sync_started">Eşitleme başlatıldı.</string>
-    <string name="show_app_button">“GKeepDroid’i aç” düğmesini göster</string>
     <string name="orphans_clean">Artık kullanılmayan widget’ları temizle</string>
     <string name="orphans_removed">%d artık kullanılmayan widget’ın ayarları silindi. Ana ekrandaki widget’ları orada kaldırın (uzun basın).</string>
-    <string name="side_off">Kapalı</string>
     <string name="btn_refresh">Yenile</string>
     <string name="btn_add_item">Öğe ekle</string>
     <string name="btn_new_note">Yeni not</string>
@@ -222,12 +192,6 @@
     <string name="btn_keep">Google Keep’i aç</string>
     <string name="btn_settings">Ayarlar</string>
     <string name="button_layout_hint">Bir düğmeye uzun basıp widget’ın üst, alt, sol veya sağ kenarına sürükleyin. Kapatmak için ortaya bırakın.</string>
-    <string name="buttons_hidden">Gösterilmiyor</string>
-    <string name="bar_alignment">Hizalama: %s çubuğu</string>
-    <string name="align_spread">Yayılmış</string>
-    <string name="align_start">Başlangıç</string>
-    <string name="align_center">Orta</string>
-    <string name="align_end">Son</string>
     <string name="layout_save">Düzeni kaydet</string>
     <string name="layout_load">Düzeni yükle</string>
     <string name="layout_reset">Varsayılana dön</string>
@@ -235,15 +199,12 @@
     <string name="layout_loaded">Düzen yüklendi.</string>
     <string name="layout_failed">Bu düzen okunamadı.</string>
     <string name="layout_reset_done">Varsayılana döndürüldü</string>
-    <string name="button_size_real">Simge %1$d dp · düğme %2$d dp</string>
     <string name="layout_reset_confirm">Varsayılan düğme çubuğu geri yüklensin mi? Mevcut düzeniniz değiştirilecek.</string>
     <string name="edited_as_date">“2 gün önce” yerine tarihi göster</string>
-    <string name="sync_display_on">Ekran açıkken eşitleme aralığı (dakika, 0 = kapalı)</string>
     <string name="sync_on_unlock">Kilit açılırken eşitle</string>
     <string name="sync_min_gap">İki eşitleme arasındaki en kısa süre</string>
     <string name="sync_min_gap_hint">Telefonu dakikada birkaç kez açsanız da Google her seferinde sorgulanmaz: çok erken istenen eşitleme atlanır. Yenile düğmesi ve “Şimdi eşitle” her zaman eşitler.</string>
     <string name="sync_background">Arka planda eşitle (ekran kapalı)</string>
-    <string name="sync_background_interval">Arka plan aralığı (dakika)</string>
     <string name="sync_background_hint">Varsayılan olarak kapalı: ekran kapalıyken hiçbir şey eşitlenmez. 15 dakikadan kısa aralıklar alarm kullanır ve daha çok pil harcar.</string>
     <string name="sync_wifi_only">Mobil veride eşitleme</string>
     <string name="sync_group_display">Ekran açıkken</string>
@@ -270,4 +231,10 @@
     <string name="first_sync_hint">İlk eşitleme, not sayınıza bağlı olarak birkaç dakika sürebilir.</string>
     <string name="note_changed_remote">Bu not Keep’te değiştirildi. Yeniden yüklemek yazdıklarınızın yerine geçer.</string>
     <string name="reload">Yeniden yükle</string>
+    <string name="move_up">Yukarı taşı</string>
+    <string name="move_down">Aşağı taşı</string>
+    <string name="note_image">Resim</string>
+    <string name="item_checked">İşaretli</string>
+    <string name="item_unchecked">İşaretli değil</string>
+    <string name="drag_handle">Sıralamak için sürükleyin</string>
 </resources>

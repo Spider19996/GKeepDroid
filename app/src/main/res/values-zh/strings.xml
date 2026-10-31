@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="widget_description">以可调节的背景显示你的 Google Keep 笔记。</string>
-    <string name="account">账号</string>
     <string name="email_label">Google 账号邮箱</string>
     <string name="token_label">主令牌 (aas_et/...)</string>
     <string name="token_label_saved">主令牌（已保存，留空则保持不变）</string>
@@ -12,12 +11,8 @@
     <string name="show_note_colors">显示笔记颜色</string>
     <string name="note_opacity">笔记卡片不透明度：%1$d%%</string>
     <string name="sync_section">同步</string>
-    <string name="sync_interval">检查更新</string>
     <string name="sync_manual">仅手动</string>
     <string name="save">保存</string>
-    <string name="save_and_sync">保存并同步</string>
-    <string name="saved">已保存。</string>
-    <string name="saved_syncing">已保存。正在后台同步笔记……</string>
     <string name="credentials_required">需要填写邮箱和主令牌。</string>
     <string name="no_notes">还没有笔记。请打开设置 (⚙) 登录。</string>
     <string name="new_note">新建笔记</string>
@@ -36,8 +31,6 @@
     <string name="theme_light">浅色</string>
     <string name="theme_dark">深色</string>
     <string name="theme_oled">OLED 纯黑</string>
-    <string name="tab_sync">同步</string>
-    <string name="tab_widget">小组件</string>
     <string name="tab_accounts">账号</string>
     <string name="tab_backup">备份</string>
     <string name="plain_style">无颜色的笔记</string>
@@ -54,23 +47,17 @@
     <string name="import_done">设置已导入。</string>
     <string name="import_failed">导入失败：%1$s</string>
     <string name="backup_note">主令牌和邮箱地址都不会被导出。导入后请重新添加账号。</string>
-    <string name="tab_general">常规</string>
     <string name="color_picker_title">自定义颜色</string>
     <string name="color_hue">色相</string>
     <string name="color_saturation">饱和度</string>
     <string name="color_brightness">亮度</string>
     <string name="header_position">按钮栏位置</string>
-    <string name="position_top">顶部</string>
-    <string name="position_bottom">底部</string>
     <string name="header_size">按钮大小：%1$d dp</string>
     <string name="list_section">清单</string>
     <string name="check_in_widget">直接在小组件中勾选项目</string>
     <string name="checked_to_end">将已勾选项目移到末尾</string>
     <string name="collapse_checked">默认折叠已勾选项目</string>
     <string name="list_spacing">项目间距</string>
-    <string name="spacing_compact">紧凑</string>
-    <string name="spacing_normal">标准</string>
-    <string name="spacing_comfortable">宽松</string>
     <string name="checked_count">已勾选 %1$d 项</string>
     <string name="note_gone">此笔记已不存在。</string>
     <string name="offline_note">离线：显示最后已知的版本。</string>
@@ -80,7 +67,6 @@
     <string name="sort_edited">最近编辑</string>
     <string name="sort_created">创建日期</string>
     <string name="sort_title">标题 (A–Z)</string>
-    <string name="pinned_first">置顶笔记优先</string>
     <string name="show_images">显示图片</string>
     <string name="show_keep_button">显示“打开 Google Keep”按钮</string>
     <string name="select_note">此小组件显示的笔记</string>
@@ -103,13 +89,9 @@
     <string name="checkbox_style">复选框样式</string>
     <string name="checkbox_size">复选框大小：%1$d dp</string>
     <string name="tap_whole_row">点按整行任意位置即可勾选</string>
-    <string name="pin_off">固定在小组件</string>
-    <string name="pin_top">已固定在顶部</string>
-    <string name="pin_bottom">已固定在底部</string>
     <string name="delete_checked">立即删除已勾选的项目</string>
     <string name="image_open_gallery">在相册中打开</string>
     <string name="image_remove">移除图片</string>
-    <string name="image_remove_confirm">要从笔记中移除这张图片吗？此操作无法撤销。</string>
     <string name="image_add_keep">在 Google Keep 中添加图片</string>
     <string name="search_notes_hint">搜索笔记</string>
     <string name="show_search_bar">显示搜索按钮</string>
@@ -121,7 +103,6 @@
     <string name="image_removal_pending">保存时将移除此图片。</string>
     <string name="image_undo">撤销</string>
     <string name="delete_note">删除笔记</string>
-    <string name="delete_note_confirm">要将这条笔记移到回收站吗？你可以在 Google Keep 中恢复它。</string>
     <string name="move_to_trash">移到回收站</string>
     <string name="archive_note">归档</string>
     <string name="more_actions">更多操作</string>
@@ -131,9 +112,6 @@
     <string name="show_sort_button">显示排序按钮（手动排序）</string>
     <string name="show_settings_button">显示设置按钮</string>
     <string name="settings_button_hint">关闭后，可通过 Android 设置 › 应用 › GKeepDroid › 应用设置 打开设置，或在主屏幕上长按小组件并选择“重新配置”（取决于启动器）。</string>
-    <string name="choose_widget">要配置哪个小组件？</string>
-    <string name="position_left">左侧</string>
-    <string name="position_right">右侧</string>
     <string name="turn_off">关闭</string>
     <string name="text_color_auto">文字颜色跟随系统主题</string>
     <string name="show_edited_time">显示笔记的最后编辑时间</string>
@@ -155,18 +133,12 @@
     <string name="hide_token_form">隐藏主令牌表单</string>
     <string name="local_account_name">本地（此设备）</string>
     <string name="local_account_hint">本地模式只把笔记保存在此设备上。与 Google 账号相比缺少：\n• 不与 Google Keep 或其他设备同步\n• 没有图片和手绘\n• 没有归档和回收站：删除是永久的\n• 没有“在 Google Keep 中打开”\n• 卸载应用会删除所有笔记</string>
-    <string name="login_intro">输入你的 Google 账号邮箱，然后在下一页登录。应用只保存令牌，绝不保存你的密码。</string>
     <string name="login_continue">继续</string>
     <string name="login_failed">登录失败：%1$s</string>
     <string name="login_working">正在完成登录…</string>
     <string name="remove_local_confirm">要移除本地账号吗？所有本地笔记将被永久删除。</string>
     <string name="delete_local_confirm">要永久删除这条笔记吗？</string>
     <string name="login_need_email">无法自动读取邮箱地址。请输入以完成。</string>
-    <string name="export_notes_md">将所有笔记导出为 Markdown</string>
-    <string name="export_notes_hint">一次性把每条笔记（含图片）保存为单独的 Markdown 文件，放在“文档/GKeepDroid”中，每个账号一个文件夹。需要保持同步的文件，请使用 Markdown 文件夹。</string>
-    <string name="export_notes_done">已将 %1$d 条笔记导出到“文档/GKeepDroid”。</string>
-    <string name="export_notes_none">还没有可导出的笔记。</string>
-    <string name="export_failed">导出失败：%1$s</string>
     <string name="md_sync_title">Markdown 文件夹（双向同步）</string>
     <string name="md_sync_enable">将笔记保存为 Markdown 文件</string>
     <string name="md_sync_choose">选择文件夹</string>
@@ -208,10 +180,8 @@
     <string name="google_disclaimer">GKeepDroid 是非官方的独立应用，与 Google 无关，也未获 Google 认可或支持。Google 和 Google Keep 是 Google LLC 的商标。</string>
     <string name="sync_now">立即同步</string>
     <string name="sync_started">已开始同步。</string>
-    <string name="show_app_button">显示“打开 GKeepDroid”按钮</string>
     <string name="orphans_clean">清理残留的小组件</string>
     <string name="orphans_removed">已移除 %d 个残留小组件的设置。主屏幕上的小组件需在主屏幕上移除（长按小组件）。</string>
-    <string name="side_off">关闭</string>
     <string name="btn_refresh">刷新</string>
     <string name="btn_add_item">添加项目</string>
     <string name="btn_new_note">新建笔记</string>
@@ -222,12 +192,6 @@
     <string name="btn_keep">打开 Google Keep</string>
     <string name="btn_settings">设置</string>
     <string name="button_layout_hint">长按按钮并拖到小组件的上、下、左或右边缘。放到中间即可关闭。</string>
-    <string name="buttons_hidden">不显示</string>
-    <string name="bar_alignment">对齐：%s栏</string>
-    <string name="align_spread">均分</string>
-    <string name="align_start">起点</string>
-    <string name="align_center">居中</string>
-    <string name="align_end">终点</string>
     <string name="layout_save">保存布局</string>
     <string name="layout_load">加载布局</string>
     <string name="layout_reset">恢复默认</string>
@@ -235,15 +199,12 @@
     <string name="layout_loaded">布局已加载。</string>
     <string name="layout_failed">无法读取此布局。</string>
     <string name="layout_reset_done">已恢复默认</string>
-    <string name="button_size_real">图标 %1$d dp · 按钮 %2$d dp</string>
     <string name="layout_reset_confirm">恢复默认按钮栏？当前布局将被替换。</string>
     <string name="edited_as_date">显示日期，而不是“2 天前”</string>
-    <string name="sync_display_on">屏幕亮起时的同步间隔（分钟，0 = 关闭）</string>
     <string name="sync_on_unlock">解锁手机时同步</string>
     <string name="sync_min_gap">两次同步之间的最短间隔</string>
     <string name="sync_min_gap_hint">即使你每分钟解锁手机多次，也不会每次都请求 Google：过早的同步请求会被跳过。刷新按钮和“立即同步”始终会同步。</string>
     <string name="sync_background">在后台同步（屏幕关闭时）</string>
-    <string name="sync_background_interval">后台间隔（分钟）</string>
     <string name="sync_background_hint">默认关闭：屏幕关闭时不会同步任何内容。短于 15 分钟的间隔使用闹钟，更耗电。</string>
     <string name="sync_wifi_only">不使用移动数据同步</string>
     <string name="sync_group_display">屏幕亮起时</string>
@@ -270,4 +231,10 @@
     <string name="first_sync_hint">首次同步可能需要几分钟，具体取决于笔记数量。</string>
     <string name="note_changed_remote">此笔记已在 Keep 中更改。重新加载会替换你输入的内容。</string>
     <string name="reload">重新加载</string>
+    <string name="move_up">上移</string>
+    <string name="move_down">下移</string>
+    <string name="note_image">图片</string>
+    <string name="item_checked">已勾选</string>
+    <string name="item_unchecked">未勾选</string>
+    <string name="drag_handle">拖动以重新排序</string>
 </resources>

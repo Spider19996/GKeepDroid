@@ -551,7 +551,7 @@ class EditNoteActivity : ComponentActivity() {
                         Column {
                             Image(
                                 bitmap = bitmap.asImageBitmap(),
-                                contentDescription = null,
+                                contentDescription = stringResource(R.string.note_image),
                                 contentScale = ContentScale.Fit,
                                 modifier = Modifier.fillMaxWidth().heightIn(max = 280.dp).clickable { viewerImage = imageId },
                             )
@@ -608,7 +608,7 @@ class EditNoteActivity : ComponentActivity() {
                         ) {
                             Icon(
                                 painterResource(R.drawable.ic_drag_handle),
-                                contentDescription = null,
+                                contentDescription = stringResource(R.string.drag_handle),
                                 modifier = Modifier
                                     .size(36.dp)
                                     .padding(6.dp)

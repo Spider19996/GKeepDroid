@@ -185,7 +185,7 @@ class NotesWidget : GlanceAppWidget() {
                                 // Arrows to move this note; the top note cannot go up, the last cannot go down.
                                 if (canMoveUp) {
                                     ArrowButton(
-                                        R.drawable.ic_arrow_up, textColor,
+                                        R.drawable.ic_arrow_up, textColor, LocalContext.current.getString(R.string.move_up),
                                         actionRunCallback<MoveNoteAction>(
                                             actionParametersOf(WidgetIdKey to appWidgetId, NoteIdKey to note.id, DeltaKey to -1)
                                         ),
@@ -193,7 +193,7 @@ class NotesWidget : GlanceAppWidget() {
                                 }
                                 if (canMoveDown) {
                                     ArrowButton(
-                                        R.drawable.ic_arrow_down, textColor,
+                                        R.drawable.ic_arrow_down, textColor, LocalContext.current.getString(R.string.move_down),
                                         actionRunCallback<MoveNoteAction>(
                                             actionParametersOf(WidgetIdKey to appWidgetId, NoteIdKey to note.id, DeltaKey to 1)
                                         ),

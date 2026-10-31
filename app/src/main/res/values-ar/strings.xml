@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="widget_description">يعرض ملاحظات Google Keep بخلفية قابلة للتعديل.</string>
-    <string name="account">الحساب</string>
     <string name="email_label">البريد الإلكتروني لحساب Google</string>
     <string name="token_label">الرمز الرئيسي (aas_et/...)</string>
     <string name="token_label_saved">الرمز الرئيسي (محفوظ، اتركه فارغًا للإبقاء عليه)</string>
@@ -12,12 +11,8 @@
     <string name="show_note_colors">إظهار ألوان الملاحظات</string>
     <string name="note_opacity">شفافية بطاقات الملاحظات: %1$d%%</string>
     <string name="sync_section">المزامنة</string>
-    <string name="sync_interval">التحقق من التغييرات</string>
     <string name="sync_manual">يدويًا فقط</string>
     <string name="save">حفظ</string>
-    <string name="save_and_sync">حفظ ومزامنة</string>
-    <string name="saved">تم الحفظ.</string>
-    <string name="saved_syncing">تم الحفظ. تتم مزامنة الملاحظات في الخلفية...</string>
     <string name="credentials_required">البريد الإلكتروني والرمز الرئيسي مطلوبان.</string>
     <string name="no_notes">لا توجد ملاحظات بعد. افتح الإعدادات (⚙) لتسجيل الدخول.</string>
     <string name="new_note">ملاحظة جديدة</string>
@@ -36,8 +31,6 @@
     <string name="theme_light">فاتح</string>
     <string name="theme_dark">داكن</string>
     <string name="theme_oled">أسود OLED</string>
-    <string name="tab_sync">المزامنة</string>
-    <string name="tab_widget">الأداة</string>
     <string name="tab_accounts">الحسابات</string>
     <string name="tab_backup">نسخ احتياطي</string>
     <string name="plain_style">ملاحظات بلا لون</string>
@@ -54,23 +47,17 @@
     <string name="import_done">تم استيراد الإعدادات.</string>
     <string name="import_failed">فشل الاستيراد: %1$s</string>
     <string name="backup_note">لا يتم تصدير الرمز الرئيسي ولا عناوين البريد الإلكتروني. بعد الاستيراد أضف حساباتك مرة أخرى.</string>
-    <string name="tab_general">عام</string>
     <string name="color_picker_title">لون مخصص</string>
     <string name="color_hue">تدرج اللون</string>
     <string name="color_saturation">التشبع</string>
     <string name="color_brightness">السطوع</string>
     <string name="header_position">موضع شريط الأزرار</string>
-    <string name="position_top">أعلى</string>
-    <string name="position_bottom">أسفل</string>
     <string name="header_size">حجم الأزرار: %1$d dp</string>
     <string name="list_section">قوائم المراجعة</string>
     <string name="check_in_widget">تحديد العناصر مباشرة في الأداة</string>
     <string name="checked_to_end">نقل العناصر المحددة إلى النهاية</string>
     <string name="collapse_checked">طيّ العناصر المحددة افتراضيًا</string>
     <string name="list_spacing">المسافة بين العناصر</string>
-    <string name="spacing_compact">مضغوط</string>
-    <string name="spacing_normal">عادي</string>
-    <string name="spacing_comfortable">واسع</string>
     <string name="checked_count">%1$d محدد</string>
     <string name="note_gone">لم تعد هذه الملاحظة موجودة.</string>
     <string name="offline_note">بلا اتصال: يتم عرض آخر نسخة معروفة.</string>
@@ -80,7 +67,6 @@
     <string name="sort_edited">آخر تعديل</string>
     <string name="sort_created">تاريخ الإنشاء</string>
     <string name="sort_title">العنوان (أ–ي)</string>
-    <string name="pinned_first">الملاحظات المثبتة أولًا</string>
     <string name="show_images">عرض الصور</string>
     <string name="show_keep_button">عرض زر \"فتح Google Keep\"</string>
     <string name="select_note">الملاحظة في هذه الأداة</string>
@@ -103,13 +89,9 @@
     <string name="checkbox_style">نمط مربع الاختيار</string>
     <string name="checkbox_size">حجم مربع الاختيار: %1$d dp</string>
     <string name="tap_whole_row">التحديد بالنقر في أي مكان على السطر</string>
-    <string name="pin_off">تثبيت في الأداة</string>
-    <string name="pin_top">مثبتة في الأعلى</string>
-    <string name="pin_bottom">مثبتة في الأسفل</string>
     <string name="delete_checked">حذف العناصر المحددة فورًا</string>
     <string name="image_open_gallery">فتح في المعرض</string>
     <string name="image_remove">إزالة الصورة</string>
-    <string name="image_remove_confirm">هل تريد إزالة هذه الصورة من الملاحظة؟ لا يمكن التراجع عن ذلك.</string>
     <string name="image_add_keep">إضافة صورة في Google Keep</string>
     <string name="search_notes_hint">البحث في الملاحظات</string>
     <string name="show_search_bar">عرض زر البحث</string>
@@ -121,7 +103,6 @@
     <string name="image_removal_pending">ستتم إزالة الصورة عند الحفظ.</string>
     <string name="image_undo">تراجع</string>
     <string name="delete_note">حذف الملاحظة</string>
-    <string name="delete_note_confirm">هل تريد نقل هذه الملاحظة إلى سلة المهملات؟ يمكنك استعادتها في Google Keep.</string>
     <string name="move_to_trash">نقل إلى سلة المهملات</string>
     <string name="archive_note">أرشفة</string>
     <string name="more_actions">المزيد من الإجراءات</string>
@@ -131,9 +112,6 @@
     <string name="show_sort_button">عرض زر الفرز (الترتيب اليدوي)</string>
     <string name="show_settings_button">عرض زر الإعدادات</string>
     <string name="settings_button_hint">إذا أوقفته، فافتح الإعدادات من إعدادات Android › التطبيقات › GKeepDroid › إعدادات التطبيق، أو اضغط مطولًا على الأداة في الشاشة الرئيسية واختر إعادة التهيئة (حسب المشغّل).</string>
-    <string name="choose_widget">أي أداة تريد إعدادها؟</string>
-    <string name="position_left">يسار</string>
-    <string name="position_right">يمين</string>
     <string name="turn_off">إيقاف</string>
     <string name="text_color_auto">لون النص يتبع سمة النظام</string>
     <string name="show_edited_time">عرض وقت آخر تعديل للملاحظة</string>
@@ -155,18 +133,12 @@
     <string name="hide_token_form">إخفاء نموذج الرمز الرئيسي</string>
     <string name="local_account_name">محلي (هذا الجهاز)</string>
     <string name="local_account_hint">يحفظ الوضع المحلي الملاحظات على هذا الجهاز فقط. ما ينقص مقارنةً بحساب Google:\n• لا مزامنة مع Google Keep أو الأجهزة الأخرى\n• لا صور ولا رسومات\n• لا أرشيف ولا سلة مهملات: الحذف نهائي\n• لا «فتح في Google Keep»\n• إلغاء تثبيت التطبيق يحذف كل الملاحظات</string>
-    <string name="login_intro">أدخل البريد الإلكتروني لحساب Google ثم سجّل الدخول في الصفحة التالية. يحتفظ التطبيق برمز فقط، وليس بكلمة المرور أبدًا.</string>
     <string name="login_continue">متابعة</string>
     <string name="login_failed">فشل تسجيل الدخول: %1$s</string>
     <string name="login_working">جارٍ إنهاء تسجيل الدخول…</string>
     <string name="remove_local_confirm">هل تريد إزالة الحساب المحلي؟ سيتم حذف جميع الملاحظات المحلية نهائيًا.</string>
     <string name="delete_local_confirm">هل تريد حذف هذه الملاحظة نهائيًا؟</string>
     <string name="login_need_email">تعذّرت قراءة البريد الإلكتروني تلقائيًا. أدخله لإنهاء العملية.</string>
-    <string name="export_notes_md">تصدير كل الملاحظات بصيغة Markdown</string>
-    <string name="export_notes_hint">يحفظ كل ملاحظة مرة واحدة كملف Markdown مستقل (مع صورها) في المستندات/GKeepDroid، مجلد لكل حساب. للملفات التي تبقى متزامنة استخدم مجلد Markdown.</string>
-    <string name="export_notes_done">تم تصدير %1$d ملاحظة إلى المستندات/GKeepDroid.</string>
-    <string name="export_notes_none">لا توجد ملاحظات للتصدير بعد.</string>
-    <string name="export_failed">فشل التصدير: %1$s</string>
     <string name="md_sync_title">مجلد Markdown (مزامنة في الاتجاهين)</string>
     <string name="md_sync_enable">حفظ الملاحظات كملفات Markdown</string>
     <string name="md_sync_choose">اختيار المجلد</string>
@@ -208,10 +180,8 @@
     <string name="google_disclaimer">GKeepDroid تطبيق مستقل غير رسمي ولا يرتبط بـ Google ولا تدعمه أو تعتمده. Google وGoogle Keep علامتان تجاريتان لشركة Google LLC.</string>
     <string name="sync_now">زامن الآن</string>
     <string name="sync_started">بدأت المزامنة.</string>
-    <string name="show_app_button">عرض زر «فتح GKeepDroid»</string>
     <string name="orphans_clean">تنظيف الأدوات اليتيمة</string>
     <string name="orphans_removed">تمت إزالة إعدادات %d من الأدوات اليتيمة. أزل الأدوات الموجودة على الشاشة الرئيسية من هناك (ضغط مطوّل).</string>
-    <string name="side_off">متوقف</string>
     <string name="btn_refresh">تحديث</string>
     <string name="btn_add_item">إضافة عنصر</string>
     <string name="btn_new_note">ملاحظة جديدة</string>
@@ -222,12 +192,6 @@
     <string name="btn_keep">فتح Google Keep</string>
     <string name="btn_settings">الإعدادات</string>
     <string name="button_layout_hint">اضغط مطولًا على زر واسحبه إلى الحافة العلوية أو السفلية أو اليسرى أو اليمنى للأداة. أفلته في المنتصف لإيقافه.</string>
-    <string name="buttons_hidden">غير معروضة</string>
-    <string name="bar_alignment">المحاذاة: شريط %s</string>
-    <string name="align_spread">موزّع</string>
-    <string name="align_start">البداية</string>
-    <string name="align_center">الوسط</string>
-    <string name="align_end">النهاية</string>
     <string name="layout_save">حفظ التخطيط</string>
     <string name="layout_load">تحميل التخطيط</string>
     <string name="layout_reset">استعادة الافتراضي</string>
@@ -235,15 +199,12 @@
     <string name="layout_loaded">تم تحميل التخطيط.</string>
     <string name="layout_failed">تعذّرت قراءة هذا التخطيط.</string>
     <string name="layout_reset_done">تمت الاستعادة</string>
-    <string name="button_size_real">الأيقونة %1$d dp · الزر %2$d dp</string>
     <string name="layout_reset_confirm">استعادة شريط الأزرار الافتراضي؟ سيتم استبدال تخطيطك الحالي.</string>
     <string name="edited_as_date">عرض التاريخ بدلًا من «قبل يومين»</string>
-    <string name="sync_display_on">فاصل المزامنة عند تشغيل الشاشة (بالدقائق، 0 = إيقاف)</string>
     <string name="sync_on_unlock">المزامنة عند فتح القفل</string>
     <string name="sync_min_gap">أقل مدة بين مزامنتين</string>
     <string name="sync_min_gap_hint">حتى لو فتحت قفل الهاتف عدة مرات في الدقيقة، لا يُسأل Google في كل مرة: تُتجاوز المزامنة المطلوبة مبكرًا. زر التحديث و«زامن الآن» يزامنان دائمًا.</string>
     <string name="sync_background">المزامنة في الخلفية (الشاشة مطفأة)</string>
-    <string name="sync_background_interval">الفاصل في الخلفية (بالدقائق)</string>
     <string name="sync_background_hint">متوقفة افتراضيًا: لا تتم مزامنة شيء عند إطفاء الشاشة. الفواصل الأقل من 15 دقيقة تستخدم المنبّهات وتستهلك بطارية أكثر.</string>
     <string name="sync_wifi_only">عدم المزامنة عبر بيانات الجوال</string>
     <string name="sync_group_display">عند تشغيل الشاشة</string>
@@ -270,4 +231,10 @@
     <string name="first_sync_hint">قد تستغرق المزامنة الأولى بضع دقائق حسب عدد الملاحظات.</string>
     <string name="note_changed_remote">تم تغيير هذه الملاحظة في Keep. إعادة التحميل تستبدل ما كتبته.</string>
     <string name="reload">إعادة التحميل</string>
+    <string name="move_up">أعلى</string>
+    <string name="move_down">أسفل</string>
+    <string name="note_image">صورة</string>
+    <string name="item_checked">محدد</string>
+    <string name="item_unchecked">غير محدد</string>
+    <string name="drag_handle">اسحب لإعادة الترتيب</string>
 </resources>

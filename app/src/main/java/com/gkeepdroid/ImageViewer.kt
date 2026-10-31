@@ -2,6 +2,7 @@ package com.gkeepdroid
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -42,7 +43,7 @@ fun ImageViewerDialog(bitmap: Bitmap, onClose: () -> Unit) {
         Box(Modifier.fillMaxSize().background(Color.Black)) {
             Image(
                 bitmap = bitmap.asImageBitmap(),
-                contentDescription = null,
+                contentDescription = stringResource(R.string.note_image),
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .fillMaxSize()

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="widget_description">Google Keep 메모를 배경을 조절해 표시합니다.</string>
-    <string name="account">계정</string>
     <string name="email_label">Google 계정 이메일</string>
     <string name="token_label">마스터 토큰 (aas_et/...)</string>
     <string name="token_label_saved">마스터 토큰 (저장됨, 유지하려면 비워 두세요)</string>
@@ -12,12 +11,8 @@
     <string name="show_note_colors">메모 색상 표시</string>
     <string name="note_opacity">메모 카드 불투명도: %1$d%%</string>
     <string name="sync_section">동기화</string>
-    <string name="sync_interval">변경 사항 확인</string>
     <string name="sync_manual">수동만</string>
     <string name="save">저장</string>
-    <string name="save_and_sync">저장 후 동기화</string>
-    <string name="saved">저장되었습니다.</string>
-    <string name="saved_syncing">저장되었습니다. 백그라운드에서 메모를 동기화하는 중...</string>
     <string name="credentials_required">이메일과 마스터 토큰이 필요합니다.</string>
     <string name="no_notes">메모가 없습니다. 설정(⚙)을 열어 로그인하세요.</string>
     <string name="new_note">새 메모</string>
@@ -36,8 +31,6 @@
     <string name="theme_light">라이트</string>
     <string name="theme_dark">다크</string>
     <string name="theme_oled">OLED 블랙</string>
-    <string name="tab_sync">동기화</string>
-    <string name="tab_widget">위젯</string>
     <string name="tab_accounts">계정</string>
     <string name="tab_backup">백업</string>
     <string name="plain_style">색상 없는 메모</string>
@@ -54,23 +47,17 @@
     <string name="import_done">설정을 가져왔습니다.</string>
     <string name="import_failed">가져오기 실패: %1$s</string>
     <string name="backup_note">마스터 토큰과 이메일 주소는 내보내지 않습니다. 가져온 후 계정을 다시 추가하세요.</string>
-    <string name="tab_general">일반</string>
     <string name="color_picker_title">사용자 지정 색상</string>
     <string name="color_hue">색조</string>
     <string name="color_saturation">채도</string>
     <string name="color_brightness">밝기</string>
     <string name="header_position">버튼 막대 위치</string>
-    <string name="position_top">위</string>
-    <string name="position_bottom">아래</string>
     <string name="header_size">버튼 크기: %1$d dp</string>
     <string name="list_section">체크리스트</string>
     <string name="check_in_widget">위젯에서 바로 항목 체크</string>
     <string name="checked_to_end">체크한 항목을 맨 뒤로 이동</string>
     <string name="collapse_checked">체크한 항목을 기본적으로 접기</string>
     <string name="list_spacing">항목 간격</string>
-    <string name="spacing_compact">촘촘하게</string>
-    <string name="spacing_normal">보통</string>
-    <string name="spacing_comfortable">넉넉하게</string>
     <string name="checked_count">%1$d개 체크됨</string>
     <string name="note_gone">이 메모는 더 이상 존재하지 않습니다.</string>
     <string name="offline_note">오프라인: 마지막으로 확인된 버전을 표시합니다.</string>
@@ -80,7 +67,6 @@
     <string name="sort_edited">최근 수정</string>
     <string name="sort_created">생성일</string>
     <string name="sort_title">제목 (가–하)</string>
-    <string name="pinned_first">고정된 메모 먼저</string>
     <string name="show_images">이미지 표시</string>
     <string name="show_keep_button">\"Google Keep 열기\" 버튼 표시</string>
     <string name="select_note">이 위젯의 메모</string>
@@ -103,13 +89,9 @@
     <string name="checkbox_style">체크박스 스타일</string>
     <string name="checkbox_size">체크박스 크기: %1$d dp</string>
     <string name="tap_whole_row">줄의 아무 곳이나 눌러 체크</string>
-    <string name="pin_off">위젯에 고정</string>
-    <string name="pin_top">맨 위에 고정됨</string>
-    <string name="pin_bottom">맨 아래에 고정됨</string>
     <string name="delete_checked">체크한 항목 즉시 삭제</string>
     <string name="image_open_gallery">갤러리에서 열기</string>
     <string name="image_remove">이미지 제거</string>
-    <string name="image_remove_confirm">이 이미지를 메모에서 제거할까요? 되돌릴 수 없습니다.</string>
     <string name="image_add_keep">Google Keep에서 이미지 추가</string>
     <string name="search_notes_hint">메모 검색</string>
     <string name="show_search_bar">검색 버튼 표시</string>
@@ -121,7 +103,6 @@
     <string name="image_removal_pending">저장하면 이미지가 제거됩니다.</string>
     <string name="image_undo">실행 취소</string>
     <string name="delete_note">메모 삭제</string>
-    <string name="delete_note_confirm">이 메모를 휴지통으로 이동할까요? Google Keep에서 복원할 수 있습니다.</string>
     <string name="move_to_trash">휴지통으로 이동</string>
     <string name="archive_note">보관처리</string>
     <string name="more_actions">더보기</string>
@@ -131,9 +112,6 @@
     <string name="show_sort_button">정렬 버튼 표시(수동 정렬)</string>
     <string name="show_settings_button">설정 버튼 표시</string>
     <string name="settings_button_hint">끄면 Android 설정 › 앱 › GKeepDroid › 앱 설정에서 열거나, 홈 화면에서 위젯을 길게 눌러 \'다시 구성\'을 선택하세요(런처에 따라 다름).</string>
-    <string name="choose_widget">어떤 위젯을 설정할까요?</string>
-    <string name="position_left">왼쪽</string>
-    <string name="position_right">오른쪽</string>
     <string name="turn_off">끄기</string>
     <string name="text_color_auto">텍스트 색상이 시스템 테마를 따름</string>
     <string name="show_edited_time">메모를 마지막으로 수정한 시간 표시</string>
@@ -155,18 +133,12 @@
     <string name="hide_token_form">마스터 토큰 양식 숨기기</string>
     <string name="local_account_name">로컬(이 기기)</string>
     <string name="local_account_hint">로컬 모드는 메모를 이 기기에만 보관합니다. Google 계정과 비교해 없는 기능:\n• Google Keep 및 다른 기기와의 동기화\n• 이미지와 그림\n• 보관함과 휴지통(삭제는 영구적)\n• \'Google Keep에서 열기\'\n• 앱을 삭제하면 모든 메모가 사라집니다</string>
-    <string name="login_intro">Google 계정 이메일을 입력한 뒤 다음 페이지에서 로그인하세요. 앱은 토큰만 저장하며 비밀번호는 저장하지 않습니다.</string>
     <string name="login_continue">계속</string>
     <string name="login_failed">로그인 실패: %1$s</string>
     <string name="login_working">로그인을 완료하는 중…</string>
     <string name="remove_local_confirm">로컬 계정을 제거할까요? 모든 로컬 메모가 영구 삭제됩니다.</string>
     <string name="delete_local_confirm">이 메모를 영구 삭제할까요?</string>
     <string name="login_need_email">이메일 주소를 자동으로 읽지 못했습니다. 입력하여 완료하세요.</string>
-    <string name="export_notes_md">모든 메모를 Markdown으로 내보내기</string>
-    <string name="export_notes_hint">각 메모를 이미지와 함께 개별 Markdown 파일로 문서/GKeepDroid에 한 번만 저장합니다(계정마다 폴더 하나). 계속 동기화되는 파일에는 Markdown 폴더를 사용하세요.</string>
-    <string name="export_notes_done">메모 %1$d개를 문서/GKeepDroid에 내보냈습니다.</string>
-    <string name="export_notes_none">내보낼 메모가 아직 없습니다.</string>
-    <string name="export_failed">내보내기 실패: %1$s</string>
     <string name="md_sync_title">Markdown 폴더(양방향 동기화)</string>
     <string name="md_sync_enable">메모를 Markdown 파일로 보관</string>
     <string name="md_sync_choose">폴더 선택</string>
@@ -208,10 +180,8 @@
     <string name="google_disclaimer">GKeepDroid는 비공식 독립 앱이며 Google과 제휴하거나 Google의 승인·지원을 받지 않습니다. Google 및 Google Keep은 Google LLC의 상표입니다.</string>
     <string name="sync_now">지금 동기화</string>
     <string name="sync_started">동기화를 시작했습니다.</string>
-    <string name="show_app_button">“GKeepDroid 열기” 버튼 표시</string>
     <string name="orphans_clean">남은 위젯 정리</string>
     <string name="orphans_removed">남은 위젯 %d개의 설정을 삭제했습니다. 홈 화면의 위젯은 홈 화면에서 직접 삭제하세요(길게 누르기).</string>
-    <string name="side_off">꺼짐</string>
     <string name="btn_refresh">새로고침</string>
     <string name="btn_add_item">항목 추가</string>
     <string name="btn_new_note">새 메모</string>
@@ -222,12 +192,6 @@
     <string name="btn_keep">Google Keep 열기</string>
     <string name="btn_settings">설정</string>
     <string name="button_layout_hint">버튼을 길게 눌러 위젯의 위, 아래, 왼쪽 또는 오른쪽 가장자리로 끄세요. 가운데에 놓으면 꺼집니다.</string>
-    <string name="buttons_hidden">표시 안 함</string>
-    <string name="bar_alignment">정렬: %s 바</string>
-    <string name="align_spread">균등</string>
-    <string name="align_start">시작</string>
-    <string name="align_center">가운데</string>
-    <string name="align_end">끝</string>
     <string name="layout_save">레이아웃 저장</string>
     <string name="layout_load">레이아웃 불러오기</string>
     <string name="layout_reset">기본값 복원</string>
@@ -235,15 +199,12 @@
     <string name="layout_loaded">레이아웃을 불러왔습니다.</string>
     <string name="layout_failed">이 레이아웃을 읽을 수 없습니다.</string>
     <string name="layout_reset_done">기본값으로 복원됨</string>
-    <string name="button_size_real">아이콘 %1$d dp · 버튼 %2$d dp</string>
     <string name="layout_reset_confirm">기본 버튼 바로 복원할까요? 현재 레이아웃이 교체됩니다.</string>
     <string name="edited_as_date">“2일 전” 대신 날짜 표시</string>
-    <string name="sync_display_on">화면이 켜져 있을 때 동기화 간격(분, 0 = 끔)</string>
     <string name="sync_on_unlock">잠금 해제 시 동기화</string>
     <string name="sync_min_gap">동기화 사이 최소 간격</string>
     <string name="sync_min_gap_hint">1분에 여러 번 잠금을 해제해도 매번 Google에 요청하지 않습니다. 너무 일찍 요청된 동기화는 건너뜁니다. 새로고침 버튼과 “지금 동기화”는 항상 동기화합니다.</string>
     <string name="sync_background">백그라운드 동기화(화면 꺼짐)</string>
-    <string name="sync_background_interval">백그라운드 간격(분)</string>
     <string name="sync_background_hint">기본값은 꺼짐: 화면이 꺼져 있으면 아무것도 동기화하지 않습니다. 15분 미만의 간격은 알람을 사용하며 배터리를 더 씁니다.</string>
     <string name="sync_wifi_only">모바일 데이터로 동기화하지 않음</string>
     <string name="sync_group_display">화면이 켜져 있을 때</string>
@@ -270,4 +231,10 @@
     <string name="first_sync_hint">첫 동기화는 메모 수에 따라 몇 분 걸릴 수 있습니다.</string>
     <string name="note_changed_remote">이 메모가 Keep에서 변경되었습니다. 다시 불러오면 입력한 내용이 바뀝니다.</string>
     <string name="reload">다시 불러오기</string>
+    <string name="move_up">위로</string>
+    <string name="move_down">아래로</string>
+    <string name="note_image">이미지</string>
+    <string name="item_checked">체크됨</string>
+    <string name="item_unchecked">체크 안 됨</string>
+    <string name="drag_handle">끌어서 순서 변경</string>
 </resources>

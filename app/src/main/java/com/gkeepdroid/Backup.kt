@@ -22,9 +22,9 @@ object Backup {
         require(o.has("layout")) { "Not a layout file" }
         return base.copy(
             headerSizeSp = o.optInt("headerSizeSp", base.headerSizeSp),
-            buttonSides = sidesFromJson(o.optString("buttonSides", null)),
+            buttonSides = sidesFromJson(o.optString("buttonSides", "{}")),
             buttonOrder = idsFromJson(o.optJSONArray("buttonOrder")?.toString()),
-            buttonSlots = sidesFromJson(o.optString("buttonSlots", null)),
+            buttonSlots = sidesFromJson(o.optString("buttonSlots", "{}")),
         )
     }
 
@@ -112,9 +112,9 @@ object Backup {
                 listSpacingDp = w.optInt("listSpacingDp", dw.listSpacingDp).coerceIn(0, 24),
                 sortMode = w.optInt("sortMode", dw.sortMode).coerceIn(SORT_KEEP, SORT_MANUAL),
                 showImages = w.optBoolean("showImages", dw.showImages),
-                buttonSides = if (w.has("buttonSides")) sidesFromJson(w.optString("buttonSides", null)) else dw.buttonSides,
+                buttonSides = if (w.has("buttonSides")) sidesFromJson(w.optString("buttonSides", "{}")) else dw.buttonSides,
                 buttonOrder = if (w.has("buttonOrder")) idsFromJson(w.optJSONArray("buttonOrder")?.toString()) else dw.buttonOrder,
-                buttonSlots = if (w.has("buttonSlots")) sidesFromJson(w.optString("buttonSlots", null)) else dw.buttonSlots,
+                buttonSlots = if (w.has("buttonSlots")) sidesFromJson(w.optString("buttonSlots", "{}")) else dw.buttonSlots,
                 checkboxStyle = w.optInt("checkboxStyle", dw.checkboxStyle).coerceIn(CB_SQUARE, CB_CLASSIC),
                 checkboxSizeDp = w.optInt("checkboxSizeDp", dw.checkboxSizeDp).coerceIn(14, 56),
                 tapWholeRow = w.optBoolean("tapWholeRow", dw.tapWholeRow),

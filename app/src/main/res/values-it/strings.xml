@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="widget_description">Mostra le tue note di Google Keep con uno sfondo regolabile.</string>
-    <string name="account">Account</string>
     <string name="email_label">E-mail dell\'account Google</string>
     <string name="token_label">Token principale (aas_et/...)</string>
     <string name="token_label_saved">Token principale (salvato, lascia vuoto per mantenerlo)</string>
@@ -12,12 +11,8 @@
     <string name="show_note_colors">Mostra i colori delle note</string>
     <string name="note_opacity">Opacità delle note: %1$d%%</string>
     <string name="sync_section">Sincronizzazione</string>
-    <string name="sync_interval">Controlla le modifiche</string>
     <string name="sync_manual">Solo manuale</string>
     <string name="save">Salva</string>
-    <string name="save_and_sync">Salva e sincronizza</string>
-    <string name="saved">Salvato.</string>
-    <string name="saved_syncing">Salvato. Sincronizzazione delle note in background...</string>
     <string name="credentials_required">E-mail e token principale sono obbligatori.</string>
     <string name="no_notes">Nessuna nota. Apri le impostazioni (⚙) per accedere.</string>
     <string name="new_note">Nuova nota</string>
@@ -36,8 +31,6 @@
     <string name="theme_light">Chiaro</string>
     <string name="theme_dark">Scuro</string>
     <string name="theme_oled">Nero OLED</string>
-    <string name="tab_sync">Sincr.</string>
-    <string name="tab_widget">Widget</string>
     <string name="tab_accounts">Account</string>
     <string name="tab_backup">Backup</string>
     <string name="plain_style">Note senza colore</string>
@@ -54,23 +47,17 @@
     <string name="import_done">Impostazioni importate.</string>
     <string name="import_failed">Importazione non riuscita: %1$s</string>
     <string name="backup_note">Né il token principale né gli indirizzi e-mail vengono esportati. Dopo l\'importazione, aggiungi di nuovo i tuoi account.</string>
-    <string name="tab_general">Generale</string>
     <string name="color_picker_title">Colore personalizzato</string>
     <string name="color_hue">Tonalità</string>
     <string name="color_saturation">Saturazione</string>
     <string name="color_brightness">Luminosità</string>
     <string name="header_position">Posizione dei pulsanti</string>
-    <string name="position_top">In alto</string>
-    <string name="position_bottom">In basso</string>
     <string name="header_size">Dimensione dei pulsanti: %1$d dp</string>
     <string name="list_section">Liste di controllo</string>
     <string name="check_in_widget">Spunta gli elementi direttamente nel widget</string>
     <string name="checked_to_end">Sposta gli elementi spuntati in fondo</string>
     <string name="collapse_checked">Comprimi gli elementi spuntati per impostazione predefinita</string>
     <string name="list_spacing">Spaziatura degli elementi</string>
-    <string name="spacing_compact">Compatta</string>
-    <string name="spacing_normal">Normale</string>
-    <string name="spacing_comfortable">Ampia</string>
     <string name="checked_count">%1$d spuntati</string>
     <string name="note_gone">Questa nota non esiste più.</string>
     <string name="offline_note">Offline: viene mostrata l\'ultima versione nota.</string>
@@ -80,7 +67,6 @@
     <string name="sort_edited">Ultima modifica</string>
     <string name="sort_created">Data di creazione</string>
     <string name="sort_title">Titolo (A–Z)</string>
-    <string name="pinned_first">Prima le note fissate</string>
     <string name="show_images">Mostra le immagini</string>
     <string name="show_keep_button">Mostra il pulsante «Apri Google Keep»</string>
     <string name="select_note">Nota di questo widget</string>
@@ -103,13 +89,9 @@
     <string name="checkbox_style">Stile delle caselle</string>
     <string name="checkbox_size">Dimensione delle caselle: %1$d dp</string>
     <string name="tap_whole_row">Spunta toccando ovunque sulla riga</string>
-    <string name="pin_off">Fissa nel widget</string>
-    <string name="pin_top">Fissata in alto</string>
-    <string name="pin_bottom">Fissata in basso</string>
     <string name="delete_checked">Elimina subito gli elementi spuntati</string>
     <string name="image_open_gallery">Apri nella galleria</string>
     <string name="image_remove">Rimuovi immagine</string>
-    <string name="image_remove_confirm">Rimuovere questa immagine dalla nota? L\'azione non si può annullare.</string>
     <string name="image_add_keep">Aggiungi immagine in Google Keep</string>
     <string name="search_notes_hint">Cerca nelle note</string>
     <string name="show_search_bar">Mostra il pulsante di ricerca</string>
@@ -121,7 +103,6 @@
     <string name="image_removal_pending">L\'immagine verrà rimossa al salvataggio.</string>
     <string name="image_undo">Annulla</string>
     <string name="delete_note">Elimina nota</string>
-    <string name="delete_note_confirm">Spostare questa nota nel cestino? Puoi ripristinarla in Google Keep.</string>
     <string name="move_to_trash">Sposta nel cestino</string>
     <string name="archive_note">Archivia</string>
     <string name="more_actions">Altre azioni</string>
@@ -131,9 +112,6 @@
     <string name="show_sort_button">Mostra il pulsante di ordinamento (ordine manuale)</string>
     <string name="show_settings_button">Mostra il pulsante delle impostazioni</string>
     <string name="settings_button_hint">Se lo disattivi, apri le impostazioni da Impostazioni Android › App › GKeepDroid › Impostazioni app, oppure tieni premuto il widget nella schermata Home e scegli Riconfigura (dipende dal launcher).</string>
-    <string name="choose_widget">Quale widget vuoi configurare?</string>
-    <string name="position_left">Sinistra</string>
-    <string name="position_right">Destra</string>
     <string name="turn_off">Disattiva</string>
     <string name="text_color_auto">Il colore del testo segue il tema di sistema</string>
     <string name="show_edited_time">Mostra quando la nota è stata modificata</string>
@@ -155,18 +133,12 @@
     <string name="hide_token_form">Nascondi il modulo del token principale</string>
     <string name="local_account_name">Locale (questo dispositivo)</string>
     <string name="local_account_hint">La modalità locale tiene le note solo su questo dispositivo. Cosa manca rispetto a un account Google:\n• Nessuna sincronizzazione con Google Keep o altri dispositivi\n• Nessuna immagine o disegno\n• Nessun archivio né cestino: l\'eliminazione è definitiva\n• Nessun «Apri in Google Keep»\n• Disinstallando l\'app tutte le note vanno perse</string>
-    <string name="login_intro">Inserisci l\'e-mail del tuo account Google, poi accedi nella pagina successiva. L\'app conserva solo un token, mai la tua password.</string>
     <string name="login_continue">Continua</string>
     <string name="login_failed">Accesso non riuscito: %1$s</string>
     <string name="login_working">Completamento dell\'accesso…</string>
     <string name="remove_local_confirm">Rimuovere l\'account locale? Tutte le note locali verranno eliminate definitivamente.</string>
     <string name="delete_local_confirm">Eliminare definitivamente questa nota?</string>
     <string name="login_need_email">Impossibile leggere l\'e-mail automaticamente. Inseriscila per completare.</string>
-    <string name="export_notes_md">Esporta tutte le note in Markdown</string>
-    <string name="export_notes_hint">Salva una volta ogni nota come file Markdown a sé (con le immagini) in Documenti/GKeepDroid, una cartella per account. Per file che restano sincronizzati, usa la cartella Markdown.</string>
-    <string name="export_notes_done">%1$d note esportate in Documenti/GKeepDroid.</string>
-    <string name="export_notes_none">Non ci sono ancora note da esportare.</string>
-    <string name="export_failed">Esportazione non riuscita: %1$s</string>
     <string name="md_sync_title">Cartella Markdown (sincronizzazione bidirezionale)</string>
     <string name="md_sync_enable">Tieni le note come file Markdown</string>
     <string name="md_sync_choose">Scegli cartella</string>
@@ -208,10 +180,8 @@
     <string name="google_disclaimer">GKeepDroid è un’app indipendente e non ufficiale, non affiliata né approvata da Google. Google e Google Keep sono marchi di Google LLC.</string>
     <string name="sync_now">Sincronizza ora</string>
     <string name="sync_started">Sincronizzazione avviata.</string>
-    <string name="show_app_button">Mostra il pulsante «Apri GKeepDroid»</string>
     <string name="orphans_clean">Pulisci i widget orfani</string>
     <string name="orphans_removed">Rimosse le impostazioni di %d widget orfani. I widget nella schermata Home vanno rimossi lì (pressione lunga).</string>
-    <string name="side_off">Disattivato</string>
     <string name="btn_refresh">Aggiorna</string>
     <string name="btn_add_item">Aggiungi elemento</string>
     <string name="btn_new_note">Nuova nota</string>
@@ -222,12 +192,6 @@
     <string name="btn_keep">Apri Google Keep</string>
     <string name="btn_settings">Impostazioni</string>
     <string name="button_layout_hint">Tieni premuto un pulsante e trascinalo sul bordo superiore, inferiore, sinistro o destro del widget. Rilascialo al centro per disattivarlo.</string>
-    <string name="buttons_hidden">Non mostrati</string>
-    <string name="bar_alignment">Allineamento: barra %s</string>
-    <string name="align_spread">Distribuito</string>
-    <string name="align_start">Inizio</string>
-    <string name="align_center">Centro</string>
-    <string name="align_end">Fine</string>
     <string name="layout_save">Salva layout</string>
     <string name="layout_load">Carica layout</string>
     <string name="layout_reset">Ripristina predefinito</string>
@@ -235,15 +199,12 @@
     <string name="layout_loaded">Layout caricato.</string>
     <string name="layout_failed">Impossibile leggere questo layout.</string>
     <string name="layout_reset_done">Predefinito ripristinato</string>
-    <string name="button_size_real">Icona %1$d dp · pulsante %2$d dp</string>
     <string name="layout_reset_confirm">Ripristinare la barra dei pulsanti predefinita? Il layout attuale verrà sostituito.</string>
     <string name="edited_as_date">Mostra la data invece di «2 giorni fa»</string>
-    <string name="sync_display_on">Intervallo di sincronizzazione a schermo acceso (minuti, 0 = disattivato)</string>
     <string name="sync_on_unlock">Sincronizza allo sblocco</string>
     <string name="sync_min_gap">Tempo minimo tra due sincronizzazioni</string>
     <string name="sync_min_gap_hint">Anche se sblocchi il telefono più volte al minuto, Google non viene interrogato ogni volta: una sincronizzazione richiesta troppo presto viene saltata. Il pulsante di aggiornamento e «Sincronizza ora» sincronizzano sempre.</string>
     <string name="sync_background">Sincronizza in background (schermo spento)</string>
-    <string name="sync_background_interval">Intervallo in background (minuti)</string>
     <string name="sync_background_hint">Disattivato per impostazione predefinita: a schermo spento non si sincronizza nulla. Gli intervalli sotto i 15 minuti usano allarmi e più batteria.</string>
     <string name="sync_wifi_only">Non sincronizzare con i dati mobili</string>
     <string name="sync_group_display">A schermo acceso</string>
@@ -270,4 +231,10 @@
     <string name="first_sync_hint">La prima sincronizzazione può richiedere alcuni minuti, a seconda del numero di note.</string>
     <string name="note_changed_remote">Questa nota è stata modificata in Keep. Ricaricare sostituisce ciò che hai scritto.</string>
     <string name="reload">Ricarica</string>
+    <string name="move_up">Sposta su</string>
+    <string name="move_down">Sposta giù</string>
+    <string name="note_image">Immagine</string>
+    <string name="item_checked">Selezionato</string>
+    <string name="item_unchecked">Non selezionato</string>
+    <string name="drag_handle">Trascina per riordinare</string>
 </resources>

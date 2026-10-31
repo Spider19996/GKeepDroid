@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="widget_description">Zeigt deine Google Keep Notizen mit einstellbarem Hintergrund an.</string>
-    <string name="account">Konto</string>
     <string name="email_label">E-Mail-Adresse des Google-Kontos</string>
     <string name="token_label">Master-Token (aas_et/...)</string>
     <string name="token_label_saved">Master-Token (gespeichert, leer lassen zum Behalten)</string>
@@ -12,12 +11,8 @@
     <string name="show_note_colors">Notizfarben anzeigen</string>
     <string name="note_opacity">Deckkraft der Notizkarten: %1$d%%</string>
     <string name="sync_section">Synchronisierung</string>
-    <string name="sync_interval">Auf Änderungen prüfen</string>
     <string name="sync_manual">Nur manuell</string>
     <string name="save">Speichern</string>
-    <string name="save_and_sync">Speichern und synchronisieren</string>
-    <string name="saved">Gespeichert.</string>
-    <string name="saved_syncing">Gespeichert. Notizen werden im Hintergrund synchronisiert...</string>
     <string name="credentials_required">E-Mail und Master-Token sind erforderlich.</string>
     <string name="no_notes">Noch keine Notizen. Öffne die Einstellungen (⚙), um dich anzumelden.</string>
     <string name="new_note">Neue Notiz</string>
@@ -36,8 +31,6 @@
     <string name="theme_light">Hell</string>
     <string name="theme_dark">Dunkel</string>
     <string name="theme_oled">OLED-Schwarz</string>
-    <string name="tab_sync">Sync</string>
-    <string name="tab_widget">Widget</string>
     <string name="tab_accounts">Konten</string>
     <string name="tab_backup">Sicherung</string>
     <string name="plain_style">Karten ohne Farbe</string>
@@ -54,23 +47,17 @@
     <string name="import_done">Einstellungen importiert.</string>
     <string name="import_failed">Import fehlgeschlagen: %1$s</string>
     <string name="backup_note">Weder der Master-Token noch E-Mail-Adressen werden exportiert. Nach dem Import müssen die Konten neu hinzugefügt werden.</string>
-    <string name="tab_general">Allgemein</string>
     <string name="color_picker_title">Eigene Farbe</string>
     <string name="color_hue">Farbton</string>
     <string name="color_saturation">Sättigung</string>
     <string name="color_brightness">Helligkeit</string>
     <string name="header_position">Position der Buttonleiste</string>
-    <string name="position_top">Oben</string>
-    <string name="position_bottom">Unten</string>
     <string name="header_size">Button-Größe: %1$d dp</string>
     <string name="list_section">Checklisten</string>
     <string name="check_in_widget">Einträge direkt im Widget abhaken</string>
     <string name="checked_to_end">Abgehakte Einträge ans Ende verschieben</string>
     <string name="collapse_checked">Abgehakte Einträge standardmäßig einklappen</string>
     <string name="list_spacing">Abstand der Einträge</string>
-    <string name="spacing_compact">Kompakt</string>
-    <string name="spacing_normal">Normal</string>
-    <string name="spacing_comfortable">Großzügig</string>
     <string name="checked_count">%1$d abgehakt</string>
     <string name="note_gone">Diese Notiz existiert nicht mehr.</string>
     <string name="offline_note">Offline: Es wird die zuletzt bekannte Version angezeigt.</string>
@@ -80,7 +67,6 @@
     <string name="sort_edited">Zuletzt bearbeitet</string>
     <string name="sort_created">Erstellungsdatum</string>
     <string name="sort_title">Titel (A–Z)</string>
-    <string name="pinned_first">Angeheftete Notizen zuerst</string>
     <string name="show_images">Bilder anzeigen</string>
     <string name="show_keep_button">Button „Google Keep öffnen“ anzeigen</string>
     <string name="select_note">Notiz in diesem Widget</string>
@@ -103,13 +89,9 @@
     <string name="checkbox_style">Kästchen-Stil</string>
     <string name="checkbox_size">Kästchen-Größe: %1$d dp</string>
     <string name="tap_whole_row">Abhaken durch Tippen auf die ganze Zeile</string>
-    <string name="pin_off">Im Widget anheften</string>
-    <string name="pin_top">Oben angeheftet</string>
-    <string name="pin_bottom">Unten angeheftet</string>
     <string name="delete_checked">Abgehakte Einträge sofort löschen</string>
     <string name="image_open_gallery">In Galerie öffnen</string>
     <string name="image_remove">Bild entfernen</string>
-    <string name="image_remove_confirm">Dieses Bild aus der Notiz entfernen? Das lässt sich nicht rückgängig machen.</string>
     <string name="image_add_keep">Bild in Google Keep hinzufügen</string>
     <string name="search_notes_hint">Notizen durchsuchen</string>
     <string name="show_search_bar">Such-Button anzeigen</string>
@@ -121,7 +103,6 @@
     <string name="image_removal_pending">Das Bild wird beim Speichern entfernt.</string>
     <string name="image_undo">Rückgängig</string>
     <string name="delete_note">Notiz löschen</string>
-    <string name="delete_note_confirm">Diese Notiz in den Papierkorb verschieben? Du kannst sie in Google Notizen wiederherstellen.</string>
     <string name="move_to_trash">In den Papierkorb verschieben</string>
     <string name="archive_note">Archivieren</string>
     <string name="more_actions">Weitere Aktionen</string>
@@ -131,9 +112,6 @@
     <string name="show_sort_button">Sortier-Button anzeigen (manuelle Reihenfolge)</string>
     <string name="show_settings_button">Einstellungs-Button anzeigen</string>
     <string name="settings_button_hint">Wenn du das ausschaltest, öffne die Einstellungen über Android-Einstellungen › Apps › GKeepDroid › App-Einstellungen oder halte das Widget auf dem Homescreen gedrückt und wähle „Neu konfigurieren“ (je nach Launcher).</string>
-    <string name="choose_widget">Welches Widget möchtest du einstellen?</string>
-    <string name="position_left">Links</string>
-    <string name="position_right">Rechts</string>
     <string name="turn_off">Ausschalten</string>
     <string name="text_color_auto">Textfarbe folgt dem System-Design</string>
     <string name="show_edited_time">Anzeigen, wann eine Notiz zuletzt bearbeitet wurde</string>
@@ -155,18 +133,12 @@
     <string name="hide_token_form">Master-Token-Formular ausblenden</string>
     <string name="local_account_name">Lokal (dieses Gerät)</string>
     <string name="local_account_hint">Der lokale Modus speichert Notizen nur auf diesem Gerät. Was im Vergleich zu einem Google-Konto fehlt:\n• Keine Synchronisierung mit Google Keep oder anderen Geräten\n• Keine Bilder oder Zeichnungen\n• Kein Archiv und kein Papierkorb: Löschen ist endgültig\n• Kein „In Google Notizen öffnen“\n• Beim Deinstallieren der App sind alle Notizen weg</string>
-    <string name="login_intro">Gib die E-Mail-Adresse deines Google-Kontos ein und melde dich dann auf der nächsten Seite an. Die App behält nur ein Token, nie dein Passwort.</string>
     <string name="login_continue">Weiter</string>
     <string name="login_failed">Anmeldung fehlgeschlagen: %1$s</string>
     <string name="login_working">Anmeldung wird abgeschlossen…</string>
     <string name="remove_local_confirm">Lokales Konto entfernen? Alle lokalen Notizen werden dauerhaft gelöscht.</string>
     <string name="delete_local_confirm">Diese Notiz endgültig löschen?</string>
     <string name="login_need_email">Die E-Mail-Adresse konnte nicht automatisch gelesen werden. Bitte gib sie ein, um abzuschließen.</string>
-    <string name="export_notes_md">Alle Notizen als Markdown exportieren</string>
-    <string name="export_notes_hint">Speichert jede Notiz einmalig als eigene Markdown-Datei (mit den Bildern) unter Dokumente/GKeepDroid, ein Ordner pro Konto. Für Dateien, die synchron bleiben, nutze den Markdown-Ordner.</string>
-    <string name="export_notes_done">%1$d Notizen nach Dokumente/GKeepDroid exportiert.</string>
-    <string name="export_notes_none">Es gibt noch keine Notizen zum Exportieren.</string>
-    <string name="export_failed">Export fehlgeschlagen: %1$s</string>
     <string name="md_sync_title">Markdown-Ordner (Zwei-Wege-Sync)</string>
     <string name="md_sync_enable">Notizen als Markdown-Dateien ablegen</string>
     <string name="md_sync_choose">Ordner wählen</string>
@@ -208,10 +180,8 @@
     <string name="google_disclaimer">GKeepDroid ist eine inoffizielle, unabhängige App und steht in keiner Verbindung zu Google. Google und Google Keep sind Marken von Google LLC.</string>
     <string name="sync_now">Jetzt synchronisieren</string>
     <string name="sync_started">Synchronisierung gestartet.</string>
-    <string name="show_app_button">Button „GKeepDroid öffnen“ anzeigen</string>
     <string name="orphans_clean">Verwaiste Widgets aufräumen</string>
     <string name="orphans_removed">Einstellungen von %d verwaisten Widgets entfernt. Widgets auf dem Homescreen musst du dort entfernen (Widget lange drücken).</string>
-    <string name="side_off">Aus</string>
     <string name="btn_refresh">Aktualisieren</string>
     <string name="btn_add_item">Eintrag hinzufügen</string>
     <string name="btn_new_note">Neue Notiz</string>
@@ -222,12 +192,6 @@
     <string name="btn_keep">Google Keep öffnen</string>
     <string name="btn_settings">Einstellungen</string>
     <string name="button_layout_hint">Button lange drücken und an den oberen, unteren, linken oder rechten Rand des Widgets ziehen. In der Mitte ablegen schaltet ihn aus.</string>
-    <string name="buttons_hidden">Wird nicht angezeigt</string>
-    <string name="bar_alignment">Ausrichtung: Leiste %s</string>
-    <string name="align_spread">Verteilt</string>
-    <string name="align_start">Anfang</string>
-    <string name="align_center">Mitte</string>
-    <string name="align_end">Ende</string>
     <string name="layout_save">Layout speichern</string>
     <string name="layout_load">Layout laden</string>
     <string name="layout_reset">Standard wiederherstellen</string>
@@ -235,15 +199,12 @@
     <string name="layout_loaded">Layout geladen.</string>
     <string name="layout_failed">Dieses Layout konnte nicht gelesen werden.</string>
     <string name="layout_reset_done">Standard wiederhergestellt</string>
-    <string name="button_size_real">Icon %1$d dp · Button %2$d dp</string>
     <string name="layout_reset_confirm">Standard-Buttonleiste wiederherstellen? Dein aktuelles Layout wird ersetzt.</string>
     <string name="edited_as_date">Datum statt „vor 2 Tagen“ anzeigen</string>
-    <string name="sync_display_on">Sync-Intervall bei eingeschaltetem Display (Minuten, 0 = aus)</string>
     <string name="sync_on_unlock">Beim Entsperren synchronisieren</string>
     <string name="sync_min_gap">Mindestabstand zwischen zwei Syncs</string>
     <string name="sync_min_gap_hint">Auch wenn du das Handy mehrmals pro Minute entsperrst, fragt die App Google nicht jedes Mal: Ein zu früh angeforderter Sync wird übersprungen. Der Aktualisieren-Button und „Jetzt synchronisieren“ synchronisieren immer.</string>
     <string name="sync_background">Im Hintergrund synchronisieren (Display aus)</string>
-    <string name="sync_background_interval">Intervall im Hintergrund (Minuten)</string>
     <string name="sync_background_hint">Standardmäßig aus: Bei ausgeschaltetem Display wird nichts synchronisiert. Intervalle unter 15 Minuten nutzen Alarme und verbrauchen mehr Akku.</string>
     <string name="sync_wifi_only">Nicht über mobile Daten synchronisieren</string>
     <string name="sync_group_display">Bei eingeschaltetem Display</string>
@@ -270,4 +231,10 @@
     <string name="first_sync_hint">Die erste Synchronisierung kann einige Minuten dauern, je nachdem, wie viele Notizen du hast.</string>
     <string name="note_changed_remote">Diese Notiz wurde in Keep geändert. Neu laden ersetzt, was du getippt hast.</string>
     <string name="reload">Neu laden</string>
+    <string name="move_up">Nach oben</string>
+    <string name="move_down">Nach unten</string>
+    <string name="note_image">Bild</string>
+    <string name="item_checked">Abgehakt</string>
+    <string name="item_unchecked">Nicht abgehakt</string>
+    <string name="drag_handle">Zum Umsortieren ziehen</string>
 </resources>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="widget_description">आपके Google Keep नोट्स को बदले जा सकने वाले बैकग्राउंड के साथ दिखाता है।</string>
-    <string name="account">खाता</string>
     <string name="email_label">Google खाते का ईमेल</string>
     <string name="token_label">मास्टर टोकन (aas_et/...)</string>
     <string name="token_label_saved">मास्टर टोकन (सहेजा गया, रखने के लिए खाली छोड़ें)</string>
@@ -12,12 +11,8 @@
     <string name="show_note_colors">नोट के रंग दिखाएँ</string>
     <string name="note_opacity">नोट कार्ड की अपारदर्शिता: %1$d%%</string>
     <string name="sync_section">सिंक</string>
-    <string name="sync_interval">बदलाव जाँचें</string>
     <string name="sync_manual">सिर्फ़ मैन्युअल</string>
     <string name="save">सहेजें</string>
-    <string name="save_and_sync">सहेजें और सिंक करें</string>
-    <string name="saved">सहेजा गया।</string>
-    <string name="saved_syncing">सहेजा गया। नोट्स बैकग्राउंड में सिंक हो रहे हैं...</string>
     <string name="credentials_required">ईमेल और मास्टर टोकन ज़रूरी हैं।</string>
     <string name="no_notes">अभी कोई नोट नहीं है। साइन इन करने के लिए सेटिंग (⚙) खोलें।</string>
     <string name="new_note">नया नोट</string>
@@ -36,8 +31,6 @@
     <string name="theme_light">लाइट</string>
     <string name="theme_dark">डार्क</string>
     <string name="theme_oled">OLED ब्लैक</string>
-    <string name="tab_sync">सिंक</string>
-    <string name="tab_widget">विजेट</string>
     <string name="tab_accounts">खाते</string>
     <string name="tab_backup">बैकअप</string>
     <string name="plain_style">बिना रंग वाले नोट</string>
@@ -54,23 +47,17 @@
     <string name="import_done">सेटिंग आयात हो गई।</string>
     <string name="import_failed">आयात विफल: %1$s</string>
     <string name="backup_note">न मास्टर टोकन और न ही ईमेल पते निर्यात किए जाते हैं। आयात के बाद अपने खाते फिर से जोड़ें।</string>
-    <string name="tab_general">सामान्य</string>
     <string name="color_picker_title">कस्टम रंग</string>
     <string name="color_hue">ह्यू</string>
     <string name="color_saturation">संतृप्ति</string>
     <string name="color_brightness">चमक</string>
     <string name="header_position">बटन बार की स्थिति</string>
-    <string name="position_top">ऊपर</string>
-    <string name="position_bottom">नीचे</string>
     <string name="header_size">बटन का आकार: %1$d dp</string>
     <string name="list_section">चेकलिस्ट</string>
     <string name="check_in_widget">विजेट में सीधे आइटम चेक करें</string>
     <string name="checked_to_end">चेक किए गए आइटम को अंत में ले जाएँ</string>
     <string name="collapse_checked">चेक किए गए आइटम को डिफ़ॉल्ट रूप से समेटें</string>
     <string name="list_spacing">आइटम के बीच की दूरी</string>
-    <string name="spacing_compact">सघन</string>
-    <string name="spacing_normal">सामान्य</string>
-    <string name="spacing_comfortable">खुला</string>
     <string name="checked_count">%1$d चेक किए गए</string>
     <string name="note_gone">यह नोट अब मौजूद नहीं है।</string>
     <string name="offline_note">ऑफ़लाइन: आखिरी ज्ञात संस्करण दिखाया जा रहा है।</string>
@@ -80,7 +67,6 @@
     <string name="sort_edited">आखिरी बार संपादित</string>
     <string name="sort_created">बनाने की तारीख</string>
     <string name="sort_title">शीर्षक (अ–ज्ञ)</string>
-    <string name="pinned_first">पिन किए गए नोट पहले</string>
     <string name="show_images">छवियाँ दिखाएँ</string>
     <string name="show_keep_button">\"Google Keep खोलें\" बटन दिखाएँ</string>
     <string name="select_note">इस विजेट का नोट</string>
@@ -103,13 +89,9 @@
     <string name="checkbox_style">चेकबॉक्स की शैली</string>
     <string name="checkbox_size">चेकबॉक्स का आकार: %1$d dp</string>
     <string name="tap_whole_row">पंक्ति में कहीं भी छूकर चेक करें</string>
-    <string name="pin_off">विजेट में पिन करें</string>
-    <string name="pin_top">ऊपर पिन किया</string>
-    <string name="pin_bottom">नीचे पिन किया</string>
     <string name="delete_checked">चेक किए गए आइटम तुरंत हटाएँ</string>
     <string name="image_open_gallery">गैलरी में खोलें</string>
     <string name="image_remove">छवि हटाएँ</string>
-    <string name="image_remove_confirm">क्या यह छवि नोट से हटाएँ? इसे वापस नहीं किया जा सकता।</string>
     <string name="image_add_keep">Google Keep में छवि जोड़ें</string>
     <string name="search_notes_hint">नोट्स खोजें</string>
     <string name="show_search_bar">खोज बटन दिखाएँ</string>
@@ -121,7 +103,6 @@
     <string name="image_removal_pending">सहेजने पर छवि हटा दी जाएगी।</string>
     <string name="image_undo">पूर्ववत करें</string>
     <string name="delete_note">नोट हटाएँ</string>
-    <string name="delete_note_confirm">क्या इस नोट को ट्रैश में ले जाएँ? आप इसे Google Keep में वापस ला सकते हैं।</string>
     <string name="move_to_trash">ट्रैश में ले जाएँ</string>
     <string name="archive_note">संग्रहित करें</string>
     <string name="more_actions">और कार्रवाइयाँ</string>
@@ -131,9 +112,6 @@
     <string name="show_sort_button">क्रमबद्ध करें बटन दिखाएँ (मैन्युअल क्रम)</string>
     <string name="show_settings_button">सेटिंग बटन दिखाएँ</string>
     <string name="settings_button_hint">इसे बंद करने पर Android सेटिंग › ऐप्स › GKeepDroid › ऐप सेटिंग से सेटिंग खोलें, या होम स्क्रीन पर विजेट को देर तक दबाकर पुनः कॉन्फ़िगर करें चुनें (लॉन्चर पर निर्भर)।</string>
-    <string name="choose_widget">आप कौन-सा विजेट कॉन्फ़िगर करना चाहते हैं?</string>
-    <string name="position_left">बाएँ</string>
-    <string name="position_right">दाएँ</string>
     <string name="turn_off">बंद करें</string>
     <string name="text_color_auto">टेक्स्ट का रंग सिस्टम थीम के अनुसार</string>
     <string name="show_edited_time">नोट आखिरी बार कब संपादित हुआ, दिखाएँ</string>
@@ -155,18 +133,12 @@
     <string name="hide_token_form">मास्टर टोकन फ़ॉर्म छिपाएँ</string>
     <string name="local_account_name">स्थानीय (यह डिवाइस)</string>
     <string name="local_account_hint">स्थानीय मोड नोट केवल इसी डिवाइस पर रखता है। Google खाते की तुलना में क्या नहीं है:\n• Google Keep या अन्य डिवाइस के साथ सिंक नहीं\n• छवियाँ या ड्रॉइंग नहीं\n• आर्काइव और ट्रैश नहीं: हटाना स्थायी है\n• \"Google Keep में खोलें\" नहीं\n• ऐप अनइंस्टॉल करने पर सभी नोट हट जाते हैं</string>
-    <string name="login_intro">अपने Google खाते का ईमेल दर्ज करें, फिर अगले पेज पर साइन इन करें। ऐप केवल एक टोकन रखता है, आपका पासवर्ड कभी नहीं।</string>
     <string name="login_continue">जारी रखें</string>
     <string name="login_failed">साइन इन विफल: %1$s</string>
     <string name="login_working">साइन इन पूरा हो रहा है…</string>
     <string name="remove_local_confirm">क्या स्थानीय खाता हटाएँ? सभी स्थानीय नोट स्थायी रूप से हट जाएँगे।</string>
     <string name="delete_local_confirm">क्या यह नोट हमेशा के लिए हटाएँ?</string>
     <string name="login_need_email">ईमेल पता अपने-आप नहीं पढ़ा जा सका। पूरा करने के लिए उसे दर्ज करें।</string>
-    <string name="export_notes_md">सभी नोट Markdown में निर्यात करें</string>
-    <string name="export_notes_hint">हर नोट को एक बार, अलग Markdown फ़ाइल के रूप में (चित्रों सहित) दस्तावेज़/GKeepDroid में सहेजता है, हर खाते के लिए एक फ़ोल्डर। सिंक रहने वाली फ़ाइलों के लिए Markdown फ़ोल्डर उपयोग करें।</string>
-    <string name="export_notes_done">%1$d नोट दस्तावेज़/GKeepDroid में निर्यात किए गए।</string>
-    <string name="export_notes_none">निर्यात करने के लिए अभी कोई नोट नहीं है।</string>
-    <string name="export_failed">निर्यात विफल: %1$s</string>
     <string name="md_sync_title">Markdown फ़ोल्डर (दोतरफ़ा सिंक)</string>
     <string name="md_sync_enable">नोट को Markdown फ़ाइलों के रूप में रखें</string>
     <string name="md_sync_choose">फ़ोल्डर चुनें</string>
@@ -208,10 +180,8 @@
     <string name="google_disclaimer">GKeepDroid एक अनौपचारिक, स्वतंत्र ऐप है और Google से संबद्ध, समर्थित या स्वीकृत नहीं है। Google और Google Keep, Google LLC के ट्रेडमार्क हैं।</string>
     <string name="sync_now">अभी सिंक करें</string>
     <string name="sync_started">सिंक शुरू हुआ।</string>
-    <string name="show_app_button">“GKeepDroid खोलें” बटन दिखाएँ</string>
     <string name="orphans_clean">बचे हुए विजेट साफ़ करें</string>
     <string name="orphans_removed">%d बचे हुए विजेट की सेटिंग हटाई गईं। होम स्क्रीन के विजेट वहीं से हटाएँ (विजेट को देर तक दबाएँ)।</string>
-    <string name="side_off">बंद</string>
     <string name="btn_refresh">रीफ़्रेश</string>
     <string name="btn_add_item">आइटम जोड़ें</string>
     <string name="btn_new_note">नया नोट</string>
@@ -222,12 +192,6 @@
     <string name="btn_keep">Google Keep खोलें</string>
     <string name="btn_settings">सेटिंग</string>
     <string name="button_layout_hint">बटन को देर तक दबाकर विजेट के ऊपर, नीचे, बाएँ या दाएँ किनारे पर खींचें। बंद करने के लिए बीच में छोड़ें।</string>
-    <string name="buttons_hidden">दिखाए नहीं जाते</string>
-    <string name="bar_alignment">संरेखण: %s पट्टी</string>
-    <string name="align_spread">फैला हुआ</string>
-    <string name="align_start">शुरुआत</string>
-    <string name="align_center">बीच</string>
-    <string name="align_end">अंत</string>
     <string name="layout_save">लेआउट सहेजें</string>
     <string name="layout_load">लेआउट लोड करें</string>
     <string name="layout_reset">डिफ़ॉल्ट बहाल करें</string>
@@ -235,15 +199,12 @@
     <string name="layout_loaded">लेआउट लोड हुआ।</string>
     <string name="layout_failed">यह लेआउट पढ़ा नहीं जा सका।</string>
     <string name="layout_reset_done">डिफ़ॉल्ट बहाल हुआ</string>
-    <string name="button_size_real">आइकन %1$d dp · बटन %2$d dp</string>
     <string name="layout_reset_confirm">डिफ़ॉल्ट बटन बार बहाल करें? आपका मौजूदा लेआउट बदल जाएगा।</string>
     <string name="edited_as_date">“2 दिन पहले” की जगह तारीख दिखाएँ</string>
-    <string name="sync_display_on">डिस्प्ले चालू होने पर सिंक अंतराल (मिनट, 0 = बंद)</string>
     <string name="sync_on_unlock">अनलॉक करने पर सिंक करें</string>
     <string name="sync_min_gap">दो सिंक के बीच न्यूनतम समय</string>
     <string name="sync_min_gap_hint">फ़ोन प्रति मिनट कई बार अनलॉक करने पर भी हर बार Google से नहीं पूछा जाता: बहुत जल्दी माँगा गया सिंक छोड़ दिया जाता है। रीफ़्रेश बटन और “अभी सिंक करें” हमेशा सिंक करते हैं।</string>
     <string name="sync_background">बैकग्राउंड में सिंक करें (डिस्प्ले बंद)</string>
-    <string name="sync_background_interval">बैकग्राउंड अंतराल (मिनट)</string>
     <string name="sync_background_hint">डिफ़ॉल्ट रूप से बंद: डिस्प्ले बंद होने पर कुछ भी सिंक नहीं होता। 15 मिनट से कम अंतराल अलार्म इस्तेमाल करते हैं और ज़्यादा बैटरी लेते हैं।</string>
     <string name="sync_wifi_only">मोबाइल डेटा पर सिंक न करें</string>
     <string name="sync_group_display">डिस्प्ले चालू होने पर</string>
@@ -270,4 +231,10 @@
     <string name="first_sync_hint">पहला सिंक नोट्स की संख्या के अनुसार कुछ मिनट ले सकता है।</string>
     <string name="note_changed_remote">यह नोट Keep में बदला गया। फिर से लोड करने पर आपका टाइप किया हुआ बदल जाएगा।</string>
     <string name="reload">फिर से लोड करें</string>
+    <string name="move_up">ऊपर ले जाएँ</string>
+    <string name="move_down">नीचे ले जाएँ</string>
+    <string name="note_image">चित्र</string>
+    <string name="item_checked">चुना हुआ</string>
+    <string name="item_unchecked">चुना नहीं गया</string>
+    <string name="drag_handle">क्रम बदलने के लिए खींचें</string>
 </resources>

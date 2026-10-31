@@ -14,7 +14,7 @@ An unofficial Android app for your Google Keep notes: home screen widgets with a
 - **Widget look**: background opacity from 0 to 100 %, text size and color, Keep's note colors, cards for notes without a color (transparent, gray or with a border)
 - **Button bar**: every button (refresh, new note, search, ...) can be hidden or dragged to any side of the widget, in any order, with an adjustable size
 - **Checklists**: tick items right in the widget, checked items move to the end, "3/7" progress, drag items to re-order them
-- **Full app**: grid or list of all notes, search, label filter, archive and trash, undo, long-press to re-order notes in Keep's order, images, sharing
+- **Full app**: grid or list of all notes, search, label filter, archive and trash, undo, long-press to re-order notes (also in archive and trash) in Keep's order, images, sharing
 - **Labels**: create, assign, delete and filter by them
 - **Private notes**: hide their content on the cards; they open only after the device lock (PIN, pattern, fingerprint)
 - **Sign in** with your Google account, with a master token, or **without an account** (notes stay on the device). Several accounts are possible

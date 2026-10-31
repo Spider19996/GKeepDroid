@@ -179,16 +179,13 @@ class MainActivity : ComponentActivity() {
                     AppScreen.Trash -> NotesCache.readOther(context, account).filter { it.state == "trashed" }
                 }
                 notes.map { it to account }
-            }.filter { it.first.matches(query) && (filterLabel == null || filterLabel in it.first.labels) }
-            if (screen == AppScreen.Notes) {
-                when (app.sortMode) {
-                    SORT_EDITED -> entries.sortedByDescending { it.first.updated }
-                    SORT_CREATED -> entries.sortedByDescending { it.first.created }
-                    SORT_TITLE -> entries.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { noteLabel(it.first) })
-                    else -> entries.sortedByDescending { it.first.sort }
-                }
-            } else {
-                entries.sortedByDescending { it.first.updated }
+            }.filter { it.first.matches(query) && (screen != AppScreen.Notes || filterLabel == null || filterLabel in it.first.labels) }
+            // Archive and trash are sorted like the notes.
+            when (app.sortMode) {
+                SORT_EDITED -> entries.sortedByDescending { it.first.updated }
+                SORT_CREATED -> entries.sortedByDescending { it.first.created }
+                SORT_TITLE -> entries.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { noteLabel(it.first) })
+                else -> entries.sortedByDescending { it.first.sort }
             }
         }
 
@@ -378,7 +375,7 @@ class MainActivity : ComponentActivity() {
                     }
                 } else {
                     // Notes can be dragged into a new place in Keep's order, for one account and without a search.
-                    val canReorder = screen == AppScreen.Notes && app.sortMode == SORT_KEEP && query.isBlank() && filterLabel == null &&
+                    val canReorder = app.sortMode == SORT_KEEP && query.isBlank() && (screen != AppScreen.Notes || filterLabel == null) &&
                         shown.map { it.second }.distinct().size == 1
                     NotesGrid(shown, screen, app, canReorder, ::openEditor, { block -> act(block) }, { deleteTarget = it })
                 }
@@ -430,8 +427,8 @@ class MainActivity : ComponentActivity() {
                 keyOf(it) != key && cardBounds[keyOf(it)]?.let { r -> r.deflate(minOf(r.width, r.height) * 0.25f).contains(pointer) } == true
             }
             if (from < 0 || to < 0) return
-            // Pinned and other notes keep their own sections.
-            if (app.pinnedSection && current[from].first.pinned != current[to].first.pinned) return
+            // Pinned and other notes keep their own sections (only the notes screen has them).
+            if (screen == AppScreen.Notes && app.pinnedSection && current[from].first.pinned != current[to].first.pinned) return
             lastMove = now
             dragOrder = current.toMutableList().also { it.add(to, it.removeAt(from)) }
         }
@@ -442,7 +439,7 @@ class MainActivity : ComponentActivity() {
             dragKey = null
             if (key == null || order == null) return
             val entry = order.firstOrNull { keyOf(it) == key } ?: return
-            val group = if (app.pinnedSection) order.filter { it.first.pinned == entry.first.pinned } else order
+            val group = if (screen == AppScreen.Notes && app.pinnedSection) order.filter { it.first.pinned == entry.first.pinned } else order
             val at = group.indexOfFirst { keyOf(it) == key }
             val above = group.getOrNull(at - 1)?.first?.sort
             val below = group.getOrNull(at + 1)?.first?.sort
@@ -600,7 +597,7 @@ class MainActivity : ComponentActivity() {
             if (thumb != null) {
                 Image(
                     bitmap = thumb.asImageBitmap(),
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.note_image),
                     contentScale = ContentScale.FillWidth,
                     modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)),
                 )
@@ -621,7 +618,7 @@ class MainActivity : ComponentActivity() {
                     if (note.pinned) {
                         Icon(
                             painterResource(R.drawable.ic_push_pin),
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.pinned_section),
                             tint = textColor,
                             modifier = Modifier.padding(start = 6.dp).size(16.dp),
                         )

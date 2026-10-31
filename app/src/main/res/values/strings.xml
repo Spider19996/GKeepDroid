@@ -4,7 +4,6 @@
     <string name="interval_min" translatable="false">%1$d min</string>
     <string name="interval_hour" translatable="false">%1$d h</string>
     <string name="widget_description">Shows your Google Keep notes with an adjustable background.</string>
-    <string name="account">Account</string>
     <string name="email_label">Google account e-mail</string>
     <string name="token_label">Master token (aas_et/...)</string>
     <string name="token_label_saved">Master token (saved, leave empty to keep)</string>
@@ -15,12 +14,8 @@
     <string name="show_note_colors">Show note colors</string>
     <string name="note_opacity">Note card opacity: %1$d%%</string>
     <string name="sync_section">Synchronization</string>
-    <string name="sync_interval">Check for changes</string>
     <string name="sync_manual">Manual only</string>
     <string name="save">Save</string>
-    <string name="save_and_sync">Save and sync</string>
-    <string name="saved">Saved.</string>
-    <string name="saved_syncing">Saved. Syncing notes in the background...</string>
     <string name="credentials_required">E-mail and master token are required.</string>
     <string name="no_notes">No notes yet. Open the settings (⚙) to sign in.</string>
     <string name="new_note">New note</string>
@@ -39,8 +34,6 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_oled">OLED black</string>
-    <string name="tab_sync">Sync</string>
-    <string name="tab_widget">Widget</string>
     <string name="tab_accounts">Accounts</string>
     <string name="tab_backup">Backup</string>
     <string name="plain_style">Cards without color</string>
@@ -57,23 +50,17 @@
     <string name="import_done">Settings imported.</string>
     <string name="import_failed">Import failed: %1$s</string>
     <string name="backup_note">Neither the master token nor e-mail addresses are exported. After importing, add your accounts again.</string>
-    <string name="tab_general">General</string>
     <string name="color_picker_title">Custom color</string>
     <string name="color_hue">Hue</string>
     <string name="color_saturation">Saturation</string>
     <string name="color_brightness">Brightness</string>
     <string name="header_position">Button bar position</string>
-    <string name="position_top">Top</string>
-    <string name="position_bottom">Bottom</string>
     <string name="header_size">Button size: %1$d dp</string>
     <string name="list_section">Checklists</string>
     <string name="check_in_widget">Check items directly in the widget</string>
     <string name="checked_to_end">Move checked items to the end</string>
     <string name="collapse_checked">Collapse checked items by default</string>
     <string name="list_spacing">Item spacing</string>
-    <string name="spacing_compact">Compact</string>
-    <string name="spacing_normal">Normal</string>
-    <string name="spacing_comfortable">Comfortable</string>
     <string name="checked_count">%1$d checked</string>
     <string name="note_gone">This note no longer exists.</string>
     <string name="offline_note">Offline: showing the last known version.</string>
@@ -83,7 +70,6 @@
     <string name="sort_edited">Last edited</string>
     <string name="sort_created">Date created</string>
     <string name="sort_title">Title (A–Z)</string>
-    <string name="pinned_first">Pinned notes first</string>
     <string name="show_images">Show images</string>
     <string name="show_keep_button">Show \"Open Google Keep\" button</string>
     <string name="select_note">Note shown in this widget</string>
@@ -106,13 +92,9 @@
     <string name="checkbox_style">Checkbox style</string>
     <string name="checkbox_size">Checkbox size: %1$d dp</string>
     <string name="tap_whole_row">Tick by tapping anywhere on the row</string>
-    <string name="pin_off">Pin in widget</string>
-    <string name="pin_top">Pinned to top</string>
-    <string name="pin_bottom">Pinned to bottom</string>
     <string name="delete_checked">Delete checked items immediately</string>
     <string name="image_open_gallery">Open in gallery</string>
     <string name="image_remove">Remove image</string>
-    <string name="image_remove_confirm">Remove this image from the note? This cannot be undone.</string>
     <string name="image_add_keep">Add image in Google Keep</string>
     <string name="search_notes_hint">Search notes</string>
     <string name="show_search_bar">Show search button</string>
@@ -124,7 +106,6 @@
     <string name="image_removal_pending">The image will be removed when you save.</string>
     <string name="image_undo">Undo</string>
     <string name="delete_note">Delete note</string>
-    <string name="delete_note_confirm">Move this note to the trash? You can restore it in Google Keep.</string>
     <string name="move_to_trash">Move to trash</string>
     <string name="archive_note">Archive</string>
     <string name="more_actions">More actions</string>
@@ -134,9 +115,6 @@
     <string name="show_sort_button">Show sort button (manual order)</string>
     <string name="show_settings_button">Show settings button</string>
     <string name="settings_button_hint">If you turn this off, open the settings via Android Settings › Apps › GKeepDroid › App settings, or long-press the widget on the home screen and choose Reconfigure (depends on your launcher).</string>
-    <string name="choose_widget">Which widget do you want to configure?</string>
-    <string name="position_left">Left</string>
-    <string name="position_right">Right</string>
     <string name="turn_off">Turn off</string>
     <string name="text_color_auto">Text color follows the system theme</string>
     <string name="show_edited_time">Show when a note was last edited</string>
@@ -158,18 +136,12 @@
     <string name="hide_token_form">Hide the master token form</string>
     <string name="local_account_name">Local (this device)</string>
     <string name="local_account_hint">Local mode keeps notes only on this device. What is missing compared to a Google account:\n• No sync with Google Keep or other devices\n• No images or drawings\n• No archive or trash: deleting is permanent\n• No \"Open in Google Keep\"\n• Uninstalling the app deletes all notes</string>
-    <string name="login_intro">Enter your Google account e-mail, then sign in on the next page. The app only keeps a token, never your password.</string>
     <string name="login_continue">Continue</string>
     <string name="login_failed">Sign-in failed: %1$s</string>
     <string name="login_working">Finishing sign-in…</string>
     <string name="remove_local_confirm">Remove the local account? All local notes will be deleted permanently.</string>
     <string name="delete_local_confirm">Delete this note permanently?</string>
     <string name="login_need_email">The e-mail address could not be read automatically. Please enter it to finish.</string>
-    <string name="export_notes_md">Export all notes as Markdown</string>
-    <string name="export_notes_hint">Saves every note as its own Markdown file (with the images) in Documents/GKeepDroid, once, one folder per account. For files that stay in sync, use the Markdown folder.</string>
-    <string name="export_notes_done">Exported %1$d notes to Documents/GKeepDroid.</string>
-    <string name="export_notes_none">There are no notes to export yet.</string>
-    <string name="export_failed">Export failed: %1$s</string>
     <string name="md_sync_title">Markdown folder (two-way sync)</string>
     <string name="md_sync_enable">Keep notes as Markdown files</string>
     <string name="md_sync_choose">Choose folder</string>
@@ -211,10 +183,8 @@
     <string name="google_disclaimer">GKeepDroid is an unofficial, independent app and is not affiliated with, endorsed or supported by Google. Google and Google Keep are trademarks of Google LLC.</string>
     <string name="sync_now">Sync now</string>
     <string name="sync_started">Sync started.</string>
-    <string name="show_app_button">Show \"Open GKeepDroid\" button</string>
     <string name="orphans_clean">Clean up leftover widgets</string>
     <string name="orphans_removed">Removed settings of %d leftover widgets. Widgets still on the home screen must be removed there (long-press the widget).</string>
-    <string name="side_off">Off</string>
     <string name="btn_refresh">Refresh</string>
     <string name="btn_add_item">Add item</string>
     <string name="btn_new_note">New note</string>
@@ -225,12 +195,6 @@
     <string name="btn_keep">Open Google Keep</string>
     <string name="btn_settings">Settings</string>
     <string name="button_layout_hint">Long-press a button and drag it to the top, bottom, left or right edge of the widget. Drop it in the middle to turn it off.</string>
-    <string name="buttons_hidden">Not shown</string>
-    <string name="bar_alignment">Alignment: %s bar</string>
-    <string name="align_spread">Spread</string>
-    <string name="align_start">Start</string>
-    <string name="align_center">Center</string>
-    <string name="align_end">End</string>
     <string name="layout_save">Save layout</string>
     <string name="layout_load">Load layout</string>
     <string name="layout_reset">Restore default</string>
@@ -238,15 +202,12 @@
     <string name="layout_loaded">Layout loaded.</string>
     <string name="layout_failed">Could not read this layout.</string>
     <string name="layout_reset_done">Default restored</string>
-    <string name="button_size_real">Icon %1$d dp · button %2$d dp</string>
     <string name="layout_reset_confirm">Restore the default button bar? Your current layout will be replaced.</string>
     <string name="edited_as_date">Show the date instead of “2 days ago”</string>
-    <string name="sync_display_on">Sync interval while the display is on (minutes, 0 = off)</string>
     <string name="sync_on_unlock">Sync when unlocking the phone</string>
     <string name="sync_min_gap">Minimum time between two syncs</string>
     <string name="sync_min_gap_hint">Unlocking the phone many times a minute does not ask Google every time: a sync requested sooner is skipped. The refresh button and “Sync now” always sync.</string>
     <string name="sync_background">Sync in the background (display off)</string>
-    <string name="sync_background_interval">Background interval (minutes)</string>
     <string name="sync_background_hint">Off by default: while the display is off, nothing is synced. Intervals below 15 minutes use alarms and more battery.</string>
     <string name="sync_wifi_only">No sync on mobile data</string>
     <string name="sync_group_display">While the display is on</string>
@@ -273,4 +234,10 @@
     <string name="first_sync_hint">The first sync can take a few minutes, depending on how many notes you have.</string>
     <string name="note_changed_remote">This note was changed in Keep. Reloading replaces what you typed.</string>
     <string name="reload">Reload</string>
+    <string name="move_up">Move up</string>
+    <string name="move_down">Move down</string>
+    <string name="note_image">Image</string>
+    <string name="item_checked">Checked</string>
+    <string name="item_unchecked">Not checked</string>
+    <string name="drag_handle">Drag to re-order</string>
 </resources>

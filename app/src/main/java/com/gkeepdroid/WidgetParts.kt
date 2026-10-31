@@ -121,14 +121,16 @@ internal fun GlanceModifier.noteBackground(
  * A button of the button bar: the icon with 8 dp of padding on each side as its touch target.
  */
 @Composable
-internal fun HeaderIcon(modifier: GlanceModifier, @DrawableRes icon: Int, color: ColorProvider, sizeDp: Int, action: Action) {
+internal fun HeaderIcon(
+    modifier: GlanceModifier, @DrawableRes icon: Int, color: ColorProvider, sizeDp: Int, action: Action, description: String,
+) {
     Box(
         modifier.padding(8.dp).clickable(action),
         contentAlignment = Alignment.Center,
     ) {
         Image(
             provider = ImageProvider(icon),
-            contentDescription = null,
+            contentDescription = description,
             colorFilter = ColorFilter.tint(color),
             modifier = GlanceModifier.size(sizeDp.dp),
         )
@@ -137,11 +139,11 @@ internal fun HeaderIcon(modifier: GlanceModifier, @DrawableRes icon: Int, color:
 
 /** A small arrow button on a note card, shown while the widget is in re-order mode. */
 @Composable
-internal fun ArrowButton(@DrawableRes icon: Int, color: ColorProvider, action: Action) {
+internal fun ArrowButton(@DrawableRes icon: Int, color: ColorProvider, description: String, action: Action) {
     Box(GlanceModifier.padding(horizontal = 6.dp, vertical = 2.dp).clickable(action)) {
         Image(
             provider = ImageProvider(icon),
-            contentDescription = null,
+            contentDescription = description,
             colorFilter = ColorFilter.tint(color),
             modifier = GlanceModifier.size(24.dp),
         )
@@ -153,7 +155,7 @@ internal fun ArrowButton(@DrawableRes icon: Int, color: ColorProvider, action: A
 internal fun PinIndicator(settings: WidgetSettings, palette: TextPalette) {
     Image(
         provider = ImageProvider(R.drawable.ic_push_pin),
-        contentDescription = null,
+        contentDescription = LocalContext.current.getString(R.string.pinned_section),
         colorFilter = ColorFilter.tint(palette.provider()),
         modifier = GlanceModifier.size((settings.textSizeSp + 2).dp).padding(start = 6.dp),
     )
@@ -164,7 +166,7 @@ internal fun PinIndicator(settings: WidgetSettings, palette: TextPalette) {
 internal fun LockIndicator(settings: WidgetSettings, palette: TextPalette) {
     Image(
         provider = ImageProvider(R.drawable.ic_lock),
-        contentDescription = null,
+        contentDescription = LocalContext.current.getString(R.string.note_private_hint),
         colorFilter = ColorFilter.tint(palette.provider()),
         modifier = GlanceModifier.size((settings.textSizeSp + 2).dp).padding(start = 6.dp),
     )
@@ -221,6 +223,19 @@ internal fun EditedTime(note: KeepNote, settings: WidgetSettings, palette: TextP
         style = TextStyle(color = palette.provider(0.6f), fontSize = (settings.textSizeSp - 2).coerceAtLeast(9).sp),
         modifier = GlanceModifier.padding(top = 4.dp),
     )
+}
+
+/** The name of a button, which a screen reader speaks for its icon. */
+private fun buttonLabelRes(id: String): Int = when (id) {
+    BTN_REFRESH -> R.string.btn_refresh
+    BTN_ADD_ITEM -> R.string.btn_add_item
+    BTN_NEW_NOTE -> R.string.btn_new_note
+    BTN_NEW_LIST -> R.string.btn_new_list
+    BTN_SORT -> R.string.btn_sort
+    BTN_SEARCH -> R.string.btn_search
+    BTN_APP -> R.string.btn_app
+    BTN_KEEP -> R.string.btn_keep
+    else -> R.string.btn_settings
 }
 
 private data class BarButton(val id: String, @DrawableRes val icon: Int, val action: Action)
@@ -314,13 +329,13 @@ internal fun HeaderBar(
         Column(GlanceModifier.fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {
             run {
                 Column(GlanceModifier.defaultWeight(), verticalAlignment = Alignment.Top) {
-                    group(ALIGN_START).forEach { HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action) }
+                    group(ALIGN_START).forEach { HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action, context.getString(buttonLabelRes(it.id))) }
                 }
                 Column {
-                    group(ALIGN_CENTER).forEach { HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action) }
+                    group(ALIGN_CENTER).forEach { HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action, context.getString(buttonLabelRes(it.id))) }
                 }
                 Column(GlanceModifier.defaultWeight(), verticalAlignment = Alignment.Bottom) {
-                    group(ALIGN_END).forEach { HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action) }
+                    group(ALIGN_END).forEach { HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action, context.getString(buttonLabelRes(it.id))) }
                 }
             }
         }
@@ -329,13 +344,13 @@ internal fun HeaderBar(
             run {
                 // Equal weights on both outer groups keep the middle group centered.
                 Row(GlanceModifier.defaultWeight(), horizontalAlignment = Alignment.Start) {
-                    group(ALIGN_START).forEach { HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action) }
+                    group(ALIGN_START).forEach { HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action, context.getString(buttonLabelRes(it.id))) }
                 }
                 Row {
-                    group(ALIGN_CENTER).forEach { HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action) }
+                    group(ALIGN_CENTER).forEach { HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action, context.getString(buttonLabelRes(it.id))) }
                 }
                 Row(GlanceModifier.defaultWeight(), horizontalAlignment = Alignment.End) {
-                    group(ALIGN_END).forEach { HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action) }
+                    group(ALIGN_END).forEach { HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action, context.getString(buttonLabelRes(it.id))) }
                 }
             }
         }
@@ -365,7 +380,7 @@ internal fun NoteImage(bitmap: Bitmap, widthDp: Dp, modifier: GlanceModifier = G
     val height = (widthDp.value * bitmap.height / bitmap.width).coerceAtMost(MAX_IMAGE_HEIGHT_DP).dp
     Image(
         provider = ImageProvider(bitmap),
-        contentDescription = null,
+        contentDescription = LocalContext.current.getString(R.string.note_image),
         contentScale = ContentScale.Fit,
         modifier = modifier.fillMaxWidth().height(height).cornerRadius(8.dp),
     )
@@ -432,7 +447,7 @@ internal fun ItemRow(note: KeepNote, item: KeepItem, account: String, settings: 
             if (resource != null) {
                 Image(
                     provider = ImageProvider(resource),
-                    contentDescription = null,
+                    contentDescription = LocalContext.current.getString(if (item.checked) R.string.item_checked else R.string.item_unchecked),
                     colorFilter = ColorFilter.tint(itemColor),
                     modifier = GlanceModifier.size(settings.checkboxSizeDp.dp),
                 )
@@ -518,7 +533,7 @@ internal fun AddItemRow(note: KeepNote, account: String, settings: WidgetSetting
     ) {
         Image(
             provider = ImageProvider(R.drawable.ic_add),
-            contentDescription = null,
+            contentDescription = LocalContext.current.getString(R.string.add_item),
             colorFilter = ColorFilter.tint(palette.provider(0.7f)),
             modifier = GlanceModifier.size(settings.checkboxSizeDp.dp).padding(end = 12.dp),
         )

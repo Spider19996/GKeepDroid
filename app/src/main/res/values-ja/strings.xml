@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="widget_description">Google Keep のメモを、背景を調整できる形で表示します。</string>
-    <string name="account">アカウント</string>
     <string name="email_label">Google アカウントのメールアドレス</string>
     <string name="token_label">マスタートークン (aas_et/...)</string>
     <string name="token_label_saved">マスタートークン（保存済み。変更しない場合は空欄）</string>
@@ -12,12 +11,8 @@
     <string name="show_note_colors">メモの色を表示</string>
     <string name="note_opacity">メモカードの不透明度：%1$d%%</string>
     <string name="sync_section">同期</string>
-    <string name="sync_interval">変更の確認</string>
     <string name="sync_manual">手動のみ</string>
     <string name="save">保存</string>
-    <string name="save_and_sync">保存して同期</string>
-    <string name="saved">保存しました。</string>
-    <string name="saved_syncing">保存しました。バックグラウンドでメモを同期しています…</string>
     <string name="credentials_required">メールアドレスとマスタートークンが必要です。</string>
     <string name="no_notes">メモがありません。設定 (⚙) を開いてログインしてください。</string>
     <string name="new_note">新しいメモ</string>
@@ -36,8 +31,6 @@
     <string name="theme_light">ライト</string>
     <string name="theme_dark">ダーク</string>
     <string name="theme_oled">OLED ブラック</string>
-    <string name="tab_sync">同期</string>
-    <string name="tab_widget">ウィジェット</string>
     <string name="tab_accounts">アカウント</string>
     <string name="tab_backup">バックアップ</string>
     <string name="plain_style">色なしのメモ</string>
@@ -54,23 +47,17 @@
     <string name="import_done">設定をインポートしました。</string>
     <string name="import_failed">インポートに失敗しました：%1$s</string>
     <string name="backup_note">マスタートークンもメールアドレスもエクスポートされません。インポート後、アカウントを再度追加してください。</string>
-    <string name="tab_general">一般</string>
     <string name="color_picker_title">カスタムカラー</string>
     <string name="color_hue">色相</string>
     <string name="color_saturation">彩度</string>
     <string name="color_brightness">明るさ</string>
     <string name="header_position">ボタンバーの位置</string>
-    <string name="position_top">上</string>
-    <string name="position_bottom">下</string>
     <string name="header_size">ボタンのサイズ：%1$d dp</string>
     <string name="list_section">チェックリスト</string>
     <string name="check_in_widget">ウィジェット上で直接項目にチェックを入れる</string>
     <string name="checked_to_end">チェック済みの項目を末尾に移動</string>
     <string name="collapse_checked">チェック済みの項目をデフォルトで折りたたむ</string>
     <string name="list_spacing">項目の間隔</string>
-    <string name="spacing_compact">コンパクト</string>
-    <string name="spacing_normal">標準</string>
-    <string name="spacing_comfortable">ゆったり</string>
     <string name="checked_count">チェック済み %1$d 件</string>
     <string name="note_gone">このメモは存在しなくなりました。</string>
     <string name="offline_note">オフライン：最後に確認できたバージョンを表示しています。</string>
@@ -80,7 +67,6 @@
     <string name="sort_edited">最終更新</string>
     <string name="sort_created">作成日</string>
     <string name="sort_title">タイトル (A–Z)</string>
-    <string name="pinned_first">ピン留めを先頭に</string>
     <string name="show_images">画像を表示</string>
     <string name="show_keep_button">「Google Keep を開く」ボタンを表示</string>
     <string name="select_note">このウィジェットのメモ</string>
@@ -103,13 +89,9 @@
     <string name="checkbox_style">チェックボックスのスタイル</string>
     <string name="checkbox_size">チェックボックスのサイズ：%1$d dp</string>
     <string name="tap_whole_row">行のどこをタップしてもチェック</string>
-    <string name="pin_off">ウィジェットに固定</string>
-    <string name="pin_top">上端に固定中</string>
-    <string name="pin_bottom">下端に固定中</string>
     <string name="delete_checked">チェック済みの項目をすぐに削除</string>
     <string name="image_open_gallery">ギャラリーで開く</string>
     <string name="image_remove">画像を削除</string>
-    <string name="image_remove_confirm">この画像をメモから削除しますか？元に戻せません。</string>
     <string name="image_add_keep">Google Keep で画像を追加</string>
     <string name="search_notes_hint">メモを検索</string>
     <string name="show_search_bar">検索ボタンを表示</string>
@@ -121,7 +103,6 @@
     <string name="image_removal_pending">保存すると画像が削除されます。</string>
     <string name="image_undo">元に戻す</string>
     <string name="delete_note">メモを削除</string>
-    <string name="delete_note_confirm">このメモをゴミ箱に移動しますか？Google Keep で元に戻せます。</string>
     <string name="move_to_trash">ゴミ箱に移動</string>
     <string name="archive_note">アーカイブ</string>
     <string name="more_actions">その他の操作</string>
@@ -131,9 +112,6 @@
     <string name="show_sort_button">並べ替えボタンを表示（手動並び替え）</string>
     <string name="show_settings_button">設定ボタンを表示</string>
     <string name="settings_button_hint">オフにした場合は、Android の設定 › アプリ › GKeepDroid › アプリの設定 から開くか、ホーム画面でウィジェットを長押しして「再設定」を選んでください（ランチャーによります）。</string>
-    <string name="choose_widget">どのウィジェットを設定しますか？</string>
-    <string name="position_left">左</string>
-    <string name="position_right">右</string>
     <string name="turn_off">オフにする</string>
     <string name="text_color_auto">文字色をシステムのテーマに合わせる</string>
     <string name="show_edited_time">メモの最終編集時刻を表示</string>
@@ -155,18 +133,12 @@
     <string name="hide_token_form">マスタートークンのフォームを隠す</string>
     <string name="local_account_name">ローカル（この端末）</string>
     <string name="local_account_hint">ローカルモードではメモはこの端末にだけ保存されます。Google アカウントと比べてできないこと：\n• Google Keep や他の端末との同期\n• 画像や手描き\n• アーカイブとゴミ箱（削除は元に戻せません）\n• 「Google Keep で開く」\n• アプリをアンインストールするとすべてのメモが消えます</string>
-    <string name="login_intro">Google アカウントのメールアドレスを入力し、次のページでログインしてください。アプリが保存するのはトークンだけで、パスワードは保存しません。</string>
     <string name="login_continue">続ける</string>
     <string name="login_failed">ログインに失敗しました：%1$s</string>
     <string name="login_working">ログインを完了しています…</string>
     <string name="remove_local_confirm">ローカルアカウントを削除しますか？ローカルのメモはすべて完全に削除されます。</string>
     <string name="delete_local_confirm">このメモを完全に削除しますか？</string>
     <string name="login_need_email">メールアドレスを自動で読み取れませんでした。入力して完了してください。</string>
-    <string name="export_notes_md">すべてのメモを Markdown で書き出す</string>
-    <string name="export_notes_hint">各メモを画像とともに、1 件ごとの Markdown ファイルとして「ドキュメント/GKeepDroid」に一度だけ保存します（アカウントごとに 1 フォルダ）。同期し続けるファイルには Markdown フォルダを使ってください。</string>
-    <string name="export_notes_done">%1$d 件のメモを「ドキュメント/GKeepDroid」に書き出しました。</string>
-    <string name="export_notes_none">書き出せるメモがまだありません。</string>
-    <string name="export_failed">書き出しに失敗しました：%1$s</string>
     <string name="md_sync_title">Markdown フォルダ（双方向同期）</string>
     <string name="md_sync_enable">メモを Markdown ファイルとして保存</string>
     <string name="md_sync_choose">フォルダを選ぶ</string>
@@ -208,10 +180,8 @@
     <string name="google_disclaimer">GKeepDroid は非公式の独立したアプリで、Google とは無関係であり、Google による承認やサポートもありません。Google と Google Keep は Google LLC の商標です。</string>
     <string name="sync_now">今すぐ同期</string>
     <string name="sync_started">同期を開始しました。</string>
-    <string name="show_app_button">「GKeepDroid を開く」ボタンを表示</string>
     <string name="orphans_clean">不要なウィジェットを整理</string>
     <string name="orphans_removed">%d 個の不要なウィジェットの設定を削除しました。ホーム画面のウィジェットはホーム画面で削除してください（長押し）。</string>
-    <string name="side_off">オフ</string>
     <string name="btn_refresh">更新</string>
     <string name="btn_add_item">項目を追加</string>
     <string name="btn_new_note">新規メモ</string>
@@ -222,12 +192,6 @@
     <string name="btn_keep">Google Keep を開く</string>
     <string name="btn_settings">設定</string>
     <string name="button_layout_hint">ボタンを長押しして、ウィジェットの上・下・左・右の端にドラッグします。真ん中に置くとオフになります。</string>
-    <string name="buttons_hidden">表示しない</string>
-    <string name="bar_alignment">配置：%sバー</string>
-    <string name="align_spread">均等</string>
-    <string name="align_start">先頭</string>
-    <string name="align_center">中央</string>
-    <string name="align_end">末尾</string>
     <string name="layout_save">レイアウトを保存</string>
     <string name="layout_load">レイアウトを読み込む</string>
     <string name="layout_reset">初期状態に戻す</string>
@@ -235,15 +199,12 @@
     <string name="layout_loaded">レイアウトを読み込みました。</string>
     <string name="layout_failed">このレイアウトを読み込めませんでした。</string>
     <string name="layout_reset_done">初期状態に戻しました</string>
-    <string name="button_size_real">アイコン %1$d dp · ボタン %2$d dp</string>
     <string name="layout_reset_confirm">ボタンバーを初期状態に戻しますか？現在のレイアウトは置き換えられます。</string>
     <string name="edited_as_date">「2日前」ではなく日付を表示</string>
-    <string name="sync_display_on">画面オン中の同期間隔（分、0 = オフ）</string>
     <string name="sync_on_unlock">ロック解除時に同期</string>
     <string name="sync_min_gap">同期の最短間隔</string>
     <string name="sync_min_gap_hint">1分間に何度ロックを解除しても、そのたびに Google へ問い合わせることはありません。早すぎる同期要求はスキップされます。更新ボタンと「今すぐ同期」は常に同期します。</string>
     <string name="sync_background">バックグラウンドで同期（画面オフ時）</string>
-    <string name="sync_background_interval">バックグラウンドの間隔（分）</string>
     <string name="sync_background_hint">初期設定ではオフ：画面オフ中は何も同期しません。15分未満の間隔はアラームを使い、電池を多く消費します。</string>
     <string name="sync_wifi_only">モバイルデータでは同期しない</string>
     <string name="sync_group_display">画面オン中</string>
@@ -270,4 +231,10 @@
     <string name="first_sync_hint">最初の同期は、ノートの数によって数分かかることがあります。</string>
     <string name="note_changed_remote">このノートは Keep で変更されました。再読み込みすると入力内容が置き換わります。</string>
     <string name="reload">再読み込み</string>
+    <string name="move_up">上へ</string>
+    <string name="move_down">下へ</string>
+    <string name="note_image">画像</string>
+    <string name="item_checked">チェック済み</string>
+    <string name="item_unchecked">未チェック</string>
+    <string name="drag_handle">ドラッグして並べ替え</string>
 </resources>
