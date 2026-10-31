@@ -267,4 +267,5 @@
     <string name="demo_mode">Demomodus (voorbeeldnotities voor screenshots)</string>
     <string name="language">Taal</string>
     <string name="language_system">Systeemtaal</string>
+    <string name="first_sync_hint">De eerste synchronisatie kan enkele minuten duren, afhankelijk van het aantal notities.</string>
 </resources>

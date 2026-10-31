@@ -270,4 +270,5 @@
     <string name="demo_mode">Demo mode (sample notes for screenshots)</string>
     <string name="language">Language</string>
     <string name="language_system">System language</string>
+    <string name="first_sync_hint">The first sync can take a few minutes, depending on how many notes you have.</string>
 </resources>

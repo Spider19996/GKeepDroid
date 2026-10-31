@@ -267,4 +267,5 @@
     <string name="demo_mode">Tryb demo (przykładowe notatki do zrzutów)</string>
     <string name="language">Język</string>
     <string name="language_system">Język systemu</string>
+    <string name="first_sync_hint">Pierwsza synchronizacja może potrwać kilka minut, zależnie od liczby notatek.</string>
 </resources>

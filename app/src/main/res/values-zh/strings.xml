@@ -267,4 +267,5 @@
     <string name="demo_mode">演示模式（用于截图的示例笔记）</string>
     <string name="language">语言</string>
     <string name="language_system">系统语言</string>
+    <string name="first_sync_hint">首次同步可能需要几分钟，具体取决于笔记数量。</string>
 </resources>

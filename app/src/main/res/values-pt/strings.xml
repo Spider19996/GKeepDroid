@@ -267,4 +267,5 @@
     <string name="demo_mode">Modo demo (notas de exemplo para capturas)</string>
     <string name="language">Idioma</string>
     <string name="language_system">Idioma do sistema</string>
+    <string name="first_sync_hint">A primeira sincronização pode levar alguns minutos, dependendo de quantas notas você tem.</string>
 </resources>

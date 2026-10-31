@@ -267,4 +267,5 @@
     <string name="demo_mode">डेमो मोड (स्क्रीनशॉट के लिए नमूना नोट)</string>
     <string name="language">भाषा</string>
     <string name="language_system">सिस्टम भाषा</string>
+    <string name="first_sync_hint">पहला सिंक नोट्स की संख्या के अनुसार कुछ मिनट ले सकता है।</string>
 </resources>

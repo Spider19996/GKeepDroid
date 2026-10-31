@@ -267,4 +267,5 @@
     <string name="demo_mode">Демо-режим (примеры заметок для скриншотов)</string>
     <string name="language">Язык</string>
     <string name="language_system">Язык системы</string>
+    <string name="first_sync_hint">Первая синхронизация может занять несколько минут, в зависимости от количества заметок.</string>
 </resources>

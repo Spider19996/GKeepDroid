@@ -253,6 +253,7 @@ class SettingsActivity : ComponentActivity() {
         val credentialsRequired = stringResource(R.string.credentials_required)
         val exportDone = stringResource(R.string.export_done)
         val importDone = stringResource(R.string.import_done)
+        val firstSyncHint = stringResource(R.string.first_sync_hint)
         val layoutSaved = stringResource(R.string.layout_saved)
         val layoutLoaded = stringResource(R.string.layout_loaded)
         val layoutFailed = stringResource(R.string.layout_failed)
@@ -352,12 +353,13 @@ class SettingsActivity : ComponentActivity() {
             if (widgetAccount.isBlank()) widgetAccount = address
             email = ""
             token = ""
-            status = ""
+            status = firstSyncHint
             SyncWorker.syncNow(context)
         }
 
-        val loginLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        val loginLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             // A finished Google sign-in has stored the account itself.
+            if (result.resultCode == RESULT_OK) status = firstSyncHint
             refreshAccounts()
             if (widgetAccount.isBlank()) widgetAccount = accounts.firstOrNull().orEmpty()
         }

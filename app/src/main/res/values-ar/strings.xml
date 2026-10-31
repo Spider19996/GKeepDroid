@@ -267,4 +267,5 @@
     <string name="demo_mode">وضع العرض (ملاحظات نموذجية للقطات الشاشة)</string>
     <string name="language">اللغة</string>
     <string name="language_system">لغة النظام</string>
+    <string name="first_sync_hint">قد تستغرق المزامنة الأولى بضع دقائق حسب عدد الملاحظات.</string>
 </resources>

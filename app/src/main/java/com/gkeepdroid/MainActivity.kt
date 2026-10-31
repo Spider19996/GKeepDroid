@@ -341,6 +341,15 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if (syncing) LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 4.dp))
+                // Right after signing in, the first sync has to fetch every note.
+                if (syncing && shown.isEmpty() && accounts.isNotEmpty() && screen == AppScreen.Notes) {
+                    Text(
+                        stringResource(R.string.first_sync_hint),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                    )
+                }
                 // A failed sync stays visible until the next one works.
                 val syncError = remember(reloadKey, syncing) { SyncPolicy.lastError(context) }
                 val expired = remember(reloadKey, syncing) { SyncPolicy.expiredAccount(context) }

@@ -267,4 +267,5 @@
     <string name="demo_mode">デモモード（スクリーンショット用のサンプルノート）</string>
     <string name="language">言語</string>
     <string name="language_system">システムの言語</string>
+    <string name="first_sync_hint">最初の同期は、ノートの数によって数分かかることがあります。</string>
 </resources>
