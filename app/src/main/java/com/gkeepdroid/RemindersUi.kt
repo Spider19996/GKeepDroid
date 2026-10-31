@@ -132,9 +132,21 @@ internal fun ColumnScope.RemindersPage(s: SettingsState) {
 
         SectionTitle(stringResource(R.string.reminder_presets))
         val presets = ReminderPresets.parse(reminderPresets)
-        presets.forEach { preset ->
+        // The order here is the order of the chips when a reminder is set.
+        fun move(index: Int, delta: Int) {
+            val moved = presets.toMutableList()
+            java.util.Collections.swap(moved, index, index + delta)
+            reminderPresets = moved.joinToString(",")
+        }
+        presets.forEachIndexed { index, preset ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(ReminderPresets.label(context, preset), Modifier.weight(1f))
+                IconButton(enabled = index > 0, onClick = { move(index, -1) }) {
+                    Icon(painterResource(R.drawable.ic_arrow_up), contentDescription = stringResource(R.string.move_up))
+                }
+                IconButton(enabled = index < presets.lastIndex, onClick = { move(index, 1) }) {
+                    Icon(painterResource(R.drawable.ic_arrow_down), contentDescription = stringResource(R.string.move_down))
+                }
                 IconButton(onClick = { reminderPresets = (presets - preset).joinToString(",") }) {
                     Icon(painterResource(R.drawable.ic_delete), contentDescription = stringResource(R.string.reminder_remove))
                 }
