@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Card with the text lines and check cut out -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M36,26H72A6,6 0 0 1 78,32V76A6,6 0 0 1 72,82H36A6,6 0 0 1 30,76V32A6,6 0 0 1 36,26Z M36,35h30v4h-30z M36,46h30v3h-30z M36,54h22v3h-22z M36,62h16v3h-16z" />
+</vector>

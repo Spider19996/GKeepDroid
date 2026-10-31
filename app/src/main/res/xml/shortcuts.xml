@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Long-press the launcher icon: new note, new checklist, search. -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="new_note"
+        android:enabled="true"
+        android:icon="@drawable/ic_add"
+        android:shortcutShortLabel="@string/btn_new_note"
+        android:shortcutLongLabel="@string/btn_new_note">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="gkeepdroid://new/note/shortcut"
+            android:targetClass="com.gkeepdroid.EditNoteActivity"
+            android:targetPackage="com.gkeepdroid" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="new_list"
+        android:enabled="true"
+        android:icon="@drawable/ic_checklist"
+        android:shortcutShortLabel="@string/btn_new_list"
+        android:shortcutLongLabel="@string/btn_new_list">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="gkeepdroid://new/list/shortcut"
+            android:targetClass="com.gkeepdroid.EditNoteActivity"
+            android:targetPackage="com.gkeepdroid" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="search"
+        android:enabled="true"
+        android:icon="@drawable/ic_search"
+        android:shortcutShortLabel="@string/btn_search"
+        android:shortcutLongLabel="@string/btn_search">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.gkeepdroid.SearchActivity"
+            android:targetPackage="com.gkeepdroid" />
+    </shortcut>
+</shortcuts>

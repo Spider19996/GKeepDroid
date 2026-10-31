@@ -1,0 +1,13 @@
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+*.jks
+*.keystore
+captures/
+.cxx/
+# Never commit credentials
+master_token*
+*.token
+.kotlin/

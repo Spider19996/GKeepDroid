@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Note card -->
+    <path
+        android:fillColor="#FFD54F"
+        android:pathData="M36,26H72A6,6 0 0 1 78,32V76A6,6 0 0 1 72,82H36A6,6 0 0 1 30,76V32A6,6 0 0 1 36,26Z" />
+    <!-- Title and text lines -->
+    <path
+        android:fillColor="#6D4C41"
+        android:pathData="M36,35h30v4h-30z M36,46h30v3h-30z M36,54h22v3h-22z M36,62h16v3h-16z" />
+    <!-- Check badge -->
+    <path
+        android:fillColor="#43A047"
+        android:pathData="M72,64m-9,0a9,9 0 1,1 18,0a9,9 0 1,1 -18,0" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M67.5,64.5L70.8,67.8L76.8,60.8"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2.4" />
+</vector>

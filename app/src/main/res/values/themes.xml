@@ -1,0 +1,9 @@
+<resources>
+    <style name="Theme.GKeepDroid" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- A see-through window for the small add-item dialog. -->
+    <style name="Theme.GKeepDroid.Translucent" parent="Theme.GKeepDroid">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+</resources>

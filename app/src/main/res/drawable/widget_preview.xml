@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="180dp"
+    android:height="110dp"
+    android:viewportWidth="180"
+    android:viewportHeight="110">
+    <!-- Widget panel -->
+    <path
+        android:fillColor="#B3263238"
+        android:pathData="M16,0H164A16,16 0 0 1 180,16V94A16,16 0 0 1 164,110H16A16,16 0 0 1 0,94V16A16,16 0 0 1 16,0Z" />
+    <!-- Header buttons -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M104,13h8v2h-8z M122,13h8v2h-8z M140,13h8v2h-8z M158,13h8v2h-8z" />
+    <!-- Yellow note card -->
+    <path
+        android:fillColor="#FFD54F"
+        android:pathData="M12,26H84A8,8 0 0 1 92,34V92A8,8 0 0 1 84,100H12A8,8 0 0 1 4,92V34A8,8 0 0 1 12,26Z" />
+    <path
+        android:fillColor="#6D4C41"
+        android:pathData="M14,36h44v5h-44z M14,48h60v3h-60z M14,56h50v3h-50z M14,64h38v3h-38z" />
+    <!-- Bordered note card -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M104,27H160A7,7 0 0 1 167,34V92A7,7 0 0 1 160,99H104A7,7 0 0 1 97,92V34A7,7 0 0 1 104,27Z"
+        android:strokeColor="#B3A0A0A0"
+        android:strokeWidth="1.5" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M106,36h34v5h-34z M106,48h50v3h-50z M106,56h42v3h-42z" />
+</vector>

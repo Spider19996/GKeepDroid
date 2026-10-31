@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="110dp"
+    android:height="110dp"
+    android:viewportWidth="110"
+    android:viewportHeight="110">
+    <!-- Widget panel -->
+    <path
+        android:fillColor="#B3263238"
+        android:pathData="M14,0H96A14,14 0 0 1 110,14V96A14,14 0 0 1 96,110H14A14,14 0 0 1 0,96V14A14,14 0 0 1 14,0Z" />
+    <!-- Title -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,14h46v6h-46z" />
+    <!-- Shopping list rows: box + line -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,32h7v7h-7z M24,34h50v3h-50z M12,46h7v7h-7z M24,48h38v3h-38z M12,60h7v7h-7z M24,62h44v3h-44z" />
+    <!-- Checked row -->
+    <path
+        android:fillColor="#99FFFFFF"
+        android:pathData="M12,74h7v7h-7z M24,76h30v3h-30z" />
+</vector>

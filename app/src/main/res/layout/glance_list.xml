@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Overrides Glance's own list layout (same name, so the app's copy wins) only to hide the
+  scrollbar: RemoteViews offers no way to toggle it per widget at runtime.
+-->
+<ListView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Glance.AppWidget.List"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:divider="@null"
+    android:listSelector="@android:color/transparent"
+    android:scrollbars="none"
+    android:theme="@style/Glance.AppWidget.Theme.ListChildren"
+    app:glance_isTopLevelLayout="true" />
