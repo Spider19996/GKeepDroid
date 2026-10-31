@@ -625,10 +625,13 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
-            Reminders.get(context, account, note.id)?.let { at ->
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            Reminders.list(context, account, note.id).let { reminders ->
+                if (reminders.isNotEmpty()) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Icon(painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminder), tint = textColor, modifier = Modifier.size(14.dp))
-                    Text(Reminders.label(context, at), color = textColor.copy(alpha = 0.8f), style = MaterialTheme.typography.labelSmall)
+                    Text(
+                        Reminders.label(context, reminders.first().at) + if (reminders.size > 1) "  (+${reminders.size - 1})" else "",
+                        color = textColor.copy(alpha = 0.8f), style = MaterialTheme.typography.labelSmall,
+                    )
                 }
             }
             if (hidden) {

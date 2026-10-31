@@ -186,6 +186,12 @@ data class GlobalSettings(
     val demoMode: Boolean = false,
     /** Language tag such as "de"; empty follows the system language. */
     val language: String = "",
+    /** Defaults for reminders; each reminder may set its own. A sound is "" (system), "none" or a ringtone URI. */
+    val reminderSound: String = "",
+    /** Vibrates when the phone is silent or on vibrate. */
+    val reminderVibrate: Boolean = true,
+    /** Sounds even when the phone is silent or on vibrate (at alarm volume). */
+    val reminderOverride: Boolean = false,
 )
 
 object SettingsStore {
@@ -212,6 +218,9 @@ object SettingsStore {
             wifiOnly = p.getBoolean("wifi_only", d.wifiOnly),
             demoMode = p.getBoolean("demo_mode", d.demoMode),
             language = p.getString("language", d.language).orEmpty(),
+            reminderSound = p.getString("reminder_sound", d.reminderSound).orEmpty(),
+            reminderVibrate = p.getBoolean("reminder_vibrate", d.reminderVibrate),
+            reminderOverride = p.getBoolean("reminder_override", d.reminderOverride),
         )
     }
 
@@ -227,6 +236,9 @@ object SettingsStore {
             .putBoolean("wifi_only", s.wifiOnly)
             .putBoolean("demo_mode", s.demoMode)
             .putString("language", s.language)
+            .putString("reminder_sound", s.reminderSound)
+            .putBoolean("reminder_vibrate", s.reminderVibrate)
+            .putBoolean("reminder_override", s.reminderOverride)
             .apply()
     }
 

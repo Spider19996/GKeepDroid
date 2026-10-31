@@ -240,6 +240,16 @@
     <string name="reminder">Hatırlatıcı</string>
     <string name="reminder_remove">Hatırlatıcıyı kaldır</string>
     <string name="reminder_at">Hatırlatıcı: %s</string>
-    <string name="reminder_channel">Hatırlatıcılar</string>
-    <string name="reminder_change">Değiştir</string>
+    <string name="reminder_add">Hatırlatıcı ekle</string>
+    <string name="reminder_sound">Ses</string>
+    <string name="reminder_default">Varsayılan</string>
+    <string name="reminder_sound_none">Ses yok</string>
+    <string name="reminder_sound_choose">Ses seç…</string>
+    <string name="reminder_vibrate">Sessizde titret</string>
+    <string name="reminder_override">Sessiz modu yoksay</string>
+    <string name="reminder_override_hint">Telefon sessiz veya titreşimde olsa bile sesi alarm ses düzeyinde çalar.</string>
+    <string name="reminder_on">Açık</string>
+    <string name="reminder_off">Kapalı</string>
+    <string name="reminders_title">Hatırlatıcılar</string>
+    <string name="reminders_none">Hatırlatıcı yok</string>
 </resources>

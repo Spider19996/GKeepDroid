@@ -104,6 +104,9 @@ internal class SettingsState(val context: SettingsActivity) {
     var wifiOnly by mutableStateOf(initialGlobal.wifiOnly)
     var demoMode by mutableStateOf(initialGlobal.demoMode)
     var language by mutableStateOf(initialGlobal.language)
+    var reminderSound by mutableStateOf(initialGlobal.reminderSound)
+    var reminderVibrate by mutableStateOf(initialGlobal.reminderVibrate)
+    var reminderOverride by mutableStateOf(initialGlobal.reminderOverride)
     var showColorPicker by mutableStateOf(false)
     var showTokenForm by mutableStateOf(false)
     var mdEnabled by mutableStateOf(MarkdownSync.isEnabled(context))
@@ -172,6 +175,7 @@ internal class SettingsState(val context: SettingsActivity) {
         themeMode = themeMode, syncIntervalMin = interval, syncOnUnlock = syncOnUnlock, syncOnOpen = syncOnOpen,
         minGapSec = minGapSec, backgroundSync = backgroundSync, backgroundIntervalMin = backgroundInterval, wifiOnly = wifiOnly,
         demoMode = demoMode, language = language,
+        reminderSound = reminderSound, reminderVibrate = reminderVibrate, reminderOverride = reminderOverride,
     )
 
     /** Saves the language at once and reopens this screen in it. */

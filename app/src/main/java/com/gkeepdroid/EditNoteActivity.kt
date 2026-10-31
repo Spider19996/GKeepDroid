@@ -226,20 +226,10 @@ class EditNoteActivity : ComponentActivity() {
                     existing.id in SettingsStore.loadWidget(this@EditNoteActivity, pinWidgetId).pinBottom
             )
         }
-        // A reminder belongs to the phone only and is saved at once, not with the note.
-        var reminder by remember { mutableStateOf(existing?.let { Reminders.get(this@EditNoteActivity, account, it.id) }) }
+        // Reminders belong to the phone only and are saved at once, not with the note.
+        var reminders by remember { mutableStateOf(existing?.let { Reminders.list(this@EditNoteActivity, account, it.id) }.orEmpty()) }
         val askNotifications = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
-        var reminderMenu by remember { mutableStateOf(false) }
-        fun chooseReminder() {
-            if (existing == null) return
-            if (android.os.Build.VERSION.SDK_INT >= 33 && !Reminders.canNotify(this@EditNoteActivity)) {
-                askNotifications.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-            }
-            pickReminder(reminder) { at ->
-                Reminders.set(this@EditNoteActivity, account, existing.id, at)
-                reminder = at
-            }
-        }
+        var remindersOpen by remember { mutableStateOf(false) }
         var error by remember { mutableStateOf("") }
         val failedTemplate = stringResource(R.string.save_failed, "%s")
 
@@ -700,27 +690,23 @@ class EditNoteActivity : ComponentActivity() {
 
             if (error.isNotEmpty()) Text(error, color = MaterialTheme.colorScheme.error)
 
-            if (reminderMenu && existing != null) {
-                AlertDialog(
-                    onDismissRequest = { reminderMenu = false },
-                    title = { Text(stringResource(R.string.reminder)) },
-                    text = { reminder?.let { Text(Reminders.label(this@EditNoteActivity, it)) } },
-                    confirmButton = {
-                        TextButton(onClick = { reminderMenu = false; chooseReminder() }) { Text(stringResource(R.string.reminder_change)) }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = {
-                            reminderMenu = false
-                            Reminders.clear(this@EditNoteActivity, account, existing.id)
-                            reminder = null
-                        }) { Text(stringResource(R.string.reminder_remove)) }
+            if (remindersOpen && existing != null) {
+                RemindersDialog(
+                    activity = this@EditNoteActivity, account = account, noteId = existing.id, reminders = reminders,
+                    onChange = { reminders = Reminders.list(this@EditNoteActivity, account, existing.id) },
+                    onDismiss = { remindersOpen = false },
+                    askNotifications = {
+                        if (android.os.Build.VERSION.SDK_INT >= 33 && !Reminders.canNotify(this@EditNoteActivity)) {
+                            askNotifications.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                        }
                     },
                 )
             }
 
-            reminder?.let {
+            reminders.firstOrNull()?.let {
                 Text(
-                    stringResource(R.string.reminder_at, Reminders.label(this@EditNoteActivity, it)),
+                    stringResource(R.string.reminder_at, Reminders.label(this@EditNoteActivity, it.at)) +
+                        if (reminders.size > 1) "  (+${reminders.size - 1})" else "",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -730,12 +716,9 @@ class EditNoteActivity : ComponentActivity() {
                 OutlinedButton(
                     modifier = Modifier.weight(1f).fillMaxHeight(), enabled = !saving, onClick = { finish() },
                 ) { Text(stringResource(R.string.cancel)) }
-                if (existing != null) Column(Modifier.align(Alignment.CenterVertically), horizontalAlignment = Alignment.CenterHorizontally) {
-                    FilledTonalIconToggleButton(
-                        checked = reminder != null,
-                        onCheckedChange = { if (reminder == null) chooseReminder() else reminderMenu = true },
-                    ) {
-                        Icon(painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminder))
+                if (existing != null) Box(Modifier.align(Alignment.CenterVertically)) {
+                    FilledTonalIconToggleButton(checked = reminders.isNotEmpty(), onCheckedChange = { remindersOpen = true }) {
+                        Icon(painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminders_title))
                     }
                 }
                 Button(
@@ -750,22 +733,6 @@ class EditNoteActivity : ComponentActivity() {
      * does not handle the link. Keep has no documented link format for the app, so the web link of
      * the note is tried with the app first.
      */
-    /** Asks for a date, then a time; a time in the past is moved to the next day. */
-    private fun pickReminder(current: Long?, onPicked: (Long) -> Unit) {
-        val start = java.util.Calendar.getInstance().apply { timeInMillis = current ?: (System.currentTimeMillis() + 3_600_000L) }
-        android.app.DatePickerDialog(this, { _, year, month, day ->
-            android.app.TimePickerDialog(this, { _, hour, minute ->
-                val picked = java.util.Calendar.getInstance().apply {
-                    set(year, month, day, hour, minute, 0)
-                    set(java.util.Calendar.MILLISECOND, 0)
-                }
-                if (picked.timeInMillis <= System.currentTimeMillis()) picked.add(java.util.Calendar.DAY_OF_YEAR, 1)
-                onPicked(picked.timeInMillis)
-            }, start.get(java.util.Calendar.HOUR_OF_DAY), start.get(java.util.Calendar.MINUTE),
-                android.text.format.DateFormat.is24HourFormat(this)).show()
-        }, start.get(java.util.Calendar.YEAR), start.get(java.util.Calendar.MONTH), start.get(java.util.Calendar.DAY_OF_MONTH)).show()
-    }
-
     private fun openInKeep(account: String, note: KeepNote) {
         val kind = if (note.isList) "LIST" else "NOTE"
         // With several signed-in accounts the web link has to say which one it means.

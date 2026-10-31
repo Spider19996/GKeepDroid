@@ -240,6 +240,16 @@
     <string name="reminder">Promemoria</string>
     <string name="reminder_remove">Rimuovi promemoria</string>
     <string name="reminder_at">Promemoria: %s</string>
-    <string name="reminder_channel">Promemoria</string>
-    <string name="reminder_change">Modifica</string>
+    <string name="reminder_add">Aggiungi promemoria</string>
+    <string name="reminder_sound">Suono</string>
+    <string name="reminder_default">Predefinito</string>
+    <string name="reminder_sound_none">Nessun suono</string>
+    <string name="reminder_sound_choose">Scegli suono…</string>
+    <string name="reminder_vibrate">Vibra in silenzioso</string>
+    <string name="reminder_override">Ignora la modalità silenziosa</string>
+    <string name="reminder_override_hint">Riproduce il suono al volume della sveglia, anche con il telefono in silenzioso o in vibrazione.</string>
+    <string name="reminder_on">Sì</string>
+    <string name="reminder_off">No</string>
+    <string name="reminders_title">Promemoria</string>
+    <string name="reminders_none">Nessun promemoria</string>
 </resources>

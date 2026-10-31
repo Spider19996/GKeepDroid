@@ -19,6 +19,7 @@ internal enum class Page(val title: Int) {
     AppView(R.string.app_view),
     Backup(R.string.tab_backup),
     Sync(R.string.sync_section),
+    Reminders(R.string.reminders_title),
 }
 
 /** One searchable setting: its label, the page it lives on, and the popup it opens (if any). */
@@ -82,6 +83,10 @@ internal fun settingEntries(isSingleNote: Boolean): List<SettingEntry> = buildLi
             .forEach { add(SettingEntry(it, Page.ButtonBar)) }
     }
 
+    add(SettingEntry(R.string.reminders_title, Page.Reminders))
+    add(SettingEntry(R.string.reminder_sound, Page.Reminders))
+    add(SettingEntry(R.string.reminder_vibrate, Page.Reminders))
+    add(SettingEntry(R.string.reminder_override, Page.Reminders))
     add(SettingEntry(R.string.sync_section, Page.Sync))
     add(SettingEntry(R.string.sync_group_display, Page.Sync))
     add(SettingEntry(R.string.sync_every, Page.Sync))

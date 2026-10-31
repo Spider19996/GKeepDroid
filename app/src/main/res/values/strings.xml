@@ -243,6 +243,16 @@
     <string name="reminder">Reminder</string>
     <string name="reminder_remove">Remove reminder</string>
     <string name="reminder_at">Reminder: %s</string>
-    <string name="reminder_channel">Reminders</string>
-    <string name="reminder_change">Change</string>
+    <string name="reminder_add">Add reminder</string>
+    <string name="reminder_sound">Sound</string>
+    <string name="reminder_default">Default</string>
+    <string name="reminder_sound_none">No sound</string>
+    <string name="reminder_sound_choose">Choose sound…</string>
+    <string name="reminder_vibrate">Vibrate when silent</string>
+    <string name="reminder_override">Ignore silent mode</string>
+    <string name="reminder_override_hint">Plays the sound at alarm volume, even when the phone is silent or on vibrate.</string>
+    <string name="reminder_on">On</string>
+    <string name="reminder_off">Off</string>
+    <string name="reminders_title">Reminders</string>
+    <string name="reminders_none">No reminders</string>
 </resources>

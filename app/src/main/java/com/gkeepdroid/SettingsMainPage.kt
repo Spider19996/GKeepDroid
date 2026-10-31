@@ -81,6 +81,7 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
                 accounts.joinToString { CredentialStore.displayName(context, it) }.ifEmpty { "–" },
             ) { page = Page.Accounts }
             MenuRow(stringResource(R.string.sync_section), null) { page = Page.Sync }
+            MenuRow(stringResource(R.string.reminders_title), null) { page = Page.Reminders }
             PopupRow(
                 pendingPopup == "theme", { pendingPopup = null },
                 stringResource(R.string.theme_section),

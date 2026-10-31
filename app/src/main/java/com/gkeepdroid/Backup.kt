@@ -45,7 +45,10 @@ object Backup {
                     .put("backgroundSync", global.backgroundSync)
                     .put("backgroundIntervalMin", global.backgroundIntervalMin)
                     .put("wifiOnly", global.wifiOnly)
-                    .put("language", global.language),
+                    .put("language", global.language)
+                    .put("reminderSound", global.reminderSound)
+                    .put("reminderVibrate", global.reminderVibrate)
+                    .put("reminderOverride", global.reminderOverride),
             )
             .put(
                 "widget",
@@ -97,6 +100,9 @@ object Backup {
                 backgroundIntervalMin = g.optInt("backgroundIntervalMin", dg.backgroundIntervalMin).coerceAtLeast(1),
                 wifiOnly = g.optBoolean("wifiOnly", dg.wifiOnly),
                 language = g.optString("language", dg.language),
+                reminderSound = g.optString("reminderSound", dg.reminderSound),
+                reminderVibrate = g.optBoolean("reminderVibrate", dg.reminderVibrate),
+                reminderOverride = g.optBoolean("reminderOverride", dg.reminderOverride),
             ),
             widget = WidgetSettings(
                 backgroundAlpha = w.optDouble("backgroundAlpha", dw.backgroundAlpha.toDouble()).toFloat().coerceIn(0f, 1f),

@@ -240,6 +240,16 @@
     <string name="reminder">提醒</string>
     <string name="reminder_remove">删除提醒</string>
     <string name="reminder_at">提醒:%s</string>
-    <string name="reminder_channel">提醒</string>
-    <string name="reminder_change">更改</string>
+    <string name="reminder_add">添加提醒</string>
+    <string name="reminder_sound">声音</string>
+    <string name="reminder_default">默认</string>
+    <string name="reminder_sound_none">无声音</string>
+    <string name="reminder_sound_choose">选择声音…</string>
+    <string name="reminder_vibrate">静音时振动</string>
+    <string name="reminder_override">忽略静音模式</string>
+    <string name="reminder_override_hint">即使手机处于静音或振动模式,也以闹钟音量播放声音。</string>
+    <string name="reminder_on">开</string>
+    <string name="reminder_off">关</string>
+    <string name="reminders_title">提醒</string>
+    <string name="reminders_none">没有提醒</string>
 </resources>

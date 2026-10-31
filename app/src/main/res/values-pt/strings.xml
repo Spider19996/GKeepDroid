@@ -240,6 +240,16 @@
     <string name="reminder">Lembrete</string>
     <string name="reminder_remove">Remover lembrete</string>
     <string name="reminder_at">Lembrete: %s</string>
-    <string name="reminder_channel">Lembretes</string>
-    <string name="reminder_change">Alterar</string>
+    <string name="reminder_add">Adicionar lembrete</string>
+    <string name="reminder_sound">Som</string>
+    <string name="reminder_default">Padrão</string>
+    <string name="reminder_sound_none">Sem som</string>
+    <string name="reminder_sound_choose">Escolher som…</string>
+    <string name="reminder_vibrate">Vibrar no silencioso</string>
+    <string name="reminder_override">Ignorar o modo silencioso</string>
+    <string name="reminder_override_hint">Toca o som no volume do alarme, mesmo com o telefone no silencioso ou em vibração.</string>
+    <string name="reminder_on">Ligado</string>
+    <string name="reminder_off">Desligado</string>
+    <string name="reminders_title">Lembretes</string>
+    <string name="reminders_none">Sem lembretes</string>
 </resources>

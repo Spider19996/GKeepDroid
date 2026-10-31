@@ -240,6 +240,16 @@
     <string name="reminder">रिमाइंडर</string>
     <string name="reminder_remove">रिमाइंडर हटाएँ</string>
     <string name="reminder_at">रिमाइंडर: %s</string>
-    <string name="reminder_channel">रिमाइंडर</string>
-    <string name="reminder_change">बदलें</string>
+    <string name="reminder_add">रिमाइंडर जोड़ें</string>
+    <string name="reminder_sound">ध्वनि</string>
+    <string name="reminder_default">डिफ़ॉल्ट</string>
+    <string name="reminder_sound_none">कोई ध्वनि नहीं</string>
+    <string name="reminder_sound_choose">ध्वनि चुनें…</string>
+    <string name="reminder_vibrate">साइलेंट होने पर वाइब्रेट करें</string>
+    <string name="reminder_override">साइलेंट मोड अनदेखा करें</string>
+    <string name="reminder_override_hint">फ़ोन साइलेंट या वाइब्रेट पर होने पर भी अलार्म की आवाज़ में ध्वनि बजाता है।</string>
+    <string name="reminder_on">चालू</string>
+    <string name="reminder_off">बंद</string>
+    <string name="reminders_title">रिमाइंडर</string>
+    <string name="reminders_none">कोई रिमाइंडर नहीं</string>
 </resources>

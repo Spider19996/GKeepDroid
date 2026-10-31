@@ -240,6 +240,16 @@
     <string name="reminder">Rappel</string>
     <string name="reminder_remove">Supprimer le rappel</string>
     <string name="reminder_at">Rappel : %s</string>
-    <string name="reminder_channel">Rappels</string>
-    <string name="reminder_change">Modifier</string>
+    <string name="reminder_add">Ajouter un rappel</string>
+    <string name="reminder_sound">Son</string>
+    <string name="reminder_default">Par défaut</string>
+    <string name="reminder_sound_none">Aucun son</string>
+    <string name="reminder_sound_choose">Choisir un son…</string>
+    <string name="reminder_vibrate">Vibrer en mode silencieux</string>
+    <string name="reminder_override">Ignorer le mode silencieux</string>
+    <string name="reminder_override_hint">Joue le son au volume de l’alarme, même si le téléphone est en silencieux ou en vibreur.</string>
+    <string name="reminder_on">Oui</string>
+    <string name="reminder_off">Non</string>
+    <string name="reminders_title">Rappels</string>
+    <string name="reminders_none">Aucun rappel</string>
 </resources>

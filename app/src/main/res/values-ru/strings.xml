@@ -240,6 +240,16 @@
     <string name="reminder">Напоминание</string>
     <string name="reminder_remove">Удалить напоминание</string>
     <string name="reminder_at">Напоминание: %s</string>
-    <string name="reminder_channel">Напоминания</string>
-    <string name="reminder_change">Изменить</string>
+    <string name="reminder_add">Добавить напоминание</string>
+    <string name="reminder_sound">Звук</string>
+    <string name="reminder_default">По умолчанию</string>
+    <string name="reminder_sound_none">Без звука</string>
+    <string name="reminder_sound_choose">Выбрать звук…</string>
+    <string name="reminder_vibrate">Вибрация в беззвучном режиме</string>
+    <string name="reminder_override">Игнорировать беззвучный режим</string>
+    <string name="reminder_override_hint">Воспроизводит звук с громкостью будильника, даже если телефон в беззвучном режиме или на вибрации.</string>
+    <string name="reminder_on">Вкл.</string>
+    <string name="reminder_off">Выкл.</string>
+    <string name="reminders_title">Напоминания</string>
+    <string name="reminders_none">Нет напоминаний</string>
 </resources>

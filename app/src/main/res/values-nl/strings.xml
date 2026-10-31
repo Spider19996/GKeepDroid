@@ -240,6 +240,16 @@
     <string name="reminder">Herinnering</string>
     <string name="reminder_remove">Herinnering verwijderen</string>
     <string name="reminder_at">Herinnering: %s</string>
-    <string name="reminder_channel">Herinneringen</string>
-    <string name="reminder_change">Wijzigen</string>
+    <string name="reminder_add">Herinnering toevoegen</string>
+    <string name="reminder_sound">Geluid</string>
+    <string name="reminder_default">Standaard</string>
+    <string name="reminder_sound_none">Geen geluid</string>
+    <string name="reminder_sound_choose">Geluid kiezen…</string>
+    <string name="reminder_vibrate">Trillen bij stil</string>
+    <string name="reminder_override">Stille modus negeren</string>
+    <string name="reminder_override_hint">Speelt het geluid af op wekkervolume, ook als de telefoon stil staat of op trillen.</string>
+    <string name="reminder_on">Aan</string>
+    <string name="reminder_off">Uit</string>
+    <string name="reminders_title">Herinneringen</string>
+    <string name="reminders_none">Geen herinneringen</string>
 </resources>

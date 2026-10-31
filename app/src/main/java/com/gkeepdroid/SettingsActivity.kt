@@ -327,6 +327,7 @@ class SettingsActivity : ComponentActivity() {
                         Page.Checklists -> ChecklistsPage(state)
                         Page.ButtonBar -> ButtonBarPage(state)
                         Page.Sync -> SyncPage(state)
+                        Page.Reminders -> RemindersPage(state)
                         Page.Backup -> BackupPage(state)
                     }
                 }

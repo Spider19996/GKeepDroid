@@ -240,6 +240,16 @@
     <string name="reminder">알림</string>
     <string name="reminder_remove">알림 삭제</string>
     <string name="reminder_at">알림: %s</string>
-    <string name="reminder_channel">알림</string>
-    <string name="reminder_change">변경</string>
+    <string name="reminder_add">알림 추가</string>
+    <string name="reminder_sound">소리</string>
+    <string name="reminder_default">기본값</string>
+    <string name="reminder_sound_none">소리 없음</string>
+    <string name="reminder_sound_choose">소리 선택…</string>
+    <string name="reminder_vibrate">무음일 때 진동</string>
+    <string name="reminder_override">무음 모드 무시</string>
+    <string name="reminder_override_hint">무음 또는 진동 모드에서도 알람 볼륨으로 소리를 재생합니다.</string>
+    <string name="reminder_on">켜기</string>
+    <string name="reminder_off">끄기</string>
+    <string name="reminders_title">알림</string>
+    <string name="reminders_none">알림 없음</string>
 </resources>

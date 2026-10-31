@@ -240,6 +240,16 @@
     <string name="reminder">リマインダー</string>
     <string name="reminder_remove">リマインダーを削除</string>
     <string name="reminder_at">リマインダー: %s</string>
-    <string name="reminder_channel">リマインダー</string>
-    <string name="reminder_change">変更</string>
+    <string name="reminder_add">リマインダーを追加</string>
+    <string name="reminder_sound">音</string>
+    <string name="reminder_default">デフォルト</string>
+    <string name="reminder_sound_none">音なし</string>
+    <string name="reminder_sound_choose">音を選択…</string>
+    <string name="reminder_vibrate">マナーモード時にバイブ</string>
+    <string name="reminder_override">マナーモードを無視</string>
+    <string name="reminder_override_hint">マナーモードやバイブレーション中でも、アラームの音量で再生します。</string>
+    <string name="reminder_on">オン</string>
+    <string name="reminder_off">オフ</string>
+    <string name="reminders_title">リマインダー</string>
+    <string name="reminders_none">リマインダーなし</string>
 </resources>
