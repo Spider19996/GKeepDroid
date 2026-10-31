@@ -599,6 +599,13 @@ class SettingsActivity : ComponentActivity() {
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
+                            // The version, as set in the build.
+                            val version = remember { context.packageManager.getPackageInfo(context.packageName, 0).versionName }
+                            Text(
+                                "GKeepDroid v$version",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
                         if (settingsQuery.isNotBlank()) {
                             // Search results: every setting whose name or page matches.
