@@ -51,7 +51,7 @@ jobs:
         if: env.SIGNED != 'true'
         run: ./gradlew :app:assembleDebug --console=plain
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: env.SIGNED != 'true'
         with:
           name: gkeepdroid-debug-apk
@@ -87,7 +87,7 @@ jobs:
 
       - name: Keep the signed APK as a download
         if: env.SIGNED == 'true' && !startsWith(github.ref, 'refs/tags/v')
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: gkeepdroid-signed-apk
           path: gkeepdroid-*.apk
