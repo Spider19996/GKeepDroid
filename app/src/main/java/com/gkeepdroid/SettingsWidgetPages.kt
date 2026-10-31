@@ -322,6 +322,7 @@ internal fun ColumnScope.ButtonBarPage(s: SettingsState) {
                 add(LayoutButton(id, icon, label, buttonSides[id], buttonSlots[id] ?: ALIGN_CENTER))
             add(BTN_REFRESH, R.drawable.ic_refresh, R.string.btn_refresh)
             if (isSingleNote) add(BTN_ADD_ITEM, R.drawable.ic_add, R.string.btn_add_item)
+            if (isSingleNote) add(BTN_REMINDER, R.drawable.ic_alarm, R.string.reminders_title)
             if (!isSingleNote) {
                 add(BTN_NEW_NOTE, R.drawable.ic_add, R.string.btn_new_note)
                 add(BTN_NEW_LIST, R.drawable.ic_checklist, R.string.btn_new_list)

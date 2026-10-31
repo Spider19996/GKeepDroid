@@ -90,7 +90,7 @@ class SingleNoteWidget : GlanceAppWidget() {
             bar = { side ->
                 HeaderBar(
                     side, appWidgetId, account, settings, textColor, withNewButtons = false,
-                    addItemNoteId = note?.takeIf { it.isList }?.id,
+                    addItemNoteId = note?.takeIf { it.isList }?.id, reminderNoteId = note?.id,
                 )
             },
         ) {

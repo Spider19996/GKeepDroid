@@ -216,7 +216,12 @@ internal fun ReminderLine(note: KeepNote, account: String, settings: WidgetSetti
     val reminders = Reminders.list(context, account, note.id)
     val next = reminders.firstOrNull() ?: return
     val size = (settings.textSizeSp - 2).coerceAtLeast(9)
-    Row(GlanceModifier.padding(bottom = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+    // A tap on the line opens the reminders of the note.
+    Row(
+        GlanceModifier.padding(bottom = 2.dp)
+            .clickable(actionStartActivity<RemindersActivity>(actionParametersOf(AccountKey to account, NoteIdKey to note.id))),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Image(
             provider = ImageProvider(R.drawable.ic_alarm),
             contentDescription = context.getString(R.string.reminder),
@@ -252,6 +257,7 @@ internal fun EditedTime(note: KeepNote, settings: WidgetSettings, palette: TextP
 private fun buttonLabelRes(id: String): Int = when (id) {
     BTN_REFRESH -> R.string.btn_refresh
     BTN_ADD_ITEM -> R.string.btn_add_item
+    BTN_REMINDER -> R.string.reminders_title
     BTN_NEW_NOTE -> R.string.btn_new_note
     BTN_NEW_LIST -> R.string.btn_new_list
     BTN_SORT -> R.string.btn_sort
@@ -273,6 +279,8 @@ private fun enabledSet(settings: WidgetSettings, withNewButtons: Boolean, hasAdd
     settings.buttonSides.keys.filter {
         when (it) {
             BTN_ADD_ITEM -> hasAddItem
+            // Only the single-note widget has one note to set a reminder for.
+            BTN_REMINDER -> !withNewButtons
             BTN_NEW_NOTE, BTN_NEW_LIST, BTN_SEARCH -> withNewButtons
             // The sort button only appears with a manual order.
             BTN_SORT -> withNewButtons && settings.sortMode == SORT_MANUAL
@@ -309,6 +317,8 @@ internal fun HeaderBar(
     reordering: Boolean = false,
     /** The checklist the single-note widget shows; gives it a button to add an item. */
     addItemNoteId: String? = null,
+    /** The note the single-note widget shows; the reminder button is for this note. */
+    reminderNoteId: String? = null,
 ) {
     val context = LocalContext.current
     val buttons = enabledButtons(settings, withNewButtons, addItemNoteId != null)
@@ -319,6 +329,10 @@ internal fun HeaderBar(
                 BTN_ADD_ITEM -> BarButton(
                     id, R.drawable.ic_add,
                     actionStartActivity<AddItemActivity>(actionParametersOf(AccountKey to account.orEmpty(), NoteIdKey to addItemNoteId.orEmpty())),
+                )
+                BTN_REMINDER -> BarButton(
+                    id, R.drawable.ic_alarm,
+                    actionStartActivity<RemindersActivity>(actionParametersOf(AccountKey to account.orEmpty(), NoteIdKey to reminderNoteId.orEmpty())),
                 )
                 BTN_NEW_NOTE -> BarButton(id, R.drawable.ic_add, actionStartActivity(newNoteIntent(context, appWidgetId, account, isList = false)))
                 BTN_NEW_LIST -> BarButton(id, R.drawable.ic_checklist, actionStartActivity(newNoteIntent(context, appWidgetId, account, isList = true)))

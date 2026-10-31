@@ -8,6 +8,7 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -307,4 +308,38 @@ private fun ReminderEditor(activity: Activity, initial: Reminder, onSave: (Remin
         confirmButton = { TextButton(onClick = { onSave(reminder) }) { Text(stringResource(android.R.string.ok)) } },
         dismissButton = { TextButton(onClick = onCancel) { Text(stringResource(android.R.string.cancel)) } },
     )
+}
+
+/** The reminders of one note as a small dialog over the home screen, opened from a widget. */
+class RemindersActivity : androidx.activity.ComponentActivity() {
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(LocaleHelper.wrap(newBase))
+    }
+
+    override fun onCreate(savedInstanceState: android.os.Bundle?) {
+        super.onCreate(savedInstanceState)
+        val account = CredentialStore.resolve(this, intent.getStringExtra(EditNoteActivity.EXTRA_ACCOUNT).orEmpty())
+        val noteId = intent.getStringExtra(EditNoteActivity.EXTRA_NOTE_ID)
+        if (account == null || noteId.isNullOrEmpty()) {
+            finish()
+            return
+        }
+        val themeMode = SettingsStore.loadGlobal(this).themeMode
+        setContent {
+            KeepTheme(themeMode, opaque = false) {
+                var reminders by remember { mutableStateOf(Reminders.list(this, account, noteId)) }
+                val askNotifications = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
+                RemindersDialog(
+                    activity = this, account = account, noteId = noteId, reminders = reminders,
+                    onChange = { reminders = Reminders.list(this, account, noteId) },
+                    onDismiss = { finish() },
+                    askNotifications = {
+                        if (android.os.Build.VERSION.SDK_INT >= 33 && !Reminders.canNotify(this)) {
+                            askNotifications.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                        }
+                    },
+                )
+            }
+        }
+    }
 }

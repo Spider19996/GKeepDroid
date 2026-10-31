@@ -69,6 +69,14 @@
             android:theme="@style/Theme.GKeepDroid.Translucent"
             android:windowSoftInputMode="stateVisible|adjustResize" />
 
+        <!-- The reminders of one note, opened from a widget. -->
+        <activity
+            android:name=".RemindersActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.GKeepDroid.Translucent" />
+
         <!-- "Share to GKeepDroid": text and links from other apps become a new note. -->
         <activity
             android:name=".ShareActivity"
