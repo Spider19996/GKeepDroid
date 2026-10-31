@@ -237,4 +237,8 @@
     <string name="item_checked">Coché</string>
     <string name="item_unchecked">Non coché</string>
     <string name="drag_handle">Faire glisser pour réordonner</string>
+    <string name="reminder">Rappel</string>
+    <string name="reminder_remove">Supprimer le rappel</string>
+    <string name="reminder_at">Rappel : %s</string>
+    <string name="reminder_channel">Rappels</string>
 </resources>

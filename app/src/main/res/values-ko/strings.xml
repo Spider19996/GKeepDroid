@@ -237,4 +237,8 @@
     <string name="item_checked">체크됨</string>
     <string name="item_unchecked">체크 안 됨</string>
     <string name="drag_handle">끌어서 순서 변경</string>
+    <string name="reminder">알림</string>
+    <string name="reminder_remove">알림 삭제</string>
+    <string name="reminder_at">알림: %s</string>
+    <string name="reminder_channel">알림</string>
 </resources>

@@ -237,4 +237,8 @@
     <string name="item_checked">Zaznaczone</string>
     <string name="item_unchecked">Niezaznaczone</string>
     <string name="drag_handle">Przeciągnij, aby zmienić kolejność</string>
+    <string name="reminder">Przypomnienie</string>
+    <string name="reminder_remove">Usuń przypomnienie</string>
+    <string name="reminder_at">Przypomnienie: %s</string>
+    <string name="reminder_channel">Przypomnienia</string>
 </resources>

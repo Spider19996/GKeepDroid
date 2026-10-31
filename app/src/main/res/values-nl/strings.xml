@@ -237,4 +237,8 @@
     <string name="item_checked">Aangevinkt</string>
     <string name="item_unchecked">Niet aangevinkt</string>
     <string name="drag_handle">Slepen om te herschikken</string>
+    <string name="reminder">Herinnering</string>
+    <string name="reminder_remove">Herinnering verwijderen</string>
+    <string name="reminder_at">Herinnering: %s</string>
+    <string name="reminder_channel">Herinneringen</string>
 </resources>

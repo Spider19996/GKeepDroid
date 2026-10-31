@@ -240,4 +240,8 @@
     <string name="item_checked">Checked</string>
     <string name="item_unchecked">Not checked</string>
     <string name="drag_handle">Drag to re-order</string>
+    <string name="reminder">Reminder</string>
+    <string name="reminder_remove">Remove reminder</string>
+    <string name="reminder_at">Reminder: %s</string>
+    <string name="reminder_channel">Reminders</string>
 </resources>

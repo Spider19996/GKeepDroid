@@ -237,4 +237,8 @@
     <string name="item_checked">محدد</string>
     <string name="item_unchecked">غير محدد</string>
     <string name="drag_handle">اسحب لإعادة الترتيب</string>
+    <string name="reminder">تذكير</string>
+    <string name="reminder_remove">إزالة التذكير</string>
+    <string name="reminder_at">التذكير: %s</string>
+    <string name="reminder_channel">التذكيرات</string>
 </resources>

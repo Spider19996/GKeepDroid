@@ -237,4 +237,8 @@
     <string name="item_checked">已勾选</string>
     <string name="item_unchecked">未勾选</string>
     <string name="drag_handle">拖动以重新排序</string>
+    <string name="reminder">提醒</string>
+    <string name="reminder_remove">删除提醒</string>
+    <string name="reminder_at">提醒:%s</string>
+    <string name="reminder_channel">提醒</string>
 </resources>

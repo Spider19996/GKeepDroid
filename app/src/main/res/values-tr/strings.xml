@@ -237,4 +237,8 @@
     <string name="item_checked">İşaretli</string>
     <string name="item_unchecked">İşaretli değil</string>
     <string name="drag_handle">Sıralamak için sürükleyin</string>
+    <string name="reminder">Hatırlatıcı</string>
+    <string name="reminder_remove">Hatırlatıcıyı kaldır</string>
+    <string name="reminder_at">Hatırlatıcı: %s</string>
+    <string name="reminder_channel">Hatırlatıcılar</string>
 </resources>

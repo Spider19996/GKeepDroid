@@ -237,4 +237,8 @@
     <string name="item_checked">Selezionato</string>
     <string name="item_unchecked">Non selezionato</string>
     <string name="drag_handle">Trascina per riordinare</string>
+    <string name="reminder">Promemoria</string>
+    <string name="reminder_remove">Rimuovi promemoria</string>
+    <string name="reminder_at">Promemoria: %s</string>
+    <string name="reminder_channel">Promemoria</string>
 </resources>

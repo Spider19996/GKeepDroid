@@ -237,4 +237,8 @@
     <string name="item_checked">チェック済み</string>
     <string name="item_unchecked">未チェック</string>
     <string name="drag_handle">ドラッグして並べ替え</string>
+    <string name="reminder">リマインダー</string>
+    <string name="reminder_remove">リマインダーを削除</string>
+    <string name="reminder_at">リマインダー: %s</string>
+    <string name="reminder_channel">リマインダー</string>
 </resources>

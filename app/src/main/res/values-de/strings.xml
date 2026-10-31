@@ -237,4 +237,8 @@
     <string name="item_checked">Abgehakt</string>
     <string name="item_unchecked">Nicht abgehakt</string>
     <string name="drag_handle">Zum Umsortieren ziehen</string>
+    <string name="reminder">Erinnerung</string>
+    <string name="reminder_remove">Erinnerung entfernen</string>
+    <string name="reminder_at">Erinnerung: %s</string>
+    <string name="reminder_channel">Erinnerungen</string>
 </resources>

@@ -237,4 +237,8 @@
     <string name="item_checked">Marcado</string>
     <string name="item_unchecked">Sin marcar</string>
     <string name="drag_handle">Arrastrar para reordenar</string>
+    <string name="reminder">Recordatorio</string>
+    <string name="reminder_remove">Quitar recordatorio</string>
+    <string name="reminder_at">Recordatorio: %s</string>
+    <string name="reminder_channel">Recordatorios</string>
 </resources>

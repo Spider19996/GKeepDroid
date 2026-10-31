@@ -237,4 +237,8 @@
     <string name="item_checked">Отмечено</string>
     <string name="item_unchecked">Не отмечено</string>
     <string name="drag_handle">Перетащите, чтобы изменить порядок</string>
+    <string name="reminder">Напоминание</string>
+    <string name="reminder_remove">Удалить напоминание</string>
+    <string name="reminder_at">Напоминание: %s</string>
+    <string name="reminder_channel">Напоминания</string>
 </resources>

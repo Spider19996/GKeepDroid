@@ -52,9 +52,10 @@ class SyncAlarmReceiver : BroadcastReceiver() {
     }
 }
 
-/** Alarms are lost on reboot and app update, so the sync schedule is set up again. */
+/** Alarms are lost on reboot and app update, so the sync schedule and the reminders are set up again. */
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         SyncWorker.schedule(context)
+        Reminders.restoreAll(context)
     }
 }

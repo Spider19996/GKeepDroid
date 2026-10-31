@@ -237,4 +237,8 @@
     <string name="item_checked">चुना हुआ</string>
     <string name="item_unchecked">चुना नहीं गया</string>
     <string name="drag_handle">क्रम बदलने के लिए खींचें</string>
+    <string name="reminder">रिमाइंडर</string>
+    <string name="reminder_remove">रिमाइंडर हटाएँ</string>
+    <string name="reminder_at">रिमाइंडर: %s</string>
+    <string name="reminder_channel">रिमाइंडर</string>
 </resources>
