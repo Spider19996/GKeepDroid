@@ -55,6 +55,7 @@ import androidx.compose.material3.FilledTonalIconToggleButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -717,14 +718,16 @@ class EditNoteActivity : ComponentActivity() {
                     modifier = Modifier.weight(1f).fillMaxHeight(), enabled = !saving, onClick = { finish() },
                 ) { Text(stringResource(R.string.cancel)) }
                 if (existing != null) Box(Modifier.align(Alignment.CenterVertically)) {
-                    FilledTonalIconToggleButton(checked = reminders.isNotEmpty(), onCheckedChange = { remindersOpen = true }) {
-                        // The bell is colored when the note has a reminder and muted when it has none.
-                        Icon(
-                            painterResource(R.drawable.ic_alarm),
-                            contentDescription = stringResource(R.string.reminders_title),
-                            tint = if (reminders.isNotEmpty()) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                        )
+                    // Set: the accent color with a matching icon. None set: a quiet button.
+                    FilledTonalIconToggleButton(
+                        checked = reminders.isNotEmpty(),
+                        onCheckedChange = { remindersOpen = true },
+                        colors = IconButtonDefaults.filledTonalIconToggleButtonColors(
+                            checkedContainerColor = MaterialTheme.colorScheme.primary,
+                            checkedContentColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
+                    ) {
+                        Icon(painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminders_title))
                     }
                 }
                 Button(
