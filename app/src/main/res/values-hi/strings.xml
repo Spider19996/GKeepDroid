@@ -241,4 +241,5 @@
     <string name="reminder_remove">रिमाइंडर हटाएँ</string>
     <string name="reminder_at">रिमाइंडर: %s</string>
     <string name="reminder_channel">रिमाइंडर</string>
+    <string name="reminder_change">बदलें</string>
 </resources>

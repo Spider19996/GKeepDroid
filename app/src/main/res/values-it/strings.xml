@@ -241,4 +241,5 @@
     <string name="reminder_remove">Rimuovi promemoria</string>
     <string name="reminder_at">Promemoria: %s</string>
     <string name="reminder_channel">Promemoria</string>
+    <string name="reminder_change">Modifica</string>
 </resources>

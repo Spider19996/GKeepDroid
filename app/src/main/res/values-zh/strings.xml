@@ -241,4 +241,5 @@
     <string name="reminder_remove">删除提醒</string>
     <string name="reminder_at">提醒:%s</string>
     <string name="reminder_channel">提醒</string>
+    <string name="reminder_change">更改</string>
 </resources>

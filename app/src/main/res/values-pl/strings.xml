@@ -241,4 +241,5 @@
     <string name="reminder_remove">Usuń przypomnienie</string>
     <string name="reminder_at">Przypomnienie: %s</string>
     <string name="reminder_channel">Przypomnienia</string>
+    <string name="reminder_change">Zmień</string>
 </resources>

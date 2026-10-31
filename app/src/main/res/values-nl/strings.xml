@@ -241,4 +241,5 @@
     <string name="reminder_remove">Herinnering verwijderen</string>
     <string name="reminder_at">Herinnering: %s</string>
     <string name="reminder_channel">Herinneringen</string>
+    <string name="reminder_change">Wijzigen</string>
 </resources>

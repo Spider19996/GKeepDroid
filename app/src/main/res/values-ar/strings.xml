@@ -241,4 +241,5 @@
     <string name="reminder_remove">إزالة التذكير</string>
     <string name="reminder_at">التذكير: %s</string>
     <string name="reminder_channel">التذكيرات</string>
+    <string name="reminder_change">تغيير</string>
 </resources>

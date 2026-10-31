@@ -241,4 +241,5 @@
     <string name="reminder_remove">알림 삭제</string>
     <string name="reminder_at">알림: %s</string>
     <string name="reminder_channel">알림</string>
+    <string name="reminder_change">변경</string>
 </resources>

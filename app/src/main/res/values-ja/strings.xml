@@ -241,4 +241,5 @@
     <string name="reminder_remove">リマインダーを削除</string>
     <string name="reminder_at">リマインダー: %s</string>
     <string name="reminder_channel">リマインダー</string>
+    <string name="reminder_change">変更</string>
 </resources>

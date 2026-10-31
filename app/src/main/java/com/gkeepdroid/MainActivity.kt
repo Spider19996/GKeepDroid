@@ -625,6 +625,12 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+            Reminders.get(context, account, note.id)?.let { at ->
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Icon(painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminder), tint = textColor, modifier = Modifier.size(14.dp))
+                    Text(Reminders.label(context, at), color = textColor.copy(alpha = 0.8f), style = MaterialTheme.typography.labelSmall)
+                }
+            }
             if (hidden) {
                 Text(
                     stringResource(R.string.note_private_hint),

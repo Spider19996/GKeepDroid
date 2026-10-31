@@ -241,4 +241,5 @@
     <string name="reminder_remove">Remover lembrete</string>
     <string name="reminder_at">Lembrete: %s</string>
     <string name="reminder_channel">Lembretes</string>
+    <string name="reminder_change">Alterar</string>
 </resources>

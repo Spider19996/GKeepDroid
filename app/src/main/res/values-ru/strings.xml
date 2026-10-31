@@ -241,4 +241,5 @@
     <string name="reminder_remove">Удалить напоминание</string>
     <string name="reminder_at">Напоминание: %s</string>
     <string name="reminder_channel">Напоминания</string>
+    <string name="reminder_change">Изменить</string>
 </resources>

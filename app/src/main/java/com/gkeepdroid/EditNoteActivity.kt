@@ -229,6 +229,17 @@ class EditNoteActivity : ComponentActivity() {
         // A reminder belongs to the phone only and is saved at once, not with the note.
         var reminder by remember { mutableStateOf(existing?.let { Reminders.get(this@EditNoteActivity, account, it.id) }) }
         val askNotifications = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
+        var reminderMenu by remember { mutableStateOf(false) }
+        fun chooseReminder() {
+            if (existing == null) return
+            if (android.os.Build.VERSION.SDK_INT >= 33 && !Reminders.canNotify(this@EditNoteActivity)) {
+                askNotifications.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+            pickReminder(reminder) { at ->
+                Reminders.set(this@EditNoteActivity, account, existing.id, at)
+                reminder = at
+            }
+        }
         var error by remember { mutableStateOf("") }
         val failedTemplate = stringResource(R.string.save_failed, "%s")
 
@@ -408,34 +419,6 @@ class EditNoteActivity : ComponentActivity() {
                         )
                     }
                 }
-            }
-
-            if (existing != null) Row(verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = {
-                    if (android.os.Build.VERSION.SDK_INT >= 33 && !Reminders.canNotify(this@EditNoteActivity)) {
-                        askNotifications.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-                    }
-                    pickReminder(reminder) { at ->
-                        Reminders.set(this@EditNoteActivity, account, existing.id, at)
-                        reminder = at
-                    }
-                }) {
-                    Icon(painterResource(R.drawable.ic_alarm), contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        reminder?.let {
-                            stringResource(R.string.reminder_at, android.text.format.DateUtils.formatDateTime(
-                                this@EditNoteActivity, it,
-                                android.text.format.DateUtils.FORMAT_SHOW_DATE or android.text.format.DateUtils.FORMAT_SHOW_TIME or
-                                    android.text.format.DateUtils.FORMAT_ABBREV_MONTH,
-                            ))
-                        } ?: stringResource(R.string.reminder)
-                    )
-                }
-                if (reminder != null) TextButton(onClick = {
-                    Reminders.clear(this@EditNoteActivity, account, existing.id)
-                    reminder = null
-                }) { Text(stringResource(R.string.reminder_remove)) }
             }
 
             // Labels: tap a known label to add or remove it; a new name creates the label on save.
@@ -717,10 +700,44 @@ class EditNoteActivity : ComponentActivity() {
 
             if (error.isNotEmpty()) Text(error, color = MaterialTheme.colorScheme.error)
 
+            if (reminderMenu && existing != null) {
+                AlertDialog(
+                    onDismissRequest = { reminderMenu = false },
+                    title = { Text(stringResource(R.string.reminder)) },
+                    text = { reminder?.let { Text(Reminders.label(this@EditNoteActivity, it)) } },
+                    confirmButton = {
+                        TextButton(onClick = { reminderMenu = false; chooseReminder() }) { Text(stringResource(R.string.reminder_change)) }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = {
+                            reminderMenu = false
+                            Reminders.clear(this@EditNoteActivity, account, existing.id)
+                            reminder = null
+                        }) { Text(stringResource(R.string.reminder_remove)) }
+                    },
+                )
+            }
+
+            reminder?.let {
+                Text(
+                    stringResource(R.string.reminder_at, Reminders.label(this@EditNoteActivity, it)),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                )
+            }
             Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedButton(
                     modifier = Modifier.weight(1f).fillMaxHeight(), enabled = !saving, onClick = { finish() },
                 ) { Text(stringResource(R.string.cancel)) }
+                if (existing != null) Column(Modifier.align(Alignment.CenterVertically), horizontalAlignment = Alignment.CenterHorizontally) {
+                    FilledTonalIconToggleButton(
+                        checked = reminder != null,
+                        onCheckedChange = { if (reminder == null) chooseReminder() else reminderMenu = true },
+                    ) {
+                        Icon(painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminder))
+                    }
+                }
                 Button(
                     modifier = Modifier.weight(1f).fillMaxHeight(), enabled = !saving, onClick = { save() },
                 ) { Text(stringResource(if (saving) R.string.saving else R.string.save)) }

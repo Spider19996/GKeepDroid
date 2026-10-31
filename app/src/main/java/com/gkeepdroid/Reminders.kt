@@ -24,6 +24,13 @@ object Reminders {
 
     private fun key(account: String, noteId: String) = "$account|$noteId"
 
+    /** A short date and time, such as "Nov 5, 9:00 AM". */
+    fun label(context: Context, at: Long): String = android.text.format.DateUtils.formatDateTime(
+        context, at,
+        android.text.format.DateUtils.FORMAT_SHOW_DATE or android.text.format.DateUtils.FORMAT_SHOW_TIME or
+            android.text.format.DateUtils.FORMAT_ABBREV_ALL,
+    )
+
     /** The due time in milliseconds, or null when the note has no reminder. */
     fun get(context: Context, account: String, noteId: String): Long? =
         prefs(context).getLong(key(account, noteId), 0L).takeIf { it > 0 }

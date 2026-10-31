@@ -241,4 +241,5 @@
     <string name="reminder_remove">Supprimer le rappel</string>
     <string name="reminder_at">Rappel : %s</string>
     <string name="reminder_channel">Rappels</string>
+    <string name="reminder_change">Modifier</string>
 </resources>

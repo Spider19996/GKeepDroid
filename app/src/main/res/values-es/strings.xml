@@ -241,4 +241,5 @@
     <string name="reminder_remove">Quitar recordatorio</string>
     <string name="reminder_at">Recordatorio: %s</string>
     <string name="reminder_channel">Recordatorios</string>
+    <string name="reminder_change">Cambiar</string>
 </resources>
