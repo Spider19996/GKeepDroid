@@ -52,7 +52,13 @@ class NotesWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val appWidgetId = GlanceAppWidgetManager(context).getAppWidgetId(id)
-        provideContent { Content(appWidgetId) }
+        provideContent {
+            // In the debug build a "DEBUG" mark lies above the widget and lets touches through.
+            Box(GlanceModifier.fillMaxSize()) {
+                Content(appWidgetId)
+                DebugWatermarkGlance()
+            }
+        }
     }
 
     @Composable

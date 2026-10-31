@@ -64,7 +64,11 @@ fun KeepTheme(themeMode: Int, opaque: Boolean = true, content: @Composable () ->
             color = if (opaque) colors.background else Color.Transparent,
             contentColor = colors.onBackground,
         ) {
-            Box(Modifier.systemBarsPadding().imePadding()) { content() }
+            Box(Modifier.fillMaxSize()) {
+                Box(Modifier.systemBarsPadding().imePadding()) { content() }
+                // Debug builds only; it lies above everything and lets touches through.
+                DebugWatermark()
+            }
         }
     }
 }
