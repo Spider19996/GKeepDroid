@@ -143,8 +143,8 @@ while no widget is placed.
 
 ## Automatic builds and releases
 
-The workflow in `.github/workflows/build.yml` builds the debug APK on every push and pull request and keeps it
-as a download of the run ("Artifacts"). It is signed with a debug key, so Android may warn when installing it.
+The workflow in `.github/workflows/build.yml` builds the signed release when a tag such as `v0.2.0` is pushed. "Run workflow"
+in the Actions tab builds a debug APK instead, kept as a download of the run ("Artifacts"); it is signed with a debug key.
 
 ### Signed release
 
