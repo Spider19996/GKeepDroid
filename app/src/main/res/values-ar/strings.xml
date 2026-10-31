@@ -252,4 +252,5 @@
     <string name="reminder_off">إيقاف</string>
     <string name="reminders_title">التذكيرات</string>
     <string name="reminders_none">لا توجد تذكيرات</string>
+    <string name="reminder_past">اختر وقتًا في المستقبل.</string>
 </resources>

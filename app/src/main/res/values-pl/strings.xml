@@ -252,4 +252,5 @@
     <string name="reminder_off">Wył.</string>
     <string name="reminders_title">Przypomnienia</string>
     <string name="reminders_none">Brak przypomnień</string>
+    <string name="reminder_past">Wybierz godzinę w przyszłości.</string>
 </resources>

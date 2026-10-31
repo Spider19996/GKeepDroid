@@ -255,4 +255,5 @@
     <string name="reminder_off">Off</string>
     <string name="reminders_title">Reminders</string>
     <string name="reminders_none">No reminders</string>
+    <string name="reminder_past">Pick a time in the future.</string>
 </resources>

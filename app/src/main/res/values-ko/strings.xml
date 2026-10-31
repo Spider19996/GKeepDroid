@@ -252,4 +252,5 @@
     <string name="reminder_off">끄기</string>
     <string name="reminders_title">알림</string>
     <string name="reminders_none">알림 없음</string>
+    <string name="reminder_past">미래의 시간을 선택하세요.</string>
 </resources>

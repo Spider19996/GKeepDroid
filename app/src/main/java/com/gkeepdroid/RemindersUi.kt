@@ -38,20 +38,30 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
-/** Asks for a date, then a time; a time in the past is moved to the next day. */
+/** Asks for a date, then a time; neither may lie in the past, so an earlier time today is asked for again. */
 internal fun pickDateTime(activity: Activity, current: Long?, onPicked: (Long) -> Unit) {
-    val start = java.util.Calendar.getInstance().apply { timeInMillis = current ?: (System.currentTimeMillis() + 3_600_000L) }
-    android.app.DatePickerDialog(activity, { _, year, month, day ->
-        android.app.TimePickerDialog(activity, { _, hour, minute ->
-            val picked = java.util.Calendar.getInstance().apply {
-                set(year, month, day, hour, minute, 0)
-                set(java.util.Calendar.MILLISECOND, 0)
-            }
-            if (picked.timeInMillis <= System.currentTimeMillis()) picked.add(java.util.Calendar.DAY_OF_YEAR, 1)
-            onPicked(picked.timeInMillis)
-        }, start.get(java.util.Calendar.HOUR_OF_DAY), start.get(java.util.Calendar.MINUTE),
-            android.text.format.DateFormat.is24HourFormat(activity)).show()
-    }, start.get(java.util.Calendar.YEAR), start.get(java.util.Calendar.MONTH), start.get(java.util.Calendar.DAY_OF_MONTH)).show()
+    val now = System.currentTimeMillis()
+    val start = java.util.Calendar.getInstance().apply { timeInMillis = current?.takeIf { it > now } ?: (now + 3_600_000L) }
+    val dateDialog = android.app.DatePickerDialog(activity, { _, year, month, day ->
+        fun askTime(hour: Int, minute: Int) {
+            android.app.TimePickerDialog(activity, { _, pickedHour, pickedMinute ->
+                val picked = java.util.Calendar.getInstance().apply {
+                    set(year, month, day, pickedHour, pickedMinute, 0)
+                    set(java.util.Calendar.MILLISECOND, 0)
+                }
+                if (picked.timeInMillis <= System.currentTimeMillis()) {
+                    android.widget.Toast.makeText(activity, R.string.reminder_past, android.widget.Toast.LENGTH_SHORT).show()
+                    askTime(pickedHour, pickedMinute)
+                } else {
+                    onPicked(picked.timeInMillis)
+                }
+            }, hour, minute, android.text.format.DateFormat.is24HourFormat(activity)).show()
+        }
+        askTime(start.get(java.util.Calendar.HOUR_OF_DAY), start.get(java.util.Calendar.MINUTE))
+    }, start.get(java.util.Calendar.YEAR), start.get(java.util.Calendar.MONTH), start.get(java.util.Calendar.DAY_OF_MONTH))
+    // The calendar starts today; earlier days cannot be chosen.
+    dateDialog.datePicker.minDate = now - 1000
+    dateDialog.show()
 }
 
 /**

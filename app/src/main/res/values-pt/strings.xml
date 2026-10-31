@@ -252,4 +252,5 @@
     <string name="reminder_off">Desligado</string>
     <string name="reminders_title">Lembretes</string>
     <string name="reminders_none">Sem lembretes</string>
+    <string name="reminder_past">Escolha um horário no futuro.</string>
 </resources>

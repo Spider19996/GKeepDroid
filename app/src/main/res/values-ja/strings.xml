@@ -252,4 +252,5 @@
     <string name="reminder_off">オフ</string>
     <string name="reminders_title">リマインダー</string>
     <string name="reminders_none">リマインダーなし</string>
+    <string name="reminder_past">未来の時刻を選んでください。</string>
 </resources>
