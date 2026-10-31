@@ -29,6 +29,9 @@ fun isDebugBuild(context: Context): Boolean =
 
 private val WATERMARK_COLOR = Color(0x55FF3B30)
 
+// Widgets sit on any wallpaper, so their mark is stronger.
+private val WIDGET_WATERMARK_COLOR = Color(0xCCFF3B30)
+
 /**
  * "DEBUG" across the screen of the debug build, drawn above everything. It takes no touches: taps
  * and scrolls go through it to what lies beneath.
@@ -38,12 +41,10 @@ fun DebugWatermark() {
     if (!isDebugBuild(LocalContext.current)) return
     Column(
         Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceEvenly,
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        repeat(3) {
-            Text("DEBUG", color = WATERMARK_COLOR, fontSize = 64.sp, fontWeight = FontWeight.Black, modifier = Modifier.rotate(-20f))
-        }
+        Text("DEBUG", color = WATERMARK_COLOR, fontSize = 64.sp, fontWeight = FontWeight.Black, modifier = Modifier.rotate(-20f))
     }
 }
 
@@ -54,7 +55,7 @@ fun DebugWatermarkGlance() {
     Box(GlanceModifier.fillMaxSize(), contentAlignment = GlanceAlignment.Center) {
         GlanceText(
             "DEBUG",
-            style = TextStyle(color = ColorProvider(WATERMARK_COLOR), fontSize = 36.sp, fontWeight = GlanceFontWeight.Bold),
+            style = TextStyle(color = ColorProvider(WIDGET_WATERMARK_COLOR), fontSize = 36.sp, fontWeight = GlanceFontWeight.Bold),
         )
     }
 }
