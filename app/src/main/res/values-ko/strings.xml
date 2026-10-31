@@ -268,4 +268,6 @@
     <string name="language">언어</string>
     <string name="language_system">시스템 언어</string>
     <string name="first_sync_hint">첫 동기화는 메모 수에 따라 몇 분 걸릴 수 있습니다.</string>
+    <string name="note_changed_remote">이 메모가 Keep에서 변경되었습니다. 다시 불러오면 입력한 내용이 바뀝니다.</string>
+    <string name="reload">다시 불러오기</string>
 </resources>

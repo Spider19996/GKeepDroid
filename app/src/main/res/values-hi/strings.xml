@@ -268,4 +268,6 @@
     <string name="language">भाषा</string>
     <string name="language_system">सिस्टम भाषा</string>
     <string name="first_sync_hint">पहला सिंक नोट्स की संख्या के अनुसार कुछ मिनट ले सकता है।</string>
+    <string name="note_changed_remote">यह नोट Keep में बदला गया। फिर से लोड करने पर आपका टाइप किया हुआ बदल जाएगा।</string>
+    <string name="reload">फिर से लोड करें</string>
 </resources>

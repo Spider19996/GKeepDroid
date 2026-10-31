@@ -268,4 +268,6 @@
     <string name="language">言語</string>
     <string name="language_system">システムの言語</string>
     <string name="first_sync_hint">最初の同期は、ノートの数によって数分かかることがあります。</string>
+    <string name="note_changed_remote">このノートは Keep で変更されました。再読み込みすると入力内容が置き換わります。</string>
+    <string name="reload">再読み込み</string>
 </resources>

@@ -268,4 +268,6 @@
     <string name="language">اللغة</string>
     <string name="language_system">لغة النظام</string>
     <string name="first_sync_hint">قد تستغرق المزامنة الأولى بضع دقائق حسب عدد الملاحظات.</string>
+    <string name="note_changed_remote">تم تغيير هذه الملاحظة في Keep. إعادة التحميل تستبدل ما كتبته.</string>
+    <string name="reload">إعادة التحميل</string>
 </resources>

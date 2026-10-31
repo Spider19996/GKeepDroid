@@ -120,25 +120,35 @@ class EditNoteActivity : ComponentActivity() {
     }
 
     /**
-     * An existing note is synced with Keep before it is shown, so the editor never works on a
-     * stale copy and a note that was deleted elsewhere is noticed.
+     * An existing note opens at once from the cache. Keep is asked in the background (unless a sync
+     * just ran); if the note changed there, a hint offers to reload it, so nothing typed is lost.
      */
     @Composable
     private fun Loader(account: String, noteId: String?, newList: Boolean, pinWidgetId: Int?) {
-        var loaded by remember { mutableStateOf(noteId == null) }
-        var existing by remember { mutableStateOf<KeepNote?>(null) }
+        val cached = remember { noteId?.let { id -> NotesCache.readAll(this@EditNoteActivity, account).firstOrNull { it.id == id } } }
+        var loaded by remember { mutableStateOf(noteId == null || cached != null) }
+        var existing by remember { mutableStateOf(cached) }
         var gone by remember { mutableStateOf(false) }
         var offline by remember { mutableStateOf(false) }
+        var remote by remember { mutableStateOf<KeepNote?>(null) }
+        var screenKey by remember { mutableStateOf(0) }
 
         LaunchedEffect(Unit) {
             if (noteId == null) return@LaunchedEffect
-            try {
-                KeepRepository.sync(this@EditNoteActivity, account)
-            } catch (e: Exception) {
-                offline = true
+            val recentlySynced = cached != null && System.currentTimeMillis() - SyncPolicy.lastSuccess(this@EditNoteActivity) < 90_000
+            if (!recentlySynced) {
+                try {
+                    KeepRepository.sync(this@EditNoteActivity, account)
+                } catch (e: Exception) {
+                    offline = true
+                }
             }
             val fresh = NotesCache.readAll(this@EditNoteActivity, account).firstOrNull { it.id == noteId }
-            if (fresh == null) gone = true else existing = fresh
+            when {
+                fresh == null -> gone = true
+                cached == null -> existing = fresh
+                fresh != cached -> remote = fresh
+            }
             loaded = true
         }
 
@@ -152,13 +162,24 @@ class EditNoteActivity : ComponentActivity() {
                     Text(stringResource(android.R.string.ok))
                 }
             }
-            else -> EditScreen(account, existing, existing?.isList ?: newList, offline, pinWidgetId)
+            else -> key(screenKey) {
+                EditScreen(
+                    account, existing, existing?.isList ?: newList, offline, pinWidgetId, remote,
+                ) {
+                    existing = remote
+                    remote = null
+                    screenKey++
+                }
+            }
         }
     }
 
     @OptIn(ExperimentalLayoutApi::class)
     @Composable
-    private fun EditScreen(account: String, existing: KeepNote?, isList: Boolean, offline: Boolean, pinWidgetId: Int?) {
+    private fun EditScreen(
+        account: String, existing: KeepNote?, isList: Boolean, offline: Boolean, pinWidgetId: Int?,
+        remote: KeepNote?, onReload: () -> Unit,
+    ) {
         val scope = rememberCoroutineScope()
         // Text shared from another app arrives as a prefill for a new note.
         var title by remember { mutableStateOf(existing?.title ?: intent.getStringExtra(EXTRA_PREFILL_TITLE).orEmpty()) }
@@ -486,6 +507,19 @@ class EditNoteActivity : ComponentActivity() {
                         TextButton(onClick = { labelToDelete = null }) { Text(stringResource(android.R.string.cancel)) }
                     },
                 )
+            }
+
+            if (remote != null) {
+                // The note changed in Keep while it was open here.
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        stringResource(R.string.note_changed_remote),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f),
+                    )
+                    TextButton(onClick = onReload) { Text(stringResource(R.string.reload)) }
+                }
             }
 
             if (offline) {

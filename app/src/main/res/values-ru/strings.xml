@@ -268,4 +268,6 @@
     <string name="language">Язык</string>
     <string name="language_system">Язык системы</string>
     <string name="first_sync_hint">Первая синхронизация может занять несколько минут, в зависимости от количества заметок.</string>
+    <string name="note_changed_remote">Заметка изменена в Keep. Перезагрузка заменит то, что вы ввели.</string>
+    <string name="reload">Перезагрузить</string>
 </resources>

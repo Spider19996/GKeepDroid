@@ -268,4 +268,6 @@
     <string name="language">Langue</string>
     <string name="language_system">Langue du système</string>
     <string name="first_sync_hint">La première synchronisation peut prendre quelques minutes, selon le nombre de notes.</string>
+    <string name="note_changed_remote">Cette note a été modifiée dans Keep. Recharger remplace ce que vous avez saisi.</string>
+    <string name="reload">Recharger</string>
 </resources>

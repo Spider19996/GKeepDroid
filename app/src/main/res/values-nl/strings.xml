@@ -268,4 +268,6 @@
     <string name="language">Taal</string>
     <string name="language_system">Systeemtaal</string>
     <string name="first_sync_hint">De eerste synchronisatie kan enkele minuten duren, afhankelijk van het aantal notities.</string>
+    <string name="note_changed_remote">Deze notitie is gewijzigd in Keep. Opnieuw laden vervangt wat je hebt getypt.</string>
+    <string name="reload">Opnieuw laden</string>
 </resources>

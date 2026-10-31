@@ -268,4 +268,6 @@
     <string name="language">Język</string>
     <string name="language_system">Język systemu</string>
     <string name="first_sync_hint">Pierwsza synchronizacja może potrwać kilka minut, zależnie od liczby notatek.</string>
+    <string name="note_changed_remote">Ta notatka została zmieniona w Keep. Ponowne wczytanie zastąpi to, co wpisałeś.</string>
+    <string name="reload">Wczytaj ponownie</string>
 </resources>

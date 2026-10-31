@@ -271,4 +271,6 @@
     <string name="language">Language</string>
     <string name="language_system">System language</string>
     <string name="first_sync_hint">The first sync can take a few minutes, depending on how many notes you have.</string>
+    <string name="note_changed_remote">This note was changed in Keep. Reloading replaces what you typed.</string>
+    <string name="reload">Reload</string>
 </resources>

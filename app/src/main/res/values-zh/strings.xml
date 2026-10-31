@@ -268,4 +268,6 @@
     <string name="language">语言</string>
     <string name="language_system">系统语言</string>
     <string name="first_sync_hint">首次同步可能需要几分钟，具体取决于笔记数量。</string>
+    <string name="note_changed_remote">此笔记已在 Keep 中更改。重新加载会替换你输入的内容。</string>
+    <string name="reload">重新加载</string>
 </resources>

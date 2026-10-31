@@ -268,4 +268,6 @@
     <string name="language">Dil</string>
     <string name="language_system">Sistem dili</string>
     <string name="first_sync_hint">İlk eşitleme, not sayınıza bağlı olarak birkaç dakika sürebilir.</string>
+    <string name="note_changed_remote">Bu not Keep’te değiştirildi. Yeniden yüklemek yazdıklarınızın yerine geçer.</string>
+    <string name="reload">Yeniden yükle</string>
 </resources>
