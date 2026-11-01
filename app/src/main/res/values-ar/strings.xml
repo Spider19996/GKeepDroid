@@ -123,7 +123,6 @@
     <string name="show_content">إظهار المحتوى في الأدوات</string>
     <string name="note_private_hint">المحتوى مخفي</string>
     <string name="show_add_item_button">عرض زر إضافة عنصر</string>
-    <string name="saved_offline">لا يوجد اتصال: سيتم إرسال تغييراتك لاحقًا.</string>
     <string name="save_to_account">حساب هذه الملاحظة</string>
     <string name="done">تم</string>
     <string name="share_note">مشاركة</string>

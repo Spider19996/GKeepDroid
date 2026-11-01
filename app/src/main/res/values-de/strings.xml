@@ -123,7 +123,6 @@
     <string name="show_content">Inhalt in Widgets anzeigen</string>
     <string name="note_private_hint">Inhalt ausgeblendet</string>
     <string name="show_add_item_button">Button „Eintrag hinzufügen“ anzeigen</string>
-    <string name="saved_offline">Keine Verbindung: Deine Änderungen werden später gesendet.</string>
     <string name="save_to_account">Konto für diese Notiz</string>
     <string name="done">Fertig</string>
     <string name="share_note">Teilen</string>

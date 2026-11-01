@@ -219,15 +219,7 @@ class EditNoteActivity : ComponentActivity() {
                     .firstOrNull { it.account == account && it.function == "update_note" && it.args.firstOrNull() == note.id }
             }
         }
-        // Checked again whenever the screen comes back, e.g. from the notification settings.
-        var notificationsOn by remember { mutableStateOf(Reminders.canNotify(this@EditNoteActivity)) }
-        androidx.compose.runtime.DisposableEffect(Unit) {
-            val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
-                if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) notificationsOn = Reminders.canNotify(this@EditNoteActivity)
-            }
-            lifecycle.addObserver(observer)
-            onDispose { lifecycle.removeObserver(observer) }
-        }
+        val notificationsOn = rememberNotificationsOn(this@EditNoteActivity)
         var confirmDelete by remember { mutableStateOf(false) }
         var viewerImage by remember { mutableStateOf<String?>(null) }
         val images = remember { existing?.images.orEmpty() }

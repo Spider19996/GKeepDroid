@@ -123,7 +123,6 @@
     <string name="show_content">在小组件中显示内容</string>
     <string name="note_private_hint">内容已隐藏</string>
     <string name="show_add_item_button">显示添加项目按钮</string>
-    <string name="saved_offline">无网络连接：你的更改稍后发送。</string>
     <string name="save_to_account">此笔记使用的账号</string>
     <string name="done">完成</string>
     <string name="share_note">分享</string>

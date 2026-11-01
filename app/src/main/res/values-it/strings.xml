@@ -123,7 +123,6 @@
     <string name="show_content">Mostra il contenuto nei widget</string>
     <string name="note_private_hint">Contenuto nascosto</string>
     <string name="show_add_item_button">Mostra il pulsante Aggiungi elemento</string>
-    <string name="saved_offline">Nessuna connessione: le modifiche verranno inviate più tardi.</string>
     <string name="save_to_account">Account per questa nota</string>
     <string name="done">Fine</string>
     <string name="share_note">Condividi</string>

@@ -36,7 +36,6 @@ data class PendingEdit(
     val account: String,
     val function: String,
     val args: List<Any>,
-    val attempts: Int = 0,
     /** Why the last attempt failed, empty while nothing went wrong besides a missing connection. */
     val error: String = "",
     val id: String = UUID.randomUUID().toString(),
@@ -58,7 +57,6 @@ object PendingEdits {
                     account = o.getString("account"),
                     function = o.getString("function"),
                     args = (0 until args.length()).map { i -> args.get(i) },
-                    attempts = o.optInt("attempts"),
                     error = o.optString("error"),
                     id = o.getString("id"),
                 )
@@ -76,7 +74,6 @@ object PendingEdits {
                 JSONObject()
                     .put("id", edit.id).put("account", edit.account).put("function", edit.function)
                     .put("args", JSONArray().apply { edit.args.forEach { put(it) } })
-                    .put("attempts", edit.attempts)
                     .put("error", edit.error)
             )
         }
@@ -91,7 +88,7 @@ object PendingEdits {
 
     @Synchronized
     fun recordFailure(context: Context, id: String, error: String) =
-        save(context, all(context).map { if (it.id == id) it.copy(attempts = it.attempts + 1, error = error) else it })
+        save(context, all(context).map { if (it.id == id) it.copy(error = error) else it })
 
     // Only one run at a time sends the stored edits, so none is sent twice.
     private val flushLock = Mutex()

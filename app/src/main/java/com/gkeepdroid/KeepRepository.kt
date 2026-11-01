@@ -124,8 +124,6 @@ object KeepRepository {
         }
     }
 
-    suspend fun addListItem(context: Context, email: String, noteId: String, text: String) =
-        call(context, email, "add_list_item", noteId, text)
 
     /** Runs a stored call again, for example one that waited for the network. */
     suspend fun run(context: Context, email: String, function: String, args: List<Any>, editId: String? = null) =

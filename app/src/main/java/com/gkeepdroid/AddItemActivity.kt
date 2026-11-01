@@ -1,7 +1,6 @@
 package com.gkeepdroid
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -69,7 +68,6 @@ class AddItemActivity : ComponentActivity() {
         var text by remember { mutableStateOf("") }
         var busy by remember { mutableStateOf(false) }
         var added by remember { mutableStateOf(0) }
-        val queuedMessage = stringResource(R.string.saved_offline)
 
         LaunchedEffect(Unit) { focus.requestFocus() }
 
@@ -77,22 +75,12 @@ class AddItemActivity : ComponentActivity() {
             val item = text.trim()
             if (item.isEmpty() || busy) return
             busy = true
-            scope.launch {
-                try {
-                    KeepRepository.addListItem(this@AddItemActivity, account, noteId, item)
-                } catch (e: Exception) {
-                    // No connection (or Keep is unreachable): keep the item and send it later.
-                    PendingEdits.add(
-                        this@AddItemActivity, PendingEdit(account, "add_list_item", listOf(noteId, item)),
-                    )
-                    PendingEditsWorker.schedule(this@AddItemActivity)
-                    Toast.makeText(this@AddItemActivity, queuedMessage, Toast.LENGTH_LONG).show()
-                }
-                text = ""
-                added++
-                busy = false
-                focus.requestFocus()
-            }
+            // Stored and sent in the background, so the dialog is ready for the next item at once.
+            KeepRepository.queueEdit(this@AddItemActivity, PendingEdit(account, "add_list_item", listOf(noteId, item)))
+            text = ""
+            added++
+            busy = false
+            focus.requestFocus()
         }
 
         // Tapping next to the dialog closes it.

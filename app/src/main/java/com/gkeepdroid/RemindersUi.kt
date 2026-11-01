@@ -268,16 +268,7 @@ internal fun RemindersDialog(
         )
         return
     }
-    // Checked again whenever the screen comes back, e.g. from the permission dialog or the settings.
-    var notificationsOn by remember { mutableStateOf(Reminders.canNotify(activity)) }
-    androidx.compose.runtime.DisposableEffect(activity) {
-        val lifecycle = (activity as androidx.lifecycle.LifecycleOwner).lifecycle
-        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
-            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) notificationsOn = Reminders.canNotify(activity)
-        }
-        lifecycle.addObserver(observer)
-        onDispose { lifecycle.removeObserver(observer) }
-    }
+    val notificationsOn = rememberNotificationsOn(activity)
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.reminders_title)) },
@@ -410,4 +401,19 @@ class RemindersActivity : androidx.activity.ComponentActivity() {
             }
         }
     }
+}
+
+/** Whether the app may show notifications; checked again whenever the screen comes back, e.g. from the permission dialog or the settings. */
+@Composable
+fun rememberNotificationsOn(activity: Activity): Boolean {
+    var on by remember { mutableStateOf(Reminders.canNotify(activity)) }
+    androidx.compose.runtime.DisposableEffect(activity) {
+        val lifecycle = (activity as androidx.lifecycle.LifecycleOwner).lifecycle
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) on = Reminders.canNotify(activity)
+        }
+        lifecycle.addObserver(observer)
+        onDispose { lifecycle.removeObserver(observer) }
+    }
+    return on
 }

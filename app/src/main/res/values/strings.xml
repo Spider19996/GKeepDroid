@@ -126,7 +126,6 @@
     <string name="show_content">Show content in widgets</string>
     <string name="note_private_hint">Content hidden</string>
     <string name="show_add_item_button">Show add item button</string>
-    <string name="saved_offline">No connection: your changes will be sent later.</string>
     <string name="save_to_account">Account for this note</string>
     <string name="done">Done</string>
     <string name="share_note">Share</string>

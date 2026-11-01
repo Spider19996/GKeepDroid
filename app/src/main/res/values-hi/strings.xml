@@ -123,7 +123,6 @@
     <string name="show_content">विजेट में सामग्री दिखाएँ</string>
     <string name="note_private_hint">सामग्री छिपी है</string>
     <string name="show_add_item_button">आइटम जोड़ें बटन दिखाएँ</string>
-    <string name="saved_offline">कनेक्शन नहीं है: आपके बदलाव बाद में भेजे जाएँगे।</string>
     <string name="save_to_account">इस नोट के लिए खाता</string>
     <string name="done">हो गया</string>
     <string name="share_note">साझा करें</string>
