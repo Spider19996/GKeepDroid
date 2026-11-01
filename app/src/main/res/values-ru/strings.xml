@@ -280,4 +280,7 @@
     <string name="save_pending_failed">«%1$s» не отправлена в Keep: %2$s. Изменение сохранено на этом телефоне.</string>
     <string name="save_retry">Повторить</string>
     <string name="save_discard">Отменить</string>
+    <string name="note_unsent">В этой заметке есть изменения, ещё не отправленные в Keep.</string>
+    <string name="note_unsent_failed">В этой заметке есть изменения, которые не удалось отправить в Keep: %1$s</string>
+    <string name="save_notifications_off">Уведомления выключены, поэтому вы не узнаете, если сохранение в Keep не удастся.</string>
 </resources>

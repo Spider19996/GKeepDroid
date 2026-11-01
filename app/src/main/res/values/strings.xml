@@ -283,4 +283,7 @@
     <string name="save_pending_failed">“%1$s” was not sent to Keep: %2$s. The change is kept on this phone.</string>
     <string name="save_retry">Try again</string>
     <string name="save_discard">Discard</string>
+    <string name="note_unsent">This note has changes that are not sent to Keep yet.</string>
+    <string name="note_unsent_failed">This note has changes that could not be sent to Keep: %1$s</string>
+    <string name="save_notifications_off">Notifications are off, so you would not notice if saving to Keep fails.</string>
 </resources>

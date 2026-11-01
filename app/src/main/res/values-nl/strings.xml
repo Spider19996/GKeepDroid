@@ -280,4 +280,7 @@
     <string name="save_pending_failed">“%1$s” is niet naar Keep verzonden: %2$s. De wijziging blijft op deze telefoon bewaard.</string>
     <string name="save_retry">Opnieuw proberen</string>
     <string name="save_discard">Verwerpen</string>
+    <string name="note_unsent">Deze notitie heeft wijzigingen die nog niet naar Keep zijn verzonden.</string>
+    <string name="note_unsent_failed">Deze notitie heeft wijzigingen die niet naar Keep konden worden verzonden: %1$s</string>
+    <string name="save_notifications_off">Meldingen staan uit; je merkt niet als opslaan in Keep mislukt.</string>
 </resources>

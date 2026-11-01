@@ -280,4 +280,7 @@
     <string name="save_pending_failed">“%1$s” Keep को नहीं भेजा गया: %2$s। बदलाव इस फ़ोन पर सुरक्षित है।</string>
     <string name="save_retry">फिर कोशिश करें</string>
     <string name="save_discard">छोड़ दें</string>
+    <string name="note_unsent">इस नोट में ऐसे बदलाव हैं जो अभी Keep को नहीं भेजे गए।</string>
+    <string name="note_unsent_failed">इस नोट के कुछ बदलाव Keep को नहीं भेजे जा सके: %1$s</string>
+    <string name="save_notifications_off">सूचनाएँ बंद हैं, इसलिए Keep में सहेजना विफल होने पर आपको पता नहीं चलेगा।</string>
 </resources>

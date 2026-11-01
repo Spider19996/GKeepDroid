@@ -134,7 +134,8 @@ object PendingEdits {
                 val reason = e.message?.lineSequence()?.firstOrNull()?.take(160) ?: e.javaClass.simpleName
                 withContext(NonCancellable) {
                     recordFailure(context, edit.id, reason)
-                    SaveFailures.show(context, edit, reason)
+                    // The same problem is not announced again at every retry.
+                    if (edit.error != reason) SaveFailures.show(context, edit, reason)
                 }
             }
         }

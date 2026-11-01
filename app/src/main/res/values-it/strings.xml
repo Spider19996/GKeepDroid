@@ -280,4 +280,7 @@
     <string name="save_pending_failed">«%1$s» non è stata inviata a Keep: %2$s. La modifica resta su questo telefono.</string>
     <string name="save_retry">Riprova</string>
     <string name="save_discard">Scarta</string>
+    <string name="note_unsent">Questa nota ha modifiche non ancora inviate a Keep.</string>
+    <string name="note_unsent_failed">Questa nota ha modifiche che non è stato possibile inviare a Keep: %1$s</string>
+    <string name="save_notifications_off">Le notifiche sono disattivate: non vedresti se il salvataggio su Keep fallisce.</string>
 </resources>

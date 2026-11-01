@@ -22,6 +22,9 @@ class SyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
         if (MarkdownSync.isEnabled(applicationContext)) {
             try { MarkdownSync.syncNow(applicationContext) } catch (_: Exception) {}
         }
+        if (PendingEdits.all(applicationContext).isNotEmpty() && PendingEdits.flush(applicationContext)) {
+            PendingEditsWorker.schedule(applicationContext)
+        }
         // Nothing to update when no widget is placed, unless the app itself asked.
         if (!inputData.getBoolean(FORCE, false) && !WidgetRefresh.hasWidgets(applicationContext)) return Result.success()
         val ok = KeepRepository.syncAll(applicationContext)

@@ -280,4 +280,7 @@
     <string name="save_pending_failed">لم يتم إرسال «%1$s» إلى Keep: %2$s. يبقى التغيير محفوظًا على هذا الهاتف.</string>
     <string name="save_retry">إعادة المحاولة</string>
     <string name="save_discard">تجاهل</string>
+    <string name="note_unsent">في هذه الملاحظة تغييرات لم تُرسل إلى Keep بعد.</string>
+    <string name="note_unsent_failed">في هذه الملاحظة تغييرات تعذّر إرسالها إلى Keep: %1$s</string>
+    <string name="save_notifications_off">الإشعارات متوقفة، لذا لن تعرف إن فشل الحفظ في Keep.</string>
 </resources>

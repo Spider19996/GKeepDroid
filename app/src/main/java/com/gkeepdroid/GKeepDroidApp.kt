@@ -9,6 +9,8 @@ class GKeepDroidApp : Application() {
         // Watch the Markdown folder for edits made by other apps while the process lives.
         if (MarkdownSync.isEnabled(this)) MarkdownSync.startObserving(this)
         ScreenSync.start(this)
+        // Changes that could not be sent earlier (no connection, a crash) are tried again at every start.
+        if (PendingEdits.all(this).isNotEmpty()) PendingEdits.sendNow(this)
         // Python takes a moment to start; do it in the background so the app opens quickly.
         Thread { PythonRuntime.get(this) }.start()
     }

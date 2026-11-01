@@ -280,4 +280,7 @@
     <string name="save_pending_failed">「%1$s」を Keep に送信できませんでした: %2$s。変更はこの端末に保持されます。</string>
     <string name="save_retry">再試行</string>
     <string name="save_discard">破棄</string>
+    <string name="note_unsent">このメモには、まだ Keep に送信されていない変更があります。</string>
+    <string name="note_unsent_failed">このメモの変更を Keep に送信できませんでした: %1$s</string>
+    <string name="save_notifications_off">通知がオフのため、Keep への保存に失敗しても気づけません。</string>
 </resources>

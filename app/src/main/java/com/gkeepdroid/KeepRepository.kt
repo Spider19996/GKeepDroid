@@ -20,6 +20,8 @@ object KeepRepository {
 
     /** Syncs every account that has a token; returns false if any of them failed. */
     suspend fun syncAll(context: Context): Boolean {
+        // Changes that are still waiting go first, so they are not held back by (or lost to) this sync.
+        if (PendingEdits.all(context).isNotEmpty()) PendingEdits.flush(context)
         var allOk = true
         var error: String? = null
         var expired: String? = null
@@ -50,15 +52,27 @@ object KeepRepository {
         call(context, email, "set_items_checked", json)
     }
 
-    suspend fun unarchiveNote(context: Context, email: String, noteId: String) = call(context, email, "unarchive_note", noteId)
+    suspend fun unarchiveNote(context: Context, email: String, noteId: String) = moveNote(context, email, "unarchive_note", noteId)
 
-    suspend fun untrashNote(context: Context, email: String, noteId: String) = call(context, email, "untrash_note", noteId)
+    suspend fun untrashNote(context: Context, email: String, noteId: String) = moveNote(context, email, "untrash_note", noteId)
 
-    suspend fun deleteForever(context: Context, email: String, noteId: String) = call(context, email, "delete_forever", noteId)
+    suspend fun deleteForever(context: Context, email: String, noteId: String) = moveNote(context, email, "delete_forever", noteId)
 
-    suspend fun archiveNote(context: Context, email: String, noteId: String) = call(context, email, "archive_note", noteId)
+    suspend fun archiveNote(context: Context, email: String, noteId: String) = moveNote(context, email, "archive_note", noteId)
 
-    suspend fun trashNote(context: Context, email: String, noteId: String) = call(context, email, "trash_note", noteId)
+    suspend fun trashNote(context: Context, email: String, noteId: String) = moveNote(context, email, "trash_note", noteId)
+
+    /**
+     * Archive, trash, restore and delete: the note moves in the app at once and Keep follows in the
+     * background. Local notes have no network, so those change directly.
+     */
+    private suspend fun moveNote(context: Context, email: String, function: String, noteId: String) {
+        if (CredentialStore.isLocal(email)) {
+            call(context, email, function, noteId)
+        } else {
+            queueEdit(context, PendingEdit(email, function, listOf(noteId)))
+        }
+    }
 
     /** The arguments of the Python calls, also stored when a change has to wait for the network. */
     fun updateNoteArgs(

@@ -212,6 +212,22 @@ class EditNoteActivity : ComponentActivity() {
         var saving by remember { mutableStateOf(false) }
         var menuOpen by remember { mutableStateOf(false) }
         val isLocal = CredentialStore.isLocal(account)
+        // A change that Keep does not have yet (and why, if sending it failed).
+        val unsent = remember {
+            existing?.let { note ->
+                PendingEdits.all(this@EditNoteActivity)
+                    .firstOrNull { it.account == account && it.function == "update_note" && it.args.firstOrNull() == note.id }
+            }
+        }
+        // Checked again whenever the screen comes back, e.g. from the notification settings.
+        var notificationsOn by remember { mutableStateOf(Reminders.canNotify(this@EditNoteActivity)) }
+        androidx.compose.runtime.DisposableEffect(Unit) {
+            val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+                if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) notificationsOn = Reminders.canNotify(this@EditNoteActivity)
+            }
+            lifecycle.addObserver(observer)
+            onDispose { lifecycle.removeObserver(observer) }
+        }
         var confirmDelete by remember { mutableStateOf(false) }
         var viewerImage by remember { mutableStateOf<String?>(null) }
         val images = remember { existing?.images.orEmpty() }
@@ -229,6 +245,14 @@ class EditNoteActivity : ComponentActivity() {
         // Reminders belong to the phone only and are saved at once, not with the note.
         var reminders by remember { mutableStateOf(existing?.let { Reminders.list(this@EditNoteActivity, account, it.id) }.orEmpty()) }
         val askNotifications = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
+        // Once, ask for the right to show the notification that tells about a failed save.
+        LaunchedEffect(Unit) {
+            val prefs = getSharedPreferences("reminder_hints", MODE_PRIVATE)
+            if (!isLocal && android.os.Build.VERSION.SDK_INT >= 33 && !notificationsOn && !prefs.getBoolean("save_asked", false)) {
+                prefs.edit().putBoolean("save_asked", true).apply()
+                askNotifications.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
         var remindersOpen by remember { mutableStateOf(false) }
         var error by remember { mutableStateOf("") }
         val failedTemplate = stringResource(R.string.save_failed, "%s")
@@ -280,6 +304,20 @@ class EditNoteActivity : ComponentActivity() {
             Modifier.verticalScroll(rememberScrollState()).padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            if (unsent != null) {
+                Text(
+                    if (unsent.error.isBlank()) stringResource(R.string.note_unsent)
+                    else stringResource(R.string.note_unsent_failed, unsent.error),
+                    color = if (unsent.error.isBlank()) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+            if (!isLocal && !notificationsOn) {
+                Text(stringResource(R.string.save_notifications_off), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+                TextButton(onClick = { startActivity(Reminders.notificationSettings(this@EditNoteActivity)) }) {
+                    Text(stringResource(R.string.reminder_open_settings))
+                }
+            }
             // Title with its actions on the right: pin, show at the widget's bottom, open in Keep.
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(

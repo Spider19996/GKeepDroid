@@ -509,8 +509,10 @@ object NotesCache {
         context: Context, email: String, json: String, pending: List<PendingToggle> = emptyList(),
         edits: List<PendingEdit> = emptyList(),
     ): Boolean {
-        val array = JSONArray(json)
+        var array = JSONArray(json)
         applyEdits(array, edits)
+        val moved = applyMoves(context, email, array, edits)
+        array = moved.first
         if (pending.isNotEmpty()) {
             for (i in 0 until array.length()) {
                 val note = array.getJSONObject(i)
@@ -528,7 +530,7 @@ object NotesCache {
         }
         val normalized = array.toString()
         val f = file(context, email)
-        if (f.exists() && f.readText() == normalized) return false
+        if (f.exists() && f.readText() == normalized) return moved.second
         f.writeText(normalized)
         return true
     }
@@ -545,6 +547,52 @@ object NotesCache {
         } catch (e: JSONException) {
             false
         }
+    }
+
+    private val MOVES = setOf("archive_note", "trash_note", "unarchive_note", "untrash_note", "delete_forever")
+
+    /**
+     * Moves notes between the notes, the archive and the trash (and removes deleted ones), as Keep will
+     * once it has the change. Returns the new list of notes and whether the archive or trash file changed.
+     */
+    private fun applyMoves(context: Context, email: String, array: JSONArray, edits: List<PendingEdit>): Pair<JSONArray, Boolean> {
+        val moves = edits.filter { it.function in MOVES }
+        if (moves.isEmpty()) return array to false
+        val otherFile = otherFile(context, email)
+        val oldOther = if (otherFile.exists()) otherFile.readText() else "[]"
+        val active = (0 until array.length()).map { array.getJSONObject(it) }.toMutableList()
+        val others = try {
+            JSONArray(oldOther).let { a -> (0 until a.length()).map { a.getJSONObject(it) } }.toMutableList()
+        } catch (e: JSONException) {
+            return array to false
+        }
+        for (edit in moves) {
+            val id = edit.args[0].toString()
+            val inActive = active.firstOrNull { it.optString("id") == id }
+            val inOther = others.firstOrNull { it.optString("id") == id }
+            when (edit.function) {
+                "archive_note", "trash_note" -> {
+                    val note = inActive ?: inOther ?: continue
+                    inActive?.let { active.remove(it) }
+                    if (inOther == null) others.add(note)
+                    note.put("state", if (edit.function == "trash_note") "trashed" else "archived")
+                }
+                "unarchive_note", "untrash_note" -> {
+                    val note = inOther ?: continue
+                    others.remove(note)
+                    note.remove("state")
+                    if (inActive == null) active.add(note)
+                }
+                else -> {
+                    inActive?.let { active.remove(it) }
+                    inOther?.let { others.remove(it) }
+                }
+            }
+        }
+        val newOther = JSONArray(others).toString()
+        val changed = newOther != JSONArray(oldOther).toString()
+        if (changed) otherFile.writeText(newOther)
+        return JSONArray(active) to changed
     }
 
     /** Applies changes of existing notes, the way Keep will once they are sent. A new note shows up with its sync. */

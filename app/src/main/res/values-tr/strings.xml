@@ -280,4 +280,7 @@
     <string name="save_pending_failed">“%1$s” Keep’e gönderilemedi: %2$s. Değişiklik bu telefonda saklanıyor.</string>
     <string name="save_retry">Tekrar dene</string>
     <string name="save_discard">Vazgeç</string>
+    <string name="note_unsent">Bu notta henüz Keep’e gönderilmemiş değişiklikler var.</string>
+    <string name="note_unsent_failed">Bu notta Keep’e gönderilemeyen değişiklikler var: %1$s</string>
+    <string name="save_notifications_off">Bildirimler kapalı; Keep’e kaydetme başarısız olursa fark etmezsiniz.</string>
 </resources>

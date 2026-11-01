@@ -280,4 +280,7 @@
     <string name="save_pending_failed">„%1$s“ wurde nicht an Keep gesendet: %2$s. Die Änderung bleibt auf diesem Handy gespeichert.</string>
     <string name="save_retry">Erneut versuchen</string>
     <string name="save_discard">Verwerfen</string>
+    <string name="note_unsent">Diese Notiz hat Änderungen, die noch nicht an Keep gesendet wurden.</string>
+    <string name="note_unsent_failed">Diese Notiz hat Änderungen, die nicht an Keep gesendet werden konnten: %1$s</string>
+    <string name="save_notifications_off">Benachrichtigungen sind aus. Du würdest nicht merken, wenn das Speichern in Keep fehlschlägt.</string>
 </resources>
