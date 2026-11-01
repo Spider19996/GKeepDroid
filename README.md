@@ -20,6 +20,7 @@ An unofficial Android app for your Google Keep notes: home screen widgets with a
 - **Private notes**: hide their content on the cards; they open only after the device lock (PIN, pattern, fingerprint)
 - **Sign in** with your Google account, with a master token, or **without an account** (notes stay on the device). Several accounts are possible
 - **Sync you control**: an interval while the display is on, sync on unlock and on opening the app, optional background sync, a minimum gap between syncs, none on mobile data. Edits made offline are sent later
+- **Saving never makes you wait**: the editor closes at once, the change shows up in the app and widgets right away and is sent to Keep in the background. A change is kept on the phone until Keep has it; if sending fails, a notification offers "Try again" and "Discard"
 - **Markdown folder, synced both ways**: every note is its own `.md` file; edit it in another app (Obsidian, Markor, ...) and the note changes, and the other way round
 - **Also**: share text or links from any app into a new note, launcher shortcuts and a Quick Settings tile, light, dark and OLED themes, 15 languages (selectable in the settings), settings backup (without tokens)
 
