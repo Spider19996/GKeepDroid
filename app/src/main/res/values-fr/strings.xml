@@ -276,4 +276,8 @@
     <string name="reminder_not_allowed">Non autorisé</string>
     <string name="reminder_notifications_off">Les notifications sont désactivées, les rappels ne peuvent donc pas s’afficher. Activez-les dans les réglages.</string>
     <string name="reminder_save_first">Enregistrez d’abord la note, vous pourrez ensuite ajouter des rappels.</string>
+    <string name="save_failures_title">La note n’a pas pu être enregistrée</string>
+    <string name="save_pending_failed">« %1$s » n’a pas été envoyée à Keep : %2$s. La modification est conservée sur ce téléphone.</string>
+    <string name="save_retry">Réessayer</string>
+    <string name="save_discard">Abandonner</string>
 </resources>

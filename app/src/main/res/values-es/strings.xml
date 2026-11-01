@@ -276,4 +276,8 @@
     <string name="reminder_not_allowed">No permitido</string>
     <string name="reminder_notifications_off">Las notificaciones están desactivadas, así que los recordatorios no pueden aparecer. Actívalas en los ajustes.</string>
     <string name="reminder_save_first">Guarda primero la nota y luego podrás añadir recordatorios.</string>
+    <string name="save_failures_title">No se pudo guardar la nota</string>
+    <string name="save_pending_failed">«%1$s» no se envió a Keep: %2$s. El cambio se conserva en este teléfono.</string>
+    <string name="save_retry">Reintentar</string>
+    <string name="save_discard">Descartar</string>
 </resources>

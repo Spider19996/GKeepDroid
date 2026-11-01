@@ -276,4 +276,8 @@
     <string name="reminder_not_allowed">Non consentito</string>
     <string name="reminder_notifications_off">Le notifiche sono disattivate, quindi i promemoria non possono comparire. Attivale nelle impostazioni.</string>
     <string name="reminder_save_first">Salva prima la nota, poi potrai aggiungere promemoria.</string>
+    <string name="save_failures_title">Impossibile salvare la nota</string>
+    <string name="save_pending_failed">«%1$s» non è stata inviata a Keep: %2$s. La modifica resta su questo telefono.</string>
+    <string name="save_retry">Riprova</string>
+    <string name="save_discard">Scarta</string>
 </resources>

@@ -276,4 +276,8 @@
     <string name="reminder_not_allowed">غير مسموح</string>
     <string name="reminder_notifications_off">الإشعارات متوقفة، لذلك لن تظهر التذكيرات. فعّلها من الإعدادات.</string>
     <string name="reminder_save_first">احفظ الملاحظة أولًا ثم أضف التذكيرات.</string>
+    <string name="save_failures_title">تعذّر حفظ الملاحظة</string>
+    <string name="save_pending_failed">لم يتم إرسال «%1$s» إلى Keep: %2$s. يبقى التغيير محفوظًا على هذا الهاتف.</string>
+    <string name="save_retry">إعادة المحاولة</string>
+    <string name="save_discard">تجاهل</string>
 </resources>

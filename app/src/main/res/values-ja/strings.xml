@@ -276,4 +276,8 @@
     <string name="reminder_not_allowed">許可されていません</string>
     <string name="reminder_notifications_off">通知がオフのため、リマインダーを表示できません。設定でオンにしてください。</string>
     <string name="reminder_save_first">先にメモを保存すると、リマインダーを追加できます。</string>
+    <string name="save_failures_title">メモを保存できませんでした</string>
+    <string name="save_pending_failed">「%1$s」を Keep に送信できませんでした: %2$s。変更はこの端末に保持されます。</string>
+    <string name="save_retry">再試行</string>
+    <string name="save_discard">破棄</string>
 </resources>

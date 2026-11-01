@@ -276,4 +276,8 @@
     <string name="reminder_not_allowed">İzin verilmedi</string>
     <string name="reminder_notifications_off">Bildirimler kapalı, bu yüzden hatırlatıcılar görünemez. Ayarlardan açın.</string>
     <string name="reminder_save_first">Önce notu kaydedin, sonra hatırlatıcı ekleyebilirsiniz.</string>
+    <string name="save_failures_title">Not kaydedilemedi</string>
+    <string name="save_pending_failed">“%1$s” Keep’e gönderilemedi: %2$s. Değişiklik bu telefonda saklanıyor.</string>
+    <string name="save_retry">Tekrar dene</string>
+    <string name="save_discard">Vazgeç</string>
 </resources>

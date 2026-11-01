@@ -209,7 +209,6 @@ class EditNoteActivity : ComponentActivity() {
                 existing != null && PrivateNotes.key(account, existing.id) in PrivateNotes.load(this@EditNoteActivity)
             )
         }
-        val savedOffline = stringResource(R.string.saved_offline)
         var saving by remember { mutableStateOf(false) }
         var menuOpen by remember { mutableStateOf(false) }
         val isLocal = CredentialStore.isLocal(account)
@@ -259,21 +258,20 @@ class EditNoteActivity : ComponentActivity() {
             } else {
                 KeepRepository.createNoteArgs(title, text, isList, items.toList(), color, pinned, labels)
             }
+            if (!CredentialStore.isLocal(target)) {
+                // The change is stored and sent in the background: the editor closes at once, and a failure
+                // shows up as a notification instead of losing the change.
+                KeepRepository.queueEdit(this@EditNoteActivity, PendingEdit(target, function, args))
+                finish()
+                return
+            }
             scope.launch {
                 try {
                     KeepRepository.run(this@EditNoteActivity, target, function, args)
                     finish()
                 } catch (e: Exception) {
-                    if (PendingEdits.isOffline(e)) {
-                        // No connection: keep the change and send it as soon as there is one.
-                        PendingEdits.add(this@EditNoteActivity, PendingEdit(target, function, args))
-                        PendingEditsWorker.schedule(this@EditNoteActivity)
-                        Toast.makeText(this@EditNoteActivity, savedOffline, Toast.LENGTH_LONG).show()
-                        finish()
-                    } else {
-                        saving = false
-                        error = failedTemplate.format(e.message ?: e.javaClass.simpleName)
-                    }
+                    saving = false
+                    error = failedTemplate.format(e.message ?: e.javaClass.simpleName)
                 }
             }
         }

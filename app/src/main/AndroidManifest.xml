@@ -126,6 +126,8 @@
         <receiver android:name=".ReminderReceiver" android:exported="false" />
         <receiver android:name=".SnoozeReceiver" android:exported="false" />
         <receiver android:name=".DoneReceiver" android:exported="false" />
+        <receiver android:name=".RetryEditReceiver" android:exported="false" />
+        <receiver android:name=".DiscardEditReceiver" android:exported="false" />
 
         <receiver android:name=".BootReceiver" android:exported="true">
             <intent-filter>

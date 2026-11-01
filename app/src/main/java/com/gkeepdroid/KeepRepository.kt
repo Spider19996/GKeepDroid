@@ -114,10 +114,27 @@ object KeepRepository {
         call(context, email, "add_list_item", noteId, text)
 
     /** Runs a stored call again, for example one that waited for the network. */
-    suspend fun run(context: Context, email: String, function: String, args: List<Any>) =
-        call(context, email, function, *args.toTypedArray())
+    suspend fun run(context: Context, email: String, function: String, args: List<Any>, editId: String? = null) =
+        call(context, email, function, *args.toTypedArray(), ignoreEdit = editId)
 
-    private suspend fun call(context: Context, email: String, function: String, vararg args: Any) {
+    /**
+     * Saves a change without making the caller wait for Keep: it is stored, shown in the cache and
+     * widgets at once, and sent in the background. It stays stored until Keep has it.
+     */
+    fun queueEdit(context: Context, edit: PendingEdit) {
+        val appContext = context.applicationContext
+        PendingEdits.add(appContext, edit)
+        val changed = NotesCache.reapplyEdits(appContext, edit.account)
+        backgroundScope.launch {
+            if (changed) {
+                WidgetRefresh.all(appContext)
+                MarkdownSync.request(appContext)
+            }
+            PendingEdits.sendNow(appContext)
+        }
+    }
+
+    private suspend fun call(context: Context, email: String, function: String, vararg args: Any, ignoreEdit: String? = null) {
         val appContext = context.applicationContext
         // Demo mode never touches the real notes.
         if (DemoNotes.enabled(appContext)) return
@@ -139,7 +156,9 @@ object KeepRepository {
         // Ticks not sent yet stay visible instead of being overwritten by Keep's older state.
         val pending = PendingToggles.list(appContext, email)
         // Widgets are only redrawn when something actually changed.
-        if (NotesCache.write(appContext, email, json, pending)) {
+        // Changes still waiting to be sent stay visible, too (the one that was just sent is in Keep's answer).
+        val edits = PendingEdits.all(appContext).filter { it.account == email && it.id != ignoreEdit }
+        if (NotesCache.write(appContext, email, json, pending, edits)) {
             WidgetRefresh.all(appContext)
             // The Markdown files follow every change of the notes.
             MarkdownSync.request(appContext)

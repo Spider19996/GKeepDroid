@@ -12,8 +12,12 @@ from gkeepapi.node import BlobType, ColorValue
 from gkeepapi.node import List as KeepList
 
 
-def _login(email, master_token, state_path):
-    """Authenticate, reusing the cached sync state for fast incremental syncs."""
+def _login(email, master_token, state_path, pull=True):
+    """Authenticate, reusing the cached sync state for fast incremental syncs.
+
+    With pull=False and a cached state the first sync is skipped: a change is applied to the cached
+    notes and the single sync that sends it also fetches what is new.
+    """
     state = None
     if os.path.exists(state_path):
         try:
@@ -24,7 +28,7 @@ def _login(email, master_token, state_path):
 
     keep = gkeepapi.Keep()
     try:
-        keep.authenticate(email, master_token, state=state, sync=True)
+        keep.authenticate(email, master_token, state=state, sync=pull or state is None)
     except Exception:
         if state is None:
             raise
@@ -79,8 +83,8 @@ def _sync_images(keep, notes, state_path):
                 pass
 
 
-def _finish(keep, state_path):
-    """Persist the sync state and return the active notes as JSON."""
+def _finish(keep, state_path, images=True):
+    """Persist the sync state and return the active notes as JSON; images=False skips their download."""
     with open(state_path, "w") as f:
         json.dump(keep.dump(), f)
     everything = [n for n in keep.all() if not n.deleted]
@@ -98,7 +102,8 @@ def _finish(keep, state_path):
         json.dump(other, f)
     with open(base + "_labels.json", "w") as f:
         json.dump(sorted(label.name for label in keep.labels()), f)
-    _sync_images(keep, active, state_path)
+    if images:
+        _sync_images(keep, active, state_path)
     # Ordering is left to the app, which can sort per widget.
     return json.dumps([_serialize(n) for n in active])
 
@@ -233,8 +238,12 @@ def set_items_checked(email, master_token, state_path, ops_json):
 
 
 def update_note(email, master_token, state_path, note_id, title, text, items_json, color, pinned, remove_images_json="[]", labels_json=None):
-    keep = _login(email, master_token, state_path)
+    keep = _login(email, master_token, state_path, pull=False)
     note = keep.get(note_id)
+    if note is None:
+        # Not in the cached state: fetch first.
+        keep.sync()
+        note = keep.get(note_id)
     if note is None:
         raise ValueError("Note not found")
     note.title = title
@@ -253,7 +262,8 @@ def update_note(email, master_token, state_path, note_id, title, text, items_jso
     else:
         note.text = text
     keep.sync()
-    return _finish(keep, state_path)
+    # Saving never adds images, so only the deletions matter; the next sync cleans up the files.
+    return _finish(keep, state_path, images=bool(removed))
 
 
 def add_list_item(email, master_token, state_path, note_id, text):
@@ -323,7 +333,7 @@ def trash_note(email, master_token, state_path, note_id):
 
 
 def create_note(email, master_token, state_path, title, text, is_list, items_json, color, pinned, labels_json=None):
-    keep = _login(email, master_token, state_path)
+    keep = _login(email, master_token, state_path, pull=False)
     if is_list:
         items = [
             (i["text"].strip(), i["checked"])
@@ -337,7 +347,7 @@ def create_note(email, master_token, state_path, title, text, is_list, items_jso
     note.pinned = pinned
     _set_labels(keep, note, labels_json)
     keep.sync()
-    return _finish(keep, state_path)
+    return _finish(keep, state_path, images=False)
 
 
 def create_label(email, master_token, state_path, name):

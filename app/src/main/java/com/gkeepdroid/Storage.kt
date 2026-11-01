@@ -505,8 +505,12 @@ object NotesCache {
      * normalized first so that the same content never looks "changed" because of formatting, and
      * [pending] checks that were not sent to Keep yet are applied on top of what Keep returned.
      */
-    fun write(context: Context, email: String, json: String, pending: List<PendingToggle> = emptyList()): Boolean {
+    fun write(
+        context: Context, email: String, json: String, pending: List<PendingToggle> = emptyList(),
+        edits: List<PendingEdit> = emptyList(),
+    ): Boolean {
         val array = JSONArray(json)
+        applyEdits(array, edits)
         if (pending.isNotEmpty()) {
             for (i in 0 until array.length()) {
                 val note = array.getJSONObject(i)
@@ -527,6 +531,54 @@ object NotesCache {
         if (f.exists() && f.readText() == normalized) return false
         f.writeText(normalized)
         return true
+    }
+
+    /** Puts the edits that were not sent to Keep yet on top of the cached notes; false when nothing changed. */
+    fun reapplyEdits(context: Context, email: String): Boolean {
+        val f = file(context, email)
+        if (!f.exists() || DemoNotes.enabled(context)) return false
+        return try {
+            write(
+                context, email, f.readText(), PendingToggles.list(context, email),
+                PendingEdits.all(context).filter { it.account == email },
+            )
+        } catch (e: JSONException) {
+            false
+        }
+    }
+
+    /** Applies changes of existing notes, the way Keep will once they are sent. A new note shows up with its sync. */
+    private fun applyEdits(array: JSONArray, edits: List<PendingEdit>) {
+        for (edit in edits) {
+            if (edit.function != "update_note") continue
+            try {
+                val id = edit.args[0].toString()
+                val removed = JSONArray(edit.args[6].toString()).let { a -> (0 until a.length()).map { a.getString(it) } }
+                for (i in 0 until array.length()) {
+                    val note = array.getJSONObject(i)
+                    if (note.getString("id") != id) continue
+                    note.put("title", edit.args[1].toString())
+                    if (note.getBoolean("isList")) {
+                        // Like the bridge, blank items are dropped.
+                        val items = JSONArray(edit.args[3].toString())
+                        val kept = JSONArray()
+                        for (j in 0 until items.length()) {
+                            if (items.getJSONObject(j).optString("text").isNotBlank()) kept.put(items.getJSONObject(j))
+                        }
+                        note.put("items", kept)
+                    } else {
+                        note.put("text", edit.args[2].toString())
+                    }
+                    note.put("color", edit.args[4].toString())
+                    note.put("pinned", edit.args[5] as? Boolean ?: edit.args[5].toString().toBoolean())
+                    note.put("labels", JSONArray(edit.args[7].toString()))
+                    val images = note.optJSONArray("images") ?: JSONArray()
+                    note.put("images", JSONArray((0 until images.length()).map { images.getString(it) }.filter { it !in removed }))
+                }
+            } catch (e: Exception) {
+                // An edit that does not fit (stored by an older version) is just not previewed.
+            }
+        }
     }
 
     /** Flips one checklist item in the cache so the widget can react before the network call ends. */

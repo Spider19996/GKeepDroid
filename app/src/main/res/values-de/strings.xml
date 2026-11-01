@@ -276,4 +276,8 @@
     <string name="reminder_not_allowed">Nicht erlaubt</string>
     <string name="reminder_notifications_off">Benachrichtigungen sind aus, deshalb können Erinnerungen nicht erscheinen. Schalte sie in den Einstellungen ein.</string>
     <string name="reminder_save_first">Speichere die Notiz zuerst, dann kannst du Erinnerungen hinzufügen.</string>
+    <string name="save_failures_title">Notiz konnte nicht gespeichert werden</string>
+    <string name="save_pending_failed">„%1$s“ wurde nicht an Keep gesendet: %2$s. Die Änderung bleibt auf diesem Handy gespeichert.</string>
+    <string name="save_retry">Erneut versuchen</string>
+    <string name="save_discard">Verwerfen</string>
 </resources>

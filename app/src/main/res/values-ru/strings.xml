@@ -276,4 +276,8 @@
     <string name="reminder_not_allowed">Не разрешено</string>
     <string name="reminder_notifications_off">Уведомления отключены, поэтому напоминания не появятся. Включите их в настройках.</string>
     <string name="reminder_save_first">Сначала сохраните заметку, потом можно добавить напоминания.</string>
+    <string name="save_failures_title">Не удалось сохранить заметку</string>
+    <string name="save_pending_failed">«%1$s» не отправлена в Keep: %2$s. Изменение сохранено на этом телефоне.</string>
+    <string name="save_retry">Повторить</string>
+    <string name="save_discard">Отменить</string>
 </resources>

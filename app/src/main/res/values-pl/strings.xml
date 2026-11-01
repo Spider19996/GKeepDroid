@@ -276,4 +276,8 @@
     <string name="reminder_not_allowed">Niedozwolone</string>
     <string name="reminder_notifications_off">Powiadomienia są wyłączone, więc przypomnienia nie mogą się pokazać. Włącz je w ustawieniach.</string>
     <string name="reminder_save_first">Najpierw zapisz notatkę, potem możesz dodać przypomnienia.</string>
+    <string name="save_failures_title">Nie udało się zapisać notatki</string>
+    <string name="save_pending_failed">„%1$s” nie została wysłana do Keep: %2$s. Zmiana pozostaje na tym telefonie.</string>
+    <string name="save_retry">Spróbuj ponownie</string>
+    <string name="save_discard">Odrzuć</string>
 </resources>

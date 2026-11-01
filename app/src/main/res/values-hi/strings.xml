@@ -276,4 +276,8 @@
     <string name="reminder_not_allowed">अनुमति नहीं है</string>
     <string name="reminder_notifications_off">सूचनाएँ बंद हैं, इसलिए रिमाइंडर नहीं दिखेंगे। उन्हें सेटिंग में चालू करें।</string>
     <string name="reminder_save_first">पहले नोट सहेजें, फिर रिमाइंडर जोड़ सकते हैं।</string>
+    <string name="save_failures_title">नोट सहेजा नहीं जा सका</string>
+    <string name="save_pending_failed">“%1$s” Keep को नहीं भेजा गया: %2$s। बदलाव इस फ़ोन पर सुरक्षित है।</string>
+    <string name="save_retry">फिर कोशिश करें</string>
+    <string name="save_discard">छोड़ दें</string>
 </resources>
