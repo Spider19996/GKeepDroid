@@ -509,6 +509,9 @@ object NotesCache {
      * normalized first so that the same content never looks "changed" because of formatting, and
      * [pending] checks that were not sent to Keep yet are applied on top of what Keep returned.
      */
+    /** Counts every change of the cached notes, so an open screen shows the change at once. */
+    val version = androidx.compose.runtime.mutableIntStateOf(0)
+
     fun write(
         context: Context, email: String, json: String, pending: List<PendingToggle> = emptyList(),
         edits: List<PendingEdit> = emptyList(),
@@ -534,8 +537,12 @@ object NotesCache {
         }
         val normalized = array.toString()
         val f = file(context, email)
-        if (f.exists() && f.readText() == normalized) return moved.second
+        if (f.exists() && f.readText() == normalized) {
+            if (moved.second) version.intValue++
+            return moved.second
+        }
         f.writeText(normalized)
+        version.intValue++
         return true
     }
 

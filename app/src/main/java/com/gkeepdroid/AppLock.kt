@@ -29,6 +29,8 @@ import androidx.lifecycle.LifecycleEventObserver
 object AppLock {
     private const val GRACE_MS = 30_000L
 
+    enum class Result { OK, CANCELED, FAILED }
+
     private var openedOnce = false
     private var lastActive = 0L
 
@@ -43,7 +45,7 @@ object AppLock {
 
     /** Asks for the lock; [onResult] gets true when it was passed. */
     @Suppress("DEPRECATION")
-    fun prompt(activity: ComponentActivity, launchCredential: (android.content.Intent) -> Unit, onResult: (Boolean) -> Unit) {
+    fun prompt(activity: ComponentActivity, launchCredential: (android.content.Intent) -> Unit, onResult: (Result) -> Unit) {
         val title = activity.getString(R.string.app_name)
         if (Build.VERSION.SDK_INT >= 30) {
             val prompt = BiometricPrompt.Builder(activity)
@@ -55,17 +57,20 @@ object AppLock {
                 .build()
             try {
                 prompt.authenticate(CancellationSignal(), activity.mainExecutor, object : BiometricPrompt.AuthenticationCallback() {
-                    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult?) = onResult(true)
-                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) = onResult(false)
+                    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult?) = onResult(Result.OK)
+                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) = onResult(
+                        if (errorCode == BiometricPrompt.BIOMETRIC_ERROR_USER_CANCELED || errorCode == BiometricPrompt.BIOMETRIC_ERROR_CANCELED
+                        ) Result.CANCELED else Result.FAILED
+                    )
                 })
             } catch (e: Exception) {
                 // No usable lock after all: the screen stays locked and offers to try again.
-                onResult(false)
+                onResult(Result.FAILED)
             }
         } else {
             val keyguard = activity.getSystemService(KeyguardManager::class.java)
             val intent = keyguard.createConfirmDeviceCredentialIntent(title, null)
-            if (intent == null) onResult(true) else launchCredential(intent)
+            if (intent == null) onResult(Result.OK) else launchCredential(intent)
         }
     }
 
@@ -86,17 +91,24 @@ object AppLock {
                 openedOnce = true
                 touch()
                 unlocked = true
+            } else {
+                activity.finish()
             }
         }
         fun ask() {
             if (asking) return
             asking = true
-            prompt(activity, { credential.launch(it) }) { ok ->
+            prompt(activity, { credential.launch(it) }) { result ->
                 asking = false
-                if (ok) {
-                    openedOnce = true
-                    touch()
-                    unlocked = true
+                when (result) {
+                    Result.OK -> {
+                        openedOnce = true
+                        touch()
+                        unlocked = true
+                    }
+                    // Backing out of the lock leaves the app instead of leaving an empty screen.
+                    Result.CANCELED -> activity.finish()
+                    Result.FAILED -> {}
                 }
             }
         }

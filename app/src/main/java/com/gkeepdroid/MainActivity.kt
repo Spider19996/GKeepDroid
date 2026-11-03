@@ -122,6 +122,10 @@ class MainActivity : ComponentActivity() {
         val accounts = remember(reloadKey) { CredentialStore.accounts(context) }
         val app = remember(reloadKey) { AppSettingsStore.load(context) }
 
+        // Notes changed in the background (a saved or converted note arriving, a sync) show up without reopening.
+        val cacheVersion = NotesCache.version.intValue
+        LaunchedEffect(cacheVersion) { if (cacheVersion > 0) reloadKey++ }
+
         BackHandler(enabled = screen != AppScreen.Notes) { screen = AppScreen.Notes }
 
         fun sync() {
