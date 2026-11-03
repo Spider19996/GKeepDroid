@@ -315,4 +315,9 @@
     <string name="lock_widget_grace_hint">Tocar una casilla en el widget abre una pequeña ventana de desbloqueo; después se pueden marcar más elementos durante este tiempo.</string>
     <string name="widget_titles_only">Los widgets solo muestran títulos</string>
     <string name="widget_titles_only_hint">Con el bloqueo de la app, los widgets ocultan el contenido de todas las notas; al tocar se abre la app bloqueada.</string>
+    <string name="edit_first_hint">Primero desbloquea: toca «Editar nota».</string>
+    <string name="lock_prompt_security">Desbloquea con la huella para abrir los ajustes de seguridad</string>
+    <string name="section_misc">Otros</string>
+    <string name="lock_widget_tick">Bloquear el marcado en el widget</string>
+    <string name="lock_edit_app_hint">Editar no necesita otro bloqueo mientras el bloqueo de la app esté activo: al desbloquear la app ya se permite.</string>
 </resources>

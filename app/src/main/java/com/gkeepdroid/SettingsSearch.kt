@@ -63,6 +63,7 @@ internal fun settingEntries(isSingleNote: Boolean): List<SettingEntry> = buildLi
     add(SettingEntry(R.string.app_lock_grace, Page.Security))
     add(SettingEntry(R.string.lock_edit_title, Page.Security))
     add(SettingEntry(R.string.lock_widget_grace, Page.Security))
+    add(SettingEntry(R.string.lock_widget_tick, Page.Security))
     add(SettingEntry(R.string.widget_titles_only, Page.Security))
     add(SettingEntry(R.string.list_section, Page.AppChecklists))
     listOf(

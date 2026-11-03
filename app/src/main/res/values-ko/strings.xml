@@ -315,4 +315,9 @@
     <string name="lock_widget_grace_hint">위젯의 체크박스를 누르면 작은 잠금 해제 창이 열리고, 이후 이 시간 동안 다른 항목을 체크할 수 있습니다.</string>
     <string name="widget_titles_only">위젯에 제목만 표시</string>
     <string name="widget_titles_only_hint">앱 잠금이 켜져 있으면 위젯이 모든 메모의 내용을 숨기며, 누르면 잠긴 앱이 열립니다.</string>
+    <string name="edit_first_hint">먼저 잠금 해제: ‘메모 편집’을 누르세요.</string>
+    <string name="lock_prompt_security">지문으로 잠금을 해제하여 보안 설정 열기</string>
+    <string name="section_misc">기타</string>
+    <string name="lock_widget_tick">위젯에서 체크 잠금</string>
+    <string name="lock_edit_app_hint">앱 잠금이 켜져 있는 동안에는 편집에 추가 잠금이 필요 없습니다. 앱 잠금 해제로 이미 허용됩니다.</string>
 </resources>

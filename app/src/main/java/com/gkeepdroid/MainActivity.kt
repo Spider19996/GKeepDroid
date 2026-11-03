@@ -141,9 +141,9 @@ class MainActivity : ComponentActivity() {
         }
         val unlock = AppLock.rememberUnlock(this@MainActivity)
         unlocker = unlock
-        fun act(block: suspend () -> Unit) {
+        fun act(onDenied: () -> Unit = {}, block: suspend () -> Unit) {
             if (!AppLock.editAllowed(this@MainActivity)) {
-                unlock(R.string.lock_prompt_edit) { ok -> if (ok) act(block) }
+                unlock(R.string.lock_prompt_edit) { ok -> if (ok) act(onDenied, block) else { onDenied(); reloadKey++ } }
                 return
             }
             scope.launch {
@@ -429,7 +429,7 @@ class MainActivity : ComponentActivity() {
                     // Notes can be dragged into a new place in Keep's order, for one account and without a search.
                     val canReorder = app.sortMode == SORT_KEEP && query.isBlank() && (screen != AppScreen.Notes || filterLabel == null) &&
                         shown.map { it.second }.distinct().size == 1
-                    NotesGrid(shown, screen, app, canReorder, ::openEditor, { block -> act(block) }, { deleteTarget = it })
+                    NotesGrid(shown, screen, app, canReorder, ::openEditor, { denied, block -> act(denied, block) }, { deleteTarget = it })
                 }
             }
         }
@@ -442,7 +442,7 @@ class MainActivity : ComponentActivity() {
         app: AppSettings,
         canReorder: Boolean,
         open: (KeepNote?, String, Boolean) -> Unit,
-        act: (suspend () -> Unit) -> Unit,
+        act: (() -> Unit, suspend () -> Unit) -> Unit,
         askDelete: (Pair<KeepNote, String>) -> Unit,
     ) {
         val context = LocalContext.current
@@ -505,7 +505,7 @@ class MainActivity : ComponentActivity() {
             if (sort == null || order.map(::keyOf) == shown.map(::keyOf)) {
                 dragOrder = null
             } else {
-                act { KeepRepository.setSort(context, entry.second, entry.first.id, sort) }
+                act({ dragOrder = null }) { KeepRepository.setSort(context, entry.second, entry.first.id, sort) }
             }
         }
 
@@ -573,12 +573,12 @@ class MainActivity : ComponentActivity() {
                 NoteTile(note, account, app, onClick = { open(note, account, false) }, modifier = Modifier.animateItem().then(dragModifier(account + "|" + note.id))) {
                     // Archive and trash get their own actions below the note.
                     if (screen == AppScreen.Archive) {
-                        TextButton(onClick = { act { KeepRepository.unarchiveNote(context, account, note.id) } }) {
+                        TextButton(onClick = { act({}) { KeepRepository.unarchiveNote(context, account, note.id) } }) {
                             Text(stringResource(R.string.unarchive_note))
                         }
                     }
                     if (screen == AppScreen.Trash) {
-                        TextButton(onClick = { act { KeepRepository.untrashNote(context, account, note.id) } }) {
+                        TextButton(onClick = { act({}) { KeepRepository.untrashNote(context, account, note.id) } }) {
                             Text(stringResource(R.string.restore_note))
                         }
                         TextButton(onClick = { askDelete(note to account) }) {

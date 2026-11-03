@@ -315,4 +315,9 @@
     <string name="lock_widget_grace_hint">Un appui sur une case dans le widget ouvre une petite fenêtre de déverrouillage ; ensuite, d’autres éléments peuvent être cochés pendant ce temps.</string>
     <string name="widget_titles_only">Les widgets n’affichent que les titres</string>
     <string name="widget_titles_only_hint">Avec le verrouillage de l’application, les widgets masquent le contenu de toutes les notes ; un appui ouvre l’application verrouillée.</string>
+    <string name="edit_first_hint">D’abord déverrouiller : touchez « Modifier la note ».</string>
+    <string name="lock_prompt_security">Déverrouiller avec l’empreinte pour ouvrir les réglages de sécurité</string>
+    <string name="section_misc">Autres</string>
+    <string name="lock_widget_tick">Verrouiller le cochage dans le widget</string>
+    <string name="lock_edit_app_hint">La modification n’a pas besoin de verrou supplémentaire tant que le verrouillage de l’application est actif : déverrouiller l’application l’autorise déjà.</string>
 </resources>

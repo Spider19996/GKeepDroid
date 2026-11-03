@@ -803,6 +803,8 @@ data class AppSettings(
     val lockWidgetGraceSec: Int = 10,
     /** While the whole app is locked, widgets show only the titles. */
     val widgetTitlesOnly: Boolean = false,
+    /** Ticking in a widget asks for the lock (with its own time), independent of the other locks. */
+    val lockWidgetTick: Boolean = false,
 )
 
 object AppSettingsStore {
@@ -837,6 +839,7 @@ object AppSettingsStore {
             listDeleteChecked = p.getBoolean("list_delete_checked", d.listDeleteChecked),
             lockWidgetGraceSec = p.getInt("lock_widget_grace_sec", d.lockWidgetGraceSec),
             widgetTitlesOnly = p.getBoolean("widget_titles_only", d.widgetTitlesOnly),
+            lockWidgetTick = p.getBoolean("lock_widget_tick", d.lockWidgetTick),
         )
     }
 
@@ -867,6 +870,7 @@ object AppSettingsStore {
             .putBoolean("list_delete_checked", s.listDeleteChecked)
             .putInt("lock_widget_grace_sec", s.lockWidgetGraceSec)
             .putBoolean("widget_titles_only", s.widgetTitlesOnly)
+            .putBoolean("lock_widget_tick", s.lockWidgetTick)
             .apply()
     }
 }

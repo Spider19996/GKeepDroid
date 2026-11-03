@@ -315,4 +315,9 @@
     <string name="lock_widget_grace_hint">Ein Tipp auf eine Checkbox im Widget öffnet ein kleines Entsperr-Fenster; danach lassen sich in dieser Zeit weitere Einträge abhaken.</string>
     <string name="widget_titles_only">Widgets zeigen nur Titel</string>
     <string name="widget_titles_only_hint">Bei aktiver App-Sperre blenden Widgets den Inhalt aller Notizen aus; ein Tipp öffnet die gesperrte App.</string>
+    <string name="edit_first_hint">Erst entsperren: Tippe auf „Notiz bearbeiten“.</string>
+    <string name="lock_prompt_security">Zum Öffnen der Sicherheitseinstellungen mit Fingerabdruck entsperren</string>
+    <string name="section_misc">Sonstiges</string>
+    <string name="lock_widget_tick">Abhaken im Widget sperren</string>
+    <string name="lock_edit_app_hint">Bearbeiten braucht keine zusätzliche Sperre, solange „App sperren“ an ist: Mit dem Entsperren der App ist es schon erlaubt.</string>
 </resources>

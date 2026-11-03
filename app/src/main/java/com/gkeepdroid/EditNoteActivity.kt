@@ -200,6 +200,7 @@ class EditNoteActivity : ComponentActivity() {
         // With the edit lock on, a note opens for reading only until the lock is passed.
         var canEdit by remember { mutableStateOf(AppLock.editAllowed(this@EditNoteActivity)) }
         val unlock = AppLock.rememberUnlock(this@EditNoteActivity)
+        fun toastUnlockFirst() = Toast.makeText(this@EditNoteActivity, R.string.edit_first_hint, Toast.LENGTH_SHORT).show()
         fun askEdit() {
             unlock(R.string.lock_prompt_edit) { ok ->
                 if (ok) canEdit = true else if (existing == null) finish()
@@ -420,11 +421,13 @@ class EditNoteActivity : ComponentActivity() {
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.weight(1f),
                 )
+                Box(Modifier.clickable(enabled = !canEdit) { toastUnlockFirst() }) {
                 FilledTonalIconToggleButton(checked = pinned, onCheckedChange = { pinned = it }, enabled = canEdit) {
                     Icon(
                         painterResource(if (pinned) R.drawable.ic_push_pin else R.drawable.ic_push_pin_outline),
                         contentDescription = stringResource(R.string.pin_note),
                     )
+                }
                 }
                 if (pinWidgetId != null && existing != null) {
                     FilledTonalIconToggleButton(
@@ -442,13 +445,16 @@ class EditNoteActivity : ComponentActivity() {
                         Icon(painterResource(R.drawable.ic_pin_bottom), contentDescription = stringResource(R.string.pin_to_bottom))
                     }
                 }
-                // Less common actions live in an overflow menu, once the note is open for editing.
-                if (canEdit) {
+                // Less common actions live in an overflow menu; grayed out until the note is open for editing.
+                run {
                     Box {
-                        IconButton(onClick = { menuOpen = true }) {
-                            Icon(painterResource(R.drawable.ic_more_vert), contentDescription = stringResource(R.string.more_actions))
+                        IconButton(onClick = { if (canEdit) menuOpen = true else toastUnlockFirst() }) {
+                            Icon(
+                                painterResource(R.drawable.ic_more_vert), contentDescription = stringResource(R.string.more_actions),
+                                tint = if (canEdit) LocalContentColor.current else LocalContentColor.current.copy(alpha = 0.38f),
+                            )
                         }
-                        DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                        DropdownMenu(expanded = menuOpen && canEdit, onDismissRequest = { menuOpen = false }) {
                             DropdownMenuItem(
                                 text = { Text(stringResource(if (isList) R.string.convert_to_note else R.string.convert_to_list)) },
                                 leadingIcon = { Icon(painterResource(R.drawable.ic_checklist), contentDescription = null) },

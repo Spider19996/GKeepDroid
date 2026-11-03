@@ -315,4 +315,9 @@
     <string name="lock_widget_grace_hint">点按小组件中的复选框会打开一个小的解锁窗口；通过后，在此时间内可继续勾选其他项目。</string>
     <string name="widget_titles_only">小组件仅显示标题</string>
     <string name="widget_titles_only_hint">开启应用锁后，小组件会隐藏所有笔记的内容；点按会打开已锁定的应用。</string>
+    <string name="edit_first_hint">请先解锁：点按“编辑笔记”。</string>
+    <string name="lock_prompt_security">使用指纹解锁以打开安全设置</string>
+    <string name="section_misc">其他</string>
+    <string name="lock_widget_tick">锁定小组件中的勾选</string>
+    <string name="lock_edit_app_hint">开启应用锁时，编辑无需额外锁定：解锁应用即已允许。</string>
 </resources>

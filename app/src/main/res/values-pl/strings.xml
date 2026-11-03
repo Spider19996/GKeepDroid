@@ -315,4 +315,9 @@
     <string name="lock_widget_grace_hint">Dotknięcie pola w widżecie otwiera małe okno odblokowania; potem w tym czasie można odhaczać kolejne pozycje.</string>
     <string name="widget_titles_only">Widżety pokazują tylko tytuły</string>
     <string name="widget_titles_only_hint">Przy włączonej blokadzie aplikacji widżety ukrywają treść wszystkich notatek; dotknięcie otwiera zablokowaną aplikację.</string>
+    <string name="edit_first_hint">Najpierw odblokuj: dotknij „Edytuj notatkę”.</string>
+    <string name="lock_prompt_security">Odblokuj odciskiem palca, aby otworzyć ustawienia zabezpieczeń</string>
+    <string name="section_misc">Inne</string>
+    <string name="lock_widget_tick">Zablokuj odhaczanie w widżecie</string>
+    <string name="lock_edit_app_hint">Edycja nie wymaga dodatkowej blokady, gdy blokada aplikacji jest włączona: odblokowanie aplikacji już na nią pozwala.</string>
 </resources>

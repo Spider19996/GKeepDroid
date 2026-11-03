@@ -312,10 +312,16 @@ internal fun ColumnScope.SecurityPage(s: SettingsState) {
         Hint(R.string.lock_private_hint)
         SwitchRow(R.string.app_lock_title, appLockApp) { appLockApp = it }
         Hint(R.string.app_lock_hint)
-        SwitchRow(R.string.lock_edit_title, appLockEdit) { appLockEdit = it }
-        Hint(R.string.lock_edit_hint)
+        // With the whole app locked, unlocking it already allows editing, so this one would only repeat it.
+        if (appLockApp) {
+            Hint(R.string.lock_edit_app_hint)
+        } else {
+            SwitchRow(R.string.lock_edit_title, appLockEdit) { appLockEdit = it }
+            Hint(R.string.lock_edit_hint)
+        }
+        SwitchRow(R.string.lock_widget_tick, appLockWidgetTick) { appLockWidgetTick = it }
         if (appLockApp || appLockEdit) NumberRow(R.string.app_lock_grace, appLockGrace, "s") { appLockGrace = it }
-        if (appLockEdit) {
+        if (appLockWidgetTick) {
             NumberRow(R.string.lock_widget_grace, appWidgetGrace, "s") { appWidgetGrace = it }
             Hint(R.string.lock_widget_grace_hint)
         }

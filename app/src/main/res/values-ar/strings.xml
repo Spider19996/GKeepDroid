@@ -315,4 +315,9 @@
     <string name="lock_widget_grace_hint">النقر على مربع في الأداة يفتح نافذة قفل صغيرة؛ بعدها يمكن تحديد عناصر أخرى خلال هذه المدة.</string>
     <string name="widget_titles_only">تعرض الأدوات العناوين فقط</string>
     <string name="widget_titles_only_hint">عند تفعيل قفل التطبيق تُخفي الأدوات محتوى جميع الملاحظات؛ النقر يفتح التطبيق المقفل.</string>
+    <string name="edit_first_hint">افتح القفل أولاً: اضغط «تعديل الملاحظة».</string>
+    <string name="lock_prompt_security">افتح القفل بالبصمة لفتح إعدادات الأمان</string>
+    <string name="section_misc">أخرى</string>
+    <string name="lock_widget_tick">قفل التحديد في الأداة</string>
+    <string name="lock_edit_app_hint">لا يحتاج التعديل إلى قفل إضافي ما دام قفل التطبيق مفعّلًا: فتح قفل التطبيق يسمح به بالفعل.</string>
 </resources>

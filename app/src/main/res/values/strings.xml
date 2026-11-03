@@ -318,4 +318,9 @@
     <string name="lock_widget_grace_hint">Tapping a checkbox in a widget opens a small unlock window; after it is passed, more items can be ticked for this time.</string>
     <string name="widget_titles_only">Widgets show only titles</string>
     <string name="widget_titles_only_hint">With the app lock on, widgets hide the content of all notes; tapping opens the locked app.</string>
+    <string name="edit_first_hint">Unlock first: tap “Edit note”.</string>
+    <string name="lock_prompt_security">Unlock with fingerprint to open the security settings</string>
+    <string name="section_misc">Other</string>
+    <string name="lock_widget_tick">Lock ticking in widgets</string>
+    <string name="lock_edit_app_hint">Editing needs no extra lock while the app lock is on: unlocking the app already allows it.</string>
 </resources>

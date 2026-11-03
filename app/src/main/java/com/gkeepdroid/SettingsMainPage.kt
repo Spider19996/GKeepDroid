@@ -71,7 +71,7 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
                         page = Page.Main
                         pendingPopup = entry.popup
                     } else {
-                        page = entry.page
+                        goTo(entry.page)
                     }
                 }
             }
@@ -106,10 +106,10 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
             MenuRow(stringResource(R.string.app_view), null) { page = Page.AppView }
             MenuRow(stringResource(R.string.list_section), null) { page = Page.AppChecklists }
 
-            HorizontalDivider(Modifier.padding(vertical = 4.dp))
+            SectionTitle(stringResource(R.string.section_misc))
             MenuRow(stringResource(R.string.reminders_title), null) { page = Page.Reminders }
 
-            MenuRow(stringResource(R.string.section_security), null) { page = Page.Security }
+            MenuRow(stringResource(R.string.section_security), null) { goTo(Page.Security) }
 
             MenuRow(stringResource(R.string.tab_backup), if (mdEnabled) mdFolder else null) { page = Page.Backup }
         }

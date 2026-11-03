@@ -315,4 +315,9 @@
     <string name="lock_widget_grace_hint">विजेट में चेकबॉक्स दबाने पर छोटी अनलॉक विंडो खुलती है; उसके बाद इस समय तक और आइटम टिक किए जा सकते हैं।</string>
     <string name="widget_titles_only">विजेट केवल शीर्षक दिखाते हैं</string>
     <string name="widget_titles_only_hint">ऐप लॉक चालू होने पर विजेट सभी नोट की सामग्री छिपाते हैं; टैप करने पर लॉक ऐप खुलता है।</string>
+    <string name="edit_first_hint">पहले अनलॉक करें: “नोट संपादित करें” दबाएँ।</string>
+    <string name="lock_prompt_security">सुरक्षा सेटिंग खोलने के लिए फ़िंगरप्रिंट से अनलॉक करें</string>
+    <string name="section_misc">अन्य</string>
+    <string name="lock_widget_tick">विजेट में टिक करना लॉक करें</string>
+    <string name="lock_edit_app_hint">ऐप लॉक चालू रहने तक संपादन के लिए अतिरिक्त लॉक ज़रूरी नहीं: ऐप अनलॉक करने से यह पहले ही अनुमत है।</string>
 </resources>

@@ -67,6 +67,9 @@ internal class SettingsState(val context: SettingsActivity) {
     var appListDeleteChecked by mutableStateOf(initialApp.listDeleteChecked)
     var appWidgetGrace by mutableIntStateOf(initialApp.lockWidgetGraceSec)
     var appWidgetTitlesOnly by mutableStateOf(initialApp.widgetTitlesOnly)
+    var appLockWidgetTick by mutableStateOf(initialApp.lockWidgetTick)
+    /** Asks for the lock (set by the screen); the security settings open only after it. */
+    var unlock: ((Int, (Boolean) -> Unit) -> Unit)? = null
     val initialGlobal = SettingsStore.loadGlobal(context)
     val initialWidget = SettingsStore.loadWidget(context, context.appWidgetId)
     val accounts = mutableStateListOf<String>().apply { addAll(CredentialStore.accounts(context)) }
@@ -208,8 +211,19 @@ internal class SettingsState(val context: SettingsActivity) {
     fun currentApp() = AppSettings(
         appLayout, appSort, appPinnedSection, appShowImages, appShowColors, appPlainStyle, appPreviewLines, appShowEdited, appEditedAsDate, appShowLabels, appShowProgress, appLockPrivate, appLockApp, appLockEdit, appLockGrace,
         appShowReminders, appListCheckedToEnd, appListCollapseChecked, appListCheckboxStyle, appListCheckboxSize, appListSpacing,
-        appListCheckInApp, appListDeleteChecked, appWidgetGrace, appWidgetTitlesOnly,
+        appListCheckInApp, appListDeleteChecked, appWidgetGrace, appWidgetTitlesOnly, appLockWidgetTick,
     )
+
+    /** Opens a page; the security page asks for the lock first (whenever the phone has one). */
+    fun goTo(target: Page) {
+        val ask = unlock
+        val secure = context.getSystemService(android.app.KeyguardManager::class.java).isDeviceSecure
+        if (target == Page.Security && ask != null && secure) {
+            ask(R.string.lock_prompt_security) { ok -> if (ok) page = target }
+        } else {
+            page = target
+        }
+    }
 
     fun refreshAccounts() {
         accounts.clear()

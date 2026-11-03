@@ -315,4 +315,9 @@
     <string name="lock_widget_grace_hint">Toccare una casella nel widget apre una piccola finestra di sblocco; poi si possono spuntare altre voci per questo tempo.</string>
     <string name="widget_titles_only">I widget mostrano solo i titoli</string>
     <string name="widget_titles_only_hint">Con il blocco dell’app, i widget nascondono il contenuto di tutte le note; un tocco apre l’app bloccata.</string>
+    <string name="edit_first_hint">Prima sblocca: tocca «Modifica nota».</string>
+    <string name="lock_prompt_security">Sblocca con l’impronta per aprire le impostazioni di sicurezza</string>
+    <string name="section_misc">Altro</string>
+    <string name="lock_widget_tick">Blocca la spunta nel widget</string>
+    <string name="lock_edit_app_hint">Modificare non richiede un blocco aggiuntivo finché il blocco dell’app è attivo: sbloccare l’app lo consente già.</string>
 </resources>

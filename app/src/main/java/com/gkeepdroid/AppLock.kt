@@ -65,10 +65,10 @@ object AppLock {
 
     private var widgetUnlockedAt = 0L
 
-    /** Ticking in a widget with the edit lock on: allowed shortly after the lock was passed there (its own time in the settings). */
+    /** Ticking in a widget with its lock on: allowed shortly after the lock was passed there (its own time in the settings). */
     fun widgetTickAllowed(context: android.content.Context): Boolean {
         val settings = AppSettingsStore.load(context)
-        if (!settings.lockEdit || !deviceSecure(context)) return true
+        if (!settings.lockWidgetTick || !deviceSecure(context)) return true
         return widgetUnlockedAt > 0 && SystemClock.elapsedRealtime() - widgetUnlockedAt < settings.lockWidgetGraceSec * 1000L
     }
 
@@ -76,8 +76,8 @@ object AppLock {
         widgetUnlockedAt = SystemClock.elapsedRealtime()
     }
 
-    /** True when the edit lock is on, so ticking in a widget goes through [UnlockTickActivity]. */
-    fun editLockOn(context: android.content.Context) = AppSettingsStore.load(context).lockEdit && deviceSecure(context)
+    /** True when ticking in widgets is locked, so a tap goes through [UnlockTickActivity]. */
+    fun editLockOn(context: android.content.Context) = AppSettingsStore.load(context).lockWidgetTick && deviceSecure(context)
 
     private var credentialCallback: ((Result) -> Unit)? = null
 

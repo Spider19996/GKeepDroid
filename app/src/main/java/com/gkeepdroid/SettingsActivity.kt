@@ -61,7 +61,12 @@ class SettingsActivity : ComponentActivity() {
         setResult(RESULT_CANCELED, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId))
         themeMode = SettingsStore.loadGlobal(this).themeMode
 
-        setContent { KeepTheme(themeMode) { AppLock.Gate(this) { SettingsScreen() } } }
+        setContent {
+            KeepTheme(themeMode) {
+                // Adding a widget needs the lock; the settings opened from the app are already behind it.
+                if (appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) AppLock.Gate(this) { SettingsScreen() } else SettingsScreen()
+            }
+        }
     }
 
     /** Whether this configuration screen was opened for a single-note widget. */
@@ -87,6 +92,7 @@ class SettingsActivity : ComponentActivity() {
         val state = remember { SettingsState(this) }
         state.uriHandler = LocalUriHandler.current
         state.scope = rememberCoroutineScope()
+        state.unlock = AppLock.rememberUnlock(this)
         with(state) {
             // After a reset the button reads "restored" and stays grayed out for a moment.
             LaunchedEffect(layoutResetShown) {
