@@ -324,4 +324,14 @@
     <string name="log_saved">Fichier journal enregistré. Il ne contient ni notes, ni noms de compte, ni jetons.</string>
     <string name="log_failed">Le fichier journal n’a pas pu être enregistré.</string>
     <string name="search_settings_no_results">Aucun réglage trouvé</string>
+    <string name="list_check_all">Tout cocher</string>
+    <string name="list_uncheck_all">Tout décocher</string>
+    <string name="list_sort_alpha">Trier par ordre alphabétique</string>
+    <string name="list_delete_checked">Supprimer les éléments cochés</string>
+    <string name="filter_notes">Notes</string>
+    <string name="filter_reminders">Avec rappel</string>
+    <string name="filter_recent">7 derniers jours</string>
+    <string name="swipe_right">Balayer vers la droite</string>
+    <string name="swipe_left">Balayer vers la gauche</string>
+    <string name="swipe_none">Rien</string>
 </resources>

@@ -324,4 +324,14 @@
     <string name="log_saved">Plik dziennika zapisany. Nie zawiera notatek, nazw kont ani tokenów.</string>
     <string name="log_failed">Nie udało się zapisać pliku dziennika.</string>
     <string name="search_settings_no_results">Nie znaleziono ustawienia</string>
+    <string name="list_check_all">Zaznacz wszystko</string>
+    <string name="list_uncheck_all">Odznacz wszystko</string>
+    <string name="list_sort_alpha">Sortuj alfabetycznie</string>
+    <string name="list_delete_checked">Usuń zaznaczone pozycje</string>
+    <string name="filter_notes">Notatki</string>
+    <string name="filter_reminders">Z przypomnieniem</string>
+    <string name="filter_recent">Ostatnie 7 dni</string>
+    <string name="swipe_right">Przesuń w prawo</string>
+    <string name="swipe_left">Przesuń w lewo</string>
+    <string name="swipe_none">Nic</string>
 </resources>

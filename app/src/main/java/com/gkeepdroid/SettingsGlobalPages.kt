@@ -278,6 +278,21 @@ internal fun ColumnScope.AppViewPage(s: SettingsState) {
         SwitchRow(R.string.show_progress, appShowProgress) { appShowProgress = it }
         SwitchRow(R.string.reminder_show_widget, appShowReminders) { appShowReminders = it }
 
+        // What swiping a card sideways does on the notes screen.
+        listOf(R.string.swipe_right to true, R.string.swipe_left to false).forEach { (label, right) ->
+            Text(stringResource(label), style = MaterialTheme.typography.titleMedium)
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(SWIPE_NONE to R.string.swipe_none, SWIPE_ARCHIVE to R.string.archive_note, SWIPE_TRASH to R.string.move_to_trash)
+                    .forEach { (action, name) ->
+                        FilterChip(
+                            selected = (if (right) appSwipeRight else appSwipeLeft) == action,
+                            onClick = { if (right) appSwipeRight = action else appSwipeLeft = action },
+                            label = { Text(stringResource(name)) },
+                        )
+                    }
+            }
+        }
+
         Text(stringResource(R.string.plain_style))
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(

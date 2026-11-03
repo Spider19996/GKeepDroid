@@ -324,4 +324,14 @@
     <string name="log_saved">Logbestand opgeslagen. Bevat geen notities, accountnamen of tokens.</string>
     <string name="log_failed">Het logbestand kon niet worden opgeslagen.</string>
     <string name="search_settings_no_results">Geen instelling gevonden</string>
+    <string name="list_check_all">Alles afvinken</string>
+    <string name="list_uncheck_all">Alles uitvinken</string>
+    <string name="list_sort_alpha">Alfabetisch sorteren</string>
+    <string name="list_delete_checked">Afgevinkte items verwijderen</string>
+    <string name="filter_notes">Notities</string>
+    <string name="filter_reminders">Met herinnering</string>
+    <string name="filter_recent">Laatste 7 dagen</string>
+    <string name="swipe_right">Naar rechts vegen</string>
+    <string name="swipe_left">Naar links vegen</string>
+    <string name="swipe_none">Niets</string>
 </resources>

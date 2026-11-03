@@ -805,7 +805,14 @@ data class AppSettings(
     val widgetTitlesOnly: Boolean = false,
     /** Ticking in a widget asks for the lock (with its own time), independent of the other locks. */
     val lockWidgetTick: Boolean = false,
+    /** What swiping a card on the notes screen does: one of SWIPE_NONE, SWIPE_ARCHIVE, SWIPE_TRASH. */
+    val swipeRight: Int = SWIPE_ARCHIVE,
+    val swipeLeft: Int = SWIPE_TRASH,
 )
+
+const val SWIPE_NONE = 0
+const val SWIPE_ARCHIVE = 1
+const val SWIPE_TRASH = 2
 
 object AppSettingsStore {
     private fun prefs(context: Context) = context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
@@ -840,6 +847,8 @@ object AppSettingsStore {
             lockWidgetGraceSec = p.getInt("lock_widget_grace_sec", d.lockWidgetGraceSec),
             widgetTitlesOnly = p.getBoolean("widget_titles_only", d.widgetTitlesOnly),
             lockWidgetTick = p.getBoolean("lock_widget_tick", d.lockWidgetTick),
+            swipeRight = p.getInt("swipe_right", d.swipeRight),
+            swipeLeft = p.getInt("swipe_left", d.swipeLeft),
         )
     }
 
@@ -871,6 +880,8 @@ object AppSettingsStore {
             .putInt("lock_widget_grace_sec", s.lockWidgetGraceSec)
             .putBoolean("widget_titles_only", s.widgetTitlesOnly)
             .putBoolean("lock_widget_tick", s.lockWidgetTick)
+            .putInt("swipe_right", s.swipeRight)
+            .putInt("swipe_left", s.swipeLeft)
             .apply()
     }
 }

@@ -31,11 +31,21 @@ object AppLog {
 
     private fun file(context: Context) = File(context.applicationContext.filesDir, "app_log.txt")
 
+    // The same message again within ten minutes is not written twice, so a problem that repeats cannot flood the log.
+    private var lastKey = ""
+    private var lastAt = 0L
+
     @Synchronized
     fun add(context: Context, level: Char, tag: String, message: String) {
         try {
+            val clean = Scrub.text(message)
+            val key = "$level/$tag $clean"
+            val now = System.currentTimeMillis()
+            if (key == lastKey && now - lastAt < 600_000) return
+            lastKey = key
+            lastAt = now
             val f = file(context)
-            val line = "${time.format(Date())} $level/$tag ${Scrub.text(message)}\n"
+            val line = "${time.format(Date())} $key\n"
             f.appendText(line)
             if (f.length() > 64_000) f.writeText(f.readLines().takeLast(MAX_LINES).joinToString("\n", postfix = "\n"))
         } catch (e: Exception) {
@@ -51,6 +61,39 @@ object AppLog {
         file(context).takeIf { it.exists() }?.readLines().orEmpty().takeLast(MAX_LINES)
     } catch (e: Exception) {
         emptyList()
+    }
+
+    /**
+     * Why the last runs of the app ended, as the system knows it (Android 11 and newer): crashes of the
+     * native part, ANRs and kills for lack of memory leave no trace in the app itself. Each one is logged
+     * once; the ordinary endings (swiped away, finished by itself) are left out.
+     */
+    fun logExitReasons(context: Context) {
+        if (android.os.Build.VERSION.SDK_INT < 30) return
+        try {
+            val manager = context.getSystemService(android.app.ActivityManager::class.java)
+            val prefs = context.getSharedPreferences("app_log_state", Context.MODE_PRIVATE)
+            val seen = prefs.getLong("exit_seen", 0)
+            val reasons = manager.getHistoricalProcessExitReasons(context.packageName, 0, 10)
+                .filter { it.timestamp > seen }.sortedBy { it.timestamp }
+            val abnormal = mapOf(
+                android.app.ApplicationExitInfo.REASON_CRASH to "crash",
+                android.app.ApplicationExitInfo.REASON_CRASH_NATIVE to "native crash",
+                android.app.ApplicationExitInfo.REASON_ANR to "ANR",
+                android.app.ApplicationExitInfo.REASON_INITIALIZATION_FAILURE to "initialization failure",
+                android.app.ApplicationExitInfo.REASON_LOW_MEMORY to "killed, low memory",
+                android.app.ApplicationExitInfo.REASON_EXCESSIVE_RESOURCE_USAGE to "killed, resource usage",
+                android.app.ApplicationExitInfo.REASON_SIGNALED to "killed by signal",
+            )
+            reasons.forEach { info ->
+                abnormal[info.reason]?.let { name ->
+                    add(context, 'E', "exit", "previous run ended: $name (status ${info.status}, ${Scrub.text(info.description, 80)})")
+                }
+            }
+            reasons.maxOfOrNull { it.timestamp }?.let { prefs.edit().putLong("exit_seen", it).apply() }
+        } catch (e: Exception) {
+            // The log is a help, never a risk.
+        }
     }
 
     /** A crash, as class names and code positions plus a scrubbed message. */

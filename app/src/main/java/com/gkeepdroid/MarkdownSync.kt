@@ -324,6 +324,7 @@ class MarkdownSyncWorker(context: Context, params: WorkerParameters) : Coroutine
             MarkdownSync.syncNow(applicationContext)
             Result.success()
         } catch (e: Exception) {
+            AppLog.e(applicationContext, "markdown", "sync failed: ${e.javaClass.simpleName} ${e.message.orEmpty()}")
             if (runAttemptCount < 3) Result.retry() else Result.failure()
         }
     }

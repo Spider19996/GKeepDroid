@@ -68,6 +68,8 @@ internal class SettingsState(val context: SettingsActivity) {
     var appWidgetGrace by mutableIntStateOf(initialApp.lockWidgetGraceSec)
     var appWidgetTitlesOnly by mutableStateOf(initialApp.widgetTitlesOnly)
     var appLockWidgetTick by mutableStateOf(initialApp.lockWidgetTick)
+    var appSwipeRight by mutableIntStateOf(initialApp.swipeRight)
+    var appSwipeLeft by mutableIntStateOf(initialApp.swipeLeft)
     /** Asks for the lock (set by the screen); the security settings open only after it. */
     var unlock: ((Int, (Boolean) -> Unit) -> Unit)? = null
     val initialGlobal = SettingsStore.loadGlobal(context)
@@ -211,7 +213,7 @@ internal class SettingsState(val context: SettingsActivity) {
     fun currentApp() = AppSettings(
         appLayout, appSort, appPinnedSection, appShowImages, appShowColors, appPlainStyle, appPreviewLines, appShowEdited, appEditedAsDate, appShowLabels, appShowProgress, appLockPrivate, appLockApp, appLockEdit, appLockGrace,
         appShowReminders, appListCheckedToEnd, appListCollapseChecked, appListCheckboxStyle, appListCheckboxSize, appListSpacing,
-        appListCheckInApp, appListDeleteChecked, appWidgetGrace, appWidgetTitlesOnly, appLockWidgetTick,
+        appListCheckInApp, appListDeleteChecked, appWidgetGrace, appWidgetTitlesOnly, appLockWidgetTick, appSwipeRight, appSwipeLeft,
     )
 
     /** Opens a page; the security page asks for the lock first (whenever the phone has one). */

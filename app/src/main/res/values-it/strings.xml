@@ -324,4 +324,14 @@
     <string name="log_saved">File di log salvato. Non contiene note, nomi account o token.</string>
     <string name="log_failed">Impossibile salvare il file di log.</string>
     <string name="search_settings_no_results">Nessuna impostazione trovata</string>
+    <string name="list_check_all">Spunta tutto</string>
+    <string name="list_uncheck_all">Deseleziona tutto</string>
+    <string name="list_sort_alpha">Ordina alfabeticamente</string>
+    <string name="list_delete_checked">Elimina le voci spuntate</string>
+    <string name="filter_notes">Note</string>
+    <string name="filter_reminders">Con promemoria</string>
+    <string name="filter_recent">Ultimi 7 giorni</string>
+    <string name="swipe_right">Scorri a destra</string>
+    <string name="swipe_left">Scorri a sinistra</string>
+    <string name="swipe_none">Niente</string>
 </resources>

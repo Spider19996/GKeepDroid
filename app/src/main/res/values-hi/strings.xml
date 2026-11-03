@@ -324,4 +324,14 @@
     <string name="log_saved">लॉग फ़ाइल सहेजी गई। इसमें नोट, खाते के नाम या टोकन नहीं हैं।</string>
     <string name="log_failed">लॉग फ़ाइल सहेजी नहीं जा सकी।</string>
     <string name="search_settings_no_results">कोई सेटिंग नहीं मिली</string>
+    <string name="list_check_all">सभी टिक करें</string>
+    <string name="list_uncheck_all">सभी टिक हटाएँ</string>
+    <string name="list_sort_alpha">वर्णानुक्रम में क्रमबद्ध करें</string>
+    <string name="list_delete_checked">टिक किए आइटम हटाएँ</string>
+    <string name="filter_notes">नोट</string>
+    <string name="filter_reminders">रिमाइंडर के साथ</string>
+    <string name="filter_recent">पिछले 7 दिन</string>
+    <string name="swipe_right">दाएँ स्वाइप करें</string>
+    <string name="swipe_left">बाएँ स्वाइप करें</string>
+    <string name="swipe_none">कुछ नहीं</string>
 </resources>

@@ -155,6 +155,7 @@ object Reminders {
         val alarms = context.getSystemService(AlarmManager::class.java)
         val operation = pending(context, account, noteId, reminder.id)
         // Exact alarms need a permission the user can withdraw; without it Android may delay the reminder a little.
+        if (!canScheduleExact(context)) AppLog.i(context, "reminder", "set without exact alarms (may be late)")
         if (canScheduleExact(context)) {
             alarms.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, reminder.at, operation)
         } else {
@@ -188,7 +189,9 @@ object Reminders {
         remove(context, account, noteId, reminderId)
         // A note that was trashed or deleted in the meantime no longer reminds.
         val note = NotesCache.readAll(context, account).firstOrNull { it.id == noteId && it.state != "trashed" }
+        if (reminder != null && note != null && !canNotify(context)) AppLog.e(context, "reminder", "due but notifications are off")
         if (reminder == null || note == null || !canNotify(context)) return finished()
+        AppLog.i(context, "reminder", "fired")
 
         val manager = context.getSystemService(NotificationManager::class.java)
         NotificationChannels.create(context)

@@ -71,6 +71,8 @@ internal fun settingEntries(isSingleNote: Boolean): List<SettingEntry> = buildLi
         R.string.checkbox_style, R.string.checkbox_size,
     ).forEach { add(SettingEntry(it, Page.AppChecklists)) }
     add(SettingEntry(R.string.reminder_show_widget, Page.AppView))
+    add(SettingEntry(R.string.swipe_right, Page.AppView))
+    add(SettingEntry(R.string.swipe_left, Page.AppView))
     if (!isSingleNote) add(SettingEntry(R.string.max_lines, Page.Notes))
     if (isSingleNote) add(SettingEntry(R.string.show_add_item_button, Page.ButtonBar))
     if (!isSingleNote) {

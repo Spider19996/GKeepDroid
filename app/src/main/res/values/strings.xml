@@ -327,4 +327,14 @@
     <string name="log_saved">Log file saved. It contains no notes, account names or tokens.</string>
     <string name="log_failed">The log file could not be saved.</string>
     <string name="search_settings_no_results">No settings found</string>
+    <string name="list_check_all">Check all</string>
+    <string name="list_uncheck_all">Uncheck all</string>
+    <string name="list_sort_alpha">Sort alphabetically</string>
+    <string name="list_delete_checked">Delete checked items</string>
+    <string name="filter_notes">Notes</string>
+    <string name="filter_reminders">With reminder</string>
+    <string name="filter_recent">Last 7 days</string>
+    <string name="swipe_right">Swipe right</string>
+    <string name="swipe_left">Swipe left</string>
+    <string name="swipe_none">Nothing</string>
 </resources>

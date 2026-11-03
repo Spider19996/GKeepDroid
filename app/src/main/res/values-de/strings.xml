@@ -324,4 +324,14 @@
     <string name="log_saved">Logdatei gespeichert. Sie enthält keine Notizen, Kontonamen oder Tokens.</string>
     <string name="log_failed">Die Logdatei konnte nicht gespeichert werden.</string>
     <string name="search_settings_no_results">Keine Einstellung gefunden</string>
+    <string name="list_check_all">Alle abhaken</string>
+    <string name="list_uncheck_all">Alle zurücksetzen</string>
+    <string name="list_sort_alpha">Alphabetisch sortieren</string>
+    <string name="list_delete_checked">Abgehakte löschen</string>
+    <string name="filter_notes">Notizen</string>
+    <string name="filter_reminders">Mit Erinnerung</string>
+    <string name="filter_recent">Letzte 7 Tage</string>
+    <string name="swipe_right">Nach rechts wischen</string>
+    <string name="swipe_left">Nach links wischen</string>
+    <string name="swipe_none">Nichts</string>
 </resources>

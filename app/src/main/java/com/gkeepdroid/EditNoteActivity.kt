@@ -460,6 +460,34 @@ class EditNoteActivity : ComponentActivity() {
                                 leadingIcon = { Icon(painterResource(R.drawable.ic_checklist), contentDescription = null) },
                                 onClick = { menuOpen = false; requestConvert() },
                             )
+                            if (isList) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.list_check_all)) },
+                                    onClick = { menuOpen = false; for (i in items.indices) items[i] = items[i].copy(checked = true) },
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.list_uncheck_all)) },
+                                    onClick = { menuOpen = false; for (i in items.indices) items[i] = items[i].copy(checked = false) },
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.list_sort_alpha)) },
+                                    onClick = {
+                                        menuOpen = false
+                                        // Sub-items lose their parent when the order changes, so they become ordinary items.
+                                        val sorted = items.sortedBy { it.text.lowercase() }.map { it.copy(indent = false) }
+                                        items.clear()
+                                        items.addAll(sorted)
+                                    },
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.list_delete_checked)) },
+                                    onClick = {
+                                        menuOpen = false
+                                        items.removeAll { it.checked }
+                                        if (items.isEmpty()) items.add(KeepItem(UUID.randomUUID().toString(), "", false))
+                                    },
+                                )
+                            }
                             if (existing != null) {
                             if (existing.serverId.isNotEmpty()) {
                                 DropdownMenuItem(
@@ -832,6 +860,23 @@ class EditNoteActivity : ComponentActivity() {
                 )
             }
 
+            // Web addresses, e-mail addresses and phone numbers in the note can be opened with one tap.
+            val links = NoteLinks.find(listOf(title, text) + items.map { it.text })
+            if (links.isNotEmpty()) FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                links.forEach { link ->
+                    androidx.compose.material3.AssistChip(
+                        onClick = {
+                            try {
+                                startActivity(link.intent)
+                            } catch (e: ActivityNotFoundException) {
+                                // No app for this kind of link.
+                            }
+                        },
+                        label = { Text(link.label, maxLines = 1) },
+                    )
+                }
+            }
+
             Text(stringResource(R.string.color))
             Row(
                 Modifier.horizontalScroll(rememberScrollState()),
@@ -978,4 +1023,33 @@ internal object ChecklistText {
         val checked = m != null && (m.groupValues[1].equals("x", true) || m.groupValues[2].equals("x", true))
         KeepItem(UUID.randomUUID().toString(), (m?.groupValues?.get(3) ?: line).trim(), checked)
     }.toList()
+}
+
+/** A web address, e-mail address or phone number found in a note, with the intent that opens it. */
+internal data class NoteLink(val label: String, val intent: Intent)
+
+internal object NoteLinks {
+    private val phone = Regex("""[+0][\d ()/.-]{5,}\d""")
+
+    fun find(texts: List<String>): List<NoteLink> {
+        val all = texts.joinToString("\n")
+        val found = linkedMapOf<String, NoteLink>()
+        fun add(label: String, intent: Intent) {
+            if (found.size < 6) found.putIfAbsent(label, NoteLink(label.take(32), intent))
+        }
+        android.util.Patterns.WEB_URL.matcher(all).let { m ->
+            while (m.find()) {
+                val url = m.group()
+                add(url, Intent(Intent.ACTION_VIEW, Uri.parse(if (url.contains("://")) url else "https://$url")))
+            }
+        }
+        android.util.Patterns.EMAIL_ADDRESS.matcher(all).let { m ->
+            while (m.find()) add(m.group(), Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + m.group())))
+        }
+        phone.findAll(all).forEach { m ->
+            if (m.value.count { it.isDigit() } >= 7) add(m.value.trim(), Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + m.value.filter { it.isDigit() || it == '+' })))
+        }
+        // An address that is part of an e-mail address is not offered a second time.
+        return found.values.filterNot { link -> link.intent.action == Intent.ACTION_VIEW && found.keys.any { it.contains("@") && it.contains(link.label) } }
+    }
 }

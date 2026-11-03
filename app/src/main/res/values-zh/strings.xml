@@ -324,4 +324,14 @@
     <string name="log_saved">日志文件已保存，不包含笔记、账户名或令牌。</string>
     <string name="log_failed">无法保存日志文件。</string>
     <string name="search_settings_no_results">未找到设置</string>
+    <string name="list_check_all">全部勾选</string>
+    <string name="list_uncheck_all">全部取消勾选</string>
+    <string name="list_sort_alpha">按字母顺序排序</string>
+    <string name="list_delete_checked">删除已勾选项目</string>
+    <string name="filter_notes">笔记</string>
+    <string name="filter_reminders">有提醒</string>
+    <string name="filter_recent">最近7天</string>
+    <string name="swipe_right">向右滑动</string>
+    <string name="swipe_left">向左滑动</string>
+    <string name="swipe_none">无</string>
 </resources>

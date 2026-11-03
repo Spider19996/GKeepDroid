@@ -118,6 +118,11 @@ class MainActivity : ComponentActivity() {
         var query by remember { mutableStateOf("") }
         var filterAccount by remember { mutableStateOf<String?>(null) }
         var filterLabel by remember { mutableStateOf<String?>(null) }
+        // More filters for the search: kind of note, with a reminder, edited lately.
+        var filterKind by remember { mutableStateOf(0) } // 0 all, 1 notes, 2 checklists
+        var filterReminder by remember { mutableStateOf(false) }
+        var filterRecent by remember { mutableStateOf(false) }
+        var undoKey by remember { mutableStateOf(0) }
         var syncing by remember { mutableStateOf(false) }
         var menuOpen by remember { mutableStateOf(false) }
         var newMenuOpen by remember { mutableStateOf(false) }
@@ -161,7 +166,7 @@ class MainActivity : ComponentActivity() {
         val trashedText = stringResource(R.string.note_trashed)
         val archivedText = stringResource(R.string.note_archived)
         val undoText = stringResource(R.string.image_undo)
-        LaunchedEffect(resumeKey) {
+        LaunchedEffect(resumeKey, undoKey) {
             val undo = UndoStore.take() ?: return@LaunchedEffect
             val result = snackbar.showSnackbar(
                 if (undo.kind == UndoStore.Kind.TRASH) trashedText else archivedText,
@@ -183,7 +188,7 @@ class MainActivity : ComponentActivity() {
         }
         if (filterLabel != null && filterLabel !in labelNames) filterLabel = null
 
-        val shown = remember(reloadKey, screen, accounts, filterAccount, filterLabel, query, app) {
+        val shown = remember(reloadKey, screen, accounts, filterAccount, filterLabel, query, app, filterKind, filterReminder, filterRecent) {
             val used = accounts.filter { filterAccount == null || it == filterAccount }
             val entries = used.flatMap { account ->
                 val notes = when (screen) {
@@ -193,12 +198,37 @@ class MainActivity : ComponentActivity() {
                 }
                 notes.map { it to account }
             }.filter { it.first.matches(query) && (screen != AppScreen.Notes || filterLabel == null || filterLabel in it.first.labels) }
+                .filter { (note, account) ->
+                    screen != AppScreen.Notes || (
+                        (filterKind == 0 || (filterKind == 2) == note.isList) &&
+                            (!filterReminder || Reminders.list(context, account, note.id).isNotEmpty()) &&
+                            (!filterRecent || System.currentTimeMillis() - note.updated < 7 * 24 * 3_600_000L)
+                        )
+                }
             // Archive and trash are sorted like the notes.
             when (app.sortMode) {
                 SORT_EDITED -> entries.sortedByDescending { it.first.updated }
                 SORT_CREATED -> entries.sortedByDescending { it.first.created }
                 SORT_TITLE -> entries.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { noteLabel(it.first) })
                 else -> entries.sortedByDescending { it.first.sort }
+            }
+        }
+
+        /** A card was swiped: archive or trash it, with the same "Undo" as in the editor. */
+        fun swiped(note: KeepNote, account: String, action: Int) {
+            when {
+                action == SWIPE_ARCHIVE && !CredentialStore.isLocal(account) -> act {
+                    KeepRepository.archiveNote(context, account, note.id)
+                    UndoStore.set(account, note.id, UndoStore.Kind.ARCHIVE)
+                    undoKey++
+                }
+                // Local notes have no trash: deleting them asks first.
+                action == SWIPE_TRASH && CredentialStore.isLocal(account) -> deleteTarget = note to account
+                action == SWIPE_TRASH -> act {
+                    KeepRepository.trashNote(context, account, note.id)
+                    UndoStore.set(account, note.id, UndoStore.Kind.TRASH)
+                    undoKey++
+                }
             }
         }
 
@@ -335,12 +365,16 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                if (screen == AppScreen.Notes && labelNames.isNotEmpty()) {
+                if (screen == AppScreen.Notes) {
                     Row(
                         Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        FilterChip(
+                        FilterChip(selected = filterKind == 1, onClick = { filterKind = if (filterKind == 1) 0 else 1 }, label = { Text(stringResource(R.string.filter_notes)) })
+                        FilterChip(selected = filterKind == 2, onClick = { filterKind = if (filterKind == 2) 0 else 2 }, label = { Text(stringResource(R.string.list_section)) })
+                        FilterChip(selected = filterReminder, onClick = { filterReminder = !filterReminder }, label = { Text(stringResource(R.string.filter_reminders)) })
+                        FilterChip(selected = filterRecent, onClick = { filterRecent = !filterRecent }, label = { Text(stringResource(R.string.filter_recent)) })
+                        if (labelNames.isNotEmpty()) FilterChip(
                             selected = filterLabel == null,
                             onClick = { filterLabel = null },
                             label = { Text(stringResource(R.string.all_labels)) },
@@ -429,7 +463,7 @@ class MainActivity : ComponentActivity() {
                     // Notes can be dragged into a new place in Keep's order, for one account and without a search.
                     val canReorder = app.sortMode == SORT_KEEP && query.isBlank() && (screen != AppScreen.Notes || filterLabel == null) &&
                         shown.map { it.second }.distinct().size == 1
-                    NotesGrid(shown, screen, app, canReorder, ::openEditor, { denied, block -> act(denied, block) }, { deleteTarget = it })
+                    NotesGrid(shown, screen, app, canReorder, ::openEditor, { denied, block -> act(denied, block) }, { deleteTarget = it }, ::swiped)
                 }
             }
         }
@@ -444,6 +478,7 @@ class MainActivity : ComponentActivity() {
         open: (KeepNote?, String, Boolean) -> Unit,
         act: (() -> Unit, suspend () -> Unit) -> Unit,
         askDelete: (Pair<KeepNote, String>) -> Unit,
+        onSwiped: (KeepNote, String, Int) -> Unit,
     ) {
         val context = LocalContext.current
         if (shown.isEmpty()) {
@@ -566,14 +601,17 @@ class MainActivity : ComponentActivity() {
             if (pinned.isNotEmpty()) {
                 item(span = StaggeredGridItemSpan.FullLine) { SectionLabel(stringResource(R.string.pinned_section)) }
                 items(pinned, key = { it.second + "|" + it.first.id }) { (note, account) ->
-                    NoteTile(note, account, app, onClick = { open(note, account, false) }, modifier = Modifier.animateItem().then(dragModifier(account + "|" + note.id)))
+                    SwipeCard(app, screen == AppScreen.Notes, { onSwiped(note, account, it) }, Modifier.animateItem()) {
+                        NoteTile(note, account, app, onClick = { open(note, account, false) }, modifier = dragModifier(account + "|" + note.id))
+                    }
                 }
                 if (others.isNotEmpty()) {
                     item(span = StaggeredGridItemSpan.FullLine) { SectionLabel(stringResource(R.string.others_section)) }
                 }
             }
             items(others, key = { it.second + "|" + it.first.id }) { (note, account) ->
-                NoteTile(note, account, app, onClick = { open(note, account, false) }, modifier = Modifier.animateItem().then(dragModifier(account + "|" + note.id))) {
+                SwipeCard(app, screen == AppScreen.Notes, { onSwiped(note, account, it) }, Modifier.animateItem()) {
+                NoteTile(note, account, app, onClick = { open(note, account, false) }, modifier = dragModifier(account + "|" + note.id)) {
                     // Archive and trash get their own actions below the note.
                     if (screen == AppScreen.Archive) {
                         TextButton(onClick = { act({}) { KeepRepository.unarchiveNote(context, account, note.id) } }) {
@@ -589,8 +627,51 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
+                }
             }
         }
+    }
+
+    /** Wraps a card so it can be swiped sideways; the action itself is done by [onAction], and the card springs back. */
+    @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+    @Composable
+    private fun SwipeCard(app: AppSettings, enabled: Boolean, onAction: (Int) -> Unit, modifier: Modifier, content: @Composable () -> Unit) {
+        if (!enabled || (app.swipeLeft == SWIPE_NONE && app.swipeRight == SWIPE_NONE)) {
+            Box(modifier) { content() }
+            return
+        }
+        val current by androidx.compose.runtime.rememberUpdatedState(app)
+        val state = androidx.compose.material3.rememberSwipeToDismissBoxState(
+            confirmValueChange = { value ->
+                when (value) {
+                    androidx.compose.material3.SwipeToDismissBoxValue.StartToEnd -> onAction(current.swipeRight)
+                    androidx.compose.material3.SwipeToDismissBoxValue.EndToStart -> onAction(current.swipeLeft)
+                    else -> {}
+                }
+                false
+            },
+        )
+        androidx.compose.material3.SwipeToDismissBox(
+            state = state,
+            modifier = modifier,
+            enableDismissFromStartToEnd = app.swipeRight != SWIPE_NONE,
+            enableDismissFromEndToStart = app.swipeLeft != SWIPE_NONE,
+            backgroundContent = {
+                val toRight = state.dismissDirection == androidx.compose.material3.SwipeToDismissBoxValue.StartToEnd
+                val action = if (toRight) app.swipeRight else app.swipeLeft
+                Box(
+                    Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp))
+                        .background(if (action == SWIPE_TRASH) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer)
+                        .padding(horizontal = 20.dp),
+                    contentAlignment = if (toRight) Alignment.CenterStart else Alignment.CenterEnd,
+                ) {
+                    when (action) {
+                        SWIPE_ARCHIVE -> Icon(painterResource(R.drawable.ic_archive), contentDescription = stringResource(R.string.archive_note))
+                        SWIPE_TRASH -> Icon(painterResource(R.drawable.ic_delete), contentDescription = stringResource(R.string.move_to_trash))
+                    }
+                }
+            },
+        ) { content() }
     }
 
     @Composable

@@ -324,4 +324,14 @@
     <string name="log_saved">로그 파일을 저장했습니다. 메모, 계정 이름, 토큰은 포함되지 않습니다.</string>
     <string name="log_failed">로그 파일을 저장하지 못했습니다.</string>
     <string name="search_settings_no_results">설정을 찾을 수 없습니다</string>
+    <string name="list_check_all">모두 체크</string>
+    <string name="list_uncheck_all">모두 체크 해제</string>
+    <string name="list_sort_alpha">가나다순 정렬</string>
+    <string name="list_delete_checked">체크한 항목 삭제</string>
+    <string name="filter_notes">메모</string>
+    <string name="filter_reminders">미리 알림 있음</string>
+    <string name="filter_recent">최근 7일</string>
+    <string name="swipe_right">오른쪽으로 밀기</string>
+    <string name="swipe_left">왼쪽으로 밀기</string>
+    <string name="swipe_none">없음</string>
 </resources>
