@@ -19,7 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 
 @Composable
@@ -82,7 +84,7 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
             ) { page = Page.Accounts }
             MenuRow(stringResource(R.string.sync_section), null) { page = Page.Sync }
 
-            SectionTitle(stringResource(R.string.appearance))
+            SectionTitle(stringResource(R.string.section_look))
             PopupRow(
                 pendingPopup == "theme", { pendingPopup = null },
                 stringResource(R.string.theme_section),
@@ -104,15 +106,12 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
             MenuRow(stringResource(R.string.app_view), null) { page = Page.AppView }
             MenuRow(stringResource(R.string.list_section), null) { page = Page.AppChecklists }
 
-            SectionTitle(stringResource(R.string.reminders_title))
+            HorizontalDivider(Modifier.padding(vertical = 4.dp))
             MenuRow(stringResource(R.string.reminders_title), null) { page = Page.Reminders }
 
-            SectionTitle(stringResource(R.string.section_security))
             MenuRow(stringResource(R.string.section_security), null) { page = Page.Security }
 
-            SectionTitle(stringResource(R.string.section_data))
             MenuRow(stringResource(R.string.tab_backup), if (mdEnabled) mdFolder else null) { page = Page.Backup }
-            SwitchRow(R.string.demo_mode, demoMode) { demoMode = it }
         }
         val widgetSection: @Composable () -> Unit = {
             if (hasWidget) {

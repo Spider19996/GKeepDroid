@@ -305,4 +305,10 @@
     <string name="section_security">安全与隐私</string>
     <string name="section_data">数据</string>
     <string name="lock_private_hint">标记为“隐藏内容”的笔记只显示标题，打开时需要设备锁。</string>
+    <string name="edit_list">编辑清单</string>
+    <string name="check_on_card">直接在卡片上勾选项目</string>
+    <string name="lock_prompt_app">使用指纹解锁以打开应用</string>
+    <string name="lock_prompt_edit">使用指纹解锁以编辑笔记</string>
+    <string name="lock_prompt_alt">或使用 PIN、图案或密码。</string>
+    <string name="section_look">外观</string>
 </resources>

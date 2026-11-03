@@ -305,4 +305,10 @@
     <string name="section_security">सुरक्षा और गोपनीयता</string>
     <string name="section_data">डेटा</string>
     <string name="lock_private_hint">“सामग्री छिपाएँ” वाले नोट केवल शीर्षक दिखाते हैं और खोलते समय डिवाइस लॉक माँगते हैं।</string>
+    <string name="edit_list">चेकलिस्ट संपादित करें</string>
+    <string name="check_on_card">कार्ड पर सीधे आइटम टिक करें</string>
+    <string name="lock_prompt_app">ऐप खोलने के लिए फ़िंगरप्रिंट से अनलॉक करें</string>
+    <string name="lock_prompt_edit">नोट संपादित करने के लिए फ़िंगरप्रिंट से अनलॉक करें</string>
+    <string name="lock_prompt_alt">या अपना PIN, पैटर्न या पासवर्ड इस्तेमाल करें।</string>
+    <string name="section_look">रूप-रंग</string>
 </resources>

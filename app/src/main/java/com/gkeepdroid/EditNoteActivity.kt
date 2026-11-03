@@ -121,8 +121,9 @@ class EditNoteActivity : ComponentActivity() {
         val pinWidgetId = widgetId.takeIf { provider?.className == NotesWidgetReceiver::class.java.name }
         // A private note opens only after the device lock (PIN, pattern, fingerprint) was confirmed.
         val keyguard = getSystemService(KeyguardManager::class.java)
-        val needsLock = noteId != null && AppSettingsStore.load(this).lockPrivateNotes &&
-            PrivateNotes.key(account, noteId) in PrivateNotes.load(this) && keyguard.isDeviceSecure
+        val cachedNote = noteId?.let { id -> NotesCache.readAll(this, account).firstOrNull { it.id == id } }
+        val needsLock = cachedNote != null && AppSettingsStore.load(this).lockPrivateNotes &&
+            PrivateNotes.isPrivate(cachedNote, account, PrivateNotes.load(this)) && keyguard.isDeviceSecure
         var unlocked by mutableStateOf(!needsLock)
         val unlock = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) unlocked = true else finish()
@@ -198,8 +199,9 @@ class EditNoteActivity : ComponentActivity() {
         val scope = rememberCoroutineScope()
         // With the edit lock on, a note opens for reading only until the lock is passed.
         var canEdit by remember { mutableStateOf(AppLock.editAllowed(this@EditNoteActivity)) }
+        val unlock = AppLock.rememberUnlock(this@EditNoteActivity)
         fun askEdit() {
-            AppLock.unlockEdit(this@EditNoteActivity) { ok ->
+            unlock(R.string.lock_prompt_edit) { ok ->
                 if (ok) canEdit = true else if (existing == null) finish()
             }
         }
@@ -226,11 +228,9 @@ class EditNoteActivity : ComponentActivity() {
         }
         val allAccounts = remember { CredentialStore.accounts(this@EditNoteActivity) }
         var targetAccount by remember { mutableStateOf(account) }
-        var hiddenInWidgets by remember {
-            mutableStateOf(
-                existing != null && PrivateNotes.key(account, existing.id) in PrivateNotes.load(this@EditNoteActivity)
-            )
-        }
+        val wasHidden = existing != null && PrivateNotes.isPrivate(existing, account, PrivateNotes.load(this@EditNoteActivity))
+        // Changed with "Hide content"; like every other change it only counts once the note is saved.
+        var hiddenInWidgets by remember { mutableStateOf(wasHidden) }
         var saving by remember { mutableStateOf(false) }
         var menuOpen by remember { mutableStateOf(false) }
         val isLocal = CredentialStore.isLocal(account)
@@ -300,10 +300,12 @@ class EditNoteActivity : ComponentActivity() {
             val converting = convertFrom != null
             val function = if (existing != null && !converting) "update_note" else "create_note"
             val args = if (existing != null && !converting) {
-                KeepRepository.updateNoteArgs(existing.id, title, text, items.toList(), color, pinned, removedImages.toList(), labels)
+                KeepRepository.updateNoteArgs(existing.id, title, text, items.toList(), color, pinned, removedImages.toList(), withHiddenLabel(labels, hiddenInWidgets))
             } else {
-                KeepRepository.createNoteArgs(title, text, isList, items.toList(), color, pinned, labels)
+                KeepRepository.createNoteArgs(title, text, isList, items.toList(), color, pinned, withHiddenLabel(labels, hiddenInWidgets))
             }
+            // The mark in Keep replaces the older one that only this phone knew.
+            if (existing != null) PrivateNotes.set(this@EditNoteActivity, account, existing.id, false)
             if (!CredentialStore.isLocal(target) || converting) {
                 // The change is stored and sent in the background: the editor closes at once, and a failure
                 // shows up as a notification instead of losing the change.
@@ -313,7 +315,7 @@ class EditNoteActivity : ComponentActivity() {
                         val old = convertFrom!!
                         val moved = Reminders.list(this@EditNoteActivity, account, old.id)
                         moved.forEach { Reminders.remove(this@EditNoteActivity, account, old.id, it.id) }
-                        PendingEdit(target, function, args, reminders = moved, hidden = hiddenInWidgets, trashAfter = old.id)
+                        PendingEdit(target, function, args, reminders = moved, trashAfter = old.id)
                     } else {
                         PendingEdit(target, function, args, reminders = if (existing == null) draftReminders else emptyList())
                     },
@@ -374,7 +376,7 @@ class EditNoteActivity : ComponentActivity() {
 
         fun hasChanges() = if (existing != null) {
             title != existing.title || text != existing.text || items.toList() != existing.items || color != existing.color ||
-                pinned != existing.pinned || labels != existing.labels || removedImages.isNotEmpty() || convertFrom != null
+                pinned != existing.pinned || labels != existing.labels || removedImages.isNotEmpty() || convertFrom != null || hiddenInWidgets != wasHidden
         } else {
             title.isNotBlank() || text.isNotBlank() || items.any { it.text.isNotBlank() }
         }
@@ -440,8 +442,8 @@ class EditNoteActivity : ComponentActivity() {
                         Icon(painterResource(R.drawable.ic_pin_bottom), contentDescription = stringResource(R.string.pin_to_bottom))
                     }
                 }
-                run {
-                    // Less common actions live in an overflow menu.
+                // Less common actions live in an overflow menu, once the note is open for editing.
+                if (canEdit) {
                     Box {
                         IconButton(onClick = { menuOpen = true }) {
                             Icon(painterResource(R.drawable.ic_more_vert), contentDescription = stringResource(R.string.more_actions))
@@ -477,7 +479,6 @@ class EditNoteActivity : ComponentActivity() {
                                     menuOpen = false
                                     if (!canEdit) return@DropdownMenuItem askEdit()
                                     hiddenInWidgets = !hiddenInWidgets
-                                    PrivateNotes.set(this@EditNoteActivity, account, existing.id, hiddenInWidgets)
                                     scope.launch { WidgetRefresh.all(this@EditNoteActivity) }
                                 },
                             )
@@ -898,7 +899,7 @@ class EditNoteActivity : ComponentActivity() {
                 }
                 Button(
                     modifier = Modifier.weight(1f).fillMaxHeight(), onClick = { if (canEdit) save() else askEdit() },
-                ) { Text(stringResource(if (canEdit) R.string.save else R.string.edit_unlock)) }
+                ) { Text(stringResource(if (canEdit) R.string.save else if (isList) R.string.edit_list else R.string.edit_note)) }
             }
         }
     }

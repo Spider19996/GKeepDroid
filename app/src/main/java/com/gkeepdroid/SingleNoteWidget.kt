@@ -107,7 +107,7 @@ class SingleNoteWidget : GlanceAppWidget() {
                 )
                 else -> NoteBody(
                     note, account, settings, palette, thumb, collapsedByNote,
-                    isPrivate = PrivateNotes.key(account, note.id) in privateKeys,
+                    isPrivate = PrivateNotes.isPrivate(note, account, privateKeys),
                 )
             }
         }

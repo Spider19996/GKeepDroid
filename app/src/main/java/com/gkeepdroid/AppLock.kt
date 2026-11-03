@@ -62,25 +62,45 @@ object AppLock {
         return valid(activity)
     }
 
-    /** Asks for the lock before something is changed; [onDone] gets true when it was passed. */
-    fun unlockEdit(activity: ComponentActivity, onDone: (Boolean) -> Unit) {
-        // Android 8 has no prompt to start from here; the edit lock needs Android 9 or newer.
-        if (Build.VERSION.SDK_INT < 29) return onDone(true)
-        prompt(activity, { }) { result ->
-            if (result == Result.OK) {
-                openedOnce = true
-                touch()
+    private var credentialCallback: ((Result) -> Unit)? = null
+
+    /** Android 8 and 9 answer through the credential screen; this hands its result to the waiting caller. */
+    fun credentialResult(ok: Boolean) {
+        val callback = credentialCallback ?: return
+        credentialCallback = null
+        callback(if (ok) Result.OK else Result.CANCELED)
+    }
+
+    /**
+     * Returns a function that asks for the lock before something is changed: it takes the sentence that
+     * says why (a string resource) and gets true when the lock was passed. Works on every Android version.
+     */
+    @Composable
+    fun rememberUnlock(activity: ComponentActivity): (Int, (Boolean) -> Unit) -> Unit {
+        val launcher = androidx.activity.compose.rememberLauncherForActivityResult(
+            androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+        ) { result -> credentialResult(result.resultCode == android.app.Activity.RESULT_OK) }
+        return { reason, done ->
+            prompt(activity, reason, { launcher.launch(it) }) { result ->
+                if (result == Result.OK) {
+                    openedOnce = true
+                    touch()
+                }
+                done(result == Result.OK)
             }
-            onDone(result == Result.OK)
         }
     }
 
     /** Asks for the lock; [onResult] gets true when it was passed. */
     @Suppress("DEPRECATION")
-    fun prompt(activity: ComponentActivity, launchCredential: (android.content.Intent) -> Unit, onResult: (Result) -> Unit) {
+    fun prompt(
+        activity: ComponentActivity, reason: Int, launchCredential: (android.content.Intent) -> Unit, onResult: (Result) -> Unit,
+    ) {
         val title = activity.getString(R.string.app_name)
+        val subtitle = activity.getString(reason)
         if (Build.VERSION.SDK_INT >= 29) {
-            val builder = BiometricPrompt.Builder(activity).setTitle(title)
+            val builder = BiometricPrompt.Builder(activity).setTitle(title).setSubtitle(subtitle)
+                .setDescription(activity.getString(R.string.lock_prompt_alt))
             if (Build.VERSION.SDK_INT >= 30) {
                 builder.setAllowedAuthenticators(
                     android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_WEAK or
@@ -104,8 +124,13 @@ object AppLock {
         } else {
             // Android 8 and 9: the credential screen of the phone (no fingerprint here).
             val keyguard = activity.getSystemService(KeyguardManager::class.java)
-            val intent = keyguard.createConfirmDeviceCredentialIntent(title, null)
-            if (intent == null) onResult(Result.OK) else launchCredential(intent)
+            val intent = keyguard.createConfirmDeviceCredentialIntent(title, subtitle)
+            if (intent == null) {
+                onResult(Result.OK)
+            } else {
+                credentialCallback = onResult
+                launchCredential(intent)
+            }
         }
     }
 
@@ -122,6 +147,7 @@ object AppLock {
             androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
         ) { result ->
             asking = false
+            credentialCallback = null
             if (result.resultCode == android.app.Activity.RESULT_OK) {
                 openedOnce = true
                 touch()
@@ -133,7 +159,7 @@ object AppLock {
         fun ask() {
             if (asking) return
             asking = true
-            prompt(activity, { credential.launch(it) }) { result ->
+            prompt(activity, R.string.lock_prompt_app, { credential.launch(it) }) { result ->
                 asking = false
                 when (result) {
                     Result.OK -> {

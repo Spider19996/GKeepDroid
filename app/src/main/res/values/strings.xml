@@ -308,4 +308,10 @@
     <string name="section_security">Security &amp; privacy</string>
     <string name="section_data">Data</string>
     <string name="lock_private_hint">Notes marked “Hide content” show only their title and ask for the device lock when opened.</string>
+    <string name="edit_list">Edit checklist</string>
+    <string name="check_on_card">Tick items directly on the cards</string>
+    <string name="lock_prompt_app">Unlock with fingerprint to open the app</string>
+    <string name="lock_prompt_edit">Unlock with fingerprint to edit notes</string>
+    <string name="lock_prompt_alt">Or use your PIN, pattern or password.</string>
+    <string name="section_look">Appearance</string>
 </resources>

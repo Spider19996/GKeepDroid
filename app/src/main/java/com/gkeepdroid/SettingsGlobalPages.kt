@@ -323,6 +323,8 @@ internal fun ColumnScope.SecurityPage(s: SettingsState) {
 @Composable
 internal fun ColumnScope.AppChecklistsPage(s: SettingsState) {
     with(s) {
+        SwitchRow(R.string.check_on_card, appListCheckInApp) { appListCheckInApp = it }
+        if (appListCheckInApp) SwitchRow(R.string.delete_checked, appListDeleteChecked) { appListDeleteChecked = it }
         SwitchRow(R.string.checked_to_end, appListCheckedToEnd) { appListCheckedToEnd = it }
         if (appListCheckedToEnd) SwitchRow(R.string.collapse_checked, appListCollapseChecked) { appListCollapseChecked = it }
         HorizontalDivider(Modifier.padding(vertical = 4.dp))

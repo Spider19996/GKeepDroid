@@ -74,7 +74,7 @@ class SearchActivity : ComponentActivity() {
         // A hidden note is found by its title only, and shows no text.
         val results = remember(query) {
             notes.filter { note ->
-                if (PrivateNotes.key(account, note.id) in privateKeys) note.copy(text = "", items = emptyList()).matches(query) else note.matches(query)
+                if (PrivateNotes.isPrivate(note, account, privateKeys)) note.copy(text = "", items = emptyList()).matches(query) else note.matches(query)
             }
         }
         val untitled = stringResource(R.string.untitled_note)
@@ -106,7 +106,7 @@ class SearchActivity : ComponentActivity() {
 
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(results, key = { it.id }) { note ->
-                    ResultCard(note, query, untitled, PrivateNotes.key(account, note.id) in privateKeys) {
+                    ResultCard(note, query, untitled, PrivateNotes.isPrivate(note, account, privateKeys)) {
                         startActivity(
                             Intent(this@SearchActivity, EditNoteActivity::class.java)
                                 .putExtra(EditNoteActivity.EXTRA_NOTE_ID, note.id)

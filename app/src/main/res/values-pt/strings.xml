@@ -305,4 +305,10 @@
     <string name="section_security">Segurança e privacidade</string>
     <string name="section_data">Dados</string>
     <string name="lock_private_hint">As notas marcadas com «Ocultar conteúdo» mostram só o título e pedem o bloqueio do dispositivo ao abrir.</string>
+    <string name="edit_list">Editar lista</string>
+    <string name="check_on_card">Marcar itens diretamente nos cartões</string>
+    <string name="lock_prompt_app">Desbloqueie com a impressão digital para abrir a app</string>
+    <string name="lock_prompt_edit">Desbloqueie com a impressão digital para editar notas</string>
+    <string name="lock_prompt_alt">Ou use o PIN, padrão ou palavra-passe.</string>
+    <string name="section_look">Aparência</string>
 </resources>

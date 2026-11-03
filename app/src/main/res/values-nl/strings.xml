@@ -305,4 +305,10 @@
     <string name="section_security">Beveiliging en privacy</string>
     <string name="section_data">Gegevens</string>
     <string name="lock_private_hint">Notities met “Inhoud verbergen” tonen alleen hun titel en vragen bij openen om de schermvergrendeling.</string>
+    <string name="edit_list">Checklist bewerken</string>
+    <string name="check_on_card">Items direct op de kaarten afvinken</string>
+    <string name="lock_prompt_app">Ontgrendel met vingerafdruk om de app te openen</string>
+    <string name="lock_prompt_edit">Ontgrendel met vingerafdruk om notities te bewerken</string>
+    <string name="lock_prompt_alt">Of gebruik je pincode, patroon of wachtwoord.</string>
+    <string name="section_look">Uiterlijk</string>
 </resources>

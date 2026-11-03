@@ -238,7 +238,7 @@ object MarkdownSync {
                 try {
                     KeepRepository.run(
                         context, account, "update_note",
-                        KeepRepository.updateNoteArgs(note.id, parsed.title, parsed.text, items, parsed.color ?: NoteColors.DEFAULT, parsed.pinned ?: false, emptyList(), parsed.labels ?: note.labels),
+                        KeepRepository.updateNoteArgs(note.id, parsed.title, parsed.text, items, parsed.color ?: NoteColors.DEFAULT, parsed.pinned ?: false, emptyList(), withHiddenLabel(parsed.labels ?: note.labels, note.hidden)),
                     )
                 } catch (e: Exception) {
                     continue // Probably no connection: the file stays as it is and is tried again.

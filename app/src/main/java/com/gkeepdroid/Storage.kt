@@ -30,8 +30,18 @@ data class KeepNote(
     val created: Long = 0,
     /** "active", or "archived" / "trashed" for notes that are only listed in the app. */
     val state: String = "active",
+    /** Without the hidden mark, which is not a label for the user (see [HIDDEN_LABEL]). */
     val labels: List<String> = emptyList(),
+    /** Marked "hide content": the note carries [HIDDEN_LABEL] in Keep, so every device hides it. */
+    val hidden: Boolean = false,
 )
+
+/** The special label that marks hidden notes in Keep, so devices with the same account share the mark. It never shows as a label. */
+const val HIDDEN_LABEL = "GKeepDroid hidden"
+
+/** The labels to send to Keep: the note's own, plus the hidden mark when it is hidden. */
+fun withHiddenLabel(labels: List<String>, hidden: Boolean): List<String> =
+    if (hidden) (labels + HIDDEN_LABEL).distinct() else labels
 
 const val PLAIN_TRANSPARENT = 0
 const val PLAIN_GRAY = 1
@@ -457,6 +467,9 @@ object PrivateNotes {
 
     fun key(account: String, noteId: String) = "$account|$noteId"
 
+    /** Hidden by the mark in Keep, or by the older mark that only this phone knows. */
+    fun isPrivate(note: KeepNote, account: String, keys: Set<String>) = note.hidden || key(account, note.id) in keys
+
     fun load(context: Context): Set<String> = prefs(context).getStringSet("keys", null)?.toSet().orEmpty()
 
     /** Changes whenever a note is hidden or shown, so open screens redraw their cards at once. */
@@ -634,7 +647,7 @@ object NotesCache {
         if (email == null) return emptyList()
         return try {
             val f = labelsFile(context, email)
-            if (f.exists()) JSONArray(f.readText()).let { a -> (0 until a.length()).map { a.getString(it) } } else emptyList()
+            if (f.exists()) JSONArray(f.readText()).let { a -> (0 until a.length()).map { a.getString(it) } }.filter { it != HIDDEN_LABEL } else emptyList()
         } catch (e: JSONException) {
             emptyList()
         }
@@ -691,7 +704,9 @@ object NotesCache {
             updated = o.optLong("updated"),
             created = o.optLong("created"),
             state = o.optString("state", "active"),
-            labels = o.optJSONArray("labels")?.let { a -> (0 until a.length()).map { a.getString(it) } }.orEmpty(),
+            labels = o.optJSONArray("labels")?.let { a -> (0 until a.length()).map { a.getString(it) } }.orEmpty()
+                .filter { it != HIDDEN_LABEL },
+            hidden = o.optJSONArray("labels")?.let { a -> (0 until a.length()).any { a.getString(it) == HIDDEN_LABEL } } ?: false,
         )
     }
 }
@@ -781,6 +796,9 @@ data class AppSettings(
     val listCheckboxStyle: Int = CB_CLASSIC,
     val listCheckboxSizeDp: Int = 18,
     val listSpacingDp: Int = 2,
+    /** Tap a box on a card to tick the item; with [listDeleteChecked] the ticked item is removed instead. */
+    val listCheckInApp: Boolean = true,
+    val listDeleteChecked: Boolean = false,
 )
 
 object AppSettingsStore {
@@ -811,6 +829,8 @@ object AppSettingsStore {
             listCheckboxStyle = p.getInt("list_checkbox_style", d.listCheckboxStyle),
             listCheckboxSizeDp = p.getInt("list_checkbox_size_dp", d.listCheckboxSizeDp),
             listSpacingDp = p.getInt("list_spacing_dp", d.listSpacingDp),
+            listCheckInApp = p.getBoolean("list_check_in_app", d.listCheckInApp),
+            listDeleteChecked = p.getBoolean("list_delete_checked", d.listDeleteChecked),
         )
     }
 
@@ -837,6 +857,8 @@ object AppSettingsStore {
             .putInt("list_checkbox_style", s.listCheckboxStyle)
             .putInt("list_checkbox_size_dp", s.listCheckboxSizeDp)
             .putInt("list_spacing_dp", s.listSpacingDp)
+            .putBoolean("list_check_in_app", s.listCheckInApp)
+            .putBoolean("list_delete_checked", s.listDeleteChecked)
             .apply()
     }
 }

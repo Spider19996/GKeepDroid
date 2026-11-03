@@ -193,7 +193,7 @@ object Reminders {
         val manager = context.getSystemService(NotificationManager::class.java)
         NotificationChannels.create(context)
         // A private note keeps its text out of the notification.
-        val hidden = PrivateNotes.key(account, noteId) in PrivateNotes.load(context)
+        val hidden = PrivateNotes.isPrivate(note, account, PrivateNotes.load(context))
         val title = note.title.ifBlank { context.getString(R.string.reminder) }
         val body = if (hidden) "" else note.text.ifBlank { note.items.joinToString("\n") { it.text } }.take(200)
         val open = PendingIntent.getActivity(

@@ -305,4 +305,10 @@
     <string name="section_security">Bezpieczeństwo i prywatność</string>
     <string name="section_data">Dane</string>
     <string name="lock_private_hint">Notatki oznaczone „Ukryj treść” pokazują tylko tytuł i przy otwarciu proszą o blokadę urządzenia.</string>
+    <string name="edit_list">Edytuj listę</string>
+    <string name="check_on_card">Odhaczaj pozycje bezpośrednio na kartach</string>
+    <string name="lock_prompt_app">Odblokuj odciskiem palca, aby otworzyć aplikację</string>
+    <string name="lock_prompt_edit">Odblokuj odciskiem palca, aby edytować notatki</string>
+    <string name="lock_prompt_alt">Lub użyj PIN-u, wzoru albo hasła.</string>
+    <string name="section_look">Wygląd</string>
 </resources>

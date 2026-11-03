@@ -305,4 +305,10 @@
     <string name="section_security">Sécurité et confidentialité</string>
     <string name="section_data">Données</string>
     <string name="lock_private_hint">Les notes marquées « Masquer les contenus » n’affichent que leur titre et demandent le verrouillage de l’appareil à l’ouverture.</string>
+    <string name="edit_list">Modifier la liste</string>
+    <string name="check_on_card">Cocher les éléments directement sur les cartes</string>
+    <string name="lock_prompt_app">Déverrouiller avec l’empreinte pour ouvrir l’application</string>
+    <string name="lock_prompt_edit">Déverrouiller avec l’empreinte pour modifier les notes</string>
+    <string name="lock_prompt_alt">Ou utilisez votre code PIN, schéma ou mot de passe.</string>
+    <string name="section_look">Apparence</string>
 </resources>

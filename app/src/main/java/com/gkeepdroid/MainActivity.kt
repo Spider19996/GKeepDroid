@@ -98,6 +98,9 @@ class MainActivity : ComponentActivity() {
         setContent { KeepTheme(themeMode) { AppLock.Gate(this) { NotesApp() } } }
     }
 
+    // The cards ask for the lock through this, so only one result launcher exists for all of them.
+    private var unlocker: ((Int, (Boolean) -> Unit) -> Unit)? = null
+
     override fun onResume() {
         super.onResume()
         // Coming back from the editor or the settings: re-read the cache and the theme.
@@ -136,9 +139,11 @@ class MainActivity : ComponentActivity() {
                 reloadKey++
             }
         }
+        val unlock = AppLock.rememberUnlock(this@MainActivity)
+        unlocker = unlock
         fun act(block: suspend () -> Unit) {
             if (!AppLock.editAllowed(this@MainActivity)) {
-                AppLock.unlockEdit(this@MainActivity) { ok -> if (ok) act(block) }
+                unlock(R.string.lock_prompt_edit) { ok -> if (ok) act(block) }
                 return
             }
             scope.launch {
@@ -606,6 +611,21 @@ class MainActivity : ComponentActivity() {
         actions: (@Composable () -> Unit)? = null,
     ) {
         val context = LocalContext.current
+        val scope = rememberCoroutineScope()
+        /** Ticks the item right on the card (or removes it): shown at once, sent to Keep a few seconds later. */
+        fun toggleItem(item: KeepItem) {
+            fun apply() {
+                val checked = !item.checked
+                val delete = app.listDeleteChecked && checked
+                PendingToggles.add(context, PendingToggle(account, note.id, item.id, checked, delete))
+                if (delete) NotesCache.removeItem(context, account, note.id, item.id)
+                else NotesCache.setChecked(context, account, note.id, item.id, checked)
+                NotesCache.version.intValue++
+                scope.launch { WidgetRefresh.all(context) }
+                ToggleItemWorker.schedule(context, account)
+            }
+            if (AppLock.editAllowed(this@MainActivity)) apply() else unlocker?.invoke(R.string.lock_prompt_edit) { if (it) apply() }
+        }
         val noteColor = if (app.showNoteColors) NoteColors.argb(note.color) else null
         val gray = noteColor == null && app.plainCardStyle == PLAIN_GRAY
         val textColor = when {
@@ -621,7 +641,7 @@ class MainActivity : ComponentActivity() {
         }
         val shape = RoundedCornerShape(14.dp)
         // A private note shows only its title until it is opened with the device lock.
-        val hidden = PrivateNotes.key(account, note.id) in remember(PrivateNotes.version.intValue) { PrivateNotes.load(context) }
+        val hidden = PrivateNotes.isPrivate(note, account, remember(PrivateNotes.version.intValue) { PrivateNotes.load(context) })
         val thumb = remember(note.id, note.images.firstOrNull(), app.showImages, hidden) {
             if (app.showImages && !hidden) note.images.firstOrNull()?.let { NoteImages.thumbnail(context, account, it) } else null
         }
@@ -706,7 +726,9 @@ class MainActivity : ComponentActivity() {
                 val visible = if (app.listCheckedToEnd && app.listCollapseChecked) open else ordered
                 visible.take(lines).forEach { item ->
                     Row(Modifier.padding(vertical = (app.listSpacingDp / 2f).dp), verticalAlignment = Alignment.CenterVertically) {
-                        CheckboxPreview(app.listCheckboxStyle, item.checked, app.listCheckboxSizeDp, textColor.copy(alpha = if (item.checked) 0.55f else 1f))
+                        Box(Modifier.clickable(enabled = app.listCheckInApp) { toggleItem(item) }.padding(2.dp)) {
+                            CheckboxPreview(app.listCheckboxStyle, item.checked, app.listCheckboxSizeDp, textColor.copy(alpha = if (item.checked) 0.55f else 1f))
+                        }
                         Text(
                             item.text,
                             color = if (item.checked) textColor.copy(alpha = 0.55f) else textColor,

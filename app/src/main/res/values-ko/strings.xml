@@ -305,4 +305,10 @@
     <string name="section_security">보안 및 개인정보</string>
     <string name="section_data">데이터</string>
     <string name="lock_private_hint">‘내용 숨기기’로 표시한 메모는 제목만 보이고 열 때 기기 잠금을 요구합니다.</string>
+    <string name="edit_list">체크리스트 편집</string>
+    <string name="check_on_card">카드에서 바로 항목 체크</string>
+    <string name="lock_prompt_app">지문으로 잠금을 해제하여 앱 열기</string>
+    <string name="lock_prompt_edit">지문으로 잠금을 해제하여 메모 편집</string>
+    <string name="lock_prompt_alt">또는 PIN, 패턴 또는 비밀번호를 사용하세요.</string>
+    <string name="section_look">모양</string>
 </resources>

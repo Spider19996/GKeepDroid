@@ -305,4 +305,10 @@
     <string name="section_security">Güvenlik ve gizlilik</string>
     <string name="section_data">Veri</string>
     <string name="lock_private_hint">“İçeriği gizle” işaretli notlar yalnızca başlığı gösterir ve açılırken cihaz kilidini ister.</string>
+    <string name="edit_list">Listeyi düzenle</string>
+    <string name="check_on_card">Öğeleri doğrudan kartlarda işaretle</string>
+    <string name="lock_prompt_app">Uygulamayı açmak için parmak iziyle kilidi açın</string>
+    <string name="lock_prompt_edit">Notları düzenlemek için parmak iziyle kilidi açın</string>
+    <string name="lock_prompt_alt">Veya PIN, desen ya da parolanızı kullanın.</string>
+    <string name="section_look">Görünüm</string>
 </resources>

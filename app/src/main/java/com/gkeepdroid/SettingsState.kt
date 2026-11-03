@@ -63,6 +63,8 @@ internal class SettingsState(val context: SettingsActivity) {
     var appListCheckboxStyle by mutableIntStateOf(initialApp.listCheckboxStyle)
     var appListCheckboxSize by mutableIntStateOf(initialApp.listCheckboxSizeDp)
     var appListSpacing by mutableIntStateOf(initialApp.listSpacingDp)
+    var appListCheckInApp by mutableStateOf(initialApp.listCheckInApp)
+    var appListDeleteChecked by mutableStateOf(initialApp.listDeleteChecked)
     val initialGlobal = SettingsStore.loadGlobal(context)
     val initialWidget = SettingsStore.loadWidget(context, context.appWidgetId)
     val accounts = mutableStateListOf<String>().apply { addAll(CredentialStore.accounts(context)) }
@@ -204,6 +206,7 @@ internal class SettingsState(val context: SettingsActivity) {
     fun currentApp() = AppSettings(
         appLayout, appSort, appPinnedSection, appShowImages, appShowColors, appPlainStyle, appPreviewLines, appShowEdited, appEditedAsDate, appShowLabels, appShowProgress, appLockPrivate, appLockApp, appLockEdit, appLockGrace,
         appShowReminders, appListCheckedToEnd, appListCollapseChecked, appListCheckboxStyle, appListCheckboxSize, appListSpacing,
+        appListCheckInApp, appListDeleteChecked,
     )
 
     fun refreshAccounts() {

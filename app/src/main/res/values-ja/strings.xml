@@ -305,4 +305,10 @@
     <string name="section_security">セキュリティとプライバシー</string>
     <string name="section_data">データ</string>
     <string name="lock_private_hint">「内容を隠す」にしたメモはタイトルのみ表示され、開くときにデバイスのロックを求めます。</string>
+    <string name="edit_list">チェックリストを編集</string>
+    <string name="check_on_card">カード上で直接項目にチェックを付ける</string>
+    <string name="lock_prompt_app">指紋でロック解除してアプリを開く</string>
+    <string name="lock_prompt_edit">指紋でロック解除してメモを編集する</string>
+    <string name="lock_prompt_alt">またはPIN、パターン、パスワードを使用します。</string>
+    <string name="section_look">外観</string>
 </resources>

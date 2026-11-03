@@ -311,7 +311,26 @@ class SettingsActivity : ComponentActivity() {
                     Text(
                         stringResource(if (page == Page.Main && !hasWidget) R.string.menu_settings else page.title),
                         style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier.weight(1f),
                     )
+                    // Rarely needed: the demo mode for screenshots lives in a menu of its own.
+                    if (page == Page.Main && !hasWidget) {
+                        var menuOpen by remember { androidx.compose.runtime.mutableStateOf(false) }
+                        androidx.compose.foundation.layout.Box {
+                            androidx.compose.material3.IconButton(onClick = { menuOpen = true }) {
+                                androidx.compose.material3.Icon(
+                                    androidx.compose.ui.res.painterResource(R.drawable.ic_more_vert),
+                                    contentDescription = stringResource(R.string.more_actions),
+                                )
+                            }
+                            androidx.compose.material3.DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                                androidx.compose.material3.DropdownMenuItem(
+                                    text = { Text((if (state.demoMode) "✓ " else "") + stringResource(R.string.demo_mode)) },
+                                    onClick = { menuOpen = false; state.demoMode = !state.demoMode },
+                                )
+                            }
+                        }
+                    }
                 }
                 HorizontalDivider()
 

@@ -305,4 +305,10 @@
     <string name="section_security">الأمان والخصوصية</string>
     <string name="section_data">البيانات</string>
     <string name="lock_private_hint">تعرض الملاحظات المعلّمة «إخفاء المحتوى» عنوانها فقط وتطلب قفل الجهاز عند الفتح.</string>
+    <string name="edit_list">تعديل قائمة المراجعة</string>
+    <string name="check_on_card">تحديد العناصر مباشرة على البطاقات</string>
+    <string name="lock_prompt_app">افتح القفل بالبصمة لفتح التطبيق</string>
+    <string name="lock_prompt_edit">افتح القفل بالبصمة لتعديل الملاحظات</string>
+    <string name="lock_prompt_alt">أو استخدم رمز PIN أو النمط أو كلمة المرور.</string>
+    <string name="section_look">المظهر</string>
 </resources>

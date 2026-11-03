@@ -305,4 +305,10 @@
     <string name="section_security">Безопасность и конфиденциальность</string>
     <string name="section_data">Данные</string>
     <string name="lock_private_hint">Заметки с пометкой «Скрыть содержимое» показывают только заголовок и при открытии запрашивают блокировку устройства.</string>
+    <string name="edit_list">Редактировать список</string>
+    <string name="check_on_card">Отмечать пункты прямо на карточках</string>
+    <string name="lock_prompt_app">Разблокируйте отпечатком, чтобы открыть приложение</string>
+    <string name="lock_prompt_edit">Разблокируйте отпечатком, чтобы редактировать заметки</string>
+    <string name="lock_prompt_alt">Или используйте PIN-код, ключ или пароль.</string>
+    <string name="section_look">Оформление</string>
 </resources>

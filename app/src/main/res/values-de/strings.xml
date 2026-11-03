@@ -305,4 +305,10 @@
     <string name="section_security">Sicherheit &amp; Datenschutz</string>
     <string name="section_data">Daten</string>
     <string name="lock_private_hint">Als „Inhalte ausblenden“ markierte Notizen zeigen nur den Titel und fragen beim Öffnen nach der Gerätesperre.</string>
+    <string name="edit_list">Checkliste bearbeiten</string>
+    <string name="check_on_card">Einträge direkt auf der Karte abhaken</string>
+    <string name="lock_prompt_app">Zum Öffnen der App mit Fingerabdruck entsperren</string>
+    <string name="lock_prompt_edit">Zum Bearbeiten von Notizen mit Fingerabdruck entsperren</string>
+    <string name="lock_prompt_alt">Alternativ mit PIN, Muster oder Passwort.</string>
+    <string name="section_look">Aussehen</string>
 </resources>

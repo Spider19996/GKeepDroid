@@ -305,4 +305,10 @@
     <string name="section_security">Sicurezza e privacy</string>
     <string name="section_data">Dati</string>
     <string name="lock_private_hint">Le note contrassegnate con «Nascondi contenuti» mostrano solo il titolo e chiedono il blocco del dispositivo all’apertura.</string>
+    <string name="edit_list">Modifica checklist</string>
+    <string name="check_on_card">Spunta le voci direttamente sulle schede</string>
+    <string name="lock_prompt_app">Sblocca con l’impronta per aprire l’app</string>
+    <string name="lock_prompt_edit">Sblocca con l’impronta per modificare le note</string>
+    <string name="lock_prompt_alt">Oppure usa PIN, sequenza o password.</string>
+    <string name="section_look">Aspetto</string>
 </resources>

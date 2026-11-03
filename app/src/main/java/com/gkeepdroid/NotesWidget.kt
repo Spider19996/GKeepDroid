@@ -129,7 +129,7 @@ class NotesWidget : GlanceAppWidget() {
                         NoteCard(
                             appWidgetId, note, account.orEmpty(), settings, collapsed, thumbs[note.id], contentWidth,
                             reordering = reordering, canMoveUp = index > 0, canMoveDown = index < notes.lastIndex,
-                            isPrivate = PrivateNotes.key(account.orEmpty(), note.id) in privateKeys,
+                            isPrivate = PrivateNotes.isPrivate(note, account.orEmpty(), privateKeys),
                         )
                     }
                 }
