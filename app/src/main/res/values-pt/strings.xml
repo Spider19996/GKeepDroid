@@ -311,4 +311,8 @@
     <string name="lock_prompt_edit">Desbloqueie com a impressão digital para editar notas</string>
     <string name="lock_prompt_alt">Ou use o PIN, padrão ou palavra-passe.</string>
     <string name="section_look">Aparência</string>
+    <string name="lock_widget_grace">Marcar no widget: não pedir novamente durante</string>
+    <string name="lock_widget_grace_hint">Tocar numa caixa no widget abre uma pequena janela de desbloqueio; depois podem marcar-se mais itens durante este tempo.</string>
+    <string name="widget_titles_only">Os widgets mostram só títulos</string>
+    <string name="widget_titles_only_hint">Com o bloqueio da app, os widgets ocultam o conteúdo de todas as notas; tocar abre a app bloqueada.</string>
 </resources>

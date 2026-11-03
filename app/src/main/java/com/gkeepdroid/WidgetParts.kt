@@ -463,13 +463,14 @@ internal fun ItemRow(note: KeepNote, item: KeepItem, account: String, settings: 
     val pad = settings.listSpacingDp.dp
     val itemColor = palette.provider(if (item.checked) 0.55f else 1f)
     val tick = if (settings.checkable && item.id.isNotEmpty()) {
-        actionRunCallback<ToggleItemAction>(
-            actionParametersOf(
-                NoteIdKey to note.id, ItemIdKey to item.id, AccountKey to account, CheckedKey to !item.checked,
-                // Ticking an open item deletes it when the widget is set to remove checked items.
-                DeleteKey to (settings.deleteChecked && !item.checked),
-            )
+        val parameters = actionParametersOf(
+            NoteIdKey to note.id, ItemIdKey to item.id, AccountKey to account, CheckedKey to !item.checked,
+            // Ticking an open item deletes it when the widget is set to remove checked items.
+            DeleteKey to (settings.deleteChecked && !item.checked),
         )
+        // With the edit lock on, a small window asks for the lock first.
+        if (AppLock.editLockOn(androidx.glance.LocalContext.current)) actionStartActivity<UnlockTickActivity>(parameters)
+        else actionRunCallback<ToggleItemAction>(parameters)
     } else {
         null
     }
@@ -612,16 +613,20 @@ class ToggleItemAction : ActionCallback {
         val itemId = parameters[ItemIdKey] ?: return
         val checked = parameters[CheckedKey] ?: return
         val delete = parameters[DeleteKey] ?: false
-        // Instant local change; Keep is updated a few seconds after the last tick.
-        PendingToggles.add(context, PendingToggle(account, noteId, itemId, checked, delete))
-        val changed = if (delete) {
-            NotesCache.removeItem(context, account, noteId, itemId)
-        } else {
-            NotesCache.setChecked(context, account, noteId, itemId, checked)
-        }
-        if (changed) WidgetRefresh.all(context)
-        ToggleItemWorker.schedule(context, account)
+        applyTick(context, account, noteId, itemId, checked, delete)
     }
+}
+
+/** Instant local change; Keep is updated a few seconds after the last tick. */
+internal suspend fun applyTick(context: Context, account: String, noteId: String, itemId: String, checked: Boolean, delete: Boolean) {
+    PendingToggles.add(context, PendingToggle(account, noteId, itemId, checked, delete))
+    val changed = if (delete) {
+        NotesCache.removeItem(context, account, noteId, itemId)
+    } else {
+        NotesCache.setChecked(context, account, noteId, itemId, checked)
+    }
+    if (changed) WidgetRefresh.all(context)
+    ToggleItemWorker.schedule(context, account)
 }
 
 class ToggleCollapseAction : ActionCallback {

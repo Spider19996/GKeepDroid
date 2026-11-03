@@ -311,4 +311,8 @@
     <string name="lock_prompt_edit">Déverrouiller avec l’empreinte pour modifier les notes</string>
     <string name="lock_prompt_alt">Ou utilisez votre code PIN, schéma ou mot de passe.</string>
     <string name="section_look">Apparence</string>
+    <string name="lock_widget_grace">Cocher dans le widget : ne pas redemander pendant</string>
+    <string name="lock_widget_grace_hint">Un appui sur une case dans le widget ouvre une petite fenêtre de déverrouillage ; ensuite, d’autres éléments peuvent être cochés pendant ce temps.</string>
+    <string name="widget_titles_only">Les widgets n’affichent que les titres</string>
+    <string name="widget_titles_only_hint">Avec le verrouillage de l’application, les widgets masquent le contenu de toutes les notes ; un appui ouvre l’application verrouillée.</string>
 </resources>

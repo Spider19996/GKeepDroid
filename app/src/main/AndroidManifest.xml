@@ -70,6 +70,14 @@
             android:theme="@style/Theme.GKeepDroid.Translucent"
             android:windowSoftInputMode="stateVisible|adjustResize" />
 
+        <!-- Asks for the edit lock when a checkbox in a widget is tapped. -->
+        <activity
+            android:name=".UnlockTickActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.GKeepDroid.Translucent" />
+
         <!-- The reminders of one note, opened from a widget. -->
         <activity
             android:name=".RemindersActivity"

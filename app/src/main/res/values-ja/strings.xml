@@ -311,4 +311,8 @@
     <string name="lock_prompt_edit">指紋でロック解除してメモを編集する</string>
     <string name="lock_prompt_alt">またはPIN、パターン、パスワードを使用します。</string>
     <string name="section_look">外観</string>
+    <string name="lock_widget_grace">ウィジェットでのチェック：再確認までの時間</string>
+    <string name="lock_widget_grace_hint">ウィジェットのチェックボックスをタップすると小さなロック解除画面が開き、その後この時間内は続けてチェックできます。</string>
+    <string name="widget_titles_only">ウィジェットはタイトルのみ表示</string>
+    <string name="widget_titles_only_hint">アプリのロック中は、ウィジェットがすべてのメモの内容を隠します。タップするとロックされたアプリが開きます。</string>
 </resources>

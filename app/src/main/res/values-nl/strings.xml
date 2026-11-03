@@ -311,4 +311,8 @@
     <string name="lock_prompt_edit">Ontgrendel met vingerafdruk om notities te bewerken</string>
     <string name="lock_prompt_alt">Of gebruik je pincode, patroon of wachtwoord.</string>
     <string name="section_look">Uiterlijk</string>
+    <string name="lock_widget_grace">Afvinken in widget: niet opnieuw vragen binnen</string>
+    <string name="lock_widget_grace_hint">Een tik op een selectievakje in de widget opent een klein ontgrendelvenster; daarna kunnen in deze tijd meer items worden afgevinkt.</string>
+    <string name="widget_titles_only">Widgets tonen alleen titels</string>
+    <string name="widget_titles_only_hint">Met de app-vergrendeling verbergen widgets de inhoud van alle notities; tikken opent de vergrendelde app.</string>
 </resources>

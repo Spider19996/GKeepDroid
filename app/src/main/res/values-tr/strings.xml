@@ -311,4 +311,8 @@
     <string name="lock_prompt_edit">Notları düzenlemek için parmak iziyle kilidi açın</string>
     <string name="lock_prompt_alt">Veya PIN, desen ya da parolanızı kullanın.</string>
     <string name="section_look">Görünüm</string>
+    <string name="lock_widget_grace">Widget’ta işaretleme: şu süre içinde tekrar sorma</string>
+    <string name="lock_widget_grace_hint">Widget’taki bir kutuya dokunmak küçük bir kilit açma penceresi açar; ardından bu süre boyunca başka öğeler işaretlenebilir.</string>
+    <string name="widget_titles_only">Widget’lar yalnızca başlıkları gösterir</string>
+    <string name="widget_titles_only_hint">Uygulama kilidi açıkken widget’lar tüm notların içeriğini gizler; dokunmak kilitli uygulamayı açar.</string>
 </resources>

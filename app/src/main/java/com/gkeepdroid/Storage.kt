@@ -799,6 +799,10 @@ data class AppSettings(
     /** Tap a box on a card to tick the item; with [listDeleteChecked] the ticked item is removed instead. */
     val listCheckInApp: Boolean = true,
     val listDeleteChecked: Boolean = false,
+    /** Ticking in a widget with the edit lock on: seconds during which the lock is not asked again. */
+    val lockWidgetGraceSec: Int = 10,
+    /** While the whole app is locked, widgets show only the titles. */
+    val widgetTitlesOnly: Boolean = false,
 )
 
 object AppSettingsStore {
@@ -831,6 +835,8 @@ object AppSettingsStore {
             listSpacingDp = p.getInt("list_spacing_dp", d.listSpacingDp),
             listCheckInApp = p.getBoolean("list_check_in_app", d.listCheckInApp),
             listDeleteChecked = p.getBoolean("list_delete_checked", d.listDeleteChecked),
+            lockWidgetGraceSec = p.getInt("lock_widget_grace_sec", d.lockWidgetGraceSec),
+            widgetTitlesOnly = p.getBoolean("widget_titles_only", d.widgetTitlesOnly),
         )
     }
 
@@ -859,6 +865,8 @@ object AppSettingsStore {
             .putInt("list_spacing_dp", s.listSpacingDp)
             .putBoolean("list_check_in_app", s.listCheckInApp)
             .putBoolean("list_delete_checked", s.listDeleteChecked)
+            .putInt("lock_widget_grace_sec", s.lockWidgetGraceSec)
+            .putBoolean("widget_titles_only", s.widgetTitlesOnly)
             .apply()
     }
 }

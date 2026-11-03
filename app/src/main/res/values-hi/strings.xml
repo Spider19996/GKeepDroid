@@ -311,4 +311,8 @@
     <string name="lock_prompt_edit">नोट संपादित करने के लिए फ़िंगरप्रिंट से अनलॉक करें</string>
     <string name="lock_prompt_alt">या अपना PIN, पैटर्न या पासवर्ड इस्तेमाल करें।</string>
     <string name="section_look">रूप-रंग</string>
+    <string name="lock_widget_grace">विजेट में टिक: इतने समय तक दोबारा न पूछें</string>
+    <string name="lock_widget_grace_hint">विजेट में चेकबॉक्स दबाने पर छोटी अनलॉक विंडो खुलती है; उसके बाद इस समय तक और आइटम टिक किए जा सकते हैं।</string>
+    <string name="widget_titles_only">विजेट केवल शीर्षक दिखाते हैं</string>
+    <string name="widget_titles_only_hint">ऐप लॉक चालू होने पर विजेट सभी नोट की सामग्री छिपाते हैं; टैप करने पर लॉक ऐप खुलता है।</string>
 </resources>

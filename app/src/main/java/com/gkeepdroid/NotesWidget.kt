@@ -75,6 +75,7 @@ class NotesWidget : GlanceAppWidget() {
         val collapsed = remember(version) { CollapseStore.load(context) }
         val reordering = remember(version) { SettingsStore.isReordering(context, appWidgetId) }
         val privateKeys = remember(version) { PrivateNotes.load(context) }
+        val hideAll = remember(version) { AppSettingsStore.load(context).let { it.lockApp && it.widgetTitlesOnly } }
         val thumbs = remember(version) {
             val result = HashMap<String, Bitmap?>()
             if (settings.showImages && account != null) {
@@ -90,7 +91,7 @@ class NotesWidget : GlanceAppWidget() {
             }
             result
         }
-        Content(appWidgetId, account, notes, settings, collapsed, thumbs, reordering, privateKeys)
+        Content(appWidgetId, account, notes, settings, collapsed, thumbs, reordering, privateKeys, hideAll)
     }
 
     @Composable
@@ -103,6 +104,7 @@ class NotesWidget : GlanceAppWidget() {
         thumbs: Map<String, Bitmap?>,
         reordering: Boolean,
         privateKeys: Set<String>,
+        hideAll: Boolean,
     ) {
         val context = LocalContext.current
         // Widget padding (8 dp each side) and card padding (8 dp each side) are left free for the image.
@@ -129,7 +131,7 @@ class NotesWidget : GlanceAppWidget() {
                         NoteCard(
                             appWidgetId, note, account.orEmpty(), settings, collapsed, thumbs[note.id], contentWidth,
                             reordering = reordering, canMoveUp = index > 0, canMoveDown = index < notes.lastIndex,
-                            isPrivate = PrivateNotes.isPrivate(note, account.orEmpty(), privateKeys),
+                            isPrivate = hideAll || PrivateNotes.isPrivate(note, account.orEmpty(), privateKeys),
                         )
                     }
                 }

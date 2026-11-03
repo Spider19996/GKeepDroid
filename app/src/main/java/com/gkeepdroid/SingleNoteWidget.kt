@@ -68,6 +68,7 @@ class SingleNoteWidget : GlanceAppWidget() {
         val note = remember(version) { NotesCache.read(context, account).firstOrNull { it.id == settings.noteId } }
         val collapsedByNote = remember(version) { CollapseStore.load(context) }
         val privateKeys = remember(version) { PrivateNotes.load(context) }
+        val hideAll = remember(version) { AppSettingsStore.load(context).let { it.lockApp && it.widgetTitlesOnly } }
         val thumb = remember(version) {
             if (settings.showImages && note != null && account != null) {
                 note.images.firstOrNull()?.let { NoteImages.thumbnail(context, account, it) }
@@ -107,7 +108,7 @@ class SingleNoteWidget : GlanceAppWidget() {
                 )
                 else -> NoteBody(
                     note, account, settings, palette, thumb, collapsedByNote,
-                    isPrivate = PrivateNotes.isPrivate(note, account, privateKeys),
+                    isPrivate = hideAll || PrivateNotes.isPrivate(note, account, privateKeys),
                 )
             }
         }

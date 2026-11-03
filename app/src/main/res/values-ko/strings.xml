@@ -311,4 +311,8 @@
     <string name="lock_prompt_edit">지문으로 잠금을 해제하여 메모 편집</string>
     <string name="lock_prompt_alt">또는 PIN, 패턴 또는 비밀번호를 사용하세요.</string>
     <string name="section_look">모양</string>
+    <string name="lock_widget_grace">위젯에서 체크: 다시 묻지 않는 시간</string>
+    <string name="lock_widget_grace_hint">위젯의 체크박스를 누르면 작은 잠금 해제 창이 열리고, 이후 이 시간 동안 다른 항목을 체크할 수 있습니다.</string>
+    <string name="widget_titles_only">위젯에 제목만 표시</string>
+    <string name="widget_titles_only_hint">앱 잠금이 켜져 있으면 위젯이 모든 메모의 내용을 숨기며, 누르면 잠긴 앱이 열립니다.</string>
 </resources>

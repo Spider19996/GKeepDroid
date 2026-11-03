@@ -311,4 +311,8 @@
     <string name="lock_prompt_edit">Odblokuj odciskiem palca, aby edytować notatki</string>
     <string name="lock_prompt_alt">Lub użyj PIN-u, wzoru albo hasła.</string>
     <string name="section_look">Wygląd</string>
+    <string name="lock_widget_grace">Odhaczanie w widżecie: nie pytaj ponownie przez</string>
+    <string name="lock_widget_grace_hint">Dotknięcie pola w widżecie otwiera małe okno odblokowania; potem w tym czasie można odhaczać kolejne pozycje.</string>
+    <string name="widget_titles_only">Widżety pokazują tylko tytuły</string>
+    <string name="widget_titles_only_hint">Przy włączonej blokadzie aplikacji widżety ukrywają treść wszystkich notatek; dotknięcie otwiera zablokowaną aplikację.</string>
 </resources>

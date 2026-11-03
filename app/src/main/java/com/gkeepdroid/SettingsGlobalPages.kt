@@ -315,6 +315,14 @@ internal fun ColumnScope.SecurityPage(s: SettingsState) {
         SwitchRow(R.string.lock_edit_title, appLockEdit) { appLockEdit = it }
         Hint(R.string.lock_edit_hint)
         if (appLockApp || appLockEdit) NumberRow(R.string.app_lock_grace, appLockGrace, "s") { appLockGrace = it }
+        if (appLockEdit) {
+            NumberRow(R.string.lock_widget_grace, appWidgetGrace, "s") { appWidgetGrace = it }
+            Hint(R.string.lock_widget_grace_hint)
+        }
+        if (appLockApp) {
+            SwitchRow(R.string.widget_titles_only, appWidgetTitlesOnly) { appWidgetTitlesOnly = it }
+            Hint(R.string.widget_titles_only_hint)
+        }
 
     }
 }

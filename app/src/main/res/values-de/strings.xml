@@ -311,4 +311,8 @@
     <string name="lock_prompt_edit">Zum Bearbeiten von Notizen mit Fingerabdruck entsperren</string>
     <string name="lock_prompt_alt">Alternativ mit PIN, Muster oder Passwort.</string>
     <string name="section_look">Aussehen</string>
+    <string name="lock_widget_grace">Abhaken im Widget: nicht erneut fragen innerhalb von</string>
+    <string name="lock_widget_grace_hint">Ein Tipp auf eine Checkbox im Widget öffnet ein kleines Entsperr-Fenster; danach lassen sich in dieser Zeit weitere Einträge abhaken.</string>
+    <string name="widget_titles_only">Widgets zeigen nur Titel</string>
+    <string name="widget_titles_only_hint">Bei aktiver App-Sperre blenden Widgets den Inhalt aller Notizen aus; ein Tipp öffnet die gesperrte App.</string>
 </resources>

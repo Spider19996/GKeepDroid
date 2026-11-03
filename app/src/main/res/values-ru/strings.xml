@@ -311,4 +311,8 @@
     <string name="lock_prompt_edit">Разблокируйте отпечатком, чтобы редактировать заметки</string>
     <string name="lock_prompt_alt">Или используйте PIN-код, ключ или пароль.</string>
     <string name="section_look">Оформление</string>
+    <string name="lock_widget_grace">Отметка в виджете: не спрашивать повторно в течение</string>
+    <string name="lock_widget_grace_hint">Нажатие на флажок в виджете открывает небольшое окно разблокировки; после этого в течение этого времени можно отмечать другие пункты.</string>
+    <string name="widget_titles_only">Виджеты показывают только заголовки</string>
+    <string name="widget_titles_only_hint">При блокировке приложения виджеты скрывают содержимое всех заметок; нажатие открывает заблокированное приложение.</string>
 </resources>

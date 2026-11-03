@@ -314,4 +314,8 @@
     <string name="lock_prompt_edit">Unlock with fingerprint to edit notes</string>
     <string name="lock_prompt_alt">Or use your PIN, pattern or password.</string>
     <string name="section_look">Appearance</string>
+    <string name="lock_widget_grace">Ticking in widgets: ask again after</string>
+    <string name="lock_widget_grace_hint">Tapping a checkbox in a widget opens a small unlock window; after it is passed, more items can be ticked for this time.</string>
+    <string name="widget_titles_only">Widgets show only titles</string>
+    <string name="widget_titles_only_hint">With the app lock on, widgets hide the content of all notes; tapping opens the locked app.</string>
 </resources>

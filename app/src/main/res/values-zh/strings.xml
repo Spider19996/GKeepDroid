@@ -311,4 +311,8 @@
     <string name="lock_prompt_edit">使用指纹解锁以编辑笔记</string>
     <string name="lock_prompt_alt">或使用 PIN、图案或密码。</string>
     <string name="section_look">外观</string>
+    <string name="lock_widget_grace">在小组件中勾选：在此时间内不再询问</string>
+    <string name="lock_widget_grace_hint">点按小组件中的复选框会打开一个小的解锁窗口；通过后，在此时间内可继续勾选其他项目。</string>
+    <string name="widget_titles_only">小组件仅显示标题</string>
+    <string name="widget_titles_only_hint">开启应用锁后，小组件会隐藏所有笔记的内容；点按会打开已锁定的应用。</string>
 </resources>

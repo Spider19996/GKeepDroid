@@ -43,6 +43,7 @@ object AppLock {
 
     /** Locks at once: the next look at the app asks for the lock. */
     fun lockNow() {
+        widgetUnlockedAt = 0L
         openedOnce = false
         lockVersion.intValue++
     }
@@ -61,6 +62,22 @@ object AppLock {
         if (!settings.lockEdit || !deviceSecure(activity)) return true
         return valid(activity)
     }
+
+    private var widgetUnlockedAt = 0L
+
+    /** Ticking in a widget with the edit lock on: allowed shortly after the lock was passed there (its own time in the settings). */
+    fun widgetTickAllowed(context: android.content.Context): Boolean {
+        val settings = AppSettingsStore.load(context)
+        if (!settings.lockEdit || !deviceSecure(context)) return true
+        return widgetUnlockedAt > 0 && SystemClock.elapsedRealtime() - widgetUnlockedAt < settings.lockWidgetGraceSec * 1000L
+    }
+
+    fun markWidgetUnlocked() {
+        widgetUnlockedAt = SystemClock.elapsedRealtime()
+    }
+
+    /** True when the edit lock is on, so ticking in a widget goes through [UnlockTickActivity]. */
+    fun editLockOn(context: android.content.Context) = AppSettingsStore.load(context).lockEdit && deviceSecure(context)
 
     private var credentialCallback: ((Result) -> Unit)? = null
 
