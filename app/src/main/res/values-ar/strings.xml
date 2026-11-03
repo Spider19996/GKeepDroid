@@ -214,6 +214,12 @@
     <string name="back">رجوع</string>
     <string name="show_progress">عرض التقدّم (3/7) في القوائم</string>
     <string name="sync_never">لم تتم المزامنة بعد</string>
+    <string name="sync_requests_24h">الطلبات إلى Keep خلال آخر 24 ساعة: %1$d</string>
+    <string name="convert_to_list_hint">يبدو هذا كقائمة.</string>
+    <string name="convert_to_list">تحويل إلى قائمة مراجعة</string>
+    <string name="convert_to_list_no">لا</string>
+    <string name="note_saved">تم حفظ الملاحظة</string>
+    <string name="note_discarded">تم تجاهل الملاحظة</string>
     <string name="sync_last_ok">آخر مزامنة %s</string>
     <string name="sync_last_error">فشلت آخر مزامنة: %s</string>
     <string name="note_trashed">تم نقل الملاحظة إلى سلة المهملات</string>

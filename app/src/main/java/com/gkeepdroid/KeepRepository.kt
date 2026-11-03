@@ -157,6 +157,7 @@ object KeepRepository {
             val token = CredentialStore.token(appContext, email)
             check(token != null) { "Not signed in" }
             val statePath = NotesCache.stateFile(appContext, email).absolutePath
+            RequestStats.record(appContext)
             lock.withLock {
                 withContext(Dispatchers.IO) {
                     PythonRuntime.get(appContext).getModule("keep_bridge")

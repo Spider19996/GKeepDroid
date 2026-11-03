@@ -214,6 +214,12 @@
     <string name="back">返回</string>
     <string name="show_progress">在清单上显示进度（3/7）</string>
     <string name="sync_never">尚未同步</string>
+    <string name="sync_requests_24h">过去24小时向Keep发出的请求：%1$d</string>
+    <string name="convert_to_list_hint">这看起来像一个列表。</string>
+    <string name="convert_to_list">转换为清单</string>
+    <string name="convert_to_list_no">否</string>
+    <string name="note_saved">笔记已保存</string>
+    <string name="note_discarded">笔记已丢弃</string>
     <string name="sync_last_ok">上次同步 %s</string>
     <string name="sync_last_error">上次同步失败：%s</string>
     <string name="note_trashed">笔记已移至回收站</string>

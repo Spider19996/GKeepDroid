@@ -214,6 +214,12 @@
     <string name="back">Назад</string>
     <string name="show_progress">Показывать прогресс (3/7) в списках</string>
     <string name="sync_never">Ещё не синхронизировано</string>
+    <string name="sync_requests_24h">Запросы к Keep за последние 24 часа: %1$d</string>
+    <string name="convert_to_list_hint">Похоже на список.</string>
+    <string name="convert_to_list">Преобразовать в список</string>
+    <string name="convert_to_list_no">Нет</string>
+    <string name="note_saved">Заметка сохранена</string>
+    <string name="note_discarded">Заметка отклонена</string>
     <string name="sync_last_ok">Последняя синхронизация %s</string>
     <string name="sync_last_error">Последняя синхронизация не удалась: %s</string>
     <string name="note_trashed">Заметка перемещена в корзину</string>

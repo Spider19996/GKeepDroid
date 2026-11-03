@@ -62,6 +62,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -69,6 +70,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -88,6 +90,14 @@ class EditNoteActivity : ComponentActivity() {
         super.attachBaseContext(LocaleHelper.wrap(newBase))
     }
 
+
+    /** Set by the open editor: saves what was typed when the user leaves with the Home button. */
+    private var onHome: (() -> Unit)? = null
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        onHome?.invoke()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -181,10 +191,13 @@ class EditNoteActivity : ComponentActivity() {
     @OptIn(ExperimentalLayoutApi::class)
     @Composable
     private fun EditScreen(
-        account: String, existing: KeepNote?, isList: Boolean, offline: Boolean, pinWidgetId: Int?,
+        account: String, existing: KeepNote?, startAsList: Boolean, offline: Boolean, pinWidgetId: Int?,
         remote: KeepNote?, onReload: () -> Unit,
     ) {
         val scope = rememberCoroutineScope()
+        // A new note can become a checklist while typing (see the offer under the text field).
+        var isList by remember { mutableStateOf(startAsList) }
+        var convertDismissed by remember { mutableStateOf(false) }
         // Text shared from another app arrives as a prefill for a new note.
         var title by remember { mutableStateOf(existing?.title ?: intent.getStringExtra(EXTRA_PREFILL_TITLE).orEmpty()) }
         var text by remember { mutableStateOf(existing?.text ?: intent.getStringExtra(EXTRA_PREFILL_TEXT).orEmpty()) }
@@ -237,14 +250,9 @@ class EditNoteActivity : ComponentActivity() {
         // Reminders belong to the phone only and are saved at once, not with the note.
         var reminders by remember { mutableStateOf(existing?.let { Reminders.list(this@EditNoteActivity, account, it.id) }.orEmpty()) }
         val askNotifications = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
-        // Once, ask for the right to show the notification that tells about a failed save.
-        LaunchedEffect(Unit) {
-            val prefs = getSharedPreferences("reminder_hints", MODE_PRIVATE)
-            if (!isLocal && android.os.Build.VERSION.SDK_INT >= 33 && !notificationsOn && !prefs.getBoolean("save_asked", false)) {
-                prefs.edit().putBoolean("save_asked", true).apply()
-                askNotifications.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-            }
-        }
+        // Saving in the background is the first thing that needs notifications (they tell about a failed
+        // send), so the right is asked for once, when a note is saved; the editor closes after the answer.
+        val askAfterSave = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { finish() }
         var remindersOpen by remember { mutableStateOf(false) }
         var error by remember { mutableStateOf("") }
         val failedTemplate = stringResource(R.string.save_failed, "%s")
@@ -264,7 +272,8 @@ class EditNoteActivity : ComponentActivity() {
             }
         }
 
-        fun save() {
+        fun save(fromHome: Boolean = false) {
+            if (saving) return
             saving = true
             error = ""
             val target = if (existing != null) account else targetAccount
@@ -278,18 +287,47 @@ class EditNoteActivity : ComponentActivity() {
                 // The change is stored and sent in the background: the editor closes at once, and a failure
                 // shows up as a notification instead of losing the change.
                 KeepRepository.queueEdit(this@EditNoteActivity, PendingEdit(target, function, args))
-                finish()
+                Toast.makeText(applicationContext, R.string.note_saved, Toast.LENGTH_SHORT).show()
+                val prefs = getSharedPreferences("reminder_hints", MODE_PRIVATE)
+                if (!fromHome && android.os.Build.VERSION.SDK_INT >= 33 && !notificationsOn && !prefs.getBoolean("save_asked", false)) {
+                    prefs.edit().putBoolean("save_asked", true).apply()
+                    askAfterSave.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                } else {
+                    finish()
+                }
                 return
             }
             scope.launch {
                 try {
                     KeepRepository.run(this@EditNoteActivity, target, function, args)
+                    Toast.makeText(applicationContext, R.string.note_saved, Toast.LENGTH_SHORT).show()
                     finish()
                 } catch (e: Exception) {
                     saving = false
                     error = failedTemplate.format(e.message ?: e.javaClass.simpleName)
                 }
             }
+        }
+
+        fun hasChanges() = if (existing != null) {
+            title != existing.title || text != existing.text || items.toList() != existing.items || color != existing.color ||
+                pinned != existing.pinned || labels != existing.labels || removedImages.isNotEmpty()
+        } else {
+            title.isNotBlank() || text.isNotBlank() || items.any { it.text.isNotBlank() }
+        }
+
+        /** Closes the editor without saving; a note that was changed is reported as discarded. */
+        fun discard() {
+            if (hasChanges()) Toast.makeText(this@EditNoteActivity, R.string.note_discarded, Toast.LENGTH_SHORT).show()
+            finish()
+        }
+        androidx.activity.compose.BackHandler(enabled = !saving) { discard() }
+
+        // Home keeps what was typed: a changed note is saved, not thrown away. Back still discards.
+        val saveOnHome by rememberUpdatedState { if (hasChanges() && !saving) save(fromHome = true) }
+        DisposableEffect(Unit) {
+            onHome = { saveOnHome() }
+            onDispose { onHome = null }
         }
 
         Column(
@@ -690,6 +728,23 @@ class EditNoteActivity : ComponentActivity() {
                     label = { Text(stringResource(R.string.note_hint)) },
                     modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp),
                 )
+                // Lines that start with "-" (or "*", "[ ]") are a list: offer to make it one.
+                if (existing == null && !convertDismissed && ChecklistText.looksLikeList(text)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            stringResource(R.string.convert_to_list_hint),
+                            Modifier.weight(1f),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        TextButton(onClick = { convertDismissed = true }) { Text(stringResource(R.string.convert_to_list_no)) }
+                        Button(onClick = {
+                            items.clear()
+                            items.addAll(ChecklistText.items(text))
+                            text = ""
+                            isList = true
+                        }) { Text(stringResource(R.string.convert_to_list)) }
+                    }
+                }
             }
 
             Text(stringResource(R.string.color))
@@ -743,7 +798,7 @@ class EditNoteActivity : ComponentActivity() {
             }
             Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedButton(
-                    modifier = Modifier.weight(1f).fillMaxHeight(), enabled = !saving, onClick = { finish() },
+                    modifier = Modifier.weight(1f).fillMaxHeight(), enabled = !saving, onClick = { discard() },
                 ) { Text(stringResource(R.string.cancel)) }
                 if (existing == null) Box(Modifier.align(Alignment.CenterVertically)) {
                     // A new note has no id yet, so it cannot have a reminder; the button says so.
@@ -767,8 +822,8 @@ class EditNoteActivity : ComponentActivity() {
                     }
                 }
                 Button(
-                    modifier = Modifier.weight(1f).fillMaxHeight(), enabled = !saving, onClick = { save() },
-                ) { Text(stringResource(if (saving) R.string.saving else R.string.save)) }
+                    modifier = Modifier.weight(1f).fillMaxHeight(), onClick = { save() },
+                ) { Text(stringResource(R.string.save)) }
             }
         }
     }
@@ -826,4 +881,19 @@ class EditNoteActivity : ComponentActivity() {
         const val EXTRA_PREFILL_TEXT = "prefill_text"
         const val EXTRA_NEW_LIST = "new_list"
     }
+}
+
+/** Recognises text typed as a list ("- milk", "* eggs", "[ ] bread") and turns it into checklist items. */
+internal object ChecklistText {
+    private val marker = Regex("""^\s*(?:[-*•]\s*(?:\[([ xX]?)\]\s*)?|\[([ xX]?)\]\s*)(.*)$""")
+
+    /** At least two lines that start with a list marker. */
+    fun looksLikeList(text: String): Boolean =
+        text.lineSequence().count { marker.matches(it) && marker.find(it)!!.groupValues[3].isNotBlank() } >= 2
+
+    fun items(text: String): List<KeepItem> = text.lineSequence().filter { it.isNotBlank() }.map { line ->
+        val m = marker.find(line)
+        val checked = m != null && (m.groupValues[1].equals("x", true) || m.groupValues[2].equals("x", true))
+        KeepItem(UUID.randomUUID().toString(), (m?.groupValues?.get(3) ?: line).trim(), checked)
+    }.toList()
 }

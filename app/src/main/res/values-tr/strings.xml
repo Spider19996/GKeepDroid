@@ -214,6 +214,12 @@
     <string name="back">Geri</string>
     <string name="show_progress">Kontrol listelerinde ilerlemeyi (3/7) göster</string>
     <string name="sync_never">Henüz eşitlenmedi</string>
+    <string name="sync_requests_24h">Son 24 saatte Keep\'e yapılan istekler: %1$d</string>
+    <string name="convert_to_list_hint">Bu bir listeye benziyor.</string>
+    <string name="convert_to_list">Kontrol listesine dönüştür</string>
+    <string name="convert_to_list_no">Hayır</string>
+    <string name="note_saved">Not kaydedildi</string>
+    <string name="note_discarded">Not silindi</string>
     <string name="sync_last_ok">Son eşitleme %s</string>
     <string name="sync_last_error">Son eşitleme başarısız: %s</string>
     <string name="note_trashed">Not çöp kutusuna taşındı</string>

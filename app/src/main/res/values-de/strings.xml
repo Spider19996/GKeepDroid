@@ -214,6 +214,12 @@
     <string name="back">Zurück</string>
     <string name="show_progress">Fortschritt (3/7) bei Checklisten anzeigen</string>
     <string name="sync_never">Noch nicht synchronisiert</string>
+    <string name="sync_requests_24h">Abfragen an Keep in den letzten 24 Stunden: %1$d</string>
+    <string name="convert_to_list_hint">Das sieht nach einer Liste aus.</string>
+    <string name="convert_to_list">In Checkliste umwandeln</string>
+    <string name="convert_to_list_no">Nein</string>
+    <string name="note_saved">Notiz gespeichert</string>
+    <string name="note_discarded">Notiz verworfen</string>
     <string name="sync_last_ok">Zuletzt synchronisiert %s</string>
     <string name="sync_last_error">Letzter Sync fehlgeschlagen: %s</string>
     <string name="note_trashed">Notiz in den Papierkorb verschoben</string>

@@ -214,6 +214,12 @@
     <string name="back">Terug</string>
     <string name="show_progress">Voortgang (3/7) bij checklists tonen</string>
     <string name="sync_never">Nog niet gesynchroniseerd</string>
+    <string name="sync_requests_24h">Verzoeken aan Keep in de laatste 24 uur: %1$d</string>
+    <string name="convert_to_list_hint">Dit lijkt op een lijst.</string>
+    <string name="convert_to_list">Omzetten naar checklist</string>
+    <string name="convert_to_list_no">Nee</string>
+    <string name="note_saved">Notitie opgeslagen</string>
+    <string name="note_discarded">Notitie verworpen</string>
     <string name="sync_last_ok">Laatst gesynchroniseerd %s</string>
     <string name="sync_last_error">Laatste synchronisatie mislukt: %s</string>
     <string name="note_trashed">Notitie naar de prullenbak verplaatst</string>

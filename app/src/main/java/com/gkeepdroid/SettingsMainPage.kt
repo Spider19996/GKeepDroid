@@ -78,7 +78,7 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
             SectionTitle(stringResource(R.string.settings_global))
             MenuRow(
                 stringResource(R.string.tab_accounts),
-                accounts.joinToString { CredentialStore.displayName(context, it) }.ifEmpty { "–" },
+                accounts.joinToString { CredentialStore.displayName(context, it, demoMode) }.ifEmpty { "–" },
             ) { page = Page.Accounts }
             MenuRow(stringResource(R.string.sync_section), null) { page = Page.Sync }
             MenuRow(stringResource(R.string.reminders_title), null) { page = Page.Reminders }
@@ -124,7 +124,7 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
                 }
                 MenuRow(
                     stringResource(R.string.tab_accounts),
-                    accounts.joinToString { CredentialStore.displayName(context, it) }.ifEmpty { "–" },
+                    accounts.joinToString { CredentialStore.displayName(context, it, demoMode) }.ifEmpty { "–" },
                 ) { page = Page.Accounts }
                 MenuRow(stringResource(R.string.appearance), null) { page = Page.Appearance }
                 MenuRow(stringResource(R.string.section_notes), null) { page = Page.Notes }
@@ -157,7 +157,7 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
                 placed.forEachIndexed { index, (id, single) ->
                     val name = stringResource(if (single) R.string.widget_label_single else R.string.widget_label_list)
                     val account = SettingsStore.loadWidget(context, id).account
-                        .takeIf { it.isNotEmpty() }?.let { CredentialStore.displayName(context, it) }
+                        .takeIf { it.isNotEmpty() }?.let { CredentialStore.displayName(context, it, demoMode) }
                     MenuRow("$name · ${index + 1}", account) {
                         startActivity(
                             Intent(context, SettingsActivity::class.java)

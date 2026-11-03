@@ -47,7 +47,7 @@ internal fun ColumnScope.AccountsPage(s: SettingsState) {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(Modifier.weight(1f)) {
-                    Text(CredentialStore.displayName(context, account))
+                    Text(CredentialStore.displayName(context, account, demoMode))
                     if (!CredentialStore.isUsable(context, account)) {
                         Text(
                             stringResource(R.string.token_missing),
@@ -80,7 +80,7 @@ internal fun ColumnScope.AccountsPage(s: SettingsState) {
                     FilterChip(
                         selected = selected == account,
                         onClick = { widgetAccount = account },
-                        label = { Text(CredentialStore.displayName(context, account)) },
+                        label = { Text(CredentialStore.displayName(context, account, demoMode)) },
                     )
                 }
             }
@@ -163,6 +163,12 @@ internal fun ColumnScope.SyncPage(s: SettingsState) {
                 color = MaterialTheme.colorScheme.error,
             )
         }
+
+        // Every call to Keep's servers of the last 24 hours, so the load on Google can be judged.
+        Text(
+            stringResource(R.string.sync_requests_24h, RequestStats.last24h(context)),
+            style = MaterialTheme.typography.bodyMedium,
+        )
 
         SectionTitle(stringResource(R.string.sync_group_display))
         NumberRow(R.string.sync_every, interval, "min") { interval = it }

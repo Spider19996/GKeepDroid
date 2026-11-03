@@ -214,6 +214,12 @@
     <string name="back">Indietro</string>
     <string name="show_progress">Mostra l’avanzamento (3/7) nelle liste</string>
     <string name="sync_never">Non ancora sincronizzato</string>
+    <string name="sync_requests_24h">Richieste a Keep nelle ultime 24 ore: %1$d</string>
+    <string name="convert_to_list_hint">Sembra un elenco.</string>
+    <string name="convert_to_list">Converti in checklist</string>
+    <string name="convert_to_list_no">No</string>
+    <string name="note_saved">Nota salvata</string>
+    <string name="note_discarded">Nota scartata</string>
     <string name="sync_last_ok">Ultima sincronizzazione %s</string>
     <string name="sync_last_error">Ultima sincronizzazione non riuscita: %s</string>
     <string name="note_trashed">Nota spostata nel cestino</string>

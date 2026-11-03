@@ -404,9 +404,9 @@ object CredentialStore {
     fun isUsable(context: Context, email: String) = isLocal(email) || token(context, email) != null
 
     /** What the user sees for an account: the e-mail, or a name for the local account. */
-    fun displayName(context: Context, email: String) = when {
+    fun displayName(context: Context, email: String, demo: Boolean = DemoNotes.enabled(context)) = when {
         isLocal(email) -> context.getString(R.string.local_account_name)
-        DemoNotes.enabled(context) -> DemoNotes.ACCOUNT_NAME
+        demo -> DemoNotes.ACCOUNT_NAME
         else -> email
     }
 

@@ -214,6 +214,12 @@
     <string name="back">Retour</string>
     <string name="show_progress">Afficher la progression (3/7) des listes</string>
     <string name="sync_never">Pas encore synchronisé</string>
+    <string name="sync_requests_24h">Requêtes vers Keep ces dernières 24 h : %1$d</string>
+    <string name="convert_to_list_hint">On dirait une liste.</string>
+    <string name="convert_to_list">Convertir en liste de contrôle</string>
+    <string name="convert_to_list_no">Non</string>
+    <string name="note_saved">Note enregistrée</string>
+    <string name="note_discarded">Note ignorée</string>
     <string name="sync_last_ok">Dernière synchro %s</string>
     <string name="sync_last_error">Échec de la dernière synchro : %s</string>
     <string name="note_trashed">Note déplacée dans la corbeille</string>
