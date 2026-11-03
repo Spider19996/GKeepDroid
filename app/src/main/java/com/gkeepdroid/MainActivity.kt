@@ -889,9 +889,9 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     if (app.foldNotes) {
-                        // A generous touch target: the arrow itself is only part of it.
+                        // Wide rather than tall, so the title row stays close to the height of the title.
                         Box(
-                            Modifier.size(40.dp).offset(x = 8.dp, y = (-8).dp).clickable {
+                            Modifier.size(width = 44.dp, height = 26.dp).offset(x = 10.dp, y = (-3).dp).clickable {
                                 FoldStore.set(context, account, note.id, !folded)
                                 scope.launch { WidgetRefresh.all(context) }
                             },
