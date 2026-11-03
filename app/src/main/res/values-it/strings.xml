@@ -334,4 +334,17 @@
     <string name="swipe_right">Scorri a destra</string>
     <string name="swipe_left">Scorri a sinistra</string>
     <string name="swipe_none">Niente</string>
+    <string name="log_enable">Registra il log</string>
+    <string name="fold_notes_app">Le note si possono ridurre al titolo</string>
+    <string name="fold_notes_widget">Le note si possono ridurre al titolo</string>
+    <string name="fold_all">Riduci tutto</string>
+    <string name="unfold_all">Espandi tutto</string>
+    <string name="filter_with_image">Con immagine</string>
+    <string name="filter_pinned">Fissate</string>
+    <string name="filter_bar_title">Barra dei filtri</string>
+    <string name="filter_bar_show">Mostra la barra dei filtri</string>
+    <string name="app_layout_sort">Layout e ordinamento</string>
+    <string name="app_cards">Contenuto delle schede</string>
+    <string name="swipe_title">Gesti di scorrimento</string>
+    <string name="swipe_hint">L’azione viene eseguita quando rilasci dopo aver scorso abbastanza.</string>
 </resources>

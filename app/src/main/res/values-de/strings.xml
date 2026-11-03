@@ -334,4 +334,17 @@
     <string name="swipe_right">Nach rechts wischen</string>
     <string name="swipe_left">Nach links wischen</string>
     <string name="swipe_none">Nichts</string>
+    <string name="log_enable">Log aufzeichnen</string>
+    <string name="fold_notes_app">Notizen lassen sich auf den Titel einklappen</string>
+    <string name="fold_notes_widget">Notizen lassen sich auf den Titel einklappen</string>
+    <string name="fold_all">Alle einklappen</string>
+    <string name="unfold_all">Alle ausklappen</string>
+    <string name="filter_with_image">Mit Bild</string>
+    <string name="filter_pinned">Angeheftet</string>
+    <string name="filter_bar_title">Filterleiste</string>
+    <string name="filter_bar_show">Filterleiste anzeigen</string>
+    <string name="app_layout_sort">Layout &amp; Sortierung</string>
+    <string name="app_cards">Karteninhalt</string>
+    <string name="swipe_title">Wischgesten</string>
+    <string name="swipe_hint">Die Aktion wird ausgeführt, wenn du nach weit genug Wischen loslässt.</string>
 </resources>

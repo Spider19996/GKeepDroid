@@ -70,6 +70,9 @@ internal class SettingsState(val context: SettingsActivity) {
     var appLockWidgetTick by mutableStateOf(initialApp.lockWidgetTick)
     var appSwipeRight by mutableIntStateOf(initialApp.swipeRight)
     var appSwipeLeft by mutableIntStateOf(initialApp.swipeLeft)
+    var appFoldNotes by mutableStateOf(initialApp.foldNotes)
+    var appFilterBar by mutableStateOf(initialApp.filterBar)
+    var appFilterChips by mutableIntStateOf(initialApp.filterChips)
     /** Asks for the lock (set by the screen); the security settings open only after it. */
     var unlock: ((Int, (Boolean) -> Unit) -> Unit)? = null
     val initialGlobal = SettingsStore.loadGlobal(context)
@@ -111,6 +114,7 @@ internal class SettingsState(val context: SettingsActivity) {
     var showReminders by mutableStateOf(initialWidget.showReminders)
     var labelFilter by mutableStateOf(initialWidget.labelFilter)
     var showProgress by mutableStateOf(initialWidget.showProgress)
+    var foldable by mutableStateOf(initialWidget.foldable)
     var settingsQuery by mutableStateOf("")
     // A search hit for a popup setting opens that popup once the main list is shown again.
     var pendingPopup by mutableStateOf<String?>(null)
@@ -180,6 +184,7 @@ internal class SettingsState(val context: SettingsActivity) {
         showReminders = showReminders,
         labelFilter = labelFilter,
         showProgress = showProgress,
+        foldable = foldable,
     )
 
     /** Moves a note in the manual order; the whole displayed order becomes the manual order. */
@@ -213,7 +218,7 @@ internal class SettingsState(val context: SettingsActivity) {
     fun currentApp() = AppSettings(
         appLayout, appSort, appPinnedSection, appShowImages, appShowColors, appPlainStyle, appPreviewLines, appShowEdited, appEditedAsDate, appShowLabels, appShowProgress, appLockPrivate, appLockApp, appLockEdit, appLockGrace,
         appShowReminders, appListCheckedToEnd, appListCollapseChecked, appListCheckboxStyle, appListCheckboxSize, appListSpacing,
-        appListCheckInApp, appListDeleteChecked, appWidgetGrace, appWidgetTitlesOnly, appLockWidgetTick, appSwipeRight, appSwipeLeft,
+        appListCheckInApp, appListDeleteChecked, appWidgetGrace, appWidgetTitlesOnly, appLockWidgetTick, appSwipeRight, appSwipeLeft, appFoldNotes, appFilterBar, appFilterChips,
     )
 
     /** Opens a page; the security page asks for the lock first (whenever the phone has one). */

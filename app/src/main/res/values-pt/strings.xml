@@ -334,4 +334,17 @@
     <string name="swipe_right">Deslizar para a direita</string>
     <string name="swipe_left">Deslizar para a esquerda</string>
     <string name="swipe_none">Nada</string>
+    <string name="log_enable">Gravar o registo</string>
+    <string name="fold_notes_app">As notas podem ser recolhidas ao título</string>
+    <string name="fold_notes_widget">As notas podem ser recolhidas ao título</string>
+    <string name="fold_all">Recolher tudo</string>
+    <string name="unfold_all">Expandir tudo</string>
+    <string name="filter_with_image">Com imagem</string>
+    <string name="filter_pinned">Afixadas</string>
+    <string name="filter_bar_title">Barra de filtros</string>
+    <string name="filter_bar_show">Mostrar a barra de filtros</string>
+    <string name="app_layout_sort">Layout e ordenação</string>
+    <string name="app_cards">Conteúdo dos cartões</string>
+    <string name="swipe_title">Gestos de deslize</string>
+    <string name="swipe_hint">A ação é executada ao soltar depois de deslizar o suficiente.</string>
 </resources>

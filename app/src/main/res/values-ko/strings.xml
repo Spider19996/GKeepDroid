@@ -334,4 +334,17 @@
     <string name="swipe_right">오른쪽으로 밀기</string>
     <string name="swipe_left">왼쪽으로 밀기</string>
     <string name="swipe_none">없음</string>
+    <string name="log_enable">로그 기록</string>
+    <string name="fold_notes_app">메모를 제목만 보이게 접을 수 있음</string>
+    <string name="fold_notes_widget">메모를 제목만 보이게 접을 수 있음</string>
+    <string name="fold_all">모두 접기</string>
+    <string name="unfold_all">모두 펼치기</string>
+    <string name="filter_with_image">이미지 있음</string>
+    <string name="filter_pinned">고정됨</string>
+    <string name="filter_bar_title">필터 바</string>
+    <string name="filter_bar_show">필터 바 표시</string>
+    <string name="app_layout_sort">레이아웃 및 정렬</string>
+    <string name="app_cards">카드 내용</string>
+    <string name="swipe_title">스와이프 동작</string>
+    <string name="swipe_hint">충분히 밀고 손을 떼면 동작이 실행됩니다.</string>
 </resources>

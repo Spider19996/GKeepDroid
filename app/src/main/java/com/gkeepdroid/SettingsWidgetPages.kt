@@ -170,6 +170,7 @@ internal fun ColumnScope.NotesPage(s: SettingsState) {
             )
         }
         if (!isSingleNote) SwitchRow(R.string.show_progress, showProgress) { showProgress = it }
+        if (!isSingleNote) SwitchRow(R.string.fold_notes_widget, foldable) { foldable = it }
         if (!isSingleNote) {
             // 0 means unlimited. Longer notes are cut off in the list; the editor shows everything.
             Text(

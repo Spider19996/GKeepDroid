@@ -238,8 +238,9 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
     }
 }
 
+/** Layout, order and the look of the cards. */
 @Composable
-internal fun ColumnScope.AppViewPage(s: SettingsState) {
+internal fun ColumnScope.AppLayoutPage(s: SettingsState) {
     with(s) {
         Text(stringResource(R.string.layout_label), style = MaterialTheme.typography.titleMedium)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -269,30 +270,6 @@ internal fun ColumnScope.AppViewPage(s: SettingsState) {
         }
         SwitchRow(R.string.pinned_section_switch, appPinnedSection) { appPinnedSection = it }
 
-        HorizontalDivider(Modifier.padding(vertical = 4.dp))
-        SwitchRow(R.string.show_images, appShowImages) { appShowImages = it }
-        SwitchRow(R.string.show_note_colors, appShowColors) { appShowColors = it }
-        SwitchRow(R.string.show_edited_time, appShowEdited) { appShowEdited = it }
-        if (appShowEdited) SwitchRow(R.string.edited_as_date, appEditedAsDate) { appEditedAsDate = it }
-        SwitchRow(R.string.show_labels, appShowLabels) { appShowLabels = it }
-        SwitchRow(R.string.show_progress, appShowProgress) { appShowProgress = it }
-        SwitchRow(R.string.reminder_show_widget, appShowReminders) { appShowReminders = it }
-
-        // What swiping a card sideways does on the notes screen.
-        listOf(R.string.swipe_right to true, R.string.swipe_left to false).forEach { (label, right) ->
-            Text(stringResource(label), style = MaterialTheme.typography.titleMedium)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf(SWIPE_NONE to R.string.swipe_none, SWIPE_ARCHIVE to R.string.archive_note, SWIPE_TRASH to R.string.move_to_trash)
-                    .forEach { (action, name) ->
-                        FilterChip(
-                            selected = (if (right) appSwipeRight else appSwipeLeft) == action,
-                            onClick = { if (right) appSwipeRight = action else appSwipeLeft = action },
-                            label = { Text(stringResource(name)) },
-                        )
-                    }
-            }
-        }
-
         Text(stringResource(R.string.plain_style))
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(
@@ -317,6 +294,72 @@ internal fun ColumnScope.AppViewPage(s: SettingsState) {
             value = appPreviewLines.toFloat(), onValueChange = { appPreviewLines = it.toInt() },
             valueRange = 0f..30f, steps = 29,
         )
+    }
+}
+
+/** What a card shows. */
+@Composable
+internal fun ColumnScope.AppCardsPage(s: SettingsState) {
+    with(s) {
+        SwitchRow(R.string.show_images, appShowImages) { appShowImages = it }
+        SwitchRow(R.string.show_note_colors, appShowColors) { appShowColors = it }
+        SwitchRow(R.string.show_edited_time, appShowEdited) { appShowEdited = it }
+        if (appShowEdited) SwitchRow(R.string.edited_as_date, appEditedAsDate) { appEditedAsDate = it }
+        SwitchRow(R.string.show_labels, appShowLabels) { appShowLabels = it }
+        SwitchRow(R.string.show_progress, appShowProgress) { appShowProgress = it }
+        SwitchRow(R.string.reminder_show_widget, appShowReminders) { appShowReminders = it }
+        SwitchRow(R.string.fold_notes_app, appFoldNotes) { appFoldNotes = it }
+    }
+}
+
+/** What swiping a card sideways does on the notes screen. */
+@Composable
+internal fun ColumnScope.AppSwipePage(s: SettingsState) {
+    with(s) {
+        listOf(R.string.swipe_right to true, R.string.swipe_left to false).forEach { (label, right) ->
+            Text(stringResource(label), style = MaterialTheme.typography.titleMedium)
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                swipeChoices.forEach { (action, name) ->
+                    FilterChip(
+                        selected = (if (right) appSwipeRight else appSwipeLeft) == action,
+                        onClick = { if (right) appSwipeRight = action else appSwipeLeft = action },
+                        label = { Text(stringResource(name)) },
+                    )
+                }
+            }
+        }
+        Hint(R.string.swipe_hint)
+    }
+}
+
+internal val swipeChoices = listOf(
+    SWIPE_NONE to R.string.swipe_none, SWIPE_ARCHIVE to R.string.archive_note, SWIPE_TRASH to R.string.move_to_trash,
+    SWIPE_PIN to R.string.pin_note, SWIPE_REMINDER to R.string.reminders_title, SWIPE_SHARE to R.string.share_note,
+    SWIPE_HIDE to R.string.hide_content,
+)
+
+/** The buttons above the notes: shown or not, and which ones. */
+internal val filterChoices = listOf(
+    FILTER_NOTES to R.string.filter_notes, FILTER_LISTS to R.string.list_section, FILTER_REMINDER to R.string.filter_reminders,
+    FILTER_RECENT to R.string.filter_recent, FILTER_IMAGE to R.string.filter_with_image, FILTER_PINNED to R.string.filter_pinned,
+    FILTER_LABELS to R.string.labels_title,
+)
+
+@Composable
+internal fun ColumnScope.FilterBarOptions(bar: Boolean, chips: Int, onBar: (Boolean) -> Unit, onChips: (Int) -> Unit) {
+    SwitchRow(R.string.filter_bar_show, bar, onBar)
+    if (bar) filterChoices.forEach { (bit, label) ->
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            androidx.compose.material3.Checkbox(checked = chips and bit != 0, onCheckedChange = { on -> onChips(if (on) chips or bit else chips and bit.inv()) })
+            Text(stringResource(label))
+        }
+    }
+}
+
+@Composable
+internal fun ColumnScope.AppFiltersPage(s: SettingsState) {
+    with(s) {
+        FilterBarOptions(appFilterBar, appFilterChips, { appFilterBar = it }) { appFilterChips = it }
     }
 }
 
@@ -356,7 +399,14 @@ internal fun ColumnScope.AppChecklistsPage(s: SettingsState) {
         if (appListCheckInApp) SwitchRow(R.string.delete_checked, appListDeleteChecked) { appListDeleteChecked = it }
         SwitchRow(R.string.checked_to_end, appListCheckedToEnd) { appListCheckedToEnd = it }
         if (appListCheckedToEnd) SwitchRow(R.string.collapse_checked, appListCollapseChecked) { appListCollapseChecked = it }
-        HorizontalDivider(Modifier.padding(vertical = 4.dp))
+        MenuRow(stringResource(R.string.checkbox_style), null) { page = Page.AppCheckbox }
+    }
+}
+
+/** How the boxes of a checklist look on the cards: style, size and spacing. */
+@Composable
+internal fun ColumnScope.AppCheckboxPage(s: SettingsState) {
+    with(s) {
         Text("${stringResource(R.string.list_spacing)}: $appListSpacing dp")
         Slider(value = appListSpacing.toFloat(), onValueChange = { appListSpacing = it.toInt() }, valueRange = 0f..24f)
         Text(stringResource(R.string.checkbox_style), style = MaterialTheme.typography.titleMedium)

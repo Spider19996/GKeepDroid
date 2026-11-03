@@ -334,4 +334,17 @@
     <string name="swipe_right">दाएँ स्वाइप करें</string>
     <string name="swipe_left">बाएँ स्वाइप करें</string>
     <string name="swipe_none">कुछ नहीं</string>
+    <string name="log_enable">लॉग रिकॉर्ड करें</string>
+    <string name="fold_notes_app">नोट को शीर्षक तक समेटा जा सकता है</string>
+    <string name="fold_notes_widget">नोट को शीर्षक तक समेटा जा सकता है</string>
+    <string name="fold_all">सभी समेटें</string>
+    <string name="unfold_all">सभी फैलाएँ</string>
+    <string name="filter_with_image">चित्र के साथ</string>
+    <string name="filter_pinned">पिन किए गए</string>
+    <string name="filter_bar_title">फ़िल्टर बार</string>
+    <string name="filter_bar_show">फ़िल्टर बार दिखाएँ</string>
+    <string name="app_layout_sort">लेआउट और क्रम</string>
+    <string name="app_cards">कार्ड की सामग्री</string>
+    <string name="swipe_title">स्वाइप जेस्चर</string>
+    <string name="swipe_hint">काफ़ी दूर स्वाइप करके छोड़ने पर क्रिया चलती है।</string>
 </resources>

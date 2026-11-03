@@ -158,6 +158,7 @@ class NotesWidget : GlanceAppWidget() {
         val textColor = palette.provider()
 
         val cardModifier = GlanceModifier.fillMaxWidth().cornerRadius(12.dp).noteBackground(noteColor, settings)
+        val folded = settings.foldable && FoldStore.isFolded(LocalContext.current, account, note.id)
 
         Column(GlanceModifier.fillMaxWidth().padding(bottom = 6.dp)) {
             Column(
@@ -172,7 +173,7 @@ class NotesWidget : GlanceAppWidget() {
                     if (thumb != null && !isPrivate) Box(GlanceModifier.padding(bottom = 6.dp)) { NoteImage(thumb, contentWidth) }
                     // A small pin shows that the note is pinned in Keep or shown at the widget's bottom.
                     val pinned = note.pinned || note.id in settings.pinBottom
-                    if (note.title.isNotBlank() || pinned || reordering || isPrivate || (settings.showProgress && progressText(note) != null)) {
+                    if (note.title.isNotBlank() || pinned || reordering || isPrivate || settings.foldable || (settings.showProgress && progressText(note) != null)) {
                         Row(GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
                             if (note.title.isNotBlank()) {
                                 Text(
@@ -189,6 +190,17 @@ class NotesWidget : GlanceAppWidget() {
                             }
                             if (isPrivate) LockIndicator(settings, palette) else ProgressIndicator(note, settings, palette)
                             if (pinned) PinIndicator(settings, palette)
+                            if (settings.foldable) {
+                                Text(
+                                    if (folded) "▸" else "▾",
+                                    style = TextStyle(color = textColor, fontSize = (settings.textSizeSp + 4).sp),
+                                    modifier = GlanceModifier.padding(start = 8.dp, end = 2.dp).clickable(
+                                        actionRunCallback<ToggleFoldAction>(
+                                            actionParametersOf(NoteIdKey to note.id, AccountKey to account, CollapsedKey to !folded)
+                                        )
+                                    ),
+                                )
+                            }
                             if (reordering) {
                                 // Arrows to move this note; the top note cannot go up, the last cannot go down.
                                 if (canMoveUp) {
@@ -210,7 +222,9 @@ class NotesWidget : GlanceAppWidget() {
                             }
                         }
                     }
-                    if (isPrivate) {
+                    if (folded) {
+                        // Folded: the title line is all there is.
+                    } else if (isPrivate) {
                         PrivateHint(settings, palette)
                     } else {
                         LabelsLine(note, settings, palette)

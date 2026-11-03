@@ -334,4 +334,17 @@
     <string name="swipe_right">向右滑动</string>
     <string name="swipe_left">向左滑动</string>
     <string name="swipe_none">无</string>
+    <string name="log_enable">记录日志</string>
+    <string name="fold_notes_app">笔记可折叠为仅显示标题</string>
+    <string name="fold_notes_widget">笔记可折叠为仅显示标题</string>
+    <string name="fold_all">全部折叠</string>
+    <string name="unfold_all">全部展开</string>
+    <string name="filter_with_image">有图片</string>
+    <string name="filter_pinned">已置顶</string>
+    <string name="filter_bar_title">筛选栏</string>
+    <string name="filter_bar_show">显示筛选栏</string>
+    <string name="app_layout_sort">布局与排序</string>
+    <string name="app_cards">卡片内容</string>
+    <string name="swipe_title">滑动手势</string>
+    <string name="swipe_hint">滑动足够远后松手即执行操作。</string>
 </resources>

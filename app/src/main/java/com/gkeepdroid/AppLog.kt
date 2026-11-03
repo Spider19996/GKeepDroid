@@ -37,6 +37,7 @@ object AppLog {
 
     @Synchronized
     fun add(context: Context, level: Char, tag: String, message: String) {
+        if (!enabled(context)) return
         try {
             val clean = Scrub.text(message)
             val key = "$level/$tag $clean"
@@ -63,19 +64,25 @@ object AppLog {
         emptyList()
     }
 
+    private fun state(context: Context) = context.applicationContext.getSharedPreferences("app_log_state", Context.MODE_PRIVATE)
+
+    /** Recording is off until the user turns it on (settings menu); what is recorded stays on the phone. */
+    fun enabled(context: Context) = state(context).getBoolean("enabled", false)
+
+    fun setEnabled(context: Context, on: Boolean) {
+        state(context).edit().putBoolean("enabled", on).apply()
+        if (!on) file(context).delete()
+    }
+
     /**
-     * Why the last runs of the app ended, as the system knows it (Android 11 and newer): crashes of the
-     * native part, ANRs and kills for lack of memory leave no trace in the app itself. Each one is logged
-     * once; the ordinary endings (swiped away, finished by itself) are left out.
+     * Why the last runs of the app ended, as the system itself keeps it (Android 11 and newer, also while the
+     * log is off): crashes of the native part, ANRs and kills for lack of memory leave no trace in the app.
+     * The ordinary endings (swiped away, finished by itself, app update) are left out.
      */
-    fun logExitReasons(context: Context) {
-        if (android.os.Build.VERSION.SDK_INT < 30) return
-        try {
+    fun exitReasons(context: Context): List<String> {
+        if (android.os.Build.VERSION.SDK_INT < 30) return listOf("not available before Android 11")
+        return try {
             val manager = context.getSystemService(android.app.ActivityManager::class.java)
-            val prefs = context.getSharedPreferences("app_log_state", Context.MODE_PRIVATE)
-            val seen = prefs.getLong("exit_seen", 0)
-            val reasons = manager.getHistoricalProcessExitReasons(context.packageName, 0, 10)
-                .filter { it.timestamp > seen }.sortedBy { it.timestamp }
             val abnormal = mapOf(
                 android.app.ApplicationExitInfo.REASON_CRASH to "crash",
                 android.app.ApplicationExitInfo.REASON_CRASH_NATIVE to "native crash",
@@ -85,14 +92,12 @@ object AppLog {
                 android.app.ApplicationExitInfo.REASON_EXCESSIVE_RESOURCE_USAGE to "killed, resource usage",
                 android.app.ApplicationExitInfo.REASON_SIGNALED to "killed by signal",
             )
-            reasons.forEach { info ->
-                abnormal[info.reason]?.let { name ->
-                    add(context, 'E', "exit", "previous run ended: $name (status ${info.status}, ${Scrub.text(info.description, 80)})")
-                }
-            }
-            reasons.maxOfOrNull { it.timestamp }?.let { prefs.edit().putLong("exit_seen", it).apply() }
+            val date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
+            manager.getHistoricalProcessExitReasons(context.packageName, 0, 15)
+                .mapNotNull { info -> abnormal[info.reason]?.let { "${date.format(Date(info.timestamp))} $it (status ${info.status}, ${Scrub.text(info.description, 80)})" } }
+                .ifEmpty { listOf("none") }
         } catch (e: Exception) {
-            // The log is a help, never a risk.
+            listOf("not available")
         }
     }
 
@@ -142,7 +147,10 @@ object LogReport {
             appendLine("Locks: app ${app.lockApp}, edit ${app.lockEdit}, widget tick ${app.lockWidgetTick}, private notes ${app.lockPrivateNotes}, grace ${app.lockGraceSec} s")
             appendLine("Cards: layout ${app.layout}, sort ${app.sortMode}, lines ${app.previewLines}")
             appendLine()
-            appendLine("== Events (newest last) ==")
+            appendLine("== Previous runs that ended badly (from the system) ==")
+            AppLog.exitReasons(context).forEach { appendLine(it) }
+            appendLine()
+            appendLine("== Events (newest last, recording is ${if (AppLog.enabled(context)) "on" else "off"}) ==")
             AppLog.lines(context).forEach { appendLine(it) }
         }
     }

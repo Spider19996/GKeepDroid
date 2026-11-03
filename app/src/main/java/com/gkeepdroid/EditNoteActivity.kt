@@ -1031,6 +1031,43 @@ internal data class NoteLink(val label: String, val intent: Intent)
 internal object NoteLinks {
     private val phone = Regex("""[+0][\d ()/.-]{5,}\d""")
 
+    /** The text with its links made tappable: the system opens each in the app made for it (browser, mail, phone). */
+    fun annotate(text: String, color: androidx.compose.ui.graphics.Color): androidx.compose.ui.text.AnnotatedString {
+        val taken = mutableListOf<IntRange>()
+        val ranges = mutableListOf<Pair<IntRange, String>>()
+        fun add(range: IntRange, url: String) {
+            if (taken.none { it.first <= range.last && range.first <= it.last }) {
+                taken += range
+                ranges += range to url
+            }
+        }
+        // E-mail addresses first, so their domain is not taken for a web address.
+        android.util.Patterns.EMAIL_ADDRESS.matcher(text).let { m ->
+            while (m.find()) add(m.start() until m.end(), "mailto:" + m.group())
+        }
+        android.util.Patterns.WEB_URL.matcher(text).let { m ->
+            while (m.find()) add(m.start() until m.end(), if (m.group().contains("://")) m.group() else "https://" + m.group())
+        }
+        phone.findAll(text).forEach { m ->
+            if (m.value.count { it.isDigit() } >= 7) add(m.range, "tel:" + m.value.filter { it.isDigit() || it == '+' })
+        }
+        if (ranges.isEmpty()) return androidx.compose.ui.text.AnnotatedString(text)
+        return androidx.compose.ui.text.buildAnnotatedString {
+            append(text)
+            ranges.forEach { (range, url) ->
+                addLink(
+                    androidx.compose.ui.text.LinkAnnotation.Url(
+                        url,
+                        androidx.compose.ui.text.TextLinkStyles(
+                            androidx.compose.ui.text.SpanStyle(color = color, textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline)
+                        ),
+                    ),
+                    range.first, range.last + 1,
+                )
+            }
+        }
+    }
+
     fun find(texts: List<String>): List<NoteLink> {
         val all = texts.joinToString("\n")
         val found = linkedMapOf<String, NoteLink>()

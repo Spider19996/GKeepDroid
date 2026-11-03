@@ -14,14 +14,19 @@ An unofficial Android app for your Google Keep notes: home screen widgets with a
 - **Widget look**: background opacity from 0 to 100 %, text size and color, Keep's note colors, cards for notes without a color (transparent, gray or with a border)
 - **Button bar**: every button (refresh, new note, search, ...) can be hidden or dragged to any side of the widget, in any order, with an adjustable size
 - **Reminders**: several per note, each with its own sound, vibration and silent-mode setting, snooze, quick times you define, shown on the cards and in the widgets. They live on the phone only, Keep's own reminders are not synced
-- **Checklists**: tick items right in the widget, checked items move to the end, "3/7" progress, drag items to re-order them
-- **Full app**: grid or list of all notes, search, label filter, archive and trash, undo, long-press to re-order notes (also in archive and trash) in Keep's order, images, sharing
+- **Checklists**: tick items right in the widget or on the cards of the app, checked items move to the end (or are hidden), "3/7" progress, drag items to re-order them, check/uncheck all, sort A–Z, delete checked, convert between note and checklist (also from lines starting with "-")
+- **Folding**: a small arrow folds a note to its title in the app and, optionally, in the widgets
+- **Full app**: grid or list of all notes, search with a customizable filter bar (notes, checklists, with reminder, last 7 days, with image, pinned, labels), archive and trash, undo, long-press to re-order notes (also in archive and trash) in Keep's order, images, sharing
+- **Swipe gestures**: swipe a card left or right to archive, trash, pin, set a reminder, share or hide it; the action runs when you let go, and you choose it for each direction
+- **Links**: web addresses, e-mail addresses and phone numbers in notes open in the app made for them
 - **Labels**: create, assign, delete and filter by them
-- **Private notes**: hide their content on the cards; they open only after the device lock (PIN, pattern, fingerprint)
+- **Private notes**: "Hide content" shows only the title on the cards and in the widgets and asks for the device lock (PIN, pattern, fingerprint) to open. The mark is a special label in Keep, so devices with the same account agree on it
+- **Locks**: lock the whole app, or only editing (reading stays free), or only ticking items in widgets, each with its own grace time; the security settings always ask; optionally widgets show only titles while the app is locked. Works with fingerprint or face from Android 10, with PIN, pattern or password on Android 8 and 9
 - **Sign in** with your Google account, with a master token, or **without an account** (notes stay on the device). Several accounts are possible
 - **Sync you control**: an interval while the display is on, sync on unlock and on opening the app, optional background sync, a minimum gap between syncs, none on mobile data. Edits made offline are sent later
 - **Saving never makes you wait**: the editor closes at once, the change shows up in the app and widgets right away and is sent to Keep in the background. A change is kept on the phone until Keep has it; if sending fails, a notification offers "Try again" and "Discard"
 - **Markdown folder, synced both ways**: every note is its own `.md` file; edit it in another app (Obsidian, Markor, ...) and the note changes, and the other way round
+- **Log for bug reports**: off by default; when on, the app records only what happened (sync, sending, lock, crashes) and writes a text file on request. It never contains notes, titles, labels, account names or tokens
 - **Also**: share text or links from any app into a new note, launcher shortcuts and a Quick Settings tile, light, dark and OLED themes, 15 languages (selectable in the settings), settings backup (without tokens)
 
 ## Usage
@@ -44,8 +49,13 @@ Google Keep has no public API for personal Google accounts. GKeepDroid uses the 
 
 **Limitations**
 - Images can be opened and removed, but not added: use the Keep app for that. Audio and shared notes are not supported.
-- Reminders are local to the phone: they do not appear in Keep, and reminders set in Keep are not shown here. A new note gets reminders once it is saved.
+- Reminders are local to the phone: they do not appear in Keep, and reminders set in Keep are not shown here. They need notifications to be switched on.
+- A note cannot change its kind in Keep: converting a note into a checklist (or back) saves a new note and moves the old one to the trash.
 - Widgets show the first image of a note as a thumbnail and hide archived and trashed notes.
+
+## Requirements
+
+Android 8.0 (API 26) or newer.
 
 ## Building
 

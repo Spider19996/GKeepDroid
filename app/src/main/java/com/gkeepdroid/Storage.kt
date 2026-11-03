@@ -173,6 +173,8 @@ data class WidgetSettings(
     val labelFilter: String = "",
     /** Shows how many checklist items are ticked, such as 3/7, in the title line. */
     val showProgress: Boolean = true,
+    /** A small arrow on each note folds it to its title. */
+    val foldable: Boolean = false,
 )
 
 const val THEME_SYSTEM = 0
@@ -337,6 +339,7 @@ object SettingsStore {
             showReminders = p.getBoolean("show_reminders", d.showReminders),
             labelFilter = p.getString("label_filter", d.labelFilter).orEmpty(),
             showProgress = p.getBoolean("show_progress", d.showProgress),
+            foldable = p.getBoolean("foldable", d.foldable),
         )
     }
 
@@ -374,6 +377,7 @@ object SettingsStore {
             .putBoolean("show_reminders", s.showReminders)
             .putString("label_filter", s.labelFilter)
             .putBoolean("show_progress", s.showProgress)
+            .putBoolean("foldable", s.foldable)
             .apply()
     }
 }
@@ -459,6 +463,29 @@ object CollapseStore {
     fun set(context: Context, account: String, noteId: String, collapsed: Boolean) {
         prefs(context).edit().putBoolean(key(account, noteId), collapsed).apply()
     }
+}
+
+/** Notes folded to their title, in the app and in the widgets; stays on this device. */
+object FoldStore {
+    private fun prefs(context: Context) = context.getSharedPreferences("folded_notes", Context.MODE_PRIVATE)
+
+    fun key(account: String, noteId: String) = "$account|$noteId"
+
+    /** Changes whenever a note is folded or unfolded, so open screens redraw their cards at once. */
+    val version = androidx.compose.runtime.mutableIntStateOf(0)
+
+    fun load(context: Context): Set<String> = prefs(context).getStringSet("keys", null)?.toSet().orEmpty()
+
+    fun isFolded(context: Context, account: String, noteId: String) = key(account, noteId) in load(context)
+
+    fun setAll(context: Context, keys: Collection<String>, folded: Boolean) {
+        val all = load(context).toMutableSet()
+        if (folded) all.addAll(keys) else all.removeAll(keys.toSet())
+        prefs(context).edit().putStringSet("keys", all).apply()
+        version.intValue++
+    }
+
+    fun set(context: Context, account: String, noteId: String, folded: Boolean) = setAll(context, listOf(key(account, noteId)), folded)
 }
 
 /** Notes whose content is hidden in the widgets (only the title shows); stays on this device. */
@@ -808,11 +835,28 @@ data class AppSettings(
     /** What swiping a card on the notes screen does: one of SWIPE_NONE, SWIPE_ARCHIVE, SWIPE_TRASH. */
     val swipeRight: Int = SWIPE_ARCHIVE,
     val swipeLeft: Int = SWIPE_TRASH,
+    /** An arrow on each card folds the note to its title. */
+    val foldNotes: Boolean = true,
+    /** The row of filter buttons above the notes, and which of them it shows (bits of FILTER_*). */
+    val filterBar: Boolean = true,
+    val filterChips: Int = FILTER_NOTES or FILTER_LISTS or FILTER_REMINDER or FILTER_RECENT or FILTER_LABELS,
 )
+
+const val FILTER_NOTES = 1
+const val FILTER_LISTS = 2
+const val FILTER_REMINDER = 4
+const val FILTER_RECENT = 8
+const val FILTER_IMAGE = 16
+const val FILTER_PINNED = 32
+const val FILTER_LABELS = 64
 
 const val SWIPE_NONE = 0
 const val SWIPE_ARCHIVE = 1
 const val SWIPE_TRASH = 2
+const val SWIPE_PIN = 3
+const val SWIPE_REMINDER = 4
+const val SWIPE_SHARE = 5
+const val SWIPE_HIDE = 6
 
 object AppSettingsStore {
     private fun prefs(context: Context) = context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
@@ -849,6 +893,9 @@ object AppSettingsStore {
             lockWidgetTick = p.getBoolean("lock_widget_tick", d.lockWidgetTick),
             swipeRight = p.getInt("swipe_right", d.swipeRight),
             swipeLeft = p.getInt("swipe_left", d.swipeLeft),
+            foldNotes = p.getBoolean("fold_notes", d.foldNotes),
+            filterBar = p.getBoolean("filter_bar", d.filterBar),
+            filterChips = p.getInt("filter_chips", d.filterChips),
         )
     }
 
@@ -882,6 +929,9 @@ object AppSettingsStore {
             .putBoolean("lock_widget_tick", s.lockWidgetTick)
             .putInt("swipe_right", s.swipeRight)
             .putInt("swipe_left", s.swipeLeft)
+            .putBoolean("fold_notes", s.foldNotes)
+            .putBoolean("filter_bar", s.filterBar)
+            .putInt("filter_chips", s.filterChips)
             .apply()
     }
 }

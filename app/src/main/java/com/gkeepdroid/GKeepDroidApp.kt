@@ -14,7 +14,6 @@ class GKeepDroidApp : Application() {
             previous?.uncaughtException(thread, throwable)
         }
         AppLog.i(this, "app", "started")
-        Thread { AppLog.logExitReasons(this) }.start()
         // Switching the screen off (locking the phone) locks the app at once.
         androidx.core.content.ContextCompat.registerReceiver(
             this,

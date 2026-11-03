@@ -629,6 +629,16 @@ internal suspend fun applyTick(context: Context, account: String, noteId: String
     ToggleItemWorker.schedule(context, account)
 }
 
+/** Folds a note to its title or unfolds it. */
+class ToggleFoldAction : ActionCallback {
+    override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
+        val account = parameters[AccountKey] ?: return
+        val noteId = parameters[NoteIdKey] ?: return
+        FoldStore.set(context, account, noteId, parameters[CollapsedKey] ?: return)
+        WidgetRefresh.all(context)
+    }
+}
+
 class ToggleCollapseAction : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         val account = parameters[AccountKey] ?: return

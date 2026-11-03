@@ -334,4 +334,17 @@
     <string name="swipe_right">Смахнуть вправо</string>
     <string name="swipe_left">Смахнуть влево</string>
     <string name="swipe_none">Ничего</string>
+    <string name="log_enable">Вести журнал</string>
+    <string name="fold_notes_app">Заметки можно сворачивать до заголовка</string>
+    <string name="fold_notes_widget">Заметки можно сворачивать до заголовка</string>
+    <string name="fold_all">Свернуть все</string>
+    <string name="unfold_all">Развернуть все</string>
+    <string name="filter_with_image">С изображением</string>
+    <string name="filter_pinned">Закреплённые</string>
+    <string name="filter_bar_title">Панель фильтров</string>
+    <string name="filter_bar_show">Показывать панель фильтров</string>
+    <string name="app_layout_sort">Макет и сортировка</string>
+    <string name="app_cards">Содержимое карточек</string>
+    <string name="swipe_title">Жесты смахивания</string>
+    <string name="swipe_hint">Действие выполняется, когда вы отпускаете палец после достаточно далёкого смахивания.</string>
 </resources>

@@ -13,6 +13,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -122,6 +123,9 @@ class MainActivity : ComponentActivity() {
         var filterKind by remember { mutableStateOf(0) } // 0 all, 1 notes, 2 checklists
         var filterReminder by remember { mutableStateOf(false) }
         var filterRecent by remember { mutableStateOf(false) }
+        var filterImage by remember { mutableStateOf(false) }
+        var filterPinned by remember { mutableStateOf(false) }
+        var filterDialog by remember { mutableStateOf(false) }
         var undoKey by remember { mutableStateOf(0) }
         var syncing by remember { mutableStateOf(false) }
         var menuOpen by remember { mutableStateOf(false) }
@@ -186,9 +190,9 @@ class MainActivity : ComponentActivity() {
                 .flatMap { account -> NotesCache.read(context, account).flatMap { it.labels } }
                 .distinct().sortedBy { it.lowercase() }
         }
-        if (filterLabel != null && filterLabel !in labelNames) filterLabel = null
+        if (filterLabel != null && (filterLabel !in labelNames || !app.filterBar || app.filterChips and FILTER_LABELS == 0)) filterLabel = null
 
-        val shown = remember(reloadKey, screen, accounts, filterAccount, filterLabel, query, app, filterKind, filterReminder, filterRecent) {
+        val shown = remember(reloadKey, screen, accounts, filterAccount, filterLabel, query, app, filterKind, filterReminder, filterRecent, filterImage, filterPinned) {
             val used = accounts.filter { filterAccount == null || it == filterAccount }
             val entries = used.flatMap { account ->
                 val notes = when (screen) {
@@ -199,10 +203,14 @@ class MainActivity : ComponentActivity() {
                 notes.map { it to account }
             }.filter { it.first.matches(query) && (screen != AppScreen.Notes || filterLabel == null || filterLabel in it.first.labels) }
                 .filter { (note, account) ->
+                    // A filter that is not on the bar (or a bar that is off) does not filter.
+                    val on = { bit: Int -> app.filterBar && app.filterChips and bit != 0 }
                     screen != AppScreen.Notes || (
-                        (filterKind == 0 || (filterKind == 2) == note.isList) &&
-                            (!filterReminder || Reminders.list(context, account, note.id).isNotEmpty()) &&
-                            (!filterRecent || System.currentTimeMillis() - note.updated < 7 * 24 * 3_600_000L)
+                        (filterKind == 0 || !(on(FILTER_NOTES) || on(FILTER_LISTS)) || (filterKind == 2) == note.isList) &&
+                            (!filterReminder || !on(FILTER_REMINDER) || Reminders.list(context, account, note.id).isNotEmpty()) &&
+                            (!filterRecent || !on(FILTER_RECENT) || System.currentTimeMillis() - note.updated < 7 * 24 * 3_600_000L) &&
+                            (!filterImage || !on(FILTER_IMAGE) || note.images.isNotEmpty()) &&
+                            (!filterPinned || !on(FILTER_PINNED) || note.pinned)
                         )
                 }
             // Archive and trash are sorted like the notes.
@@ -214,8 +222,18 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        /** A card was swiped: archive or trash it, with the same "Undo" as in the editor. */
+        /** A card was swiped (and let go): the action chosen in the settings, with "Undo" where there is one. */
         fun swiped(note: KeepNote, account: String, action: Int) {
+            /** Changes of the note itself (pin, hide) are edits like any other: they ask for the lock when it is on. */
+            fun editNote(pinned: Boolean, hide: Boolean) {
+                act {
+                    val args = KeepRepository.updateNoteArgs(
+                        note.id, note.title, note.text, note.items, note.color, pinned, emptyList(), withHiddenLabel(note.labels, hide),
+                    )
+                    PrivateNotes.set(context, account, note.id, false)
+                    KeepRepository.queueEdit(context, PendingEdit(account, "update_note", args))
+                }
+            }
             when {
                 action == SWIPE_ARCHIVE && !CredentialStore.isLocal(account) -> act {
                     KeepRepository.archiveNote(context, account, note.id)
@@ -228,6 +246,28 @@ class MainActivity : ComponentActivity() {
                     KeepRepository.trashNote(context, account, note.id)
                     UndoStore.set(account, note.id, UndoStore.Kind.TRASH)
                     undoKey++
+                }
+                action == SWIPE_PIN -> editNote(!note.pinned, PrivateNotes.isPrivate(note, account, PrivateNotes.load(context)))
+                action == SWIPE_HIDE -> editNote(note.pinned, !PrivateNotes.isPrivate(note, account, PrivateNotes.load(context)))
+                action == SWIPE_REMINDER -> {
+                    val open = {
+                        startActivity(
+                            Intent(context, RemindersActivity::class.java)
+                                .putExtra(EditNoteActivity.EXTRA_ACCOUNT, account)
+                                .putExtra(EditNoteActivity.EXTRA_NOTE_ID, note.id)
+                        )
+                    }
+                    if (AppLock.editAllowed(this@MainActivity)) open() else unlock(R.string.lock_prompt_edit) { ok -> if (ok) open() }
+                }
+                action == SWIPE_SHARE && !PrivateNotes.isPrivate(note, account, PrivateNotes.load(context)) -> {
+                    val body = if (note.isList) note.items.joinToString("\n") { (if (it.checked) "☑ " else "☐ ") + it.text } else note.text
+                    startActivity(
+                        Intent.createChooser(
+                            Intent(Intent.ACTION_SEND).setType("text/plain")
+                                .putExtra(Intent.EXTRA_SUBJECT, note.title).putExtra(Intent.EXTRA_TEXT, body),
+                            null,
+                        )
+                    )
                 }
             }
         }
@@ -331,6 +371,30 @@ class MainActivity : ComponentActivity() {
                                 leadingIcon = { Icon(painterResource(R.drawable.ic_delete), contentDescription = null) },
                                 onClick = { menuOpen = false; screen = AppScreen.Trash },
                             )
+                            if (screen == AppScreen.Notes) {
+                                if (app.foldNotes) {
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.fold_all)) },
+                                        onClick = {
+                                            menuOpen = false
+                                            FoldStore.setAll(context, shown.map { FoldStore.key(it.second, it.first.id) }, true)
+                                            scope.launch { WidgetRefresh.all(context) }
+                                        },
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.unfold_all)) },
+                                        onClick = {
+                                            menuOpen = false
+                                            FoldStore.setAll(context, shown.map { FoldStore.key(it.second, it.first.id) }, false)
+                                            scope.launch { WidgetRefresh.all(context) }
+                                        },
+                                    )
+                                }
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.filter_bar_title)) },
+                                    onClick = { menuOpen = false; filterDialog = true },
+                                )
+                            }
                             if (app.lockApp && AppLock.enabled(this@MainActivity)) DropdownMenuItem(
                                 text = { Text(stringResource(R.string.app_lock_title)) },
                                 leadingIcon = { Icon(painterResource(R.drawable.ic_lock), contentDescription = null) },
@@ -365,28 +429,54 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                if (screen == AppScreen.Notes) {
+                if (screen == AppScreen.Notes && app.filterBar) {
+                    val chips = app.filterChips
                     Row(
                         Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        FilterChip(selected = filterKind == 1, onClick = { filterKind = if (filterKind == 1) 0 else 1 }, label = { Text(stringResource(R.string.filter_notes)) })
-                        FilterChip(selected = filterKind == 2, onClick = { filterKind = if (filterKind == 2) 0 else 2 }, label = { Text(stringResource(R.string.list_section)) })
-                        FilterChip(selected = filterReminder, onClick = { filterReminder = !filterReminder }, label = { Text(stringResource(R.string.filter_reminders)) })
-                        FilterChip(selected = filterRecent, onClick = { filterRecent = !filterRecent }, label = { Text(stringResource(R.string.filter_recent)) })
-                        if (labelNames.isNotEmpty()) FilterChip(
-                            selected = filterLabel == null,
-                            onClick = { filterLabel = null },
-                            label = { Text(stringResource(R.string.all_labels)) },
-                        )
-                        labelNames.forEach { name ->
-                            FilterChip(
-                                selected = filterLabel == name,
-                                onClick = { filterLabel = if (filterLabel == name) null else name },
-                                label = { Text(name) },
+                        if (chips and FILTER_NOTES != 0) FilterChip(selected = filterKind == 1, onClick = { filterKind = if (filterKind == 1) 0 else 1 }, label = { Text(stringResource(R.string.filter_notes)) })
+                        if (chips and FILTER_LISTS != 0) FilterChip(selected = filterKind == 2, onClick = { filterKind = if (filterKind == 2) 0 else 2 }, label = { Text(stringResource(R.string.list_section)) })
+                        if (chips and FILTER_REMINDER != 0) FilterChip(selected = filterReminder, onClick = { filterReminder = !filterReminder }, label = { Text(stringResource(R.string.filter_reminders)) })
+                        if (chips and FILTER_RECENT != 0) FilterChip(selected = filterRecent, onClick = { filterRecent = !filterRecent }, label = { Text(stringResource(R.string.filter_recent)) })
+                        if (chips and FILTER_IMAGE != 0) FilterChip(selected = filterImage, onClick = { filterImage = !filterImage }, label = { Text(stringResource(R.string.filter_with_image)) })
+                        if (chips and FILTER_PINNED != 0) FilterChip(selected = filterPinned, onClick = { filterPinned = !filterPinned }, label = { Text(stringResource(R.string.filter_pinned)) })
+                        if (chips and FILTER_LABELS != 0) {
+                            if (labelNames.isNotEmpty()) FilterChip(
+                                selected = filterLabel == null,
+                                onClick = { filterLabel = null },
+                                label = { Text(stringResource(R.string.all_labels)) },
                             )
+                            labelNames.forEach { name ->
+                                FilterChip(
+                                    selected = filterLabel == name,
+                                    onClick = { filterLabel = if (filterLabel == name) null else name },
+                                    label = { Text(name) },
+                                )
+                            }
+                        }
+                        // The cog at the end chooses which filters the bar offers.
+                        IconButton(onClick = { filterDialog = true }) {
+                            Icon(painterResource(R.drawable.ic_settings), contentDescription = stringResource(R.string.filter_bar_title))
                         }
                     }
+                }
+                if (filterDialog) {
+                    AlertDialog(
+                        onDismissRequest = { filterDialog = false },
+                        title = { Text(stringResource(R.string.filter_bar_title)) },
+                        text = {
+                            Column(Modifier.verticalScroll(rememberScrollState())) {
+                                FilterBarOptions(
+                                    app.filterBar, app.filterChips,
+                                    { on -> AppSettingsStore.save(context, app.copy(filterBar = on)); reloadKey++ },
+                                    { bits -> AppSettingsStore.save(context, app.copy(filterChips = bits)); reloadKey++ },
+                                )
+                            }
+                        },
+                        confirmButton = { TextButton(onClick = { filterDialog = false }) { Text(stringResource(R.string.done)) } },
+                    )
                 }
 
                 // Without the right to notify, a failed sync or save can only be told here, at the top.
@@ -632,7 +722,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /** Wraps a card so it can be swiped sideways; the action itself is done by [onAction], and the card springs back. */
+    /** Wraps a card so it can be swiped sideways; the action runs when the finger lets go past the threshold, and the card springs back. */
     @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
     @Composable
     private fun SwipeCard(app: AppSettings, enabled: Boolean, onAction: (Int) -> Unit, modifier: Modifier, content: @Composable () -> Unit) {
@@ -641,16 +731,17 @@ class MainActivity : ComponentActivity() {
             return
         }
         val current by androidx.compose.runtime.rememberUpdatedState(app)
-        val state = androidx.compose.material3.rememberSwipeToDismissBoxState(
-            confirmValueChange = { value ->
-                when (value) {
-                    androidx.compose.material3.SwipeToDismissBoxValue.StartToEnd -> onAction(current.swipeRight)
-                    androidx.compose.material3.SwipeToDismissBoxValue.EndToStart -> onAction(current.swipeLeft)
-                    else -> {}
-                }
-                false
-            },
-        )
+        val action by androidx.compose.runtime.rememberUpdatedState(onAction)
+        val state = androidx.compose.material3.rememberSwipeToDismissBoxState(confirmValueChange = { true })
+        // settledValue only changes once the finger is up and the card has come to rest at the edge.
+        LaunchedEffect(state.settledValue) {
+            when (state.settledValue) {
+                androidx.compose.material3.SwipeToDismissBoxValue.StartToEnd -> action(current.swipeRight)
+                androidx.compose.material3.SwipeToDismissBoxValue.EndToStart -> action(current.swipeLeft)
+                else -> return@LaunchedEffect
+            }
+            state.snapTo(androidx.compose.material3.SwipeToDismissBoxValue.Settled)
+        }
         androidx.compose.material3.SwipeToDismissBox(
             state = state,
             modifier = modifier,
@@ -658,17 +749,23 @@ class MainActivity : ComponentActivity() {
             enableDismissFromEndToStart = app.swipeLeft != SWIPE_NONE,
             backgroundContent = {
                 val toRight = state.dismissDirection == androidx.compose.material3.SwipeToDismissBoxValue.StartToEnd
-                val action = if (toRight) app.swipeRight else app.swipeLeft
+                val kind = if (toRight) app.swipeRight else app.swipeLeft
                 Box(
                     Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp))
-                        .background(if (action == SWIPE_TRASH) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer)
+                        .background(if (kind == SWIPE_TRASH) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer)
                         .padding(horizontal = 20.dp),
                     contentAlignment = if (toRight) Alignment.CenterStart else Alignment.CenterEnd,
                 ) {
-                    when (action) {
-                        SWIPE_ARCHIVE -> Icon(painterResource(R.drawable.ic_archive), contentDescription = stringResource(R.string.archive_note))
-                        SWIPE_TRASH -> Icon(painterResource(R.drawable.ic_delete), contentDescription = stringResource(R.string.move_to_trash))
+                    val (icon, name) = when (kind) {
+                        SWIPE_ARCHIVE -> R.drawable.ic_archive to R.string.archive_note
+                        SWIPE_TRASH -> R.drawable.ic_delete to R.string.move_to_trash
+                        SWIPE_PIN -> R.drawable.ic_push_pin to R.string.pin_note
+                        SWIPE_REMINDER -> R.drawable.ic_alarm to R.string.reminders_title
+                        SWIPE_SHARE -> R.drawable.ic_share to R.string.share_note
+                        SWIPE_HIDE -> R.drawable.ic_lock to R.string.hide_content
+                        else -> return@Box
                     }
+                    Icon(painterResource(icon), contentDescription = stringResource(name))
                 }
             },
         ) { content() }
@@ -696,6 +793,8 @@ class MainActivity : ComponentActivity() {
     ) {
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
+        val foldedKeys = remember(FoldStore.version.intValue) { FoldStore.load(context) }
+        val folded = app.foldNotes && FoldStore.key(account, note.id) in foldedKeys
         /** Ticks the item right on the card (or removes it): shown at once, sent to Keep a few seconds later. */
         fun toggleItem(item: KeepItem) {
             fun apply() {
@@ -724,6 +823,8 @@ class MainActivity : ComponentActivity() {
             else -> Color.Transparent
         }
         val shape = RoundedCornerShape(14.dp)
+        // Web addresses, e-mail addresses and phone numbers open in the app made for them.
+        val linkColor = if (noteColor != null) Color(0xFF0B57D0) else MaterialTheme.colorScheme.primary
         // A private note shows only its title until it is opened with the device lock.
         val hidden = PrivateNotes.isPrivate(note, account, remember(PrivateNotes.version.intValue) { PrivateNotes.load(context) })
         val thumb = remember(note.id, note.images.firstOrNull(), app.showImages, hidden) {
@@ -754,7 +855,7 @@ class MainActivity : ComponentActivity() {
                 )
             }
             val progress = progressText(note)?.takeIf { app.showProgress && !hidden }
-            if (note.title.isNotBlank() || note.pinned || progress != null) {
+            if (note.title.isNotBlank() || note.pinned || progress != null || app.foldNotes) {
                 Row(verticalAlignment = Alignment.Top) {
                     Text(
                         note.title,
@@ -774,11 +875,22 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.padding(start = 6.dp).size(16.dp),
                         )
                     }
+                    if (app.foldNotes) {
+                        Text(
+                            if (folded) "▸" else "▾",
+                            color = textColor,
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(start = 6.dp).clickable {
+                                FoldStore.set(context, account, note.id, !folded)
+                                scope.launch { WidgetRefresh.all(context) }
+                            },
+                        )
+                    }
                 }
             }
             // Read again whenever the screen comes back, as reminders are changed in the editor.
             remember(resumeKey, note.id) { Reminders.list(context, account, note.id) }.let { reminders ->
-                if (app.showReminders && reminders.isNotEmpty()) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                if (!folded && app.showReminders && reminders.isNotEmpty()) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Icon(painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminder), tint = textColor, modifier = Modifier.size(14.dp))
                     Text(
                         Reminders.label(context, reminders.first().at) + if (reminders.size > 1) "  (+${reminders.size - 1})" else "",
@@ -786,7 +898,9 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             }
-            if (hidden) {
+            if (folded) {
+                // Folded: the title line is all there is.
+            } else if (hidden) {
                 Text(
                     stringResource(R.string.note_private_hint),
                     color = textColor.copy(alpha = 0.65f),
@@ -814,7 +928,7 @@ class MainActivity : ComponentActivity() {
                             CheckboxPreview(app.listCheckboxStyle, item.checked, app.listCheckboxSizeDp, textColor.copy(alpha = if (item.checked) 0.55f else 1f))
                         }
                         Text(
-                            item.text,
+                            NoteLinks.annotate(item.text, linkColor),
                             color = if (item.checked) textColor.copy(alpha = 0.55f) else textColor,
                             style = MaterialTheme.typography.bodyMedium,
                             maxLines = 2,
@@ -832,7 +946,7 @@ class MainActivity : ComponentActivity() {
                 }
             } else if (note.text.isNotBlank()) {
                 Text(
-                    note.text,
+                    NoteLinks.annotate(note.text, linkColor),
                     color = textColor,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = lines,
@@ -842,7 +956,7 @@ class MainActivity : ComponentActivity() {
                 Text(stringResource(R.string.note_empty), color = textColor.copy(alpha = 0.65f), style = MaterialTheme.typography.bodyMedium)
             }
             }
-            if (app.showEditedTime && note.updated > 0) {
+            if (!folded && app.showEditedTime && note.updated > 0) {
                 Text(
                     stringResource(
                         R.string.edited_time,

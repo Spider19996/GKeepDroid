@@ -334,4 +334,17 @@
     <string name="swipe_right">Balayer vers la droite</string>
     <string name="swipe_left">Balayer vers la gauche</string>
     <string name="swipe_none">Rien</string>
+    <string name="log_enable">Enregistrer le journal</string>
+    <string name="fold_notes_app">Les notes peuvent être réduites à leur titre</string>
+    <string name="fold_notes_widget">Les notes peuvent être réduites à leur titre</string>
+    <string name="fold_all">Tout réduire</string>
+    <string name="unfold_all">Tout développer</string>
+    <string name="filter_with_image">Avec image</string>
+    <string name="filter_pinned">Épinglées</string>
+    <string name="filter_bar_title">Barre de filtres</string>
+    <string name="filter_bar_show">Afficher la barre de filtres</string>
+    <string name="app_layout_sort">Disposition et tri</string>
+    <string name="app_cards">Contenu des cartes</string>
+    <string name="swipe_title">Gestes de balayage</string>
+    <string name="swipe_hint">L’action s’exécute quand vous relâchez après avoir balayé assez loin.</string>
 </resources>

@@ -334,4 +334,17 @@
     <string name="swipe_right">Sağa kaydır</string>
     <string name="swipe_left">Sola kaydır</string>
     <string name="swipe_none">Hiçbir şey</string>
+    <string name="log_enable">Günlüğü kaydet</string>
+    <string name="fold_notes_app">Notlar başlığa katlanabilir</string>
+    <string name="fold_notes_widget">Notlar başlığa katlanabilir</string>
+    <string name="fold_all">Tümünü katla</string>
+    <string name="unfold_all">Tümünü aç</string>
+    <string name="filter_with_image">Resimli</string>
+    <string name="filter_pinned">Sabitlenmiş</string>
+    <string name="filter_bar_title">Filtre çubuğu</string>
+    <string name="filter_bar_show">Filtre çubuğunu göster</string>
+    <string name="app_layout_sort">Düzen ve sıralama</string>
+    <string name="app_cards">Kart içeriği</string>
+    <string name="swipe_title">Kaydırma hareketleri</string>
+    <string name="swipe_hint">Eylem, yeterince kaydırıp bıraktığınızda çalışır.</string>
 </resources>

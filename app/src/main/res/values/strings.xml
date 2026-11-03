@@ -337,4 +337,17 @@
     <string name="swipe_right">Swipe right</string>
     <string name="swipe_left">Swipe left</string>
     <string name="swipe_none">Nothing</string>
+    <string name="log_enable">Record log</string>
+    <string name="fold_notes_app">Notes can be folded to their title</string>
+    <string name="fold_notes_widget">Notes can be folded to their title</string>
+    <string name="fold_all">Fold all</string>
+    <string name="unfold_all">Unfold all</string>
+    <string name="filter_with_image">With image</string>
+    <string name="filter_pinned">Pinned</string>
+    <string name="filter_bar_title">Filter bar</string>
+    <string name="filter_bar_show">Show filter bar</string>
+    <string name="app_layout_sort">Layout &amp; sorting</string>
+    <string name="app_cards">Card content</string>
+    <string name="swipe_title">Swipe gestures</string>
+    <string name="swipe_hint">The action runs when you let go after swiping far enough.</string>
 </resources>

@@ -334,4 +334,17 @@
     <string name="swipe_right">右にスワイプ</string>
     <string name="swipe_left">左にスワイプ</string>
     <string name="swipe_none">何もしない</string>
+    <string name="log_enable">ログを記録</string>
+    <string name="fold_notes_app">メモをタイトルだけに折りたためる</string>
+    <string name="fold_notes_widget">メモをタイトルだけに折りたためる</string>
+    <string name="fold_all">すべて折りたたむ</string>
+    <string name="unfold_all">すべて展開</string>
+    <string name="filter_with_image">画像あり</string>
+    <string name="filter_pinned">ピン留め</string>
+    <string name="filter_bar_title">フィルターバー</string>
+    <string name="filter_bar_show">フィルターバーを表示</string>
+    <string name="app_layout_sort">レイアウトと並べ替え</string>
+    <string name="app_cards">カードの内容</string>
+    <string name="swipe_title">スワイプ操作</string>
+    <string name="swipe_hint">十分にスワイプして指を離すと操作が実行されます。</string>
 </resources>

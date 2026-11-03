@@ -334,4 +334,17 @@
     <string name="swipe_right">Naar rechts vegen</string>
     <string name="swipe_left">Naar links vegen</string>
     <string name="swipe_none">Niets</string>
+    <string name="log_enable">Log bijhouden</string>
+    <string name="fold_notes_app">Notities kunnen tot hun titel worden ingeklapt</string>
+    <string name="fold_notes_widget">Notities kunnen tot hun titel worden ingeklapt</string>
+    <string name="fold_all">Alles inklappen</string>
+    <string name="unfold_all">Alles uitklappen</string>
+    <string name="filter_with_image">Met afbeelding</string>
+    <string name="filter_pinned">Vastgemaakt</string>
+    <string name="filter_bar_title">Filterbalk</string>
+    <string name="filter_bar_show">Filterbalk tonen</string>
+    <string name="app_layout_sort">Indeling en sortering</string>
+    <string name="app_cards">Inhoud van kaarten</string>
+    <string name="swipe_title">Veegbewegingen</string>
+    <string name="swipe_hint">De actie wordt uitgevoerd als je loslaat na ver genoeg vegen.</string>
 </resources>

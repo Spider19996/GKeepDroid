@@ -334,4 +334,17 @@
     <string name="swipe_right">التمرير لليمين</string>
     <string name="swipe_left">التمرير لليسار</string>
     <string name="swipe_none">لا شيء</string>
+    <string name="log_enable">تسجيل السجل</string>
+    <string name="fold_notes_app">يمكن طيّ الملاحظات إلى عنوانها</string>
+    <string name="fold_notes_widget">يمكن طيّ الملاحظات إلى عنوانها</string>
+    <string name="fold_all">طيّ الكل</string>
+    <string name="unfold_all">توسيع الكل</string>
+    <string name="filter_with_image">مع صورة</string>
+    <string name="filter_pinned">المثبّتة</string>
+    <string name="filter_bar_title">شريط التصفية</string>
+    <string name="filter_bar_show">إظهار شريط التصفية</string>
+    <string name="app_layout_sort">التخطيط والترتيب</string>
+    <string name="app_cards">محتوى البطاقات</string>
+    <string name="swipe_title">إيماءات التمرير</string>
+    <string name="swipe_hint">يُنفَّذ الإجراء عند رفع الإصبع بعد التمرير بما يكفي.</string>
 </resources>

@@ -322,6 +322,7 @@ class SettingsActivity : ComponentActivity() {
                     // Rarely needed: the demo mode for screenshots lives in a menu of its own.
                     if (page == Page.Main && !hasWidget) {
                         var menuOpen by remember { androidx.compose.runtime.mutableStateOf(false) }
+                        var logOn by remember { androidx.compose.runtime.mutableStateOf(AppLog.enabled(this@SettingsActivity)) }
                         // The log is written where the user chooses (Downloads, Documents...), as a plain text file.
                         val logLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
                             if (uri != null) {
@@ -346,6 +347,14 @@ class SettingsActivity : ComponentActivity() {
                                     onClick = { menuOpen = false; state.demoMode = !state.demoMode },
                                 )
                                 androidx.compose.material3.DropdownMenuItem(
+                                    text = { Text((if (logOn) "✓ " else "") + stringResource(R.string.log_enable)) },
+                                    onClick = {
+                                        menuOpen = false
+                                        logOn = !logOn
+                                        AppLog.setEnabled(this@SettingsActivity, logOn)
+                                    },
+                                )
+                                androidx.compose.material3.DropdownMenuItem(
                                     text = { Text(stringResource(R.string.log_create)) },
                                     onClick = {
                                         menuOpen = false
@@ -365,7 +374,11 @@ class SettingsActivity : ComponentActivity() {
                 ) {
                     when (page) {
                         Page.Main -> MainPage(state)
-                        Page.AppView -> AppViewPage(state)
+                        Page.AppLayout -> AppLayoutPage(state)
+                        Page.AppCards -> AppCardsPage(state)
+                        Page.AppSwipe -> AppSwipePage(state)
+                        Page.AppFilters -> AppFiltersPage(state)
+                        Page.AppCheckbox -> AppCheckboxPage(state)
                         Page.Security -> SecurityPage(state)
                         Page.AppChecklists -> AppChecklistsPage(state)
                         Page.Accounts -> AccountsPage(state)

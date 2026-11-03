@@ -16,7 +16,11 @@ internal enum class Page(val title: Int) {
     ManageNotes(R.string.manage_notes),
     Checklists(R.string.list_section),
     ButtonBar(R.string.section_button_bar),
-    AppView(R.string.app_view),
+    AppLayout(R.string.app_layout_sort),
+    AppCards(R.string.app_cards),
+    AppSwipe(R.string.swipe_title),
+    AppFilters(R.string.filter_bar_title),
+    AppCheckbox(R.string.checkbox_style),
     Backup(R.string.tab_backup),
     Sync(R.string.sync_section),
     Reminders(R.string.reminders_title),
@@ -35,10 +39,14 @@ internal fun android.content.Context.settingLabel(res: Int): String =
 
 internal fun settingEntries(isSingleNote: Boolean): List<SettingEntry> = buildList {
     add(SettingEntry(R.string.tab_accounts, Page.Accounts))
-    add(SettingEntry(R.string.app_view, Page.AppView))
-    add(SettingEntry(R.string.layout_label, Page.AppView))
-    add(SettingEntry(R.string.pinned_section_switch, Page.AppView))
-    add(SettingEntry(R.string.preview_lines, Page.AppView))
+    add(SettingEntry(R.string.app_layout_sort, Page.AppLayout))
+    add(SettingEntry(R.string.layout_label, Page.AppLayout))
+    add(SettingEntry(R.string.pinned_section_switch, Page.AppLayout))
+    add(SettingEntry(R.string.preview_lines, Page.AppLayout))
+    add(SettingEntry(R.string.app_cards, Page.AppCards))
+    add(SettingEntry(R.string.fold_notes_app, Page.AppCards))
+    add(SettingEntry(R.string.filter_bar_title, Page.AppFilters))
+    add(SettingEntry(R.string.filter_bar_show, Page.AppFilters))
     add(SettingEntry(R.string.add_account, Page.Accounts))
     add(SettingEntry(R.string.account_for_widget, Page.Accounts))
     add(SettingEntry(R.string.token_help, Page.Accounts))
@@ -57,6 +65,7 @@ internal fun settingEntries(isSingleNote: Boolean): List<SettingEntry> = buildLi
     add(SettingEntry(R.string.reminder_show_widget, Page.Notes))
     if (!isSingleNote) add(SettingEntry(R.string.label_filter, Page.Notes, popup = "labelfilter"))
     add(SettingEntry(R.string.show_progress, Page.Notes))
+    if (!isSingleNote) add(SettingEntry(R.string.fold_notes_widget, Page.Notes))
     add(SettingEntry(R.string.section_security, Page.Security))
     add(SettingEntry(R.string.lock_private, Page.Security))
     add(SettingEntry(R.string.app_lock_title, Page.Security))
@@ -66,13 +75,13 @@ internal fun settingEntries(isSingleNote: Boolean): List<SettingEntry> = buildLi
     add(SettingEntry(R.string.lock_widget_tick, Page.Security))
     add(SettingEntry(R.string.widget_titles_only, Page.Security))
     add(SettingEntry(R.string.list_section, Page.AppChecklists))
-    listOf(
-        R.string.check_on_card, R.string.delete_checked, R.string.checked_to_end, R.string.collapse_checked, R.string.list_spacing,
-        R.string.checkbox_style, R.string.checkbox_size,
-    ).forEach { add(SettingEntry(it, Page.AppChecklists)) }
-    add(SettingEntry(R.string.reminder_show_widget, Page.AppView))
-    add(SettingEntry(R.string.swipe_right, Page.AppView))
-    add(SettingEntry(R.string.swipe_left, Page.AppView))
+    listOf(R.string.check_on_card, R.string.delete_checked, R.string.checked_to_end, R.string.collapse_checked)
+        .forEach { add(SettingEntry(it, Page.AppChecklists)) }
+    listOf(R.string.list_spacing, R.string.checkbox_style, R.string.checkbox_size).forEach { add(SettingEntry(it, Page.AppCheckbox)) }
+    add(SettingEntry(R.string.reminder_show_widget, Page.AppCards))
+    add(SettingEntry(R.string.swipe_title, Page.AppSwipe))
+    add(SettingEntry(R.string.swipe_right, Page.AppSwipe))
+    add(SettingEntry(R.string.swipe_left, Page.AppSwipe))
     if (!isSingleNote) add(SettingEntry(R.string.max_lines, Page.Notes))
     if (isSingleNote) add(SettingEntry(R.string.show_add_item_button, Page.ButtonBar))
     if (!isSingleNote) {

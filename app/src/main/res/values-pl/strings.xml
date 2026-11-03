@@ -334,4 +334,17 @@
     <string name="swipe_right">Przesuń w prawo</string>
     <string name="swipe_left">Przesuń w lewo</string>
     <string name="swipe_none">Nic</string>
+    <string name="log_enable">Zapisuj dziennik</string>
+    <string name="fold_notes_app">Notatki można zwinąć do tytułu</string>
+    <string name="fold_notes_widget">Notatki można zwinąć do tytułu</string>
+    <string name="fold_all">Zwiń wszystko</string>
+    <string name="unfold_all">Rozwiń wszystko</string>
+    <string name="filter_with_image">Z obrazem</string>
+    <string name="filter_pinned">Przypięte</string>
+    <string name="filter_bar_title">Pasek filtrów</string>
+    <string name="filter_bar_show">Pokaż pasek filtrów</string>
+    <string name="app_layout_sort">Układ i sortowanie</string>
+    <string name="app_cards">Zawartość kart</string>
+    <string name="swipe_title">Gesty przesuwania</string>
+    <string name="swipe_hint">Akcja wykona się po puszczeniu palca po wystarczająco długim przesunięciu.</string>
 </resources>

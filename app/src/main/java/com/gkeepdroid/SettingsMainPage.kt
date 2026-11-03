@@ -103,8 +103,11 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
                     ((if (tag == language) "✓ " else "") + name) to { changeLanguage(tag) }
                 },
             )
-            MenuRow(stringResource(R.string.app_view), null) { page = Page.AppView }
+            MenuRow(stringResource(R.string.app_layout_sort), null) { page = Page.AppLayout }
+            MenuRow(stringResource(R.string.app_cards), null) { page = Page.AppCards }
             MenuRow(stringResource(R.string.list_section), null) { page = Page.AppChecklists }
+            MenuRow(stringResource(R.string.swipe_title), null) { page = Page.AppSwipe }
+            MenuRow(stringResource(R.string.filter_bar_title), null) { page = Page.AppFilters }
 
             SectionTitle(stringResource(R.string.section_misc))
             MenuRow(stringResource(R.string.reminders_title), null) { page = Page.Reminders }
