@@ -217,7 +217,7 @@
     <string name="sync_requests_24h">최근 24시간 동안 Keep 요청: %1$d</string>
     <string name="convert_to_list_hint">목록처럼 보입니다.</string>
     <string name="convert_to_list">체크리스트로 변환</string>
-    <string name="convert_to_list_no">아니요</string>
+    <string name="convert_to_list_no">메모로 유지</string>
     <string name="note_saved">메모를 저장했습니다</string>
     <string name="note_discarded">메모를 취소했습니다</string>
     <string name="sync_last_ok">마지막 동기화 %s</string>

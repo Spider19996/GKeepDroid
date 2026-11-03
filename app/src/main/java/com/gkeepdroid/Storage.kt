@@ -459,7 +459,11 @@ object PrivateNotes {
 
     fun load(context: Context): Set<String> = prefs(context).getStringSet("keys", null)?.toSet().orEmpty()
 
+    /** Changes whenever a note is hidden or shown, so open screens redraw their cards at once. */
+    val version = androidx.compose.runtime.mutableIntStateOf(0)
+
     fun set(context: Context, account: String, noteId: String, hidden: Boolean) {
+        version.intValue++
         val keys = load(context).toMutableSet()
         if (hidden) keys.add(key(account, noteId)) else keys.remove(key(account, noteId))
         prefs(context).edit().putStringSet("keys", keys).apply()

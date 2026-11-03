@@ -220,7 +220,7 @@
     <string name="sync_requests_24h">Requests to Keep in the last 24 hours: %1$d</string>
     <string name="convert_to_list_hint">This looks like a list.</string>
     <string name="convert_to_list">Convert to checklist</string>
-    <string name="convert_to_list_no">No</string>
+    <string name="convert_to_list_no">Keep as note</string>
     <string name="note_saved">Note saved</string>
     <string name="note_discarded">Note discarded</string>
     <string name="sync_last_ok">Last synced %s</string>

@@ -217,7 +217,7 @@
     <string name="sync_requests_24h">पिछले 24 घंटों में Keep को अनुरोध: %1$d</string>
     <string name="convert_to_list_hint">यह एक सूची जैसा लगता है।</string>
     <string name="convert_to_list">चेकलिस्ट में बदलें</string>
-    <string name="convert_to_list_no">नहीं</string>
+    <string name="convert_to_list_no">नोट रहने दें</string>
     <string name="note_saved">नोट सहेजा गया</string>
     <string name="note_discarded">नोट छोड़ दिया गया</string>
     <string name="sync_last_ok">आख़िरी सिंक %s</string>

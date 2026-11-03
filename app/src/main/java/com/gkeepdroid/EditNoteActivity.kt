@@ -256,7 +256,9 @@ class EditNoteActivity : ComponentActivity() {
         var remindersOpen by remember { mutableStateOf(false) }
         // Reminders of a new note wait here until the note exists and has its id.
         var draftReminders by remember { mutableStateOf(listOf<Reminder>()) }
-        var confirmConvert by remember { mutableStateOf(false) }
+        // Set while an existing note is turned into the other kind: nothing changes until "Save", which
+        // then creates the new note and moves this one to the trash.
+        var convertFrom by remember { mutableStateOf<KeepNote?>(null) }
         val shownReminders = if (existing != null) reminders else draftReminders.sortedBy { it.at }
         val convertPrefs = remember { getSharedPreferences("convert_hints", MODE_PRIVATE) }
         val convertKey = existing?.let { account + "|" + it.id }
@@ -285,22 +287,30 @@ class EditNoteActivity : ComponentActivity() {
             saving = true
             error = ""
             val target = if (existing != null) account else targetAccount
-            val function = if (existing != null) "update_note" else "create_note"
-            val args = if (existing != null) {
+            val converting = convertFrom != null
+            val function = if (existing != null && !converting) "update_note" else "create_note"
+            val args = if (existing != null && !converting) {
                 KeepRepository.updateNoteArgs(existing.id, title, text, items.toList(), color, pinned, removedImages.toList(), labels)
             } else {
                 KeepRepository.createNoteArgs(title, text, isList, items.toList(), color, pinned, labels)
             }
-            if (!CredentialStore.isLocal(target)) {
+            if (!CredentialStore.isLocal(target) || converting) {
                 // The change is stored and sent in the background: the editor closes at once, and a failure
                 // shows up as a notification instead of losing the change.
                 KeepRepository.queueEdit(
                     this@EditNoteActivity,
-                    PendingEdit(target, function, args, reminders = if (existing == null) draftReminders else emptyList()),
+                    if (converting) {
+                        val old = convertFrom!!
+                        val moved = Reminders.list(this@EditNoteActivity, account, old.id)
+                        moved.forEach { Reminders.remove(this@EditNoteActivity, account, old.id, it.id) }
+                        PendingEdit(target, function, args, reminders = moved, hidden = hiddenInWidgets, trashAfter = old.id)
+                    } else {
+                        PendingEdit(target, function, args, reminders = if (existing == null) draftReminders else emptyList())
+                    },
                 )
                 Toast.makeText(applicationContext, R.string.note_saved, Toast.LENGTH_SHORT).show()
                 val prefs = getSharedPreferences("reminder_hints", MODE_PRIVATE)
-                if (!fromHome && android.os.Build.VERSION.SDK_INT >= 33 && !notificationsOn && !prefs.getBoolean("save_asked", false)) {
+                if (!fromHome && !CredentialStore.isLocal(target) && android.os.Build.VERSION.SDK_INT >= 33 && !notificationsOn && !prefs.getBoolean("save_asked", false)) {
                     prefs.edit().putBoolean("save_asked", true).apply()
                     askAfterSave.launch(android.Manifest.permission.POST_NOTIFICATIONS)
                 } else {
@@ -341,25 +351,18 @@ class EditNoteActivity : ComponentActivity() {
             } else if (existing.images.isNotEmpty()) {
                 Toast.makeText(this@EditNoteActivity, R.string.convert_images_blocked, Toast.LENGTH_LONG).show()
             } else {
-                confirmConvert = true
+                val (newText, newItems) = convertedContent(!isList)
+                items.clear()
+                items.addAll(newItems)
+                text = newText
+                isList = !isList
+                convertFrom = if (isList != existing.isList) existing else null
             }
-        }
-
-        fun convertExisting(note: KeepNote) {
-            val toList = !isList
-            val (newText, newItems) = convertedContent(toList)
-            val args = KeepRepository.createNoteArgs(title, newText, toList, newItems, color, pinned, labels)
-            val moved = Reminders.list(this@EditNoteActivity, account, note.id)
-            moved.forEach { Reminders.remove(this@EditNoteActivity, account, note.id, it.id) }
-            KeepRepository.queueEdit(this@EditNoteActivity, PendingEdit(account, "create_note", args, reminders = moved, hidden = hiddenInWidgets))
-            KeepRepository.queueEdit(this@EditNoteActivity, PendingEdit(account, "trash_note", listOf(note.id)))
-            Toast.makeText(applicationContext, R.string.note_saved, Toast.LENGTH_SHORT).show()
-            finish()
         }
 
         fun hasChanges() = if (existing != null) {
             title != existing.title || text != existing.text || items.toList() != existing.items || color != existing.color ||
-                pinned != existing.pinned || labels != existing.labels || removedImages.isNotEmpty()
+                pinned != existing.pinned || labels != existing.labels || removedImages.isNotEmpty() || convertFrom != null
         } else {
             title.isNotBlank() || text.isNotBlank() || items.any { it.text.isNotBlank() }
         }
@@ -496,22 +499,6 @@ class EditNoteActivity : ComponentActivity() {
                         }
                     }
                 }
-            }
-
-            if (confirmConvert && existing != null) {
-                AlertDialog(
-                    onDismissRequest = { confirmConvert = false },
-                    title = { Text(stringResource(if (isList) R.string.convert_to_note else R.string.convert_to_list)) },
-                    text = { Text(stringResource(R.string.convert_existing_hint)) },
-                    confirmButton = {
-                        TextButton(onClick = { confirmConvert = false; convertExisting(existing) }) {
-                            Text(stringResource(if (isList) R.string.convert_to_note else R.string.convert_to_list))
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { confirmConvert = false }) { Text(stringResource(android.R.string.cancel)) }
-                    },
-                )
             }
 
             if (confirmDelete && existing != null) {
@@ -721,6 +708,13 @@ class EditNoteActivity : ComponentActivity() {
                 if (full != null) ImageViewerDialog(full) { viewerImage = null }
             }
 
+            if (convertFrom != null) {
+                Text(
+                    stringResource(R.string.convert_existing_hint),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
             OutlinedTextField(
                 value = title, onValueChange = { title = it },
                 label = { Text(stringResource(R.string.title_hint)) },

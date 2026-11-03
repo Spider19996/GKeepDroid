@@ -608,7 +608,7 @@ class MainActivity : ComponentActivity() {
         }
         val shape = RoundedCornerShape(14.dp)
         // A private note shows only its title until it is opened with the device lock.
-        val hidden = PrivateNotes.key(account, note.id) in remember { PrivateNotes.load(context) }
+        val hidden = PrivateNotes.key(account, note.id) in remember(PrivateNotes.version.intValue) { PrivateNotes.load(context) }
         val thumb = remember(note.id, note.images.firstOrNull(), app.showImages, hidden) {
             if (app.showImages && !hidden) note.images.firstOrNull()?.let { NoteImages.thumbnail(context, account, it) } else null
         }

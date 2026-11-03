@@ -217,7 +217,7 @@
     <string name="sync_requests_24h">Zapytania do Keep w ostatnich 24 godzinach: %1$d</string>
     <string name="convert_to_list_hint">To wygląda na listę.</string>
     <string name="convert_to_list">Zamień na listę kontrolną</string>
-    <string name="convert_to_list_no">Nie</string>
+    <string name="convert_to_list_no">Zostaw notatkę</string>
     <string name="note_saved">Notatka zapisana</string>
     <string name="note_discarded">Notatka odrzucona</string>
     <string name="sync_last_ok">Ostatnia synchronizacja %s</string>

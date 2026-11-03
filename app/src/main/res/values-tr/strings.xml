@@ -217,7 +217,7 @@
     <string name="sync_requests_24h">Son 24 saatte Keep\'e yapılan istekler: %1$d</string>
     <string name="convert_to_list_hint">Bu bir listeye benziyor.</string>
     <string name="convert_to_list">Kontrol listesine dönüştür</string>
-    <string name="convert_to_list_no">Hayır</string>
+    <string name="convert_to_list_no">Not olarak kalsın</string>
     <string name="note_saved">Not kaydedildi</string>
     <string name="note_discarded">Not silindi</string>
     <string name="sync_last_ok">Son eşitleme %s</string>

@@ -217,7 +217,7 @@
     <string name="sync_requests_24h">过去24小时向Keep发出的请求：%1$d</string>
     <string name="convert_to_list_hint">这看起来像一个列表。</string>
     <string name="convert_to_list">转换为清单</string>
-    <string name="convert_to_list_no">否</string>
+    <string name="convert_to_list_no">保持为笔记</string>
     <string name="note_saved">笔记已保存</string>
     <string name="note_discarded">笔记已丢弃</string>
     <string name="sync_last_ok">上次同步 %s</string>

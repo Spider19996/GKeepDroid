@@ -42,6 +42,8 @@ data class PendingEdit(
     /** For a new note: reminders and the "hide content" mark that move to the note once it has its id. */
     val reminders: List<Reminder> = emptyList(),
     val hidden: Boolean = false,
+    /** For a note converted into the other kind: the old note moves to the trash once the new one exists. */
+    val trashAfter: String = "",
 )
 
 /** Edits made without a connection, kept on the device until they can be sent. */
@@ -64,6 +66,7 @@ object PendingEdits {
                     id = o.getString("id"),
                     reminders = o.optJSONArray("reminders")?.let { r -> (0 until r.length()).map { Reminder.fromJson(r.getJSONObject(it)) } }.orEmpty(),
                     hidden = o.optBoolean("hidden"),
+                    trashAfter = o.optString("trashAfter"),
                 )
             }
         } catch (e: Exception) {
@@ -82,6 +85,7 @@ object PendingEdits {
                     .put("error", edit.error)
                     .put("reminders", JSONArray().apply { edit.reminders.forEach { put(it.toJson()) } })
                     .put("hidden", edit.hidden)
+                    .put("trashAfter", edit.trashAfter)
             )
         }
         prefs(context).edit().putString("edits", array.toString()).apply()
@@ -125,6 +129,17 @@ object PendingEdits {
                 val before = if (edit.function == "create_note") Reminders.noteIds(context, edit.account) else emptySet()
                 KeepRepository.run(context, edit.account, edit.function, edit.args, edit.id)
                 if (edit.function == "create_note") Reminders.attachToNew(context, edit, before)
+                if (edit.trashAfter.isNotBlank()) {
+                    // The new note is safe in Keep; a failing trash call must not send it a second time.
+                    try {
+                        KeepRepository.run(context, edit.account, "trash_note", listOf(edit.trashAfter))
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        add(context, PendingEdit(edit.account, "trash_note", listOf(edit.trashAfter)))
+                        retry = true
+                    }
+                }
                 // Not cancellable: an edit that Keep already has must not stay stored and be sent twice.
                 withContext(NonCancellable) {
                     remove(context, edit.id)

@@ -217,7 +217,7 @@
     <string name="sync_requests_24h">過去24時間のKeepへのリクエスト: %1$d</string>
     <string name="convert_to_list_hint">リストのようです。</string>
     <string name="convert_to_list">チェックリストに変換</string>
-    <string name="convert_to_list_no">いいえ</string>
+    <string name="convert_to_list_no">メモのままにする</string>
     <string name="note_saved">メモを保存しました</string>
     <string name="note_discarded">メモを破棄しました</string>
     <string name="sync_last_ok">最終同期 %s</string>

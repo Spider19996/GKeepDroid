@@ -217,7 +217,7 @@
     <string name="sync_requests_24h">Verzoeken aan Keep in de laatste 24 uur: %1$d</string>
     <string name="convert_to_list_hint">Dit lijkt op een lijst.</string>
     <string name="convert_to_list">Omzetten naar checklist</string>
-    <string name="convert_to_list_no">Nee</string>
+    <string name="convert_to_list_no">Notitie houden</string>
     <string name="note_saved">Notitie opgeslagen</string>
     <string name="note_discarded">Notitie verworpen</string>
     <string name="sync_last_ok">Laatst gesynchroniseerd %s</string>

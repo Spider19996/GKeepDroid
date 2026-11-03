@@ -53,10 +53,15 @@ object AppLock {
                         android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL
                 )
                 .build()
-            prompt.authenticate(CancellationSignal(), activity.mainExecutor, object : BiometricPrompt.AuthenticationCallback() {
-                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult?) = onResult(true)
-                override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) = onResult(false)
-            })
+            try {
+                prompt.authenticate(CancellationSignal(), activity.mainExecutor, object : BiometricPrompt.AuthenticationCallback() {
+                    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult?) = onResult(true)
+                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) = onResult(false)
+                })
+            } catch (e: Exception) {
+                // No usable lock after all: the screen stays locked and offers to try again.
+                onResult(false)
+            }
         } else {
             val keyguard = activity.getSystemService(KeyguardManager::class.java)
             val intent = keyguard.createConfirmDeviceCredentialIntent(title, null)

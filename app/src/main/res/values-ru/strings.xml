@@ -217,7 +217,7 @@
     <string name="sync_requests_24h">Запросы к Keep за последние 24 часа: %1$d</string>
     <string name="convert_to_list_hint">Похоже на список.</string>
     <string name="convert_to_list">Преобразовать в список</string>
-    <string name="convert_to_list_no">Нет</string>
+    <string name="convert_to_list_no">Оставить заметкой</string>
     <string name="note_saved">Заметка сохранена</string>
     <string name="note_discarded">Заметка отклонена</string>
     <string name="sync_last_ok">Последняя синхронизация %s</string>
