@@ -13,6 +13,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.gestures.draggable
@@ -862,6 +863,8 @@ class MainActivity : ComponentActivity() {
                     }
                 )
                 .clickable(onClick = onClick)
+                // Tall enough for the fold arrow, also when a folded note has nothing else to show.
+                .then(if (app.foldNotes) Modifier.heightIn(min = 44.dp) else Modifier)
                 // Without a title row the arrow floats over the first line, so that line stops short of it.
                 .padding(start = 12.dp, top = 12.dp, bottom = 12.dp, end = if (app.foldNotes && !hasTitleRow) 36.dp else 12.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -909,7 +912,14 @@ class MainActivity : ComponentActivity() {
                 }
             }
             if (folded) {
-                // Folded: the title line is all there is.
+                // Folded: the title is all there is; a note without one shows its first line instead.
+                if (note.title.isBlank() && !hidden) {
+                    val first = (if (note.isList) note.items.firstOrNull { it.text.isNotBlank() }?.text else note.text.lineSequence().firstOrNull { it.isNotBlank() }).orEmpty()
+                    if (first.isNotBlank()) Text(
+                        first, color = textColor.copy(alpha = 0.7f), style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    )
+                }
             } else if (hidden) {
                 Text(
                     stringResource(R.string.note_private_hint),
