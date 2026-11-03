@@ -279,6 +279,7 @@ internal fun ColumnScope.AppViewPage(s: SettingsState) {
         SwitchRow(R.string.lock_private, appLockPrivate) { appLockPrivate = it }
         SwitchRow(R.string.app_lock_title, appLockApp) { appLockApp = it }
         Hint(R.string.app_lock_hint)
+        if (appLockApp) NumberRow(R.string.app_lock_grace, appLockGrace, "s") { appLockGrace = it }
 
         Text(stringResource(R.string.plain_style))
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

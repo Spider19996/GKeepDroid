@@ -297,4 +297,5 @@
     <string name="convert_images_blocked">이미지가 있는 메모는 변환할 수 없습니다.</string>
     <string name="notif_off_main">알림이 꺼져 있습니다. 동기화나 저장이 실패해도 알림이 오지 않으며, 이런 오류는 여기 맨 위에만 표시됩니다.</string>
     <string name="notif_hint_dismiss">다시 표시 안 함</string>
+    <string name="app_lock_grace">다시 묻지 않는 시간</string>
 </resources>

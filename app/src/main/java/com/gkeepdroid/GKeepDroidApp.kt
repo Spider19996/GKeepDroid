@@ -7,6 +7,15 @@ class GKeepDroidApp : Application() {
         super.onCreate()
         LocaleHelper.applyToApp(this)
         NotificationChannels.create(this)
+        // Switching the screen off (locking the phone) locks the app at once.
+        androidx.core.content.ContextCompat.registerReceiver(
+            this,
+            object : android.content.BroadcastReceiver() {
+                override fun onReceive(context: android.content.Context, intent: android.content.Intent) = AppLock.lockNow()
+            },
+            android.content.IntentFilter(android.content.Intent.ACTION_SCREEN_OFF),
+            androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED,
+        )
         // Watch the Markdown folder for edits made by other apps while the process lives.
         if (MarkdownSync.isEnabled(this)) MarkdownSync.startObserving(this)
         ScreenSync.start(this)

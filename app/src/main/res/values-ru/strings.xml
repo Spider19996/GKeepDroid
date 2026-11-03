@@ -297,4 +297,5 @@
     <string name="convert_images_blocked">Заметки с изображениями нельзя преобразовать.</string>
     <string name="notif_off_main">Уведомления выключены. Об ошибках синхронизации или сохранения уведомления не придут; такие ошибки показываются только здесь, вверху.</string>
     <string name="notif_hint_dismiss">Больше не показывать</string>
+    <string name="app_lock_grace">Не спрашивать повторно в течение</string>
 </resources>

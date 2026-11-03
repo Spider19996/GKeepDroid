@@ -297,4 +297,5 @@
     <string name="convert_images_blocked">Le note con immagini non possono essere convertite.</string>
     <string name="notif_off_main">Le notifiche sono disattivate. Non sarai avvisato se la sincronizzazione o il salvataggio falliscono; questi errori compaiono solo qui in alto.</string>
     <string name="notif_hint_dismiss">Non mostrare più</string>
+    <string name="app_lock_grace">Non chiedere di nuovo entro</string>
 </resources>

@@ -769,6 +769,8 @@ data class AppSettings(
     val lockPrivateNotes: Boolean = true,
     /** The whole app asks for fingerprint, PIN or password. */
     val lockApp: Boolean = false,
+    /** Seconds in the background during which the app opens again without asking. */
+    val lockGraceSec: Int = 10,
 )
 
 object AppSettingsStore {
@@ -791,6 +793,7 @@ object AppSettingsStore {
             showProgress = p.getBoolean("show_progress", d.showProgress),
             lockPrivateNotes = p.getBoolean("lock_private_notes", d.lockPrivateNotes),
             lockApp = p.getBoolean("lock_app", d.lockApp),
+            lockGraceSec = p.getInt("lock_grace_sec", d.lockGraceSec),
         )
     }
 
@@ -809,6 +812,7 @@ object AppSettingsStore {
             .putBoolean("show_progress", s.showProgress)
             .putBoolean("lock_private_notes", s.lockPrivateNotes)
             .putBoolean("lock_app", s.lockApp)
+            .putInt("lock_grace_sec", s.lockGraceSec)
             .apply()
     }
 }

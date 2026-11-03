@@ -297,4 +297,5 @@
     <string name="convert_images_blocked">لا يمكن تحويل الملاحظات التي تحتوي على صور.</string>
     <string name="notif_off_main">सूचनाएँ बंद हैं। सिंक या सेव विफल होने पर सूचना नहीं मिलेगी; ऐसी त्रुटियाँ केवल यहाँ ऊपर दिखेंगी।</string>
     <string name="notif_hint_dismiss">عدم الإظهار مجددًا</string>
+    <string name="app_lock_grace">عدم السؤال مجددًا خلال</string>
 </resources>

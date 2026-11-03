@@ -297,4 +297,5 @@
     <string name="convert_images_blocked">Notizen mit Bildern lassen sich nicht umwandeln.</string>
     <string name="notif_off_main">Benachrichtigungen sind ausgeschaltet. Du erfährst nicht per Benachrichtigung, wenn Synchronisieren oder Speichern fehlschlägt; solche Fehler erscheinen nur hier oben.</string>
     <string name="notif_hint_dismiss">Nicht mehr anzeigen</string>
+    <string name="app_lock_grace">Nicht erneut fragen innerhalb von</string>
 </resources>

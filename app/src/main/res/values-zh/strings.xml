@@ -297,4 +297,5 @@
     <string name="convert_images_blocked">带图片的笔记无法转换。</string>
     <string name="notif_off_main">الإشعارات متوقفة. لن يصلك إشعار عند فشل المزامنة أو الحفظ؛ تظهر هذه الأخطاء هنا في الأعلى فقط.</string>
     <string name="notif_hint_dismiss">不再显示</string>
+    <string name="app_lock_grace">在此时间内不再询问</string>
 </resources>

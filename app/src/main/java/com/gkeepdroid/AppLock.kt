@@ -27,14 +27,25 @@ import androidx.lifecycle.LifecycleEventObserver
  * it has no sensor. Once opened, the app stays open while it is used and for a short time in the background.
  */
 object AppLock {
-    private const val GRACE_MS = 30_000L
+    /** Counts every "lock now", so open screens lock at once. */
+    val lockVersion = androidx.compose.runtime.mutableIntStateOf(0)
 
     enum class Result { OK, CANCELED, FAILED }
 
     private var openedOnce = false
     private var lastActive = 0L
 
-    private fun valid() = openedOnce && SystemClock.elapsedRealtime() - lastActive < GRACE_MS
+    /** Seconds in the background (or the lock screen) that the app stays open; at least two, so passing the lock itself never asks again. */
+    private fun graceMs(context: android.content.Context) = maxOf(AppSettingsStore.load(context).lockGraceSec * 1000L, 2_000L)
+
+    private fun valid(context: android.content.Context) =
+        openedOnce && SystemClock.elapsedRealtime() - lastActive < graceMs(context)
+
+    /** Locks at once: the next look at the app asks for the lock. */
+    fun lockNow() {
+        openedOnce = false
+        lockVersion.intValue++
+    }
 
     private fun touch() {
         lastActive = SystemClock.elapsedRealtime()
@@ -81,7 +92,7 @@ object AppLock {
             content()
             return
         }
-        var unlocked by remember { mutableStateOf(valid()) }
+        var unlocked by remember { mutableStateOf(valid(activity)) }
         var asking by remember { mutableStateOf(false) }
         val credential = androidx.activity.compose.rememberLauncherForActivityResult(
             androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
@@ -112,11 +123,23 @@ object AppLock {
                 }
             }
         }
+        // "Lock now" (menu, screen off) takes effect while the app is open, too.
+        val lockCount = lockVersion.intValue
+        androidx.compose.runtime.LaunchedEffect(lockCount) {
+            if (!valid(activity)) {
+                unlocked = false
+                if (activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) ask()
+            }
+        }
         DisposableEffect(activity) {
             val observer = LifecycleEventObserver { _, event ->
                 when (event) {
-                    Lifecycle.Event.ON_PAUSE -> if (unlocked && !asking) touch()
-                    Lifecycle.Event.ON_RESUME -> if (!valid()) {
+                    Lifecycle.Event.ON_PAUSE -> {
+                        if (unlocked && !asking) touch()
+                        // Closing the app with Back locks it again at once.
+                        if (activity.isFinishing && activity.isTaskRoot) lockNow()
+                    }
+                    Lifecycle.Event.ON_RESUME -> if (!valid(activity)) {
                         unlocked = false
                         ask()
                     } else {

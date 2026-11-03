@@ -297,4 +297,5 @@
     <string name="convert_images_blocked">Notities met afbeeldingen kunnen niet worden omgezet.</string>
     <string name="notif_off_main">Meldingen staan uit. Je krijgt geen melding als synchroniseren of opslaan mislukt; zulke fouten verschijnen alleen hier bovenaan.</string>
     <string name="notif_hint_dismiss">Niet meer tonen</string>
+    <string name="app_lock_grace">Niet opnieuw vragen binnen</string>
 </resources>

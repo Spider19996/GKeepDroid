@@ -297,4 +297,5 @@
     <string name="convert_images_blocked">Resimli notlar dönüştürülemez.</string>
     <string name="notif_off_main">Bildirimler kapalı. Eşitleme veya kaydetme başarısız olursa bildirim almazsın; bu hatalar yalnızca burada, üstte görünür.</string>
     <string name="notif_hint_dismiss">Bir daha gösterme</string>
+    <string name="app_lock_grace">Şu süre içinde tekrar sorma</string>
 </resources>

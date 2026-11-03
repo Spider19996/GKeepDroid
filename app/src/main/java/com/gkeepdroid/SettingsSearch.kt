@@ -57,6 +57,7 @@ internal fun settingEntries(isSingleNote: Boolean): List<SettingEntry> = buildLi
     add(SettingEntry(R.string.show_progress, Page.Notes))
     add(SettingEntry(R.string.lock_private, Page.AppView))
     add(SettingEntry(R.string.app_lock_title, Page.AppView))
+    add(SettingEntry(R.string.app_lock_grace, Page.AppView))
     if (!isSingleNote) add(SettingEntry(R.string.max_lines, Page.Notes))
     if (isSingleNote) add(SettingEntry(R.string.show_add_item_button, Page.ButtonBar))
     if (!isSingleNote) {

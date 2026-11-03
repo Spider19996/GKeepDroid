@@ -297,4 +297,5 @@
     <string name="convert_images_blocked">画像付きのメモは変換できません。</string>
     <string name="notif_off_main">通知がオフです。同期や保存に失敗しても通知されません。そのようなエラーはここ上部にのみ表示されます。</string>
     <string name="notif_hint_dismiss">今後表示しない</string>
+    <string name="app_lock_grace">再確認までの時間</string>
 </resources>

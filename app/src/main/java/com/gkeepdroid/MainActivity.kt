@@ -292,6 +292,11 @@ class MainActivity : ComponentActivity() {
                                 leadingIcon = { Icon(painterResource(R.drawable.ic_delete), contentDescription = null) },
                                 onClick = { menuOpen = false; screen = AppScreen.Trash },
                             )
+                            if (app.lockApp && AppLock.enabled(this@MainActivity)) DropdownMenuItem(
+                                text = { Text(stringResource(R.string.app_lock_title)) },
+                                leadingIcon = { Icon(painterResource(R.drawable.ic_lock), contentDescription = null) },
+                                onClick = { menuOpen = false; AppLock.lockNow() },
+                            )
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.menu_settings)) },
                                 leadingIcon = { Icon(painterResource(R.drawable.ic_settings), contentDescription = null) },

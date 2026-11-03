@@ -297,4 +297,5 @@
     <string name="convert_images_blocked">Notatek z obrazami nie można zamienić.</string>
     <string name="notif_off_main">Powiadomienia są wyłączone. Nie dostaniesz powiadomienia o błędzie synchronizacji lub zapisu; takie błędy pojawią się tylko tutaj, na górze.</string>
     <string name="notif_hint_dismiss">Nie pokazuj więcej</string>
+    <string name="app_lock_grace">Nie pytaj ponownie przez</string>
 </resources>
