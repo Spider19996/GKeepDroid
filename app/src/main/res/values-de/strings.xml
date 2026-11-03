@@ -301,4 +301,8 @@
     <string name="edit_unlock">Bearbeiten entsperren</string>
     <string name="lock_edit_title">Bearbeiten sperren</string>
     <string name="lock_edit_hint">Notizen lassen sich weiter lesen und öffnen. Ändern, Archivieren oder Löschen fragt nach Fingerabdruck, PIN oder Passwort.</string>
+    <string name="section_accounts_sync">Konten &amp; Synchronisation</string>
+    <string name="section_security">Sicherheit &amp; Datenschutz</string>
+    <string name="section_data">Daten</string>
+    <string name="lock_private_hint">Als „Inhalte ausblenden“ markierte Notizen zeigen nur den Titel und fragen beim Öffnen nach der Gerätesperre.</string>
 </resources>

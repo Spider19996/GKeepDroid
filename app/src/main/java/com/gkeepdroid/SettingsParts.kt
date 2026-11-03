@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -129,7 +130,7 @@ internal fun MenuRow(title: String, summary: String?, chevron: String = "›", o
 
 /** The checkbox as the widget draws it, in the settings colors. */
 @Composable
-internal fun CheckboxPreview(style: Int, checked: Boolean, sizeDp: Int) {
+internal fun CheckboxPreview(style: Int, checked: Boolean, sizeDp: Int, tint: Color = MaterialTheme.colorScheme.onSurface) {
     val resource = when (style) {
         CB_SQUARE -> if (checked) R.drawable.cb_square_on else R.drawable.cb_square_off
         CB_ROUNDED -> if (checked) R.drawable.cb_rounded_on else R.drawable.cb_rounded_off
@@ -140,11 +141,11 @@ internal fun CheckboxPreview(style: Int, checked: Boolean, sizeDp: Int) {
         Image(
             painter = painterResource(resource),
             contentDescription = null,
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
+            colorFilter = ColorFilter.tint(tint),
             modifier = Modifier.size(sizeDp.dp),
         )
     } else {
-        Text(if (checked) "☑" else "☐", fontSize = (sizeDp * 0.85f).sp)
+        Text(if (checked) "☑" else "☐", fontSize = (sizeDp * 0.85f).sp, color = tint)
     }
 }
 

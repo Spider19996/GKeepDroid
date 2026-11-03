@@ -75,13 +75,14 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
             }
         } else {
         val globalSection: @Composable () -> Unit = {
-            SectionTitle(stringResource(R.string.settings_global))
+            SectionTitle(stringResource(R.string.section_accounts_sync))
             MenuRow(
                 stringResource(R.string.tab_accounts),
                 accounts.joinToString { CredentialStore.displayName(context, it, demoMode) }.ifEmpty { "–" },
             ) { page = Page.Accounts }
             MenuRow(stringResource(R.string.sync_section), null) { page = Page.Sync }
-            MenuRow(stringResource(R.string.reminders_title), null) { page = Page.Reminders }
+
+            SectionTitle(stringResource(R.string.appearance))
             PopupRow(
                 pendingPopup == "theme", { pendingPopup = null },
                 stringResource(R.string.theme_section),
@@ -100,12 +101,18 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
                     ((if (tag == language) "✓ " else "") + name) to { changeLanguage(tag) }
                 },
             )
+            MenuRow(stringResource(R.string.app_view), null) { page = Page.AppView }
+            MenuRow(stringResource(R.string.list_section), null) { page = Page.AppChecklists }
+
+            SectionTitle(stringResource(R.string.reminders_title))
+            MenuRow(stringResource(R.string.reminders_title), null) { page = Page.Reminders }
+
+            SectionTitle(stringResource(R.string.section_security))
+            MenuRow(stringResource(R.string.section_security), null) { page = Page.Security }
+
+            SectionTitle(stringResource(R.string.section_data))
             MenuRow(stringResource(R.string.tab_backup), if (mdEnabled) mdFolder else null) { page = Page.Backup }
             SwitchRow(R.string.demo_mode, demoMode) { demoMode = it }
-        }
-        val appSection: @Composable () -> Unit = {
-            SectionTitle(stringResource(R.string.settings_app))
-            MenuRow(stringResource(R.string.app_view), null) { page = Page.AppView }
         }
         val widgetSection: @Composable () -> Unit = {
             if (hasWidget) {
@@ -169,7 +176,7 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
         }
         // Opened for a widget, only that widget's settings show; from the app, the rest does.
         val sections = if (hasWidget) listOf(widgetSection)
-        else listOf(globalSection, appSection, widgetSection)
+        else listOf(globalSection, widgetSection)
         sections.forEachIndexed { index, section ->
             if (index > 0) HorizontalDivider()
             section()

@@ -301,4 +301,8 @@
     <string name="edit_unlock">Bewerken ontgrendelen</string>
     <string name="lock_edit_title">Bewerken vergrendelen</string>
     <string name="lock_edit_hint">Notities blijven leesbaar en te openen. Wijzigen, archiveren of verwijderen vraagt om vingerafdruk, pincode of wachtwoord.</string>
+    <string name="section_accounts_sync">Accounts en synchronisatie</string>
+    <string name="section_security">Beveiliging en privacy</string>
+    <string name="section_data">Gegevens</string>
+    <string name="lock_private_hint">Notities met “Inhoud verbergen” tonen alleen hun titel en vragen bij openen om de schermvergrendeling.</string>
 </resources>

@@ -301,4 +301,8 @@
     <string name="edit_unlock">संपादन अनलॉक करें</string>
     <string name="lock_edit_title">संपादन लॉक करें</string>
     <string name="lock_edit_hint">नोट पढ़े और खोले जा सकते हैं। बदलने, आर्काइव या हटाने पर फ़िंगरप्रिंट, PIN या पासवर्ड माँगा जाएगा।</string>
+    <string name="section_accounts_sync">खाते और सिंक</string>
+    <string name="section_security">सुरक्षा और गोपनीयता</string>
+    <string name="section_data">डेटा</string>
+    <string name="lock_private_hint">“सामग्री छिपाएँ” वाले नोट केवल शीर्षक दिखाते हैं और खोलते समय डिवाइस लॉक माँगते हैं।</string>
 </resources>

@@ -20,6 +20,8 @@ internal enum class Page(val title: Int) {
     Backup(R.string.tab_backup),
     Sync(R.string.sync_section),
     Reminders(R.string.reminders_title),
+    Security(R.string.section_security),
+    AppChecklists(R.string.list_section),
 }
 
 /** One searchable setting: its label, the page it lives on, and the popup it opens (if any). */
@@ -55,10 +57,15 @@ internal fun settingEntries(isSingleNote: Boolean): List<SettingEntry> = buildLi
     add(SettingEntry(R.string.reminder_show_widget, Page.Notes))
     if (!isSingleNote) add(SettingEntry(R.string.label_filter, Page.Notes, popup = "labelfilter"))
     add(SettingEntry(R.string.show_progress, Page.Notes))
-    add(SettingEntry(R.string.lock_private, Page.AppView))
-    add(SettingEntry(R.string.app_lock_title, Page.AppView))
-    add(SettingEntry(R.string.app_lock_grace, Page.AppView))
-    add(SettingEntry(R.string.lock_edit_title, Page.AppView))
+    add(SettingEntry(R.string.section_security, Page.Security))
+    add(SettingEntry(R.string.lock_private, Page.Security))
+    add(SettingEntry(R.string.app_lock_title, Page.Security))
+    add(SettingEntry(R.string.app_lock_grace, Page.Security))
+    add(SettingEntry(R.string.lock_edit_title, Page.Security))
+    add(SettingEntry(R.string.list_section, Page.AppChecklists))
+    listOf(R.string.checked_to_end, R.string.collapse_checked, R.string.list_spacing, R.string.checkbox_style, R.string.checkbox_size)
+        .forEach { add(SettingEntry(it, Page.AppChecklists)) }
+    add(SettingEntry(R.string.reminder_show_widget, Page.AppView))
     if (!isSingleNote) add(SettingEntry(R.string.max_lines, Page.Notes))
     if (isSingleNote) add(SettingEntry(R.string.show_add_item_button, Page.ButtonBar))
     if (!isSingleNote) {

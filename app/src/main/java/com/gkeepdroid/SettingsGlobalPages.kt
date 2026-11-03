@@ -276,12 +276,7 @@ internal fun ColumnScope.AppViewPage(s: SettingsState) {
         if (appShowEdited) SwitchRow(R.string.edited_as_date, appEditedAsDate) { appEditedAsDate = it }
         SwitchRow(R.string.show_labels, appShowLabels) { appShowLabels = it }
         SwitchRow(R.string.show_progress, appShowProgress) { appShowProgress = it }
-        SwitchRow(R.string.lock_private, appLockPrivate) { appLockPrivate = it }
-        SwitchRow(R.string.app_lock_title, appLockApp) { appLockApp = it }
-        Hint(R.string.app_lock_hint)
-        SwitchRow(R.string.lock_edit_title, appLockEdit) { appLockEdit = it }
-        Hint(R.string.lock_edit_hint)
-        if (appLockApp || appLockEdit) NumberRow(R.string.app_lock_grace, appLockGrace, "s") { appLockGrace = it }
+        SwitchRow(R.string.reminder_show_widget, appShowReminders) { appShowReminders = it }
 
         Text(stringResource(R.string.plain_style))
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -307,5 +302,55 @@ internal fun ColumnScope.AppViewPage(s: SettingsState) {
             value = appPreviewLines.toFloat(), onValueChange = { appPreviewLines = it.toInt() },
             valueRange = 0f..30f, steps = 29,
         )
+    }
+}
+
+@Composable
+internal fun ColumnScope.SecurityPage(s: SettingsState) {
+    with(s) {
+        SwitchRow(R.string.lock_private, appLockPrivate) { appLockPrivate = it }
+        Hint(R.string.lock_private_hint)
+        SwitchRow(R.string.app_lock_title, appLockApp) { appLockApp = it }
+        Hint(R.string.app_lock_hint)
+        SwitchRow(R.string.lock_edit_title, appLockEdit) { appLockEdit = it }
+        Hint(R.string.lock_edit_hint)
+        if (appLockApp || appLockEdit) NumberRow(R.string.app_lock_grace, appLockGrace, "s") { appLockGrace = it }
+
+    }
+}
+
+/** The checklists on the cards of the app: order, hidden checked items, box style and spacing. */
+@Composable
+internal fun ColumnScope.AppChecklistsPage(s: SettingsState) {
+    with(s) {
+        SwitchRow(R.string.checked_to_end, appListCheckedToEnd) { appListCheckedToEnd = it }
+        if (appListCheckedToEnd) SwitchRow(R.string.collapse_checked, appListCollapseChecked) { appListCollapseChecked = it }
+        HorizontalDivider(Modifier.padding(vertical = 4.dp))
+        Text("${stringResource(R.string.list_spacing)}: $appListSpacing dp")
+        Slider(value = appListSpacing.toFloat(), onValueChange = { appListSpacing = it.toInt() }, valueRange = 0f..24f)
+        Text(stringResource(R.string.checkbox_style), style = MaterialTheme.typography.titleMedium)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(
+                CB_SQUARE to R.string.cb_style_square,
+                CB_ROUNDED to R.string.cb_style_rounded,
+                CB_CIRCLE to R.string.cb_style_circle,
+                CB_CLASSIC to R.string.cb_style_classic,
+            ).forEach { (style, label) ->
+                FilterChip(
+                    selected = appListCheckboxStyle == style,
+                    onClick = { appListCheckboxStyle = style },
+                    label = { Text(stringResource(label)) },
+                )
+            }
+        }
+        Text(stringResource(R.string.checkbox_size, appListCheckboxSize))
+        Slider(value = appListCheckboxSize.toFloat(), onValueChange = { appListCheckboxSize = it.toInt() }, valueRange = 12f..40f)
+        // Live preview of both states with the chosen style, size and spacing.
+        listOf(false, true).forEach { checked ->
+            Row(Modifier.padding(vertical = (appListSpacing / 2).dp), verticalAlignment = Alignment.CenterVertically) {
+                CheckboxPreview(appListCheckboxStyle, checked, appListCheckboxSize)
+                Text(stringResource(R.string.item_hint), Modifier.padding(start = 8.dp))
+            }
+        }
     }
 }

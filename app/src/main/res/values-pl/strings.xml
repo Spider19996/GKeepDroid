@@ -301,4 +301,8 @@
     <string name="edit_unlock">Odblokuj edycję</string>
     <string name="lock_edit_title">Zablokuj edycję</string>
     <string name="lock_edit_hint">Notatki nadal można czytać i otwierać. Zmiana, archiwizacja lub usunięcie wymaga odcisku palca, PIN-u lub hasła.</string>
+    <string name="section_accounts_sync">Konta i synchronizacja</string>
+    <string name="section_security">Bezpieczeństwo i prywatność</string>
+    <string name="section_data">Dane</string>
+    <string name="lock_private_hint">Notatki oznaczone „Ukryj treść” pokazują tylko tytuł i przy otwarciu proszą o blokadę urządzenia.</string>
 </resources>

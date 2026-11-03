@@ -301,4 +301,8 @@
     <string name="edit_unlock">Разблокировать редактирование</string>
     <string name="lock_edit_title">Заблокировать редактирование</string>
     <string name="lock_edit_hint">Заметки по-прежнему можно читать и открывать. Изменение, архивирование и удаление требуют отпечаток, PIN-код или пароль.</string>
+    <string name="section_accounts_sync">Аккаунты и синхронизация</string>
+    <string name="section_security">Безопасность и конфиденциальность</string>
+    <string name="section_data">Данные</string>
+    <string name="lock_private_hint">Заметки с пометкой «Скрыть содержимое» показывают только заголовок и при открытии запрашивают блокировку устройства.</string>
 </resources>

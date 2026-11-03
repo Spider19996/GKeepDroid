@@ -322,6 +322,8 @@ class SettingsActivity : ComponentActivity() {
                     when (page) {
                         Page.Main -> MainPage(state)
                         Page.AppView -> AppViewPage(state)
+                        Page.Security -> SecurityPage(state)
+                        Page.AppChecklists -> AppChecklistsPage(state)
                         Page.Accounts -> AccountsPage(state)
                         Page.Appearance -> AppearancePage(state)
                         Page.Notes -> NotesPage(state)

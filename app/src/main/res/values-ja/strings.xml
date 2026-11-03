@@ -301,4 +301,8 @@
     <string name="edit_unlock">編集のロック解除</string>
     <string name="lock_edit_title">編集をロック</string>
     <string name="lock_edit_hint">メモの閲覧と表示は引き続き可能です。変更・アーカイブ・削除には指紋、PIN、パスワードが必要です。</string>
+    <string name="section_accounts_sync">アカウントと同期</string>
+    <string name="section_security">セキュリティとプライバシー</string>
+    <string name="section_data">データ</string>
+    <string name="lock_private_hint">「内容を隠す」にしたメモはタイトルのみ表示され、開くときにデバイスのロックを求めます。</string>
 </resources>

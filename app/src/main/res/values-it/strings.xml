@@ -301,4 +301,8 @@
     <string name="edit_unlock">Sblocca modifica</string>
     <string name="lock_edit_title">Blocca la modifica</string>
     <string name="lock_edit_hint">Le note restano leggibili e apribili. Modificarle, archiviarle o eliminarle chiede impronta, PIN o password.</string>
+    <string name="section_accounts_sync">Account e sincronizzazione</string>
+    <string name="section_security">Sicurezza e privacy</string>
+    <string name="section_data">Dati</string>
+    <string name="lock_private_hint">Le note contrassegnate con «Nascondi contenuti» mostrano solo il titolo e chiedono il blocco del dispositivo all’apertura.</string>
 </resources>

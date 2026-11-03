@@ -304,4 +304,8 @@
     <string name="edit_unlock">Unlock editing</string>
     <string name="lock_edit_title">Lock editing</string>
     <string name="lock_edit_hint">Notes can still be read and opened. Changing, archiving or deleting them asks for fingerprint, PIN or password.</string>
+    <string name="section_accounts_sync">Accounts &amp; sync</string>
+    <string name="section_security">Security &amp; privacy</string>
+    <string name="section_data">Data</string>
+    <string name="lock_private_hint">Notes marked “Hide content” show only their title and ask for the device lock when opened.</string>
 </resources>

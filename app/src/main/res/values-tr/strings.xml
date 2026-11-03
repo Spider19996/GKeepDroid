@@ -301,4 +301,8 @@
     <string name="edit_unlock">Düzenlemeyi aç</string>
     <string name="lock_edit_title">Düzenlemeyi kilitle</string>
     <string name="lock_edit_hint">Notlar yine okunabilir ve açılabilir. Değiştirme, arşivleme veya silme parmak izi, PIN veya parola ister.</string>
+    <string name="section_accounts_sync">Hesaplar ve eşitleme</string>
+    <string name="section_security">Güvenlik ve gizlilik</string>
+    <string name="section_data">Veri</string>
+    <string name="lock_private_hint">“İçeriği gizle” işaretli notlar yalnızca başlığı gösterir ve açılırken cihaz kilidini ister.</string>
 </resources>

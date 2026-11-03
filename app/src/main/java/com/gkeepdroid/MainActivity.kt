@@ -674,7 +674,7 @@ class MainActivity : ComponentActivity() {
             }
             // Read again whenever the screen comes back, as reminders are changed in the editor.
             remember(resumeKey, note.id) { Reminders.list(context, account, note.id) }.let { reminders ->
-                if (reminders.isNotEmpty()) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                if (app.showReminders && reminders.isNotEmpty()) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Icon(painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminder), tint = textColor, modifier = Modifier.size(14.dp))
                     Text(
                         Reminders.label(context, reminders.first().at) + if (reminders.size > 1) "  (+${reminders.size - 1})" else "",
@@ -701,18 +701,25 @@ class MainActivity : ComponentActivity() {
             if (note.isList) {
                 val open = note.items.filter { !it.checked }
                 val done = note.items.filter { it.checked }
-                (open + done).take(lines).forEach { item ->
-                    Text(
-                        (if (item.checked) "☑ " else "☐ ") + item.text,
-                        color = if (item.checked) textColor.copy(alpha = 0.55f) else textColor,
-                        style = MaterialTheme.typography.bodyMedium,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                    )
+                // Checked items go last, and can be left out altogether.
+                val ordered = if (app.listCheckedToEnd) open + done else note.items
+                val visible = if (app.listCheckedToEnd && app.listCollapseChecked) open else ordered
+                visible.take(lines).forEach { item ->
+                    Row(Modifier.padding(vertical = (app.listSpacingDp / 2f).dp), verticalAlignment = Alignment.CenterVertically) {
+                        CheckboxPreview(app.listCheckboxStyle, item.checked, app.listCheckboxSizeDp, textColor.copy(alpha = if (item.checked) 0.55f else 1f))
+                        Text(
+                            item.text,
+                            color = if (item.checked) textColor.copy(alpha = 0.55f) else textColor,
+                            style = MaterialTheme.typography.bodyMedium,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(start = 6.dp),
+                        )
+                    }
                 }
-                if (note.items.size > lines) {
+                if (visible.size > lines) {
                     Text(
-                        stringResource(R.string.items_more, note.items.size - lines),
+                        stringResource(R.string.items_more, visible.size - lines),
                         color = textColor.copy(alpha = 0.65f),
                         style = MaterialTheme.typography.bodySmall,
                     )

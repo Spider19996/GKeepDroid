@@ -301,4 +301,8 @@
     <string name="edit_unlock">Desbloquear edición</string>
     <string name="lock_edit_title">Bloquear la edición</string>
     <string name="lock_edit_hint">Las notas se pueden seguir leyendo y abriendo. Cambiarlas, archivarlas o borrarlas pide huella, PIN o contraseña.</string>
+    <string name="section_accounts_sync">Cuentas y sincronización</string>
+    <string name="section_security">Seguridad y privacidad</string>
+    <string name="section_data">Datos</string>
+    <string name="lock_private_hint">Las notas marcadas con «Ocultar contenido» solo muestran su título y piden el bloqueo del dispositivo al abrirse.</string>
 </resources>

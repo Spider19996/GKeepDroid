@@ -773,6 +773,14 @@ data class AppSettings(
     val lockEdit: Boolean = false,
     /** Seconds in the background during which the app opens again without asking. */
     val lockGraceSec: Int = 10,
+    /** Reminders on the cards. */
+    val showReminders: Boolean = true,
+    /** Checklists on the cards: checked items last, optionally hidden, and how the boxes look. */
+    val listCheckedToEnd: Boolean = true,
+    val listCollapseChecked: Boolean = false,
+    val listCheckboxStyle: Int = CB_CLASSIC,
+    val listCheckboxSizeDp: Int = 18,
+    val listSpacingDp: Int = 2,
 )
 
 object AppSettingsStore {
@@ -797,6 +805,12 @@ object AppSettingsStore {
             lockApp = p.getBoolean("lock_app", d.lockApp),
             lockEdit = p.getBoolean("lock_edit", d.lockEdit),
             lockGraceSec = p.getInt("lock_grace_sec", d.lockGraceSec),
+            showReminders = p.getBoolean("show_reminders", d.showReminders),
+            listCheckedToEnd = p.getBoolean("list_checked_to_end", d.listCheckedToEnd),
+            listCollapseChecked = p.getBoolean("list_collapse_checked", d.listCollapseChecked),
+            listCheckboxStyle = p.getInt("list_checkbox_style", d.listCheckboxStyle),
+            listCheckboxSizeDp = p.getInt("list_checkbox_size_dp", d.listCheckboxSizeDp),
+            listSpacingDp = p.getInt("list_spacing_dp", d.listSpacingDp),
         )
     }
 
@@ -817,6 +831,12 @@ object AppSettingsStore {
             .putBoolean("lock_app", s.lockApp)
             .putBoolean("lock_edit", s.lockEdit)
             .putInt("lock_grace_sec", s.lockGraceSec)
+            .putBoolean("show_reminders", s.showReminders)
+            .putBoolean("list_checked_to_end", s.listCheckedToEnd)
+            .putBoolean("list_collapse_checked", s.listCollapseChecked)
+            .putInt("list_checkbox_style", s.listCheckboxStyle)
+            .putInt("list_checkbox_size_dp", s.listCheckboxSizeDp)
+            .putInt("list_spacing_dp", s.listSpacingDp)
             .apply()
     }
 }

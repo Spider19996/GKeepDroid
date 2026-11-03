@@ -301,4 +301,8 @@
     <string name="edit_unlock">Déverrouiller la modification</string>
     <string name="lock_edit_title">Verrouiller la modification</string>
     <string name="lock_edit_hint">Les notes restent lisibles et ouvrables. Les modifier, archiver ou supprimer demande l’empreinte, le PIN ou le mot de passe.</string>
+    <string name="section_accounts_sync">Comptes et synchronisation</string>
+    <string name="section_security">Sécurité et confidentialité</string>
+    <string name="section_data">Données</string>
+    <string name="lock_private_hint">Les notes marquées « Masquer les contenus » n’affichent que leur titre et demandent le verrouillage de l’appareil à l’ouverture.</string>
 </resources>
