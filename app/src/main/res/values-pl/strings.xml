@@ -298,4 +298,7 @@
     <string name="notif_off_main">Powiadomienia są wyłączone. Nie dostaniesz powiadomienia o błędzie synchronizacji lub zapisu; takie błędy pojawią się tylko tutaj, na górze.</string>
     <string name="notif_hint_dismiss">Nie pokazuj więcej</string>
     <string name="app_lock_grace">Nie pytaj ponownie przez</string>
+    <string name="edit_unlock">Odblokuj edycję</string>
+    <string name="lock_edit_title">Zablokuj edycję</string>
+    <string name="lock_edit_hint">Notatki nadal można czytać i otwierać. Zmiana, archiwizacja lub usunięcie wymaga odcisku palca, PIN-u lub hasła.</string>
 </resources>

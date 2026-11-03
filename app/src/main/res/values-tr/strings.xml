@@ -298,4 +298,7 @@
     <string name="notif_off_main">Bildirimler kapalı. Eşitleme veya kaydetme başarısız olursa bildirim almazsın; bu hatalar yalnızca burada, üstte görünür.</string>
     <string name="notif_hint_dismiss">Bir daha gösterme</string>
     <string name="app_lock_grace">Şu süre içinde tekrar sorma</string>
+    <string name="edit_unlock">Düzenlemeyi aç</string>
+    <string name="lock_edit_title">Düzenlemeyi kilitle</string>
+    <string name="lock_edit_hint">Notlar yine okunabilir ve açılabilir. Değiştirme, arşivleme veya silme parmak izi, PIN veya parola ister.</string>
 </resources>

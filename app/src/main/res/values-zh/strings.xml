@@ -298,4 +298,7 @@
     <string name="notif_off_main">الإشعارات متوقفة. لن يصلك إشعار عند فشل المزامنة أو الحفظ؛ تظهر هذه الأخطاء هنا في الأعلى فقط.</string>
     <string name="notif_hint_dismiss">不再显示</string>
     <string name="app_lock_grace">在此时间内不再询问</string>
+    <string name="edit_unlock">解锁编辑</string>
+    <string name="lock_edit_title">锁定编辑</string>
+    <string name="lock_edit_hint">笔记仍可阅读和打开。修改、归档或删除时需要指纹、PIN 或密码。</string>
 </resources>

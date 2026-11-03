@@ -137,6 +137,10 @@ class MainActivity : ComponentActivity() {
             }
         }
         fun act(block: suspend () -> Unit) {
+            if (!AppLock.editAllowed(this@MainActivity)) {
+                AppLock.unlockEdit(this@MainActivity) { ok -> if (ok) act(block) }
+                return
+            }
             scope.launch {
                 syncing = true
                 runCatching { block() }

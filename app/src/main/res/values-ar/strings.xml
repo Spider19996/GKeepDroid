@@ -298,4 +298,7 @@
     <string name="notif_off_main">सूचनाएँ बंद हैं। सिंक या सेव विफल होने पर सूचना नहीं मिलेगी; ऐसी त्रुटियाँ केवल यहाँ ऊपर दिखेंगी।</string>
     <string name="notif_hint_dismiss">عدم الإظهار مجددًا</string>
     <string name="app_lock_grace">عدم السؤال مجددًا خلال</string>
+    <string name="edit_unlock">فتح قفل التعديل</string>
+    <string name="lock_edit_title">قفل التعديل</string>
+    <string name="lock_edit_hint">لا يزال بإمكان قراءة الملاحظات وفتحها. يتطلب التعديل أو الأرشفة أو الحذف البصمة أو رمز PIN أو كلمة المرور.</string>
 </resources>

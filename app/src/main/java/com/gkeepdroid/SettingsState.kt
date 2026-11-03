@@ -55,6 +55,7 @@ internal class SettingsState(val context: SettingsActivity) {
     var appShowProgress by mutableStateOf(initialApp.showProgress)
     var appLockPrivate by mutableStateOf(initialApp.lockPrivateNotes)
     var appLockApp by mutableStateOf(initialApp.lockApp)
+    var appLockEdit by mutableStateOf(initialApp.lockEdit)
     var appLockGrace by mutableIntStateOf(initialApp.lockGraceSec)
     val initialGlobal = SettingsStore.loadGlobal(context)
     val initialWidget = SettingsStore.loadWidget(context, context.appWidgetId)
@@ -195,7 +196,7 @@ internal class SettingsState(val context: SettingsActivity) {
     }
 
     fun currentApp() = AppSettings(
-        appLayout, appSort, appPinnedSection, appShowImages, appShowColors, appPlainStyle, appPreviewLines, appShowEdited, appEditedAsDate, appShowLabels, appShowProgress, appLockPrivate, appLockApp, appLockGrace,
+        appLayout, appSort, appPinnedSection, appShowImages, appShowColors, appPlainStyle, appPreviewLines, appShowEdited, appEditedAsDate, appShowLabels, appShowProgress, appLockPrivate, appLockApp, appLockEdit, appLockGrace,
     )
 
     fun refreshAccounts() {

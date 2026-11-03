@@ -298,4 +298,7 @@
     <string name="notif_off_main">Meldingen staan uit. Je krijgt geen melding als synchroniseren of opslaan mislukt; zulke fouten verschijnen alleen hier bovenaan.</string>
     <string name="notif_hint_dismiss">Niet meer tonen</string>
     <string name="app_lock_grace">Niet opnieuw vragen binnen</string>
+    <string name="edit_unlock">Bewerken ontgrendelen</string>
+    <string name="lock_edit_title">Bewerken vergrendelen</string>
+    <string name="lock_edit_hint">Notities blijven leesbaar en te openen. Wijzigen, archiveren of verwijderen vraagt om vingerafdruk, pincode of wachtwoord.</string>
 </resources>

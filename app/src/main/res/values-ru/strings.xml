@@ -298,4 +298,7 @@
     <string name="notif_off_main">Уведомления выключены. Об ошибках синхронизации или сохранения уведомления не придут; такие ошибки показываются только здесь, вверху.</string>
     <string name="notif_hint_dismiss">Больше не показывать</string>
     <string name="app_lock_grace">Не спрашивать повторно в течение</string>
+    <string name="edit_unlock">Разблокировать редактирование</string>
+    <string name="lock_edit_title">Заблокировать редактирование</string>
+    <string name="lock_edit_hint">Заметки по-прежнему можно читать и открывать. Изменение, архивирование и удаление требуют отпечаток, PIN-код или пароль.</string>
 </resources>

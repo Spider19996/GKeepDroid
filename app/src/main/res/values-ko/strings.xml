@@ -298,4 +298,7 @@
     <string name="notif_off_main">알림이 꺼져 있습니다. 동기화나 저장이 실패해도 알림이 오지 않으며, 이런 오류는 여기 맨 위에만 표시됩니다.</string>
     <string name="notif_hint_dismiss">다시 표시 안 함</string>
     <string name="app_lock_grace">다시 묻지 않는 시간</string>
+    <string name="edit_unlock">편집 잠금 해제</string>
+    <string name="lock_edit_title">편집 잠금</string>
+    <string name="lock_edit_hint">메모는 계속 읽고 열 수 있습니다. 변경, 보관, 삭제에는 지문, PIN 또는 비밀번호가 필요합니다.</string>
 </resources>

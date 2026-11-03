@@ -301,4 +301,7 @@
     <string name="notif_off_main">Notifications are turned off. You will not be told when syncing or saving fails; such errors only show here at the top.</string>
     <string name="notif_hint_dismiss">Don’t show again</string>
     <string name="app_lock_grace">Ask again only after</string>
+    <string name="edit_unlock">Unlock editing</string>
+    <string name="lock_edit_title">Lock editing</string>
+    <string name="lock_edit_hint">Notes can still be read and opened. Changing, archiving or deleting them asks for fingerprint, PIN or password.</string>
 </resources>

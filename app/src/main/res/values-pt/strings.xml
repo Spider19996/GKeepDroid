@@ -298,4 +298,7 @@
     <string name="notif_off_main">As notificações estão desativadas. Não será avisado se a sincronização ou o guardar falhar; esses erros só aparecem aqui em cima.</string>
     <string name="notif_hint_dismiss">Não mostrar novamente</string>
     <string name="app_lock_grace">Não pedir novamente durante</string>
+    <string name="edit_unlock">Desbloquear edição</string>
+    <string name="lock_edit_title">Bloquear a edição</string>
+    <string name="lock_edit_hint">As notas continuam a poder ser lidas e abertas. Alterar, arquivar ou apagar pede impressão digital, PIN ou palavra-passe.</string>
 </resources>

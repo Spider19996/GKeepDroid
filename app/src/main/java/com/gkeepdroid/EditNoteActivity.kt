@@ -196,6 +196,15 @@ class EditNoteActivity : ComponentActivity() {
         remote: KeepNote?, onReload: () -> Unit,
     ) {
         val scope = rememberCoroutineScope()
+        // With the edit lock on, a note opens for reading only until the lock is passed.
+        var canEdit by remember { mutableStateOf(AppLock.editAllowed(this@EditNoteActivity)) }
+        fun askEdit() {
+            AppLock.unlockEdit(this@EditNoteActivity) { ok ->
+                if (ok) canEdit = true else if (existing == null) finish()
+            }
+        }
+        // A new note is all editing, so the lock is asked for at once.
+        LaunchedEffect(Unit) { if (!canEdit && existing == null) askEdit() }
         // A new note can become a checklist while typing (see the offer under the text field).
         var isList by remember { mutableStateOf(startAsList) }
         // Text shared from another app arrives as a prefill for a new note.
@@ -269,6 +278,7 @@ class EditNoteActivity : ComponentActivity() {
 
         /** Runs an action that ends the editing of this note (archive, trash) and closes the editor. */
         fun leaveNote(action: suspend () -> Unit) {
+            if (!canEdit) return askEdit()
             saving = true
             error = ""
             scope.launch {
@@ -283,7 +293,7 @@ class EditNoteActivity : ComponentActivity() {
         }
 
         fun save(fromHome: Boolean = false) {
-            if (saving) return
+            if (saving || !canEdit) return
             saving = true
             error = ""
             val target = if (existing != null) account else targetAccount
@@ -342,7 +352,9 @@ class EditNoteActivity : ComponentActivity() {
 
         /** A new note changes its kind right here; an existing one is saved as a new note and the old one goes to the trash. */
         fun requestConvert() {
-            if (existing == null) {
+            if (!canEdit) {
+                askEdit()
+            } else if (existing == null) {
                 val (newText, newItems) = convertedContent(!isList)
                 items.clear()
                 items.addAll(newItems)
@@ -406,7 +418,7 @@ class EditNoteActivity : ComponentActivity() {
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.weight(1f),
                 )
-                FilledTonalIconToggleButton(checked = pinned, onCheckedChange = { pinned = it }) {
+                FilledTonalIconToggleButton(checked = pinned, onCheckedChange = { pinned = it }, enabled = canEdit) {
                     Icon(
                         painterResource(if (pinned) R.drawable.ic_push_pin else R.drawable.ic_push_pin_outline),
                         contentDescription = stringResource(R.string.pin_note),
@@ -463,6 +475,7 @@ class EditNoteActivity : ComponentActivity() {
                                 leadingIcon = { Icon(painterResource(R.drawable.ic_lock), contentDescription = null) },
                                 onClick = {
                                     menuOpen = false
+                                    if (!canEdit) return@DropdownMenuItem askEdit()
                                     hiddenInWidgets = !hiddenInWidgets
                                     PrivateNotes.set(this@EditNoteActivity, account, existing.id, hiddenInWidgets)
                                     scope.launch { WidgetRefresh.all(this@EditNoteActivity) }
@@ -547,6 +560,7 @@ class EditNoteActivity : ComponentActivity() {
                 allLabels.forEach { name ->
                     FilterChip(
                         selected = name in labels,
+                        enabled = canEdit,
                         onClick = { labels = if (name in labels) labels - name else labels + name },
                         label = { Text(name) },
                     )
@@ -716,7 +730,7 @@ class EditNoteActivity : ComponentActivity() {
                 )
             }
             OutlinedTextField(
-                value = title, onValueChange = { title = it },
+                value = title, onValueChange = { title = it }, readOnly = !canEdit,
                 label = { Text(stringResource(R.string.title_hint)) },
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -766,19 +780,20 @@ class EditNoteActivity : ComponentActivity() {
                             )
                             Checkbox(
                                 checked = item.checked,
+                                enabled = canEdit,
                                 onCheckedChange = { checked -> items.indexOfFirst { it.id == item.id }.let { items[it] = item.copy(checked = checked) } },
                             )
                             OutlinedTextField(
-                                value = item.text,
+                                value = item.text, readOnly = !canEdit,
                                 onValueChange = { text -> items.indexOfFirst { it.id == item.id }.let { items[it] = items[it].copy(text = text) } },
                                 placeholder = { Text(stringResource(R.string.item_hint)) },
                                 modifier = Modifier.weight(1f),
                             )
-                            TextButton(onClick = { items.removeAll { it.id == item.id }; fixFirst() }) { Text("✕") }
+                            if (canEdit) TextButton(onClick = { items.removeAll { it.id == item.id }; fixFirst() }) { Text("✕") }
                         }
                     }
                 }
-                OutlinedButton(onClick = { items.add(KeepItem(UUID.randomUUID().toString(), "", false)) }) {
+                if (canEdit) OutlinedButton(onClick = { items.add(KeepItem(UUID.randomUUID().toString(), "", false)) }) {
                     Text("＋ " + stringResource(R.string.add_item))
                 }
             } else {
@@ -804,7 +819,7 @@ class EditNoteActivity : ComponentActivity() {
                     }
                 }
                 OutlinedTextField(
-                    value = text, onValueChange = { text = it },
+                    value = text, onValueChange = { text = it }, readOnly = !canEdit,
                     label = { Text(stringResource(R.string.note_hint)) },
                     modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp),
                 )
@@ -826,7 +841,7 @@ class EditNoteActivity : ComponentActivity() {
                                 if (name == color) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                                 CircleShape,
                             )
-                            .clickable { color = name },
+                            .clickable(enabled = canEdit) { color = name },
                         contentAlignment = Alignment.Center,
                     ) {
                         // The default (uncolored) swatch is transparent, so mark it.
@@ -869,7 +884,7 @@ class EditNoteActivity : ComponentActivity() {
                     // Set: the accent color with a matching icon. None set: a quiet button.
                     FilledTonalIconToggleButton(
                         checked = shownReminders.isNotEmpty(),
-                        onCheckedChange = { remindersOpen = true },
+                        onCheckedChange = { if (canEdit) remindersOpen = true else askEdit() },
                         colors = IconButtonDefaults.filledTonalIconToggleButtonColors(
                             checkedContainerColor = MaterialTheme.colorScheme.primary,
                             checkedContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -882,8 +897,8 @@ class EditNoteActivity : ComponentActivity() {
                     }
                 }
                 Button(
-                    modifier = Modifier.weight(1f).fillMaxHeight(), onClick = { save() },
-                ) { Text(stringResource(R.string.save)) }
+                    modifier = Modifier.weight(1f).fillMaxHeight(), onClick = { if (canEdit) save() else askEdit() },
+                ) { Text(stringResource(if (canEdit) R.string.save else R.string.edit_unlock)) }
             }
         }
     }

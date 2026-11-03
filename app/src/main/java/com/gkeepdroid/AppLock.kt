@@ -51,21 +51,45 @@ object AppLock {
         lastActive = SystemClock.elapsedRealtime()
     }
 
-    fun enabled(activity: ComponentActivity) =
-        AppSettingsStore.load(activity).lockApp && activity.getSystemService(KeyguardManager::class.java).isDeviceSecure
+    private fun deviceSecure(context: android.content.Context) = context.getSystemService(KeyguardManager::class.java).isDeviceSecure
+
+    fun enabled(activity: ComponentActivity) = AppSettingsStore.load(activity).lockApp && deviceSecure(activity)
+
+    /** True when notes may be changed now: no edit lock, or the lock was passed a moment ago (or the whole app is unlocked). */
+    fun editAllowed(activity: ComponentActivity): Boolean {
+        val settings = AppSettingsStore.load(activity)
+        if (!settings.lockEdit || !deviceSecure(activity)) return true
+        return valid(activity)
+    }
+
+    /** Asks for the lock before something is changed; [onDone] gets true when it was passed. */
+    fun unlockEdit(activity: ComponentActivity, onDone: (Boolean) -> Unit) {
+        // Android 8 has no prompt to start from here; the edit lock needs Android 9 or newer.
+        if (Build.VERSION.SDK_INT < 29) return onDone(true)
+        prompt(activity, { }) { result ->
+            if (result == Result.OK) {
+                openedOnce = true
+                touch()
+            }
+            onDone(result == Result.OK)
+        }
+    }
 
     /** Asks for the lock; [onResult] gets true when it was passed. */
     @Suppress("DEPRECATION")
     fun prompt(activity: ComponentActivity, launchCredential: (android.content.Intent) -> Unit, onResult: (Result) -> Unit) {
         val title = activity.getString(R.string.app_name)
-        if (Build.VERSION.SDK_INT >= 30) {
-            val prompt = BiometricPrompt.Builder(activity)
-                .setTitle(title)
-                .setAllowedAuthenticators(
+        if (Build.VERSION.SDK_INT >= 29) {
+            val builder = BiometricPrompt.Builder(activity).setTitle(title)
+            if (Build.VERSION.SDK_INT >= 30) {
+                builder.setAllowedAuthenticators(
                     android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_WEAK or
                         android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL
                 )
-                .build()
+            } else {
+                builder.setDeviceCredentialAllowed(true)
+            }
+            val prompt = builder.build()
             try {
                 prompt.authenticate(CancellationSignal(), activity.mainExecutor, object : BiometricPrompt.AuthenticationCallback() {
                     override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult?) = onResult(Result.OK)
@@ -75,10 +99,10 @@ object AppLock {
                     )
                 })
             } catch (e: Exception) {
-                // No usable lock after all: the screen stays locked and offers to try again.
                 onResult(Result.FAILED)
             }
         } else {
+            // Android 8 and 9: the credential screen of the phone (no fingerprint here).
             val keyguard = activity.getSystemService(KeyguardManager::class.java)
             val intent = keyguard.createConfirmDeviceCredentialIntent(title, null)
             if (intent == null) onResult(Result.OK) else launchCredential(intent)
@@ -118,8 +142,7 @@ object AppLock {
                         unlocked = true
                     }
                     // Backing out of the lock leaves the app instead of leaving an empty screen.
-                    Result.CANCELED -> activity.finish()
-                    Result.FAILED -> {}
+                    Result.CANCELED, Result.FAILED -> activity.finish()
                 }
             }
         }
@@ -154,9 +177,8 @@ object AppLock {
         if (unlocked) {
             content()
         } else {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Button(onClick = { ask() }) { Text(stringResource(R.string.app_locked_unlock)) }
-            }
+            // Nothing to show while locked: the lock dialog is on top, and Back or Home leave the app.
+            Box(Modifier.fillMaxSize())
         }
     }
 }

@@ -298,4 +298,7 @@
     <string name="notif_off_main">Les notifications sont désactivées. Tu ne seras pas prévenu si la synchronisation ou l’enregistrement échoue ; ces erreurs n’apparaissent qu’ici, en haut.</string>
     <string name="notif_hint_dismiss">Ne plus afficher</string>
     <string name="app_lock_grace">Ne pas redemander pendant</string>
+    <string name="edit_unlock">Déverrouiller la modification</string>
+    <string name="lock_edit_title">Verrouiller la modification</string>
+    <string name="lock_edit_hint">Les notes restent lisibles et ouvrables. Les modifier, archiver ou supprimer demande l’empreinte, le PIN ou le mot de passe.</string>
 </resources>

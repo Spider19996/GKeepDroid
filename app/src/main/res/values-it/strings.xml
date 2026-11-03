@@ -298,4 +298,7 @@
     <string name="notif_off_main">Le notifiche sono disattivate. Non sarai avvisato se la sincronizzazione o il salvataggio falliscono; questi errori compaiono solo qui in alto.</string>
     <string name="notif_hint_dismiss">Non mostrare più</string>
     <string name="app_lock_grace">Non chiedere di nuovo entro</string>
+    <string name="edit_unlock">Sblocca modifica</string>
+    <string name="lock_edit_title">Blocca la modifica</string>
+    <string name="lock_edit_hint">Le note restano leggibili e apribili. Modificarle, archiviarle o eliminarle chiede impronta, PIN o password.</string>
 </resources>

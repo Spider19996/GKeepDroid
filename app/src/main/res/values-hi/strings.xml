@@ -298,4 +298,7 @@
     <string name="notif_off_main">सूचनाएँ बंद हैं। सिंक या सेव विफल होने पर सूचना नहीं मिलेगी; ऐसी त्रुटियाँ केवल यहाँ ऊपर दिखेंगी।</string>
     <string name="notif_hint_dismiss">फिर न दिखाएँ</string>
     <string name="app_lock_grace">इतने समय तक दोबारा न पूछें</string>
+    <string name="edit_unlock">संपादन अनलॉक करें</string>
+    <string name="lock_edit_title">संपादन लॉक करें</string>
+    <string name="lock_edit_hint">नोट पढ़े और खोले जा सकते हैं। बदलने, आर्काइव या हटाने पर फ़िंगरप्रिंट, PIN या पासवर्ड माँगा जाएगा।</string>
 </resources>

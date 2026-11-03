@@ -298,4 +298,7 @@
     <string name="notif_off_main">通知がオフです。同期や保存に失敗しても通知されません。そのようなエラーはここ上部にのみ表示されます。</string>
     <string name="notif_hint_dismiss">今後表示しない</string>
     <string name="app_lock_grace">再確認までの時間</string>
+    <string name="edit_unlock">編集のロック解除</string>
+    <string name="lock_edit_title">編集をロック</string>
+    <string name="lock_edit_hint">メモの閲覧と表示は引き続き可能です。変更・アーカイブ・削除には指紋、PIN、パスワードが必要です。</string>
 </resources>
