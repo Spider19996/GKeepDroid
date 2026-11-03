@@ -845,6 +845,9 @@ class MainActivity : ComponentActivity() {
             if (app.showImages && !hidden) note.images.firstOrNull()?.let { NoteImages.thumbnail(context, account, it) } else null
         }
         val lines = if (app.previewLines <= 0) Int.MAX_VALUE else app.previewLines
+        val progress = progressText(note)?.takeIf { app.showProgress && !hidden }
+        // No title (and nothing else for that line): no room is kept for it.
+        val hasTitleRow = note.title.isNotBlank() || note.pinned || progress != null
         // The fold arrow floats over the card's corner: its touch area can be large without making the title row taller.
         Box(modifier.fillMaxWidth()) {
         Column(
@@ -859,7 +862,8 @@ class MainActivity : ComponentActivity() {
                     }
                 )
                 .clickable(onClick = onClick)
-                .padding(12.dp),
+                // Without a title row the arrow floats over the first line, so that line stops short of it.
+                .padding(start = 12.dp, top = 12.dp, bottom = 12.dp, end = if (app.foldNotes && !hasTitleRow) 36.dp else 12.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             if (thumb != null) {
@@ -870,8 +874,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)),
                 )
             }
-            val progress = progressText(note)?.takeIf { app.showProgress && !hidden }
-            if (note.title.isNotBlank() || note.pinned || progress != null || app.foldNotes) {
+            if (hasTitleRow) {
                 Row(verticalAlignment = Alignment.Top) {
                     Text(
                         note.title,
@@ -983,7 +986,10 @@ class MainActivity : ComponentActivity() {
         }
         if (app.foldNotes) {
             Box(
-                Modifier.align(Alignment.TopEnd).size(40.dp).clickable {
+                Modifier.align(Alignment.TopEnd).size(40.dp).clickable(
+                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                    indication = null,
+                ) {
                     FoldStore.set(context, account, note.id, !folded)
                     scope.launch { WidgetRefresh.all(context) }
                 },
