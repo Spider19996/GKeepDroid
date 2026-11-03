@@ -756,6 +756,8 @@ data class AppSettings(
     val showProgress: Boolean = true,
     /** Private notes ask for the device lock (PIN, pattern, fingerprint) before they open, and hide their content on the cards. */
     val lockPrivateNotes: Boolean = true,
+    /** The whole app asks for fingerprint, PIN or password. */
+    val lockApp: Boolean = false,
 )
 
 object AppSettingsStore {
@@ -777,6 +779,7 @@ object AppSettingsStore {
             showLabels = p.getBoolean("show_labels", d.showLabels),
             showProgress = p.getBoolean("show_progress", d.showProgress),
             lockPrivateNotes = p.getBoolean("lock_private_notes", d.lockPrivateNotes),
+            lockApp = p.getBoolean("lock_app", d.lockApp),
         )
     }
 
@@ -794,6 +797,7 @@ object AppSettingsStore {
             .putBoolean("show_labels", s.showLabels)
             .putBoolean("show_progress", s.showProgress)
             .putBoolean("lock_private_notes", s.lockPrivateNotes)
+            .putBoolean("lock_app", s.lockApp)
             .apply()
     }
 }

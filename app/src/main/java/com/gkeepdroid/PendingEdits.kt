@@ -39,6 +39,9 @@ data class PendingEdit(
     /** Why the last attempt failed, empty while nothing went wrong besides a missing connection. */
     val error: String = "",
     val id: String = UUID.randomUUID().toString(),
+    /** For a new note: reminders and the "hide content" mark that move to the note once it has its id. */
+    val reminders: List<Reminder> = emptyList(),
+    val hidden: Boolean = false,
 )
 
 /** Edits made without a connection, kept on the device until they can be sent. */
@@ -59,6 +62,8 @@ object PendingEdits {
                     args = (0 until args.length()).map { i -> args.get(i) },
                     error = o.optString("error"),
                     id = o.getString("id"),
+                    reminders = o.optJSONArray("reminders")?.let { r -> (0 until r.length()).map { Reminder.fromJson(r.getJSONObject(it)) } }.orEmpty(),
+                    hidden = o.optBoolean("hidden"),
                 )
             }
         } catch (e: Exception) {
@@ -75,6 +80,8 @@ object PendingEdits {
                     .put("id", edit.id).put("account", edit.account).put("function", edit.function)
                     .put("args", JSONArray().apply { edit.args.forEach { put(it) } })
                     .put("error", edit.error)
+                    .put("reminders", JSONArray().apply { edit.reminders.forEach { put(it.toJson()) } })
+                    .put("hidden", edit.hidden)
             )
         }
         prefs(context).edit().putString("edits", array.toString()).apply()
@@ -115,7 +122,9 @@ object PendingEdits {
                 continue
             }
             try {
+                val before = if (edit.function == "create_note") Reminders.noteIds(context, edit.account) else emptySet()
                 KeepRepository.run(context, edit.account, edit.function, edit.args, edit.id)
+                if (edit.function == "create_note") Reminders.attachToNew(context, edit, before)
                 // Not cancellable: an edit that Keep already has must not stay stored and be sent twice.
                 withContext(NonCancellable) {
                     remove(context, edit.id)
@@ -193,8 +202,12 @@ object SaveFailures {
         return given.ifBlank { context.getString(R.string.untitled_note) }
     }
 
+    /** The sentence that tells the user what failed; also shown at the top of the app. */
+    fun message(context: Context, edit: PendingEdit, reason: String) =
+        context.getString(R.string.save_pending_failed, title(context, edit), reason)
+
     fun show(context: Context, edit: PendingEdit, reason: String) {
-        val text = context.getString(R.string.save_pending_failed, title(context, edit), reason)
+        val text = message(context, edit, reason)
         if (!Reminders.canNotify(context)) {
             android.os.Handler(android.os.Looper.getMainLooper()).post {
                 Toast.makeText(context, text, Toast.LENGTH_LONG).show()
@@ -202,9 +215,7 @@ object SaveFailures {
             return
         }
         val manager = context.getSystemService(NotificationManager::class.java)
-        manager.createNotificationChannel(
-            NotificationChannel(CHANNEL, context.getString(R.string.save_failures_title), NotificationManager.IMPORTANCE_DEFAULT)
-        )
+        NotificationChannels.create(context)
         fun action(receiver: Class<*>, name: String) = PendingIntent.getBroadcast(
             context, 0,
             Intent(context, receiver)

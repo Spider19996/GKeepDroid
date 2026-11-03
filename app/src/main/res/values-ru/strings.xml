@@ -119,8 +119,8 @@
     <string name="max_lines">Максимум строк в заметке: %1$d</string>
     <string name="max_lines_unlimited">Максимум строк в заметке: без ограничений</string>
     <string name="items_more">+ ещё %1$d</string>
-    <string name="hide_content">Скрывать содержимое в виджетах</string>
-    <string name="show_content">Показывать содержимое в виджетах</string>
+    <string name="hide_content">Скрыть содержимое</string>
+    <string name="show_content">Показать содержимое</string>
     <string name="note_private_hint">Содержимое скрыто</string>
     <string name="show_add_item_button">Показывать кнопку добавления пункта</string>
     <string name="save_to_account">Аккаунт для этой заметки</string>
@@ -281,6 +281,7 @@
     <string name="reminder_not_allowed">Не разрешено</string>
     <string name="reminder_notifications_off">Уведомления отключены, поэтому напоминания не появятся. Включите их в настройках.</string>
     <string name="reminder_save_first">Сначала сохраните заметку, потом можно добавить напоминания.</string>
+    <string name="reminder_needs_notifications">Сначала включите уведомления, они нужны для напоминаний.</string>
     <string name="save_failures_title">Не удалось сохранить заметку</string>
     <string name="save_pending_failed">«%1$s» не отправлена в Keep: %2$s. Изменение сохранено на этом телефоне.</string>
     <string name="save_retry">Повторить</string>
@@ -288,4 +289,12 @@
     <string name="note_unsent">В этой заметке есть изменения, ещё не отправленные в Keep.</string>
     <string name="note_unsent_failed">В этой заметке есть изменения, которые не удалось отправить в Keep: %1$s</string>
     <string name="save_notifications_off">Уведомления выключены, поэтому вы не узнаете, если сохранение в Keep не удастся.</string>
+    <string name="app_lock_title">Заблокировать приложение</string>
+    <string name="app_lock_hint">Всё приложение запрашивает отпечаток, PIN-код или пароль при открытии и после короткого времени в фоне.</string>
+    <string name="app_locked_unlock">Разблокировать</string>
+    <string name="convert_to_note">Преобразовать в заметку</string>
+    <string name="convert_existing_hint">Заметка сохраняется как новая, старая уходит в корзину. Напоминания переносятся.</string>
+    <string name="convert_images_blocked">Заметки с изображениями нельзя преобразовать.</string>
+    <string name="notif_off_main">Уведомления выключены. Об ошибках синхронизации или сохранения уведомления не придут; такие ошибки показываются только здесь, вверху.</string>
+    <string name="notif_hint_dismiss">Больше не показывать</string>
 </resources>

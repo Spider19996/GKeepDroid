@@ -119,8 +119,8 @@
     <string name="max_lines">Máximo de linhas por nota: %1$d</string>
     <string name="max_lines_unlimited">Máximo de linhas por nota: ilimitado</string>
     <string name="items_more">+%1$d mais</string>
-    <string name="hide_content">Ocultar o conteúdo nos widgets</string>
-    <string name="show_content">Mostrar o conteúdo nos widgets</string>
+    <string name="hide_content">Ocultar conteúdo</string>
+    <string name="show_content">Mostrar conteúdo</string>
     <string name="note_private_hint">Conteúdo oculto</string>
     <string name="show_add_item_button">Mostrar botão de adicionar item</string>
     <string name="save_to_account">Conta desta nota</string>
@@ -281,6 +281,7 @@
     <string name="reminder_not_allowed">Não permitido</string>
     <string name="reminder_notifications_off">As notificações estão desativadas, então os lembretes não podem aparecer. Ative-as nas configurações.</string>
     <string name="reminder_save_first">Salve a nota primeiro, depois você poderá adicionar lembretes.</string>
+    <string name="reminder_needs_notifications">Ative primeiro as notificações, os lembretes precisam delas.</string>
     <string name="save_failures_title">Não foi possível guardar a nota</string>
     <string name="save_pending_failed">“%1$s” não foi enviada ao Keep: %2$s. A alteração fica guardada neste telemóvel.</string>
     <string name="save_retry">Tentar novamente</string>
@@ -288,4 +289,12 @@
     <string name="note_unsent">Esta nota tem alterações que ainda não foram enviadas ao Keep.</string>
     <string name="note_unsent_failed">Esta nota tem alterações que não foi possível enviar ao Keep: %1$s</string>
     <string name="save_notifications_off">As notificações estão desativadas; não saberia se a gravação no Keep falhasse.</string>
+    <string name="app_lock_title">Bloquear a app</string>
+    <string name="app_lock_hint">Toda a app pede impressão digital, PIN ou palavra-passe ao abrir e após pouco tempo em segundo plano.</string>
+    <string name="app_locked_unlock">Desbloquear</string>
+    <string name="convert_to_note">Converter em nota</string>
+    <string name="convert_existing_hint">A nota é guardada como nova e a antiga vai para o lixo. Os lembretes são mantidos.</string>
+    <string name="convert_images_blocked">Notas com imagens não podem ser convertidas.</string>
+    <string name="notif_off_main">As notificações estão desativadas. Não será avisado se a sincronização ou o guardar falhar; esses erros só aparecem aqui em cima.</string>
+    <string name="notif_hint_dismiss">Não mostrar novamente</string>
 </resources>

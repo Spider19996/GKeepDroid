@@ -119,8 +119,8 @@
     <string name="max_lines">Maksymalna liczba wierszy na notatkę: %1$d</string>
     <string name="max_lines_unlimited">Maksymalna liczba wierszy na notatkę: bez limitu</string>
     <string name="items_more">+%1$d więcej</string>
-    <string name="hide_content">Ukryj zawartość w widżetach</string>
-    <string name="show_content">Pokaż zawartość w widżetach</string>
+    <string name="hide_content">Ukryj treść</string>
+    <string name="show_content">Pokaż treść</string>
     <string name="note_private_hint">Zawartość ukryta</string>
     <string name="show_add_item_button">Pokaż przycisk dodawania elementu</string>
     <string name="save_to_account">Konto dla tej notatki</string>
@@ -281,6 +281,7 @@
     <string name="reminder_not_allowed">Niedozwolone</string>
     <string name="reminder_notifications_off">Powiadomienia są wyłączone, więc przypomnienia nie mogą się pokazać. Włącz je w ustawieniach.</string>
     <string name="reminder_save_first">Najpierw zapisz notatkę, potem możesz dodać przypomnienia.</string>
+    <string name="reminder_needs_notifications">Najpierw włącz powiadomienia, przypomnienia ich potrzebują.</string>
     <string name="save_failures_title">Nie udało się zapisać notatki</string>
     <string name="save_pending_failed">„%1$s” nie została wysłana do Keep: %2$s. Zmiana pozostaje na tym telefonie.</string>
     <string name="save_retry">Spróbuj ponownie</string>
@@ -288,4 +289,12 @@
     <string name="note_unsent">Ta notatka ma zmiany, które nie zostały jeszcze wysłane do Keep.</string>
     <string name="note_unsent_failed">Ta notatka ma zmiany, których nie udało się wysłać do Keep: %1$s</string>
     <string name="save_notifications_off">Powiadomienia są wyłączone, więc nie dowiesz się, jeśli zapis w Keep się nie powiedzie.</string>
+    <string name="app_lock_title">Zablokuj aplikację</string>
+    <string name="app_lock_hint">Cała aplikacja prosi o odcisk palca, PIN lub hasło przy otwarciu i po krótkiej chwili w tle.</string>
+    <string name="app_locked_unlock">Odblokuj</string>
+    <string name="convert_to_note">Zamień na notatkę</string>
+    <string name="convert_existing_hint">Notatka zostanie zapisana jako nowa, a stara trafi do kosza. Przypomnienia zostaną przeniesione.</string>
+    <string name="convert_images_blocked">Notatek z obrazami nie można zamienić.</string>
+    <string name="notif_off_main">Powiadomienia są wyłączone. Nie dostaniesz powiadomienia o błędzie synchronizacji lub zapisu; takie błędy pojawią się tylko tutaj, na górze.</string>
+    <string name="notif_hint_dismiss">Nie pokazuj więcej</string>
 </resources>

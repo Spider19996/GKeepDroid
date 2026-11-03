@@ -119,8 +119,8 @@
     <string name="max_lines">أقصى عدد أسطر لكل ملاحظة: %1$d</string>
     <string name="max_lines_unlimited">أقصى عدد أسطر لكل ملاحظة: غير محدود</string>
     <string name="items_more">+%1$d أخرى</string>
-    <string name="hide_content">إخفاء المحتوى في الأدوات</string>
-    <string name="show_content">إظهار المحتوى في الأدوات</string>
+    <string name="hide_content">إخفاء المحتوى</string>
+    <string name="show_content">إظهار المحتوى</string>
     <string name="note_private_hint">المحتوى مخفي</string>
     <string name="show_add_item_button">عرض زر إضافة عنصر</string>
     <string name="save_to_account">حساب هذه الملاحظة</string>
@@ -281,6 +281,7 @@
     <string name="reminder_not_allowed">غير مسموح</string>
     <string name="reminder_notifications_off">الإشعارات متوقفة، لذلك لن تظهر التذكيرات. فعّلها من الإعدادات.</string>
     <string name="reminder_save_first">احفظ الملاحظة أولًا ثم أضف التذكيرات.</string>
+    <string name="reminder_needs_notifications">فعّل الإشعارات أولاً، فالتذكيرات تحتاج إليها.</string>
     <string name="save_failures_title">تعذّر حفظ الملاحظة</string>
     <string name="save_pending_failed">لم يتم إرسال «%1$s» إلى Keep: %2$s. يبقى التغيير محفوظًا على هذا الهاتف.</string>
     <string name="save_retry">إعادة المحاولة</string>
@@ -288,4 +289,12 @@
     <string name="note_unsent">في هذه الملاحظة تغييرات لم تُرسل إلى Keep بعد.</string>
     <string name="note_unsent_failed">في هذه الملاحظة تغييرات تعذّر إرسالها إلى Keep: %1$s</string>
     <string name="save_notifications_off">الإشعارات متوقفة، لذا لن تعرف إن فشل الحفظ في Keep.</string>
+    <string name="app_lock_title">قفل التطبيق</string>
+    <string name="app_lock_hint">يطلب التطبيق بأكمله البصمة أو رمز PIN أو كلمة المرور عند الفتح وبعد فترة قصيرة في الخلفية.</string>
+    <string name="app_locked_unlock">فتح القفل</string>
+    <string name="convert_to_note">تحويل إلى ملاحظة</string>
+    <string name="convert_existing_hint">تُحفظ الملاحظة كملاحظة جديدة وتنتقل القديمة إلى سلة المحذوفات. تُنقل التذكيرات معها.</string>
+    <string name="convert_images_blocked">لا يمكن تحويل الملاحظات التي تحتوي على صور.</string>
+    <string name="notif_off_main">सूचनाएँ बंद हैं। सिंक या सेव विफल होने पर सूचना नहीं मिलेगी; ऐसी त्रुटियाँ केवल यहाँ ऊपर दिखेंगी।</string>
+    <string name="notif_hint_dismiss">عدم الإظهار مجددًا</string>
 </resources>

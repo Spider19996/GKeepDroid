@@ -59,7 +59,7 @@ class SearchActivity : ComponentActivity() {
         }
         val widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
         val themeMode = SettingsStore.loadGlobal(this).themeMode
-        setContent { KeepTheme(themeMode) { SearchScreen(account, widgetId) } }
+        setContent { KeepTheme(themeMode) { AppLock.Gate(this) { SearchScreen(account, widgetId) } } }
     }
 
     @Composable
@@ -70,7 +70,13 @@ class SearchActivity : ComponentActivity() {
         val notes = remember {
             sortNotes(NotesCache.read(this, account), SettingsStore.loadWidget(this, widgetId), includeHidden = true)
         }
-        val results = remember(query) { notes.filter { it.matches(query) } }
+        val privateKeys = remember { PrivateNotes.load(this) }
+        // A hidden note is found by its title only, and shows no text.
+        val results = remember(query) {
+            notes.filter { note ->
+                if (PrivateNotes.key(account, note.id) in privateKeys) note.copy(text = "", items = emptyList()).matches(query) else note.matches(query)
+            }
+        }
         val untitled = stringResource(R.string.untitled_note)
 
         LaunchedEffect(Unit) { focus.requestFocus() }
@@ -100,7 +106,7 @@ class SearchActivity : ComponentActivity() {
 
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(results, key = { it.id }) { note ->
-                    ResultCard(note, query, untitled) {
+                    ResultCard(note, query, untitled, PrivateNotes.key(account, note.id) in privateKeys) {
                         startActivity(
                             Intent(this@SearchActivity, EditNoteActivity::class.java)
                                 .putExtra(EditNoteActivity.EXTRA_NOTE_ID, note.id)
@@ -115,7 +121,7 @@ class SearchActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun ResultCard(note: KeepNote, query: String, untitled: String, onClick: () -> Unit) {
+    private fun ResultCard(note: KeepNote, query: String, untitled: String, hidden: Boolean, onClick: () -> Unit) {
         val noteColor = NoteColors.argb(note.color)
         val textColor = if (noteColor != null) DarkNoteText else MaterialTheme.colorScheme.onSurface
         Column(
@@ -132,7 +138,7 @@ class SearchActivity : ComponentActivity() {
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            val snippet = snippetFor(note, query)
+            val snippet = if (hidden) "" else snippetFor(note, query)
             if (snippet.isNotBlank()) {
                 Text(
                     highlight(snippet, query),

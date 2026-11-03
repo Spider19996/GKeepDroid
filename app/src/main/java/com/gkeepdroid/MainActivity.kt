@@ -95,7 +95,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { KeepTheme(themeMode) { NotesApp() } }
+        setContent { KeepTheme(themeMode) { AppLock.Gate(this) { NotesApp() } } }
     }
 
     override fun onResume() {
@@ -337,6 +337,40 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
+                // Without the right to notify, a failed sync or save can only be told here, at the top.
+                val notificationsOn = rememberNotificationsOn(this@MainActivity)
+                val hintPrefs = remember { context.getSharedPreferences("reminder_hints", android.content.Context.MODE_PRIVATE) }
+                var notifHintHidden by remember { mutableStateOf(hintPrefs.getBoolean("notif_hint_dismissed", false)) }
+                if (!notificationsOn && !notifHintHidden) {
+                    Column(
+                        Modifier.fillMaxWidth().padding(top = 4.dp)
+                            .background(MaterialTheme.colorScheme.errorContainer, RoundedCornerShape(12.dp)).padding(12.dp),
+                    ) {
+                        Text(
+                            stringResource(R.string.notif_off_main),
+                            color = MaterialTheme.colorScheme.onErrorContainer, fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                            TextButton(onClick = { context.startActivity(Reminders.notificationSettings(context)) }) {
+                                Text(stringResource(R.string.reminder_open_settings))
+                            }
+                            TextButton(onClick = {
+                                hintPrefs.edit().putBoolean("notif_hint_dismissed", true).apply()
+                                notifHintHidden = true
+                            }) { Text(stringResource(R.string.notif_hint_dismiss)) }
+                        }
+                    }
+                }
+                val failedEdits = remember(reloadKey, syncing) { PendingEdits.all(context).filter { it.error.isNotBlank() } }
+                if (!notificationsOn) failedEdits.forEach { edit ->
+                    Text(
+                        SaveFailures.message(context, edit, edit.error),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
+                }
                 if (syncing) LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 4.dp))
                 // A failed sync stays visible until the next one works.
                 val syncError = remember(reloadKey, syncing) { SyncPolicy.lastError(context) }
@@ -574,7 +608,7 @@ class MainActivity : ComponentActivity() {
         }
         val shape = RoundedCornerShape(14.dp)
         // A private note shows only its title until it is opened with the device lock.
-        val hidden = app.lockPrivateNotes && PrivateNotes.key(account, note.id) in remember { PrivateNotes.load(context) }
+        val hidden = PrivateNotes.key(account, note.id) in remember { PrivateNotes.load(context) }
         val thumb = remember(note.id, note.images.firstOrNull(), app.showImages, hidden) {
             if (app.showImages && !hidden) note.images.firstOrNull()?.let { NoteImages.thumbnail(context, account, it) } else null
         }

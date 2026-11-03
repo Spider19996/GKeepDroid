@@ -119,8 +119,8 @@
     <string name="max_lines">Maximale Zeilen pro Notiz: %1$d</string>
     <string name="max_lines_unlimited">Maximale Zeilen pro Notiz: unbegrenzt</string>
     <string name="items_more">+%1$d weitere</string>
-    <string name="hide_content">Inhalt in Widgets ausblenden</string>
-    <string name="show_content">Inhalt in Widgets anzeigen</string>
+    <string name="hide_content">Inhalte ausblenden</string>
+    <string name="show_content">Inhalte anzeigen</string>
     <string name="note_private_hint">Inhalt ausgeblendet</string>
     <string name="show_add_item_button">Button „Eintrag hinzufügen“ anzeigen</string>
     <string name="save_to_account">Konto für diese Notiz</string>
@@ -279,8 +279,9 @@
     <string name="reminder_reliability">Zuverlässigkeit</string>
     <string name="reminder_allowed">Erlaubt</string>
     <string name="reminder_not_allowed">Nicht erlaubt</string>
-    <string name="reminder_notifications_off">Benachrichtigungen sind aus, deshalb können Erinnerungen nicht erscheinen. Schalte sie in den Einstellungen ein.</string>
+    <string name="reminder_notifications_off">Benachrichtigungen sind ausgeschaltet, deshalb können Erinnerungen nicht erscheinen. Schalte sie in den Einstellungen ein.</string>
     <string name="reminder_save_first">Speichere die Notiz zuerst, dann kannst du Erinnerungen hinzufügen.</string>
+    <string name="reminder_needs_notifications">Schalte zuerst die Benachrichtigungen ein, Erinnerungen brauchen sie.</string>
     <string name="save_failures_title">Notiz konnte nicht gespeichert werden</string>
     <string name="save_pending_failed">„%1$s“ wurde nicht an Keep gesendet: %2$s. Die Änderung bleibt auf diesem Handy gespeichert.</string>
     <string name="save_retry">Erneut versuchen</string>
@@ -288,4 +289,12 @@
     <string name="note_unsent">Diese Notiz hat Änderungen, die noch nicht an Keep gesendet wurden.</string>
     <string name="note_unsent_failed">Diese Notiz hat Änderungen, die nicht an Keep gesendet werden konnten: %1$s</string>
     <string name="save_notifications_off">Benachrichtigungen sind aus. Du würdest nicht merken, wenn das Speichern in Keep fehlschlägt.</string>
+    <string name="app_lock_title">App sperren</string>
+    <string name="app_lock_hint">Die ganze App fragt beim Öffnen und nach kurzer Zeit im Hintergrund nach Fingerabdruck, PIN oder Passwort.</string>
+    <string name="app_locked_unlock">Entsperren</string>
+    <string name="convert_to_note">In Notiz umwandeln</string>
+    <string name="convert_existing_hint">Die Notiz wird als neue Notiz angelegt, die alte kommt in den Papierkorb. Erinnerungen werden übernommen.</string>
+    <string name="convert_images_blocked">Notizen mit Bildern lassen sich nicht umwandeln.</string>
+    <string name="notif_off_main">Benachrichtigungen sind ausgeschaltet. Du erfährst nicht per Benachrichtigung, wenn Synchronisieren oder Speichern fehlschlägt; solche Fehler erscheinen nur hier oben.</string>
+    <string name="notif_hint_dismiss">Nicht mehr anzeigen</string>
 </resources>

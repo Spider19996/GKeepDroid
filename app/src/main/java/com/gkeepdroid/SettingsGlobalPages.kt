@@ -2,6 +2,7 @@
 
 package com.gkeepdroid
 
+import android.widget.Toast
 import android.content.Intent
 import android.text.format.DateUtils
 import androidx.compose.foundation.clickable
@@ -141,7 +142,7 @@ internal fun ColumnScope.SyncPage(s: SettingsState) {
             modifier = Modifier.fillMaxWidth(),
             onClick = {
                 SyncWorker.syncNow(context)
-                status = context.getString(R.string.sync_started)
+                Toast.makeText(context, R.string.sync_started, Toast.LENGTH_SHORT).show()
             },
         ) { Text(stringResource(R.string.sync_now)) }
         // When the last sync worked, and what went wrong if the last one failed.
@@ -166,7 +167,7 @@ internal fun ColumnScope.SyncPage(s: SettingsState) {
 
         // Every call to Keep's servers of the last 24 hours, so the load on Google can be judged.
         Text(
-            stringResource(R.string.sync_requests_24h, RequestStats.last24h(context)),
+            stringResource(R.string.sync_requests_24h, RequestStats.rememberLast24h(context)),
             style = MaterialTheme.typography.bodyMedium,
         )
 
@@ -276,6 +277,8 @@ internal fun ColumnScope.AppViewPage(s: SettingsState) {
         SwitchRow(R.string.show_labels, appShowLabels) { appShowLabels = it }
         SwitchRow(R.string.show_progress, appShowProgress) { appShowProgress = it }
         SwitchRow(R.string.lock_private, appLockPrivate) { appLockPrivate = it }
+        SwitchRow(R.string.app_lock_title, appLockApp) { appLockApp = it }
+        Hint(R.string.app_lock_hint)
 
         Text(stringResource(R.string.plain_style))
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

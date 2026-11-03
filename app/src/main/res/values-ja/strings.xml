@@ -119,8 +119,8 @@
     <string name="max_lines">メモごとの最大行数：%1$d</string>
     <string name="max_lines_unlimited">メモごとの最大行数：無制限</string>
     <string name="items_more">ほか %1$d 件</string>
-    <string name="hide_content">ウィジェットで内容を非表示</string>
-    <string name="show_content">ウィジェットで内容を表示</string>
+    <string name="hide_content">内容を隠す</string>
+    <string name="show_content">内容を表示</string>
     <string name="note_private_hint">内容は非表示です</string>
     <string name="show_add_item_button">項目追加ボタンを表示</string>
     <string name="save_to_account">このメモのアカウント</string>
@@ -281,6 +281,7 @@
     <string name="reminder_not_allowed">許可されていません</string>
     <string name="reminder_notifications_off">通知がオフのため、リマインダーを表示できません。設定でオンにしてください。</string>
     <string name="reminder_save_first">先にメモを保存すると、リマインダーを追加できます。</string>
+    <string name="reminder_needs_notifications">先に通知をオンにしてください。リマインダーには通知が必要です。</string>
     <string name="save_failures_title">メモを保存できませんでした</string>
     <string name="save_pending_failed">「%1$s」を Keep に送信できませんでした: %2$s。変更はこの端末に保持されます。</string>
     <string name="save_retry">再試行</string>
@@ -288,4 +289,12 @@
     <string name="note_unsent">このメモには、まだ Keep に送信されていない変更があります。</string>
     <string name="note_unsent_failed">このメモの変更を Keep に送信できませんでした: %1$s</string>
     <string name="save_notifications_off">通知がオフのため、Keep への保存に失敗しても気づけません。</string>
+    <string name="app_lock_title">アプリをロック</string>
+    <string name="app_lock_hint">アプリを開くとき、および短時間バックグラウンドにした後に、指紋・PIN・パスワードを求めます。</string>
+    <string name="app_locked_unlock">ロック解除</string>
+    <string name="convert_to_note">メモに変換</string>
+    <string name="convert_existing_hint">メモは新しいメモとして保存され、元のメモはゴミ箱に移動します。リマインダーは引き継がれます。</string>
+    <string name="convert_images_blocked">画像付きのメモは変換できません。</string>
+    <string name="notif_off_main">通知がオフです。同期や保存に失敗しても通知されません。そのようなエラーはここ上部にのみ表示されます。</string>
+    <string name="notif_hint_dismiss">今後表示しない</string>
 </resources>

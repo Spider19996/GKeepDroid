@@ -119,8 +119,8 @@
     <string name="max_lines">Nombre maximal de lignes par note : %1$d</string>
     <string name="max_lines_unlimited">Nombre maximal de lignes par note : illimité</string>
     <string name="items_more">+%1$d de plus</string>
-    <string name="hide_content">Masquer le contenu dans les widgets</string>
-    <string name="show_content">Afficher le contenu dans les widgets</string>
+    <string name="hide_content">Masquer les contenus</string>
+    <string name="show_content">Afficher les contenus</string>
     <string name="note_private_hint">Contenu masqué</string>
     <string name="show_add_item_button">Afficher le bouton d\'ajout d\'élément</string>
     <string name="save_to_account">Compte de cette note</string>
@@ -281,6 +281,7 @@
     <string name="reminder_not_allowed">Non autorisé</string>
     <string name="reminder_notifications_off">Les notifications sont désactivées, les rappels ne peuvent donc pas s’afficher. Activez-les dans les réglages.</string>
     <string name="reminder_save_first">Enregistrez d’abord la note, vous pourrez ensuite ajouter des rappels.</string>
+    <string name="reminder_needs_notifications">Activez d\'abord les notifications, les rappels en ont besoin.</string>
     <string name="save_failures_title">La note n’a pas pu être enregistrée</string>
     <string name="save_pending_failed">« %1$s » n’a pas été envoyée à Keep : %2$s. La modification est conservée sur ce téléphone.</string>
     <string name="save_retry">Réessayer</string>
@@ -288,4 +289,12 @@
     <string name="note_unsent">Cette note a des modifications pas encore envoyées à Keep.</string>
     <string name="note_unsent_failed">Cette note a des modifications qui n’ont pas pu être envoyées à Keep : %1$s</string>
     <string name="save_notifications_off">Les notifications sont désactivées : vous ne verriez pas un échec de l’enregistrement dans Keep.</string>
+    <string name="app_lock_title">Verrouiller l’application</string>
+    <string name="app_lock_hint">Toute l’application demande l’empreinte, le code PIN ou le mot de passe à l’ouverture et après un court moment en arrière-plan.</string>
+    <string name="app_locked_unlock">Déverrouiller</string>
+    <string name="convert_to_note">Convertir en note</string>
+    <string name="convert_existing_hint">La note est enregistrée comme nouvelle note et l’ancienne va à la corbeille. Les rappels suivent.</string>
+    <string name="convert_images_blocked">Les notes avec images ne peuvent pas être converties.</string>
+    <string name="notif_off_main">Les notifications sont désactivées. Tu ne seras pas prévenu si la synchronisation ou l’enregistrement échoue ; ces erreurs n’apparaissent qu’ici, en haut.</string>
+    <string name="notif_hint_dismiss">Ne plus afficher</string>
 </resources>

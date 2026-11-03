@@ -61,7 +61,7 @@ class SettingsActivity : ComponentActivity() {
         setResult(RESULT_CANCELED, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId))
         themeMode = SettingsStore.loadGlobal(this).themeMode
 
-        setContent { KeepTheme(themeMode) { SettingsScreen() } }
+        setContent { KeepTheme(themeMode) { AppLock.Gate(this) { SettingsScreen() } } }
     }
 
     /** Whether this configuration screen was opened for a single-note widget. */

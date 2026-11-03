@@ -119,8 +119,8 @@
     <string name="max_lines">Not başına en fazla satır: %1$d</string>
     <string name="max_lines_unlimited">Not başına en fazla satır: sınırsız</string>
     <string name="items_more">+%1$d daha</string>
-    <string name="hide_content">Widget\'larda içeriği gizle</string>
-    <string name="show_content">Widget\'larda içeriği göster</string>
+    <string name="hide_content">İçeriği gizle</string>
+    <string name="show_content">İçeriği göster</string>
     <string name="note_private_hint">İçerik gizli</string>
     <string name="show_add_item_button">Öğe ekle düğmesini göster</string>
     <string name="save_to_account">Bu not için hesap</string>
@@ -281,6 +281,7 @@
     <string name="reminder_not_allowed">İzin verilmedi</string>
     <string name="reminder_notifications_off">Bildirimler kapalı, bu yüzden hatırlatıcılar görünemez. Ayarlardan açın.</string>
     <string name="reminder_save_first">Önce notu kaydedin, sonra hatırlatıcı ekleyebilirsiniz.</string>
+    <string name="reminder_needs_notifications">Önce bildirimleri açın, hatırlatıcılar buna ihtiyaç duyar.</string>
     <string name="save_failures_title">Not kaydedilemedi</string>
     <string name="save_pending_failed">“%1$s” Keep’e gönderilemedi: %2$s. Değişiklik bu telefonda saklanıyor.</string>
     <string name="save_retry">Tekrar dene</string>
@@ -288,4 +289,12 @@
     <string name="note_unsent">Bu notta henüz Keep’e gönderilmemiş değişiklikler var.</string>
     <string name="note_unsent_failed">Bu notta Keep’e gönderilemeyen değişiklikler var: %1$s</string>
     <string name="save_notifications_off">Bildirimler kapalı; Keep’e kaydetme başarısız olursa fark etmezsiniz.</string>
+    <string name="app_lock_title">Uygulamayı kilitle</string>
+    <string name="app_lock_hint">Uygulamanın tamamı açılırken ve kısa süre arka planda kaldıktan sonra parmak izi, PIN veya parola ister.</string>
+    <string name="app_locked_unlock">Kilidi aç</string>
+    <string name="convert_to_note">Nota dönüştür</string>
+    <string name="convert_existing_hint">Not yeni bir not olarak kaydedilir, eskisi çöp kutusuna gider. Hatırlatıcılar taşınır.</string>
+    <string name="convert_images_blocked">Resimli notlar dönüştürülemez.</string>
+    <string name="notif_off_main">Bildirimler kapalı. Eşitleme veya kaydetme başarısız olursa bildirim almazsın; bu hatalar yalnızca burada, üstte görünür.</string>
+    <string name="notif_hint_dismiss">Bir daha gösterme</string>
 </resources>

@@ -119,8 +119,8 @@
     <string name="max_lines">Maximaal aantal regels per notitie: %1$d</string>
     <string name="max_lines_unlimited">Maximaal aantal regels per notitie: onbeperkt</string>
     <string name="items_more">+%1$d meer</string>
-    <string name="hide_content">Inhoud in widgets verbergen</string>
-    <string name="show_content">Inhoud in widgets tonen</string>
+    <string name="hide_content">Inhoud verbergen</string>
+    <string name="show_content">Inhoud tonen</string>
     <string name="note_private_hint">Inhoud verborgen</string>
     <string name="show_add_item_button">Knop Item toevoegen tonen</string>
     <string name="save_to_account">Account voor deze notitie</string>
@@ -281,6 +281,7 @@
     <string name="reminder_not_allowed">Niet toegestaan</string>
     <string name="reminder_notifications_off">Meldingen staan uit, dus herinneringen kunnen niet verschijnen. Zet ze aan in de instellingen.</string>
     <string name="reminder_save_first">Sla de notitie eerst op, dan kun je herinneringen toevoegen.</string>
+    <string name="reminder_needs_notifications">Zet eerst meldingen aan, herinneringen hebben die nodig.</string>
     <string name="save_failures_title">Notitie kon niet worden opgeslagen</string>
     <string name="save_pending_failed">“%1$s” is niet naar Keep verzonden: %2$s. De wijziging blijft op deze telefoon bewaard.</string>
     <string name="save_retry">Opnieuw proberen</string>
@@ -288,4 +289,12 @@
     <string name="note_unsent">Deze notitie heeft wijzigingen die nog niet naar Keep zijn verzonden.</string>
     <string name="note_unsent_failed">Deze notitie heeft wijzigingen die niet naar Keep konden worden verzonden: %1$s</string>
     <string name="save_notifications_off">Meldingen staan uit; je merkt niet als opslaan in Keep mislukt.</string>
+    <string name="app_lock_title">App vergrendelen</string>
+    <string name="app_lock_hint">De hele app vraagt om vingerafdruk, pincode of wachtwoord bij openen en na korte tijd op de achtergrond.</string>
+    <string name="app_locked_unlock">Ontgrendelen</string>
+    <string name="convert_to_note">Omzetten naar notitie</string>
+    <string name="convert_existing_hint">De notitie wordt als nieuwe opgeslagen en de oude gaat naar de prullenbak. Herinneringen gaan mee.</string>
+    <string name="convert_images_blocked">Notities met afbeeldingen kunnen niet worden omgezet.</string>
+    <string name="notif_off_main">Meldingen staan uit. Je krijgt geen melding als synchroniseren of opslaan mislukt; zulke fouten verschijnen alleen hier bovenaan.</string>
+    <string name="notif_hint_dismiss">Niet meer tonen</string>
 </resources>

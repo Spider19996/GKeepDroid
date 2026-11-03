@@ -47,6 +47,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Checkbox
@@ -130,7 +131,7 @@ class EditNoteActivity : ComponentActivity() {
             @Suppress("DEPRECATION")
             unlock.launch(keyguard.createConfirmDeviceCredentialIntent(getString(R.string.app_name), getString(R.string.note_private_hint)))
         }
-        setContent { KeepTheme(themeMode) { if (unlocked) Loader(account, noteId, newList, pinWidgetId) } }
+        setContent { KeepTheme(themeMode) { AppLock.Gate(this) { if (unlocked) Loader(account, noteId, newList, pinWidgetId) } } }
     }
 
     /**
@@ -197,7 +198,6 @@ class EditNoteActivity : ComponentActivity() {
         val scope = rememberCoroutineScope()
         // A new note can become a checklist while typing (see the offer under the text field).
         var isList by remember { mutableStateOf(startAsList) }
-        var convertDismissed by remember { mutableStateOf(false) }
         // Text shared from another app arrives as a prefill for a new note.
         var title by remember { mutableStateOf(existing?.title ?: intent.getStringExtra(EXTRA_PREFILL_TITLE).orEmpty()) }
         var text by remember { mutableStateOf(existing?.text ?: intent.getStringExtra(EXTRA_PREFILL_TEXT).orEmpty()) }
@@ -254,6 +254,14 @@ class EditNoteActivity : ComponentActivity() {
         // send), so the right is asked for once, when a note is saved; the editor closes after the answer.
         val askAfterSave = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { finish() }
         var remindersOpen by remember { mutableStateOf(false) }
+        // Reminders of a new note wait here until the note exists and has its id.
+        var draftReminders by remember { mutableStateOf(listOf<Reminder>()) }
+        var confirmConvert by remember { mutableStateOf(false) }
+        val shownReminders = if (existing != null) reminders else draftReminders.sortedBy { it.at }
+        val convertPrefs = remember { getSharedPreferences("convert_hints", MODE_PRIVATE) }
+        val convertKey = existing?.let { account + "|" + it.id }
+        // Asked once per existing note; "No" is remembered.
+        var convertDismissed by remember { mutableStateOf(convertKey != null && convertPrefs.getBoolean(convertKey, false)) }
         var error by remember { mutableStateOf("") }
         val failedTemplate = stringResource(R.string.save_failed, "%s")
 
@@ -286,7 +294,10 @@ class EditNoteActivity : ComponentActivity() {
             if (!CredentialStore.isLocal(target)) {
                 // The change is stored and sent in the background: the editor closes at once, and a failure
                 // shows up as a notification instead of losing the change.
-                KeepRepository.queueEdit(this@EditNoteActivity, PendingEdit(target, function, args))
+                KeepRepository.queueEdit(
+                    this@EditNoteActivity,
+                    PendingEdit(target, function, args, reminders = if (existing == null) draftReminders else emptyList()),
+                )
                 Toast.makeText(applicationContext, R.string.note_saved, Toast.LENGTH_SHORT).show()
                 val prefs = getSharedPreferences("reminder_hints", MODE_PRIVATE)
                 if (!fromHome && android.os.Build.VERSION.SDK_INT >= 33 && !notificationsOn && !prefs.getBoolean("save_asked", false)) {
@@ -299,7 +310,9 @@ class EditNoteActivity : ComponentActivity() {
             }
             scope.launch {
                 try {
+                    val before = Reminders.noteIds(this@EditNoteActivity, target)
                     KeepRepository.run(this@EditNoteActivity, target, function, args)
+                    if (existing == null) Reminders.attachToNew(this@EditNoteActivity, PendingEdit(target, function, args, reminders = draftReminders), before)
                     Toast.makeText(applicationContext, R.string.note_saved, Toast.LENGTH_SHORT).show()
                     finish()
                 } catch (e: Exception) {
@@ -307,6 +320,41 @@ class EditNoteActivity : ComponentActivity() {
                     error = failedTemplate.format(e.message ?: e.javaClass.simpleName)
                 }
             }
+        }
+
+        /** Content of the editor as the other kind of note: checklist items become lines, lines become items. */
+        fun convertedContent(toList: Boolean): Pair<String, List<KeepItem>> =
+            if (toList) {
+                "" to ChecklistText.items(text).ifEmpty { listOf(KeepItem(UUID.randomUUID().toString(), "", false)) }
+            } else {
+                items.filter { it.text.isNotBlank() }.joinToString("\n") { it.text } to emptyList()
+            }
+
+        /** A new note changes its kind right here; an existing one is saved as a new note and the old one goes to the trash. */
+        fun requestConvert() {
+            if (existing == null) {
+                val (newText, newItems) = convertedContent(!isList)
+                items.clear()
+                items.addAll(newItems)
+                text = newText
+                isList = !isList
+            } else if (existing.images.isNotEmpty()) {
+                Toast.makeText(this@EditNoteActivity, R.string.convert_images_blocked, Toast.LENGTH_LONG).show()
+            } else {
+                confirmConvert = true
+            }
+        }
+
+        fun convertExisting(note: KeepNote) {
+            val toList = !isList
+            val (newText, newItems) = convertedContent(toList)
+            val args = KeepRepository.createNoteArgs(title, newText, toList, newItems, color, pinned, labels)
+            val moved = Reminders.list(this@EditNoteActivity, account, note.id)
+            moved.forEach { Reminders.remove(this@EditNoteActivity, account, note.id, it.id) }
+            KeepRepository.queueEdit(this@EditNoteActivity, PendingEdit(account, "create_note", args, reminders = moved, hidden = hiddenInWidgets))
+            KeepRepository.queueEdit(this@EditNoteActivity, PendingEdit(account, "trash_note", listOf(note.id)))
+            Toast.makeText(applicationContext, R.string.note_saved, Toast.LENGTH_SHORT).show()
+            finish()
         }
 
         fun hasChanges() = if (existing != null) {
@@ -341,12 +389,6 @@ class EditNoteActivity : ComponentActivity() {
                     color = if (unsent.error.isBlank()) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
                 )
-            }
-            if (!isLocal && !notificationsOn) {
-                Text(stringResource(R.string.save_notifications_off), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
-                TextButton(onClick = { startActivity(Reminders.notificationSettings(this@EditNoteActivity)) }) {
-                    Text(stringResource(R.string.reminder_open_settings))
-                }
             }
             // Title with its actions on the right: pin, show at the widget's bottom, open in Keep.
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -383,13 +425,19 @@ class EditNoteActivity : ComponentActivity() {
                         Icon(painterResource(R.drawable.ic_pin_bottom), contentDescription = stringResource(R.string.pin_to_bottom))
                     }
                 }
-                if (existing != null) {
+                run {
                     // Less common actions live in an overflow menu.
                     Box {
                         IconButton(onClick = { menuOpen = true }) {
                             Icon(painterResource(R.drawable.ic_more_vert), contentDescription = stringResource(R.string.more_actions))
                         }
                         DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(if (isList) R.string.convert_to_note else R.string.convert_to_list)) },
+                                leadingIcon = { Icon(painterResource(R.drawable.ic_checklist), contentDescription = null) },
+                                onClick = { menuOpen = false; requestConvert() },
+                            )
+                            if (existing != null) {
                             if (existing.serverId.isNotEmpty()) {
                                 DropdownMenuItem(
                                     text = { Text(stringResource(R.string.open_in_keep)) },
@@ -444,9 +492,26 @@ class EditNoteActivity : ComponentActivity() {
                                     }
                                 },
                             )
+                            }
                         }
                     }
                 }
+            }
+
+            if (confirmConvert && existing != null) {
+                AlertDialog(
+                    onDismissRequest = { confirmConvert = false },
+                    title = { Text(stringResource(if (isList) R.string.convert_to_note else R.string.convert_to_list)) },
+                    text = { Text(stringResource(R.string.convert_existing_hint)) },
+                    confirmButton = {
+                        TextButton(onClick = { confirmConvert = false; convertExisting(existing) }) {
+                            Text(stringResource(if (isList) R.string.convert_to_note else R.string.convert_to_list))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { confirmConvert = false }) { Text(stringResource(android.R.string.cancel)) }
+                    },
+                )
             }
 
             if (confirmDelete && existing != null) {
@@ -723,28 +788,32 @@ class EditNoteActivity : ComponentActivity() {
                     Text("＋ " + stringResource(R.string.add_item))
                 }
             } else {
+                // Lines that start with "-" (or "*", "[ ]") are a list: offer to make it one, once.
+                if (!convertDismissed && ChecklistText.looksLikeList(text) && existing?.images.isNullOrEmpty()) {
+                    Column(
+                        Modifier.fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.secondaryContainer, androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                            .padding(start = 16.dp, top = 12.dp, end = 8.dp, bottom = 4.dp),
+                    ) {
+                        Text(
+                            stringResource(R.string.convert_to_list_hint),
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                            TextButton(onClick = {
+                                convertDismissed = true
+                                convertKey?.let { convertPrefs.edit().putBoolean(it, true).apply() }
+                            }) { Text(stringResource(R.string.convert_to_list_no)) }
+                            TextButton(onClick = { requestConvert() }) { Text(stringResource(R.string.convert_to_list)) }
+                        }
+                    }
+                }
                 OutlinedTextField(
                     value = text, onValueChange = { text = it },
                     label = { Text(stringResource(R.string.note_hint)) },
                     modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp),
                 )
-                // Lines that start with "-" (or "*", "[ ]") are a list: offer to make it one.
-                if (existing == null && !convertDismissed && ChecklistText.looksLikeList(text)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            stringResource(R.string.convert_to_list_hint),
-                            Modifier.weight(1f),
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                        TextButton(onClick = { convertDismissed = true }) { Text(stringResource(R.string.convert_to_list_no)) }
-                        Button(onClick = {
-                            items.clear()
-                            items.addAll(ChecklistText.items(text))
-                            text = ""
-                            isList = true
-                        }) { Text(stringResource(R.string.convert_to_list)) }
-                    }
-                }
             }
 
             Text(stringResource(R.string.color))
@@ -774,10 +843,12 @@ class EditNoteActivity : ComponentActivity() {
 
             if (error.isNotEmpty()) Text(error, color = MaterialTheme.colorScheme.error)
 
-            if (remindersOpen && existing != null) {
+            if (remindersOpen) {
                 RemindersDialog(
-                    activity = this@EditNoteActivity, account = account, noteId = existing.id, reminders = reminders,
-                    onChange = { reminders = Reminders.list(this@EditNoteActivity, account, existing.id) },
+                    activity = this@EditNoteActivity, account = account, noteId = existing?.id.orEmpty(), reminders = shownReminders,
+                    onChange = { if (existing != null) reminders = Reminders.list(this@EditNoteActivity, account, existing.id) },
+                    onPut = if (existing == null) { r -> draftReminders = draftReminders.filter { it.id != r.id } + r } else null,
+                    onRemove = if (existing == null) { id -> draftReminders = draftReminders.filter { it.id != id } } else null,
                     onDismiss = { remindersOpen = false },
                     askNotifications = {
                         if (android.os.Build.VERSION.SDK_INT >= 33 && !Reminders.canNotify(this@EditNoteActivity)) {
@@ -787,10 +858,10 @@ class EditNoteActivity : ComponentActivity() {
                 )
             }
 
-            reminders.firstOrNull()?.let {
+            shownReminders.firstOrNull()?.let {
                 Text(
                     stringResource(R.string.reminder_at, Reminders.label(this@EditNoteActivity, it.at)) +
-                        if (reminders.size > 1) "  (+${reminders.size - 1})" else "",
+                        if (shownReminders.size > 1) "  (+${shownReminders.size - 1})" else "",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -800,25 +871,20 @@ class EditNoteActivity : ComponentActivity() {
                 OutlinedButton(
                     modifier = Modifier.weight(1f).fillMaxHeight(), enabled = !saving, onClick = { discard() },
                 ) { Text(stringResource(R.string.cancel)) }
-                if (existing == null) Box(Modifier.align(Alignment.CenterVertically)) {
-                    // A new note has no id yet, so it cannot have a reminder; the button says so.
-                    FilledTonalIconToggleButton(
-                        checked = false,
-                        onCheckedChange = { Toast.makeText(this@EditNoteActivity, R.string.reminder_save_first, Toast.LENGTH_SHORT).show() },
-                    ) {
-                        Icon(painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminders_title))
-                    }
-                } else Box(Modifier.align(Alignment.CenterVertically)) {
+                Box(Modifier.align(Alignment.CenterVertically)) {
                     // Set: the accent color with a matching icon. None set: a quiet button.
                     FilledTonalIconToggleButton(
-                        checked = reminders.isNotEmpty(),
+                        checked = shownReminders.isNotEmpty(),
                         onCheckedChange = { remindersOpen = true },
                         colors = IconButtonDefaults.filledTonalIconToggleButtonColors(
                             checkedContainerColor = MaterialTheme.colorScheme.primary,
                             checkedContentColor = MaterialTheme.colorScheme.onPrimary,
                         ),
                     ) {
-                        Icon(painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminders_title))
+                        Icon(
+                            painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminders_title),
+                            tint = if (notificationsOn) LocalContentColor.current else Color(0xFFC62828),
+                        )
                     }
                 }
                 Button(
@@ -885,11 +951,11 @@ class EditNoteActivity : ComponentActivity() {
 
 /** Recognises text typed as a list ("- milk", "* eggs", "[ ] bread") and turns it into checklist items. */
 internal object ChecklistText {
-    private val marker = Regex("""^\s*(?:[-*•]\s*(?:\[([ xX]?)\]\s*)?|\[([ xX]?)\]\s*)(.*)$""")
+    private val marker = Regex("""^\s*(?:[-–—*•](?:\s+|(?=\p{L}))(?:\[([ xX]?)\]\s*)?|\[([ xX]?)\]\s*)(.*)$""")
 
-    /** At least two lines that start with a list marker. */
+    /** At least one line that starts with a list marker ("- ", "* ", "• " or "[ ] ") followed by text. */
     fun looksLikeList(text: String): Boolean =
-        text.lineSequence().count { marker.matches(it) && marker.find(it)!!.groupValues[3].isNotBlank() } >= 2
+        text.lineSequence().any { line -> marker.matchEntire(line)?.groupValues?.get(3)?.isNotBlank() == true }
 
     fun items(text: String): List<KeepItem> = text.lineSequence().filter { it.isNotBlank() }.map { line ->
         val m = marker.find(line)

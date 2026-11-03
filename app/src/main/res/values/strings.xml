@@ -122,8 +122,8 @@
     <string name="max_lines">Maximum lines per note: %1$d</string>
     <string name="max_lines_unlimited">Maximum lines per note: unlimited</string>
     <string name="items_more">+%1$d more</string>
-    <string name="hide_content">Hide content in widgets</string>
-    <string name="show_content">Show content in widgets</string>
+    <string name="hide_content">Hide content</string>
+    <string name="show_content">Show content</string>
     <string name="note_private_hint">Content hidden</string>
     <string name="show_add_item_button">Show add item button</string>
     <string name="save_to_account">Account for this note</string>
@@ -284,6 +284,7 @@
     <string name="reminder_not_allowed">Not allowed</string>
     <string name="reminder_notifications_off">Notifications are off, so reminders cannot show. Turn them on in the settings.</string>
     <string name="reminder_save_first">Save the note first, then you can add reminders.</string>
+    <string name="reminder_needs_notifications">Turn on notifications first, reminders need them.</string>
     <string name="save_failures_title">Note could not be saved</string>
     <string name="save_pending_failed">“%1$s” was not sent to Keep: %2$s. The change is kept on this phone.</string>
     <string name="save_retry">Try again</string>
@@ -291,4 +292,12 @@
     <string name="note_unsent">This note has changes that are not sent to Keep yet.</string>
     <string name="note_unsent_failed">This note has changes that could not be sent to Keep: %1$s</string>
     <string name="save_notifications_off">Notifications are off, so you would not notice if saving to Keep fails.</string>
+    <string name="app_lock_title">Lock the app</string>
+    <string name="app_lock_hint">The whole app asks for fingerprint, PIN or password when it opens or comes back after a short time.</string>
+    <string name="app_locked_unlock">Unlock</string>
+    <string name="convert_to_note">Convert to note</string>
+    <string name="convert_existing_hint">The note is saved as a new one and the old one moves to the trash. Reminders move along.</string>
+    <string name="convert_images_blocked">Notes with images cannot be converted.</string>
+    <string name="notif_off_main">Notifications are turned off. You will not be told when syncing or saving fails; such errors only show here at the top.</string>
+    <string name="notif_hint_dismiss">Don’t show again</string>
 </resources>

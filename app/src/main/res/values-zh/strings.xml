@@ -119,8 +119,8 @@
     <string name="max_lines">每条笔记最多行数：%1$d</string>
     <string name="max_lines_unlimited">每条笔记最多行数：不限</string>
     <string name="items_more">另有 %1$d 项</string>
-    <string name="hide_content">在小组件中隐藏内容</string>
-    <string name="show_content">在小组件中显示内容</string>
+    <string name="hide_content">隐藏内容</string>
+    <string name="show_content">显示内容</string>
     <string name="note_private_hint">内容已隐藏</string>
     <string name="show_add_item_button">显示添加项目按钮</string>
     <string name="save_to_account">此笔记使用的账号</string>
@@ -281,6 +281,7 @@
     <string name="reminder_not_allowed">未允许</string>
     <string name="reminder_notifications_off">通知已关闭,因此无法显示提醒。请在设置中开启。</string>
     <string name="reminder_save_first">请先保存笔记,然后再添加提醒。</string>
+    <string name="reminder_needs_notifications">请先开启通知，提醒需要通知。</string>
     <string name="save_failures_title">无法保存便笺</string>
     <string name="save_pending_failed">“%1$s”未能发送到 Keep：%2$s。更改仍保存在此手机上。</string>
     <string name="save_retry">重试</string>
@@ -288,4 +289,12 @@
     <string name="note_unsent">此便笺有尚未发送到 Keep 的更改。</string>
     <string name="note_unsent_failed">此便笺有无法发送到 Keep 的更改：%1$s</string>
     <string name="save_notifications_off">通知已关闭，Keep 保存失败时你将不会察觉。</string>
+    <string name="app_lock_title">锁定应用</string>
+    <string name="app_lock_hint">打开应用以及在后台短暂停留后返回时，整个应用都会要求指纹、PIN 或密码。</string>
+    <string name="app_locked_unlock">解锁</string>
+    <string name="convert_to_note">转换为笔记</string>
+    <string name="convert_existing_hint">笔记将另存为新笔记，旧笔记移入回收站。提醒会一并转移。</string>
+    <string name="convert_images_blocked">带图片的笔记无法转换。</string>
+    <string name="notif_off_main">الإشعارات متوقفة. لن يصلك إشعار عند فشل المزامنة أو الحفظ؛ تظهر هذه الأخطاء هنا في الأعلى فقط.</string>
+    <string name="notif_hint_dismiss">不再显示</string>
 </resources>

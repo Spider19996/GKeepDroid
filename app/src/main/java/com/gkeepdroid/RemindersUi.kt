@@ -18,6 +18,11 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.background
+import android.widget.Toast
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -231,6 +236,8 @@ private fun TriState(label: Int, value: Boolean?, onChange: (Boolean?) -> Unit) 
 internal fun RemindersDialog(
     activity: Activity, account: String, noteId: String, reminders: List<Reminder>,
     onChange: () -> Unit, onDismiss: () -> Unit, askNotifications: () -> Unit,
+    /** For a note that does not exist yet: where the reminders are kept instead of being set at once. */
+    onPut: ((Reminder) -> Unit)? = null, onRemove: ((String) -> Unit)? = null,
 ) {
     var editing by remember { mutableStateOf<Reminder?>(null) }
     var exactHint by remember { mutableStateOf(false) }
@@ -260,7 +267,7 @@ internal fun RemindersDialog(
         ReminderEditor(
             activity, reminder,
             onSave = {
-                Reminders.put(activity, account, noteId, it)
+                if (onPut != null) onPut(it) else Reminders.put(activity, account, noteId, it)
                 editing = null
                 onChange()
             },
@@ -269,15 +276,27 @@ internal fun RemindersDialog(
         return
     }
     val notificationsOn = rememberNotificationsOn(activity)
+    /** Reminders only make sense with notifications: say so, and offer the permission where Android still allows asking. */
+    fun needNotifications() {
+        Toast.makeText(activity, R.string.reminder_needs_notifications, Toast.LENGTH_LONG).show()
+        askNotifications()
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.reminders_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 if (!notificationsOn) {
-                    Text(stringResource(R.string.reminder_notifications_off), color = MaterialTheme.colorScheme.error)
-                    TextButton(onClick = { activity.startActivity(Reminders.notificationSettings(activity)) }) {
-                        Text(stringResource(R.string.reminder_open_settings))
+                    Column(
+                        Modifier.fillMaxWidth().padding(bottom = 12.dp).background(Color(0xFFC62828), RoundedCornerShape(8.dp)).padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        Text(stringResource(R.string.reminder_notifications_off), color = Color.White, fontWeight = FontWeight.Bold)
+                        Text(
+                            stringResource(R.string.reminder_open_settings),
+                            color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold,
+                            modifier = Modifier.clickable { activity.startActivity(Reminders.notificationSettings(activity)) },
+                        )
                     }
                 }
                 if (reminders.isEmpty()) Text(stringResource(R.string.reminders_none))
@@ -285,10 +304,10 @@ internal fun RemindersDialog(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             Reminders.label(activity, reminder.at),
-                            modifier = Modifier.weight(1f).clickable { editing = reminder }.padding(vertical = 12.dp),
+                            modifier = Modifier.weight(1f).clickable { if (notificationsOn) editing = reminder else needNotifications() }.padding(vertical = 12.dp),
                         )
                         IconButton(onClick = {
-                            Reminders.remove(activity, account, noteId, reminder.id)
+                            if (onRemove != null) onRemove(reminder.id) else Reminders.remove(activity, account, noteId, reminder.id)
                             onChange()
                         }) {
                             Icon(painterResource(R.drawable.ic_delete), contentDescription = stringResource(R.string.reminder_remove))
@@ -299,7 +318,10 @@ internal fun RemindersDialog(
         },
         confirmButton = {
             TextButton(onClick = {
-                askNotifications()
+                if (!notificationsOn) {
+                    needNotifications()
+                    return@TextButton
+                }
                 val prefs = activity.getSharedPreferences("reminder_hints", android.content.Context.MODE_PRIVATE)
                 if (!Reminders.canScheduleExact(activity) && !prefs.getBoolean("exact_asked", false)) {
                     prefs.edit().putBoolean("exact_asked", true).apply()

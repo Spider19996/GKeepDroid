@@ -92,6 +92,17 @@ object Reminders {
         editor.apply()
     }
 
+    fun noteIds(context: Context, account: String): Set<String> = NotesCache.readAll(context, account).map { it.id }.toSet()
+
+    /** Gives the reminders (and the hidden mark) of a note that was just created to the new note, found as the one that was not there before. */
+    fun attachToNew(context: Context, edit: PendingEdit, before: Set<String>) {
+        if (edit.reminders.isEmpty() && !edit.hidden) return
+        val created = NotesCache.readAll(context, edit.account).filter { it.id !in before }
+        val note = created.firstOrNull { it.title == edit.args.firstOrNull() } ?: created.maxByOrNull { it.created } ?: return
+        edit.reminders.forEach { put(context, edit.account, note.id, it) }
+        if (edit.hidden) PrivateNotes.set(context, edit.account, note.id, true)
+    }
+
     /** Adds a reminder, or replaces the one with the same id, and sets its alarm. */
     fun put(context: Context, account: String, noteId: String, reminder: Reminder) {
         write(context, account, noteId, list(context, account, noteId).filter { it.id != reminder.id } + reminder)
@@ -180,13 +191,7 @@ object Reminders {
         if (reminder == null || note == null || !canNotify(context)) return finished()
 
         val manager = context.getSystemService(NotificationManager::class.java)
-        // The channel is silent: sound and vibration are played below, so each reminder can have its own.
-        manager.createNotificationChannel(
-            NotificationChannel(CHANNEL, context.getString(R.string.reminders_title), NotificationManager.IMPORTANCE_HIGH).apply {
-                setSound(null, null)
-                enableVibration(false)
-            }
-        )
+        NotificationChannels.create(context)
         // A private note keeps its text out of the notification.
         val hidden = PrivateNotes.key(account, noteId) in PrivateNotes.load(context)
         val title = note.title.ifBlank { context.getString(R.string.reminder) }

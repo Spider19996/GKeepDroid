@@ -119,8 +119,8 @@
     <string name="max_lines">Righe massime per nota: %1$d</string>
     <string name="max_lines_unlimited">Righe massime per nota: illimitate</string>
     <string name="items_more">+%1$d altri</string>
-    <string name="hide_content">Nascondi il contenuto nei widget</string>
-    <string name="show_content">Mostra il contenuto nei widget</string>
+    <string name="hide_content">Nascondi contenuti</string>
+    <string name="show_content">Mostra contenuti</string>
     <string name="note_private_hint">Contenuto nascosto</string>
     <string name="show_add_item_button">Mostra il pulsante Aggiungi elemento</string>
     <string name="save_to_account">Account per questa nota</string>
@@ -281,6 +281,7 @@
     <string name="reminder_not_allowed">Non consentito</string>
     <string name="reminder_notifications_off">Le notifiche sono disattivate, quindi i promemoria non possono comparire. Attivale nelle impostazioni.</string>
     <string name="reminder_save_first">Salva prima la nota, poi potrai aggiungere promemoria.</string>
+    <string name="reminder_needs_notifications">Attiva prima le notifiche, i promemoria ne hanno bisogno.</string>
     <string name="save_failures_title">Impossibile salvare la nota</string>
     <string name="save_pending_failed">«%1$s» non è stata inviata a Keep: %2$s. La modifica resta su questo telefono.</string>
     <string name="save_retry">Riprova</string>
@@ -288,4 +289,12 @@
     <string name="note_unsent">Questa nota ha modifiche non ancora inviate a Keep.</string>
     <string name="note_unsent_failed">Questa nota ha modifiche che non è stato possibile inviare a Keep: %1$s</string>
     <string name="save_notifications_off">Le notifiche sono disattivate: non vedresti se il salvataggio su Keep fallisce.</string>
+    <string name="app_lock_title">Blocca l’app</string>
+    <string name="app_lock_hint">L’intera app chiede impronta, PIN o password all’apertura e dopo poco tempo in background.</string>
+    <string name="app_locked_unlock">Sblocca</string>
+    <string name="convert_to_note">Converti in nota</string>
+    <string name="convert_existing_hint">La nota viene salvata come nuova e la vecchia va nel cestino. I promemoria vengono mantenuti.</string>
+    <string name="convert_images_blocked">Le note con immagini non possono essere convertite.</string>
+    <string name="notif_off_main">Le notifiche sono disattivate. Non sarai avvisato se la sincronizzazione o il salvataggio falliscono; questi errori compaiono solo qui in alto.</string>
+    <string name="notif_hint_dismiss">Non mostrare più</string>
 </resources>
