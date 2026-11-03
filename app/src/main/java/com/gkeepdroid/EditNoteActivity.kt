@@ -862,7 +862,7 @@ class EditNoteActivity : ComponentActivity() {
 
             // Web addresses, e-mail addresses and phone numbers in the note can be opened with one tap.
             val links = NoteLinks.find(listOf(title, text) + items.map { it.text })
-            if (links.isNotEmpty()) FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (links.isNotEmpty()) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 links.forEach { link ->
                     androidx.compose.material3.AssistChip(
                         onClick = {
@@ -1072,7 +1072,9 @@ internal object NoteLinks {
         val all = texts.joinToString("\n")
         val found = linkedMapOf<String, NoteLink>()
         fun add(label: String, intent: Intent) {
-            if (found.size < 6) found.putIfAbsent(label, NoteLink(label.take(32), intent))
+            // The chip shows the address without "https://www." and a trailing slash: shorter, and still clear.
+            val shown = label.removePrefix("https://").removePrefix("http://").removePrefix("www.").removeSuffix("/")
+            if (found.size < 8) found.putIfAbsent(label, NoteLink(shown.take(36), intent))
         }
         android.util.Patterns.WEB_URL.matcher(all).let { m ->
             while (m.find()) {

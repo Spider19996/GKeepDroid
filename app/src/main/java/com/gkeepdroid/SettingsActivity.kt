@@ -343,11 +343,13 @@ class SettingsActivity : ComponentActivity() {
                             }
                             androidx.compose.material3.DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                                 androidx.compose.material3.DropdownMenuItem(
-                                    text = { Text((if (state.demoMode) "✓ " else "") + stringResource(R.string.demo_mode)) },
+                                    text = { Text(stringResource(R.string.demo_mode)) },
+                                    leadingIcon = { androidx.compose.material3.Checkbox(checked = state.demoMode, onCheckedChange = null) },
                                     onClick = { menuOpen = false; state.demoMode = !state.demoMode },
                                 )
                                 androidx.compose.material3.DropdownMenuItem(
-                                    text = { Text((if (logOn) "✓ " else "") + stringResource(R.string.log_enable)) },
+                                    text = { Text(stringResource(R.string.log_enable)) },
+                                    leadingIcon = { androidx.compose.material3.Checkbox(checked = logOn, onCheckedChange = null) },
                                     onClick = {
                                         menuOpen = false
                                         logOn = !logOn

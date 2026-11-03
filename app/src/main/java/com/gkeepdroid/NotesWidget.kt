@@ -191,14 +191,15 @@ class NotesWidget : GlanceAppWidget() {
                             if (isPrivate) LockIndicator(settings, palette) else ProgressIndicator(note, settings, palette)
                             if (pinned) PinIndicator(settings, palette)
                             if (settings.foldable) {
+                                // The click area comes first, so the padding around the arrow is part of it.
                                 Text(
                                     if (folded) "▸" else "▾",
-                                    style = TextStyle(color = textColor, fontSize = (settings.textSizeSp + 4).sp),
-                                    modifier = GlanceModifier.padding(start = 8.dp, end = 2.dp).clickable(
+                                    style = TextStyle(color = textColor, fontSize = (settings.textSizeSp + 8).sp),
+                                    modifier = GlanceModifier.clickable(
                                         actionRunCallback<ToggleFoldAction>(
                                             actionParametersOf(NoteIdKey to note.id, AccountKey to account, CollapsedKey to !folded)
                                         )
-                                    ),
+                                    ).padding(start = 10.dp, end = 6.dp, top = 2.dp, bottom = 6.dp),
                                 )
                             }
                             if (reordering) {

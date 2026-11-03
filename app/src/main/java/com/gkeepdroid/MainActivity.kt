@@ -13,6 +13,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -375,6 +377,7 @@ class MainActivity : ComponentActivity() {
                                 if (app.foldNotes) {
                                     DropdownMenuItem(
                                         text = { Text(stringResource(R.string.fold_all)) },
+                                        leadingIcon = { Icon(painterResource(R.drawable.ic_fold), contentDescription = null) },
                                         onClick = {
                                             menuOpen = false
                                             FoldStore.setAll(context, shown.map { FoldStore.key(it.second, it.first.id) }, true)
@@ -383,6 +386,7 @@ class MainActivity : ComponentActivity() {
                                     )
                                     DropdownMenuItem(
                                         text = { Text(stringResource(R.string.unfold_all)) },
+                                        leadingIcon = { Icon(painterResource(R.drawable.ic_unfold), contentDescription = null) },
                                         onClick = {
                                             menuOpen = false
                                             FoldStore.setAll(context, shown.map { FoldStore.key(it.second, it.first.id) }, false)
@@ -390,10 +394,6 @@ class MainActivity : ComponentActivity() {
                                         },
                                     )
                                 }
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.filter_bar_title)) },
-                                    onClick = { menuOpen = false; filterDialog = true },
-                                )
                             }
                             if (app.lockApp && AppLock.enabled(this@MainActivity)) DropdownMenuItem(
                                 text = { Text(stringResource(R.string.app_lock_title)) },
@@ -722,38 +722,33 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /** Wraps a card so it can be swiped sideways; the action runs when the finger lets go past the threshold, and the card springs back. */
-    @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+    /**
+     * Wraps a card so it can be swiped sideways, but only as far as the symbol behind it is fully shown. The action
+     * runs when the finger lets go past the trigger point, and the card slides back.
+     */
     @Composable
     private fun SwipeCard(app: AppSettings, enabled: Boolean, onAction: (Int) -> Unit, modifier: Modifier, content: @Composable () -> Unit) {
         if (!enabled || (app.swipeLeft == SWIPE_NONE && app.swipeRight == SWIPE_NONE)) {
             Box(modifier) { content() }
             return
         }
+        val density = androidx.compose.ui.platform.LocalDensity.current
+        val maxPx = with(density) { 96.dp.toPx() }
+        val trigger = maxPx * 0.75f
+        var offsetX by remember { mutableStateOf(0f) }
         val current by androidx.compose.runtime.rememberUpdatedState(app)
         val action by androidx.compose.runtime.rememberUpdatedState(onAction)
-        val state = androidx.compose.material3.rememberSwipeToDismissBoxState(confirmValueChange = { true })
-        // settledValue only changes once the finger is up and the card has come to rest at the edge.
-        LaunchedEffect(state.settledValue) {
-            when (state.settledValue) {
-                androidx.compose.material3.SwipeToDismissBoxValue.StartToEnd -> action(current.swipeRight)
-                androidx.compose.material3.SwipeToDismissBoxValue.EndToStart -> action(current.swipeLeft)
-                else -> return@LaunchedEffect
-            }
-            state.snapTo(androidx.compose.material3.SwipeToDismissBoxValue.Settled)
-        }
-        androidx.compose.material3.SwipeToDismissBox(
-            state = state,
-            modifier = modifier,
-            enableDismissFromStartToEnd = app.swipeRight != SWIPE_NONE,
-            enableDismissFromEndToStart = app.swipeLeft != SWIPE_NONE,
-            backgroundContent = {
-                val toRight = state.dismissDirection == androidx.compose.material3.SwipeToDismissBoxValue.StartToEnd
-                val kind = if (toRight) app.swipeRight else app.swipeLeft
+        val toRight = offsetX > 0f
+        val kind = if (toRight) app.swipeRight else app.swipeLeft
+        Box(modifier) {
+            if (offsetX != 0f && kind != SWIPE_NONE) {
                 Box(
-                    Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp))
-                        .background(if (kind == SWIPE_TRASH) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer)
-                        .padding(horizontal = 20.dp),
+                    Modifier.matchParentSize().clip(RoundedCornerShape(14.dp))
+                        .background(
+                            if (kind == SWIPE_TRASH) MaterialTheme.colorScheme.errorContainer
+                            else MaterialTheme.colorScheme.secondaryContainer
+                        )
+                        .padding(horizontal = 24.dp),
                     contentAlignment = if (toRight) Alignment.CenterStart else Alignment.CenterEnd,
                 ) {
                     val (icon, name) = when (kind) {
@@ -767,8 +762,26 @@ class MainActivity : ComponentActivity() {
                     }
                     Icon(painterResource(icon), contentDescription = stringResource(name))
                 }
-            },
-        ) { content() }
+            }
+            Box(
+                Modifier
+                    .offset { androidx.compose.ui.unit.IntOffset(offsetX.toInt(), 0) }
+                    .draggable(
+                        orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
+                        state = androidx.compose.foundation.gestures.rememberDraggableState { delta ->
+                            val lowest = if (current.swipeLeft != SWIPE_NONE) -maxPx else 0f
+                            val highest = if (current.swipeRight != SWIPE_NONE) maxPx else 0f
+                            offsetX = (offsetX + delta).coerceIn(lowest, highest)
+                        },
+                        onDragStopped = {
+                            val passed = kotlin.math.abs(offsetX) >= trigger
+                            val chosen = if (offsetX > 0f) current.swipeRight else current.swipeLeft
+                            androidx.compose.animation.core.animate(offsetX, 0f) { value, _ -> offsetX = value }
+                            if (passed) action(chosen)
+                        },
+                    )
+            ) { content() }
+        }
     }
 
     @Composable
@@ -876,15 +889,20 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     if (app.foldNotes) {
-                        Text(
-                            if (folded) "▸" else "▾",
-                            color = textColor,
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(start = 6.dp).clickable {
+                        // A generous touch target: the arrow itself is only part of it.
+                        Box(
+                            Modifier.size(40.dp).offset(x = 8.dp, y = (-8).dp).clickable {
                                 FoldStore.set(context, account, note.id, !folded)
                                 scope.launch { WidgetRefresh.all(context) }
                             },
-                        )
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                painterResource(if (folded) R.drawable.ic_unfold else R.drawable.ic_fold),
+                                contentDescription = stringResource(if (folded) R.string.unfold_all else R.string.fold_all),
+                                tint = textColor, modifier = Modifier.size(24.dp),
+                            )
+                        }
                     }
                 }
             }
