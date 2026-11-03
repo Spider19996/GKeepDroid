@@ -733,7 +733,7 @@ class MainActivity : ComponentActivity() {
             return
         }
         val density = androidx.compose.ui.platform.LocalDensity.current
-        val maxPx = with(density) { 96.dp.toPx() }
+        val maxPx = with(density) { 72.dp.toPx() }
         val trigger = maxPx * 0.75f
         var offsetX by remember { mutableStateOf(0f) }
         val current by androidx.compose.runtime.rememberUpdatedState(app)
@@ -898,7 +898,7 @@ class MainActivity : ComponentActivity() {
                             contentAlignment = Alignment.Center,
                         ) {
                             Icon(
-                                painterResource(if (folded) R.drawable.ic_unfold else R.drawable.ic_fold),
+                                painterResource(if (folded) R.drawable.ic_arrow_left else R.drawable.ic_arrow_down),
                                 contentDescription = stringResource(if (folded) R.string.unfold_all else R.string.fold_all),
                                 tint = textColor, modifier = Modifier.size(24.dp),
                             )

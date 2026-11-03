@@ -76,6 +76,7 @@ class NotesWidget : GlanceAppWidget() {
         val reordering = remember(version) { SettingsStore.isReordering(context, appWidgetId) }
         val privateKeys = remember(version) { PrivateNotes.load(context) }
         val hideAll = remember(version) { AppSettingsStore.load(context).let { it.lockApp && it.widgetTitlesOnly } }
+        val foldedKeys = remember(version) { FoldStore.load(context) }
         val thumbs = remember(version) {
             val result = HashMap<String, Bitmap?>()
             if (settings.showImages && account != null) {
@@ -91,7 +92,7 @@ class NotesWidget : GlanceAppWidget() {
             }
             result
         }
-        Content(appWidgetId, account, notes, settings, collapsed, thumbs, reordering, privateKeys, hideAll)
+        Content(appWidgetId, account, notes, settings, collapsed, thumbs, reordering, privateKeys, hideAll, foldedKeys)
     }
 
     @Composable
@@ -105,6 +106,7 @@ class NotesWidget : GlanceAppWidget() {
         reordering: Boolean,
         privateKeys: Set<String>,
         hideAll: Boolean,
+        foldedKeys: Set<String>,
     ) {
         val context = LocalContext.current
         // Widget padding (8 dp each side) and card padding (8 dp each side) are left free for the image.
@@ -132,6 +134,7 @@ class NotesWidget : GlanceAppWidget() {
                             appWidgetId, note, account.orEmpty(), settings, collapsed, thumbs[note.id], contentWidth,
                             reordering = reordering, canMoveUp = index > 0, canMoveDown = index < notes.lastIndex,
                             isPrivate = hideAll || PrivateNotes.isPrivate(note, account.orEmpty(), privateKeys),
+                            foldedKeys = foldedKeys,
                         )
                     }
                 }
@@ -152,13 +155,14 @@ class NotesWidget : GlanceAppWidget() {
         canMoveUp: Boolean,
         canMoveDown: Boolean,
         isPrivate: Boolean,
+        foldedKeys: Set<String>,
     ) {
         val noteColor = if (settings.showNoteColors) NoteColors.argb(note.color) else null
         val palette = textPalette(settings, onNoteColor = noteColor != null)
         val textColor = palette.provider()
 
         val cardModifier = GlanceModifier.fillMaxWidth().cornerRadius(12.dp).noteBackground(noteColor, settings)
-        val folded = settings.foldable && FoldStore.isFolded(LocalContext.current, account, note.id)
+        val folded = settings.foldable && FoldStore.key(account, note.id) in foldedKeys
 
         Column(GlanceModifier.fillMaxWidth().padding(bottom = 6.dp)) {
             Column(
@@ -191,15 +195,13 @@ class NotesWidget : GlanceAppWidget() {
                             if (isPrivate) LockIndicator(settings, palette) else ProgressIndicator(note, settings, palette)
                             if (pinned) PinIndicator(settings, palette)
                             if (settings.foldable) {
-                                // The click area comes first, so the padding around the arrow is part of it.
-                                Text(
-                                    if (folded) "▸" else "▾",
-                                    style = TextStyle(color = textColor, fontSize = (settings.textSizeSp + 8).sp),
-                                    modifier = GlanceModifier.clickable(
-                                        actionRunCallback<ToggleFoldAction>(
-                                            actionParametersOf(NoteIdKey to note.id, AccountKey to account, CollapsedKey to !folded)
-                                        )
-                                    ).padding(start = 10.dp, end = 6.dp, top = 2.dp, bottom = 6.dp),
+                                // The same arrows as in the app: down when open, left when folded.
+                                ArrowButton(
+                                    if (folded) R.drawable.ic_arrow_left else R.drawable.ic_arrow_down, textColor,
+                                    LocalContext.current.getString(if (folded) R.string.unfold_all else R.string.fold_all),
+                                    actionRunCallback<ToggleFoldAction>(
+                                        actionParametersOf(NoteIdKey to note.id, AccountKey to account, CollapsedKey to !folded)
+                                    ),
                                 )
                             }
                             if (reordering) {
