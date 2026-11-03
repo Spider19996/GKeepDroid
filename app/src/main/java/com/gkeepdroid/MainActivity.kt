@@ -13,6 +13,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.verticalScroll
@@ -844,8 +845,10 @@ class MainActivity : ComponentActivity() {
             if (app.showImages && !hidden) note.images.firstOrNull()?.let { NoteImages.thumbnail(context, account, it) } else null
         }
         val lines = if (app.previewLines <= 0) Int.MAX_VALUE else app.previewLines
+        // The fold arrow floats over the card's corner: its touch area can be large without making the title row taller.
+        Box(modifier.fillMaxWidth()) {
         Column(
-            modifier.fillMaxWidth()
+            Modifier.fillMaxWidth()
                 .clip(shape)
                 .background(background)
                 .then(
@@ -888,22 +891,8 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.padding(start = 6.dp).size(16.dp),
                         )
                     }
-                    if (app.foldNotes) {
-                        // Wide rather than tall, so the title row stays close to the height of the title.
-                        Box(
-                            Modifier.size(width = 44.dp, height = 26.dp).offset(x = 10.dp, y = (-3).dp).clickable {
-                                FoldStore.set(context, account, note.id, !folded)
-                                scope.launch { WidgetRefresh.all(context) }
-                            },
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Icon(
-                                painterResource(if (folded) R.drawable.ic_arrow_left else R.drawable.ic_arrow_down),
-                                contentDescription = stringResource(if (folded) R.string.unfold_all else R.string.fold_all),
-                                tint = textColor, modifier = Modifier.size(24.dp),
-                            )
-                        }
-                    }
+                    // Room for the arrow that floats over the corner; its height is only the title's.
+                    if (app.foldNotes) Spacer(Modifier.size(width = 30.dp, height = 20.dp))
                 }
             }
             // Read again whenever the screen comes back, as reminders are changed in the editor.
@@ -991,6 +980,22 @@ class MainActivity : ComponentActivity() {
                 )
             }
             actions?.let { Column { it() } }
+        }
+        if (app.foldNotes) {
+            Box(
+                Modifier.align(Alignment.TopEnd).size(40.dp).clickable {
+                    FoldStore.set(context, account, note.id, !folded)
+                    scope.launch { WidgetRefresh.all(context) }
+                },
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painterResource(if (folded) R.drawable.ic_arrow_left else R.drawable.ic_arrow_down),
+                    contentDescription = stringResource(if (folded) R.string.unfold_all else R.string.fold_all),
+                    tint = textColor, modifier = Modifier.size(24.dp),
+                )
+            }
+        }
         }
     }
 
