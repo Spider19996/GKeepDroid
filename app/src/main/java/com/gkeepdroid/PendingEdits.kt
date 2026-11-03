@@ -141,6 +141,7 @@ object PendingEdits {
                     }
                 }
                 // Not cancellable: an edit that Keep already has must not stay stored and be sent twice.
+                AppLog.i(context, "save", "${edit.function} sent")
                 withContext(NonCancellable) {
                     remove(context, edit.id)
                     SaveFailures.clear(context, edit)
@@ -153,6 +154,7 @@ object PendingEdits {
                 if (isOffline(e)) return@withLock true
                 if (key != null) blocked += key
                 val reason = e.message?.lineSequence()?.firstOrNull()?.take(160) ?: e.javaClass.simpleName
+                AppLog.e(context, "save", "${edit.function} failed: $reason")
                 withContext(NonCancellable) {
                     recordFailure(context, edit.id, reason)
                     // The same problem is not announced again at every retry.

@@ -320,4 +320,8 @@
     <string name="section_misc">Diğer</string>
     <string name="lock_widget_tick">Widget’ta işaretlemeyi kilitle</string>
     <string name="lock_edit_app_hint">Uygulama kilidi açıkken düzenleme için ek kilide gerek yoktur: uygulamanın kilidini açmak zaten buna izin verir.</string>
+    <string name="log_create">Günlük dosyası oluştur</string>
+    <string name="log_saved">Günlük dosyası kaydedildi. Not, hesap adı veya belirteç içermez.</string>
+    <string name="log_failed">Günlük dosyası kaydedilemedi.</string>
+    <string name="search_settings_no_results">Ayar bulunamadı</string>
 </resources>

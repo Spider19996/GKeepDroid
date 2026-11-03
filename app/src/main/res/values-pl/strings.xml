@@ -320,4 +320,8 @@
     <string name="section_misc">Inne</string>
     <string name="lock_widget_tick">Zablokuj odhaczanie w widżecie</string>
     <string name="lock_edit_app_hint">Edycja nie wymaga dodatkowej blokady, gdy blokada aplikacji jest włączona: odblokowanie aplikacji już na nią pozwala.</string>
+    <string name="log_create">Utwórz plik dziennika</string>
+    <string name="log_saved">Plik dziennika zapisany. Nie zawiera notatek, nazw kont ani tokenów.</string>
+    <string name="log_failed">Nie udało się zapisać pliku dziennika.</string>
+    <string name="search_settings_no_results">Nie znaleziono ustawienia</string>
 </resources>

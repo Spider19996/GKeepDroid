@@ -320,4 +320,8 @@
     <string name="section_misc">其他</string>
     <string name="lock_widget_tick">锁定小组件中的勾选</string>
     <string name="lock_edit_app_hint">开启应用锁时，编辑无需额外锁定：解锁应用即已允许。</string>
+    <string name="log_create">创建日志文件</string>
+    <string name="log_saved">日志文件已保存，不包含笔记、账户名或令牌。</string>
+    <string name="log_failed">无法保存日志文件。</string>
+    <string name="search_settings_no_results">未找到设置</string>
 </resources>

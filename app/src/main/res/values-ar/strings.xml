@@ -320,4 +320,8 @@
     <string name="section_misc">أخرى</string>
     <string name="lock_widget_tick">قفل التحديد في الأداة</string>
     <string name="lock_edit_app_hint">لا يحتاج التعديل إلى قفل إضافي ما دام قفل التطبيق مفعّلًا: فتح قفل التطبيق يسمح به بالفعل.</string>
+    <string name="log_create">إنشاء ملف سجل</string>
+    <string name="log_saved">تم حفظ ملف السجل. لا يحتوي على ملاحظات أو أسماء حسابات أو رموز.</string>
+    <string name="log_failed">تعذّر حفظ ملف السجل.</string>
+    <string name="search_settings_no_results">لم يتم العثور على إعداد</string>
 </resources>

@@ -66,6 +66,7 @@ object SyncPolicy {
 
     /** Remembers the outcome of a sync of all accounts for the status display. */
     fun recordSync(context: Context, error: String?, expiredAccount: String? = null) {
+        if (error == null) AppLog.i(context, "sync", "ok") else AppLog.e(context, "sync", "failed: $error" + if (expiredAccount != null) " (sign-in expired)" else "")
         val editor = prefs(context).edit()
         if (error == null) editor.putLong("last_ok", System.currentTimeMillis()).remove("last_error")
         else editor.putString("last_error", error)

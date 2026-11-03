@@ -320,4 +320,8 @@
     <string name="section_misc">Altro</string>
     <string name="lock_widget_tick">Blocca la spunta nel widget</string>
     <string name="lock_edit_app_hint">Modificare non richiede un blocco aggiuntivo finché il blocco dell’app è attivo: sbloccare l’app lo consente già.</string>
+    <string name="log_create">Crea file di log</string>
+    <string name="log_saved">File di log salvato. Non contiene note, nomi account o token.</string>
+    <string name="log_failed">Impossibile salvare il file di log.</string>
+    <string name="search_settings_no_results">Nessuna impostazione trovata</string>
 </resources>

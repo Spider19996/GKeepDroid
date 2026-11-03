@@ -320,4 +320,8 @@
     <string name="section_misc">Sonstiges</string>
     <string name="lock_widget_tick">Abhaken im Widget sperren</string>
     <string name="lock_edit_app_hint">Bearbeiten braucht keine zusätzliche Sperre, solange „App sperren“ an ist: Mit dem Entsperren der App ist es schon erlaubt.</string>
+    <string name="log_create">Logdatei erstellen</string>
+    <string name="log_saved">Logdatei gespeichert. Sie enthält keine Notizen, Kontonamen oder Tokens.</string>
+    <string name="log_failed">Die Logdatei konnte nicht gespeichert werden.</string>
+    <string name="search_settings_no_results">Keine Einstellung gefunden</string>
 </resources>

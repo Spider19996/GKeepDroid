@@ -320,4 +320,8 @@
     <string name="section_misc">Outros</string>
     <string name="lock_widget_tick">Bloquear a marcação no widget</string>
     <string name="lock_edit_app_hint">Editar não precisa de outro bloqueio enquanto o bloqueio da app estiver ativo: desbloquear a app já o permite.</string>
+    <string name="log_create">Criar ficheiro de registo</string>
+    <string name="log_saved">Ficheiro de registo guardado. Não contém notas, nomes de conta nem tokens.</string>
+    <string name="log_failed">Não foi possível guardar o ficheiro de registo.</string>
+    <string name="search_settings_no_results">Nenhuma definição encontrada</string>
 </resources>

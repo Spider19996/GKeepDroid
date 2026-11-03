@@ -509,6 +509,9 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        // The drag gesture lives longer than one composition: it must always call the current version of drop().
+        val dropNow by androidx.compose.runtime.rememberUpdatedState<() -> Unit>({ drop() })
+
         // Near the top or bottom edge the list scrolls along with the finger.
         LaunchedEffect(dragKey) {
             while (dragKey != null) {
@@ -539,7 +542,7 @@ class MainActivity : ComponentActivity() {
                             pointer = coords[0]?.localToRoot(change.position) ?: pointer
                             moveUnderFinger()
                         },
-                        onDragEnd = { drop() },
+                        onDragEnd = { dropNow() },
                         onDragCancel = { dragKey = null; dragOrder = null },
                     )
                 }

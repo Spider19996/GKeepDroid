@@ -320,4 +320,8 @@
     <string name="section_misc">その他</string>
     <string name="lock_widget_tick">ウィジェットでのチェックをロック</string>
     <string name="lock_edit_app_hint">アプリのロックがオンの間は、編集に追加のロックは不要です。アプリのロック解除で編集できます。</string>
+    <string name="log_create">ログファイルを作成</string>
+    <string name="log_saved">ログファイルを保存しました。メモ、アカウント名、トークンは含まれません。</string>
+    <string name="log_failed">ログファイルを保存できませんでした。</string>
+    <string name="search_settings_no_results">設定が見つかりません</string>
 </resources>

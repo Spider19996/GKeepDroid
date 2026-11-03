@@ -63,7 +63,7 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
                 label.contains(settingsQuery.trim(), ignoreCase = true) ||
                     pageTitle.contains(settingsQuery.trim(), ignoreCase = true)
             }.distinctBy { it.second }
-            if (hits.isEmpty()) Text(stringResource(R.string.search_no_results))
+            if (hits.isEmpty()) Text(stringResource(R.string.search_settings_no_results))
             hits.forEach { (entry, label, pageTitle) ->
                 MenuRow(label, if (pageTitle == label) null else pageTitle) {
                     settingsQuery = ""

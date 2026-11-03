@@ -320,4 +320,8 @@
     <string name="section_misc">Прочее</string>
     <string name="lock_widget_tick">Заблокировать отметки в виджете</string>
     <string name="lock_edit_app_hint">Редактирование не требует дополнительной блокировки, пока включена блокировка приложения: разблокировка приложения уже разрешает его.</string>
+    <string name="log_create">Создать файл журнала</string>
+    <string name="log_saved">Файл журнала сохранён. В нём нет заметок, имён аккаунтов и токенов.</string>
+    <string name="log_failed">Не удалось сохранить файл журнала.</string>
+    <string name="search_settings_no_results">Настройка не найдена</string>
 </resources>

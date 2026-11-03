@@ -320,4 +320,8 @@
     <string name="section_misc">Autres</string>
     <string name="lock_widget_tick">Verrouiller le cochage dans le widget</string>
     <string name="lock_edit_app_hint">La modification n’a pas besoin de verrou supplémentaire tant que le verrouillage de l’application est actif : déverrouiller l’application l’autorise déjà.</string>
+    <string name="log_create">Créer un fichier journal</string>
+    <string name="log_saved">Fichier journal enregistré. Il ne contient ni notes, ni noms de compte, ni jetons.</string>
+    <string name="log_failed">Le fichier journal n’a pas pu être enregistré.</string>
+    <string name="search_settings_no_results">Aucun réglage trouvé</string>
 </resources>

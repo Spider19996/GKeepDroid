@@ -126,18 +126,34 @@ object AppLock {
             } else {
                 builder.setDeviceCredentialAllowed(true)
             }
-            val prompt = builder.build()
-            try {
-                prompt.authenticate(CancellationSignal(), activity.mainExecutor, object : BiometricPrompt.AuthenticationCallback() {
-                    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult?) = onResult(Result.OK)
-                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) = onResult(
-                        if (errorCode == BiometricPrompt.BIOMETRIC_ERROR_USER_CANCELED || errorCode == BiometricPrompt.BIOMETRIC_ERROR_CANCELED
-                        ) Result.CANCELED else Result.FAILED
-                    )
-                })
-            } catch (e: Exception) {
-                onResult(Result.FAILED)
+            fun attempt(retried: Boolean) {
+                try {
+                    builder.build().authenticate(CancellationSignal(), activity.mainExecutor, object : BiometricPrompt.AuthenticationCallback() {
+                        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult?) {
+                            AppLog.i(activity, "lock", "passed")
+                            onResult(Result.OK)
+                        }
+
+                        override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) {
+                            AppLog.i(activity, "lock", "prompt ended with code $errorCode")
+                            when {
+                                errorCode == BiometricPrompt.BIOMETRIC_ERROR_USER_CANCELED -> onResult(Result.CANCELED)
+                                // The system refuses a prompt that starts right after another one ended: try once more.
+                                errorCode == BiometricPrompt.BIOMETRIC_ERROR_CANCELED && !retried ->
+                                    android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({ attempt(true) }, 400)
+                                else -> {
+                                    if (errString != null) android.widget.Toast.makeText(activity, errString, android.widget.Toast.LENGTH_SHORT).show()
+                                    onResult(Result.FAILED)
+                                }
+                            }
+                        }
+                    })
+                } catch (e: Exception) {
+                    AppLog.e(activity, "lock", "prompt failed: ${e.javaClass.simpleName}")
+                    onResult(Result.FAILED)
+                }
             }
+            attempt(false)
         } else {
             // Android 8 and 9: the credential screen of the phone (no fingerprint here).
             val keyguard = activity.getSystemService(KeyguardManager::class.java)

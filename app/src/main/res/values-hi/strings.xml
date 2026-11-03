@@ -320,4 +320,8 @@
     <string name="section_misc">अन्य</string>
     <string name="lock_widget_tick">विजेट में टिक करना लॉक करें</string>
     <string name="lock_edit_app_hint">ऐप लॉक चालू रहने तक संपादन के लिए अतिरिक्त लॉक ज़रूरी नहीं: ऐप अनलॉक करने से यह पहले ही अनुमत है।</string>
+    <string name="log_create">लॉग फ़ाइल बनाएँ</string>
+    <string name="log_saved">लॉग फ़ाइल सहेजी गई। इसमें नोट, खाते के नाम या टोकन नहीं हैं।</string>
+    <string name="log_failed">लॉग फ़ाइल सहेजी नहीं जा सकी।</string>
+    <string name="search_settings_no_results">कोई सेटिंग नहीं मिली</string>
 </resources>

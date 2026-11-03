@@ -322,6 +322,17 @@ class SettingsActivity : ComponentActivity() {
                     // Rarely needed: the demo mode for screenshots lives in a menu of its own.
                     if (page == Page.Main && !hasWidget) {
                         var menuOpen by remember { androidx.compose.runtime.mutableStateOf(false) }
+                        // The log is written where the user chooses (Downloads, Documents...), as a plain text file.
+                        val logLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
+                            if (uri != null) {
+                                val ok = runCatching {
+                                    contentResolver.openOutputStream(uri)?.use { it.write(LogReport.build(this@SettingsActivity).toByteArray()) } != null
+                                }.getOrDefault(false)
+                                android.widget.Toast.makeText(
+                                    this@SettingsActivity, if (ok) R.string.log_saved else R.string.log_failed, android.widget.Toast.LENGTH_LONG,
+                                ).show()
+                            }
+                        }
                         androidx.compose.foundation.layout.Box {
                             androidx.compose.material3.IconButton(onClick = { menuOpen = true }) {
                                 androidx.compose.material3.Icon(
@@ -333,6 +344,14 @@ class SettingsActivity : ComponentActivity() {
                                 androidx.compose.material3.DropdownMenuItem(
                                     text = { Text((if (state.demoMode) "✓ " else "") + stringResource(R.string.demo_mode)) },
                                     onClick = { menuOpen = false; state.demoMode = !state.demoMode },
+                                )
+                                androidx.compose.material3.DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.log_create)) },
+                                    onClick = {
+                                        menuOpen = false
+                                        val stamp = java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US).format(java.util.Date())
+                                        logLauncher.launch("gkeepdroid-log-$stamp.txt")
+                                    },
                                 )
                             }
                         }

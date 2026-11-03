@@ -7,6 +7,13 @@ class GKeepDroidApp : Application() {
         super.onCreate()
         LocaleHelper.applyToApp(this)
         NotificationChannels.create(this)
+        // A crash goes into the app log (class names and code positions only) before the system handles it.
+        val previous = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            AppLog.crash(this, throwable)
+            previous?.uncaughtException(thread, throwable)
+        }
+        AppLog.i(this, "app", "started")
         // Switching the screen off (locking the phone) locks the app at once.
         androidx.core.content.ContextCompat.registerReceiver(
             this,

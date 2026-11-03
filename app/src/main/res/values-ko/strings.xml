@@ -320,4 +320,8 @@
     <string name="section_misc">기타</string>
     <string name="lock_widget_tick">위젯에서 체크 잠금</string>
     <string name="lock_edit_app_hint">앱 잠금이 켜져 있는 동안에는 편집에 추가 잠금이 필요 없습니다. 앱 잠금 해제로 이미 허용됩니다.</string>
+    <string name="log_create">로그 파일 만들기</string>
+    <string name="log_saved">로그 파일을 저장했습니다. 메모, 계정 이름, 토큰은 포함되지 않습니다.</string>
+    <string name="log_failed">로그 파일을 저장하지 못했습니다.</string>
+    <string name="search_settings_no_results">설정을 찾을 수 없습니다</string>
 </resources>
