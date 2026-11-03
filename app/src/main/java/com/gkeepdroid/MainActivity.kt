@@ -989,7 +989,10 @@ class MainActivity : ComponentActivity() {
                         },
                     ),
                     color = textColor.copy(alpha = 0.6f),
-                    style = MaterialTheme.typography.bodySmall,
+                    // Android's narrow font, so "Edited 28 minutes ago" fits on one line more often.
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontFamily = androidx.compose.ui.text.font.FontFamily(android.graphics.Typeface.create("sans-serif-condensed", android.graphics.Typeface.NORMAL)),
+                    ),
                 )
             }
             actions?.let { Column { it() } }
