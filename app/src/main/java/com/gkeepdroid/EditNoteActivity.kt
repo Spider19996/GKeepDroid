@@ -1104,26 +1104,23 @@ class EditNoteActivity : ComponentActivity() {
                     },
                     modifier = Modifier.fillMaxWidth(),
                 )
-                // One capsule for both jobs, 8 dp from the left, top and bottom edge: the upper half is the checkbox
-                // (a green check when done, a red cross while open), the lower half is the grip that moves the row.
+                // One capsule for both jobs, 8 dp from the left, top and bottom edge. It is the housing of the check (green) or
+                // cross (red) in its upper half and of the grip that moves the row in its lower half; both sit in the middle of their half.
                 Column(
                     Modifier
                         .align(Alignment.CenterStart).padding(start = 8.dp).size(width = 26.dp, height = 40.dp)
-                        .border(1.5.dp, MaterialTheme.colorScheme.outline, androidx.compose.foundation.shape.RoundedCornerShape(8.dp)),
+                        .border(1.5.dp, MaterialTheme.colorScheme.outline, androidx.compose.foundation.shape.RoundedCornerShape(13.dp))
+                        // The border is drawn inside the size, so the halves are measured inside it.
+                        .padding(1.5.dp),
                 ) {
                     Box(
                         Modifier.weight(1f).fillMaxWidth().clickable(enabled = editable) { onToggle() },
                         contentAlignment = Alignment.Center,
                     ) {
-                        Box(
-                            Modifier.size(14.dp).border(1.5.dp, mark, androidx.compose.foundation.shape.RoundedCornerShape(3.dp)),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Icon(
-                                painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close),
-                                contentDescription = null, tint = mark, modifier = Modifier.size(10.dp),
-                            )
-                        }
+                        Icon(
+                            painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close),
+                            contentDescription = null, tint = mark, modifier = Modifier.size(14.dp),
+                        )
                     }
                     Box(Modifier.fillMaxWidth().height(1.5.dp).background(MaterialTheme.colorScheme.outline))
                     Box(
