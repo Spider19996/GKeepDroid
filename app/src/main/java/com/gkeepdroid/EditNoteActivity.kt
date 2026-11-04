@@ -217,6 +217,7 @@ class EditNoteActivity : ComponentActivity() {
         // Text shared from another app arrives as a prefill for a new note.
         var title by remember { mutableStateOf(existing?.title ?: intent.getStringExtra(EXTRA_PREFILL_TITLE).orEmpty()) }
         var text by remember { mutableStateOf(existing?.text ?: intent.getStringExtra(EXTRA_PREFILL_TEXT).orEmpty()) }
+        var textSel by remember { mutableStateOf(androidx.compose.ui.text.TextRange(text.length)) }
         var color by remember { mutableStateOf(existing?.color ?: NoteColors.DEFAULT) }
         var labels by remember { mutableStateOf(existing?.labels.orEmpty()) }
         var newLabel by remember { mutableStateOf("") }
@@ -863,7 +864,14 @@ class EditNoteActivity : ComponentActivity() {
                     }
                 }
                 OutlinedTextField(
-                    value = text, onValueChange = { text = it }, readOnly = !canEdit,
+                    // Enter after "1. ..." (or "- ...") starts the next line with "2. " (or "- "); Enter on an empty one ends the list.
+                    value = androidx.compose.ui.text.input.TextFieldValue(text, textSel),
+                    onValueChange = { typed ->
+                        val result = ListContinue.apply(text, typed)
+                        text = result.text
+                        textSel = result.selection
+                    },
+                    readOnly = !canEdit,
                     label = { Text(stringResource(R.string.note_hint)) },
                     modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp),
                 )
@@ -1018,7 +1026,6 @@ class EditNoteActivity : ComponentActivity() {
                 OutlinedTextField(
                     value = item.text, readOnly = !editable, onValueChange = onText, minLines = 2,
                     placeholder = { Text(stringResource(R.string.item_hint)) },
-                    leadingIcon = { androidx.compose.material3.Checkbox(checked = item.checked, onCheckedChange = { onToggle() }, enabled = editable) },
                     textStyle = if (item.checked) {
                         LocalTextStyle.current.copy(
                             textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough,
@@ -1029,12 +1036,18 @@ class EditNoteActivity : ComponentActivity() {
                     },
                     modifier = Modifier.fillMaxWidth(),
                 )
-                // Bottom right: a green check when done, a red cross while still open.
-                Icon(
-                    painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close),
-                    contentDescription = null, tint = if (item.checked) green else red,
-                    modifier = Modifier.align(Alignment.BottomEnd).padding(end = 10.dp, bottom = 8.dp).size(18.dp),
-                )
+                // Bottom right: a checkbox that holds a green check when done, a red cross while still open.
+                val mark = if (item.checked) green else red
+                Box(
+                    Modifier.align(Alignment.BottomEnd).padding(end = 10.dp, bottom = 8.dp).size(22.dp)
+                        .border(2.dp, mark, androidx.compose.foundation.shape.RoundedCornerShape(4.dp)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close),
+                        contentDescription = null, tint = mark, modifier = Modifier.size(16.dp),
+                    )
+                }
                 // Bottom left: the handle that moves the row.
                 if (editable) Icon(
                     painterResource(R.drawable.ic_drag_handle),
@@ -1193,5 +1206,47 @@ internal object NoteLinks {
         }
         // An address that is part of an e-mail address is not offered a second time.
         return found.values.filterNot { link -> link.intent.action == Intent.ACTION_VIEW && found.keys.any { it.contains("@") && it.contains(link.label) } }
+    }
+}
+
+/** Continues a typed list: numbers count up, dashes and stars repeat, and an empty item ends the list. */
+internal object ListContinue {
+    private val numbered = Regex("""^(\s*)(\d{1,3})([.)])\s(.*)$""")
+    private val bulleted = Regex("""^(\s*)([-*•])\s(.*)$""")
+
+    fun apply(old: String, typed: androidx.compose.ui.text.input.TextFieldValue): androidx.compose.ui.text.input.TextFieldValue {
+        val text = typed.text
+        val pos = typed.selection.start
+        // Only one Enter typed at the cursor counts; anything else (paste, delete, other typing) is left alone.
+        val enter = typed.selection.collapsed && text.length == old.length + 1 && pos > 0 && text[pos - 1] == '\n' &&
+            text.removeRange(pos - 1, pos) == old
+        if (!enter) return typed
+        val lineStart = old.lastIndexOf('\n', pos - 2).let { if (pos - 2 < 0) 0 else it + 1 }
+        val line = old.substring(lineStart, pos - 1)
+        val marker: String
+        val empty: Boolean
+        val n = numbered.matchEntire(line)
+        val b = bulleted.matchEntire(line)
+        when {
+            n != null -> {
+                marker = n.groupValues[1] + (n.groupValues[2].toInt() + 1) + n.groupValues[3] + " "
+                empty = n.groupValues[4].isBlank()
+            }
+            b != null -> {
+                marker = b.groupValues[1] + b.groupValues[2] + " "
+                empty = b.groupValues[3].isBlank()
+            }
+            else -> return typed
+        }
+        return if (empty) {
+            // Enter on an empty item: the marker goes away and the list is over.
+            androidx.compose.ui.text.input.TextFieldValue(
+                old.substring(0, lineStart) + old.substring(pos - 1), androidx.compose.ui.text.TextRange(lineStart),
+            )
+        } else {
+            androidx.compose.ui.text.input.TextFieldValue(
+                text.substring(0, pos) + marker + text.substring(pos), androidx.compose.ui.text.TextRange(pos + marker.length),
+            )
+        }
     }
 }
