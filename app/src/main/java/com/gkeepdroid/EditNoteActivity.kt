@@ -85,6 +85,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.launch
@@ -1078,16 +1080,20 @@ class EditNoteActivity : ComponentActivity() {
                         },
                     )
             ) {
-                // Handle and checkbox sit in the left corners, one above the other and small, so a one-line field is tall enough.
-                // The handle keeps the same gap to the top and the left edge, the checkbox the same gap to the bottom and the left edge.
+                // Handle and checkbox sit in the left corners, one above the other and small. Every gap to an edge is 8 dp:
+                // the handle to the top and left, the checkbox to the left and bottom, and the text to the checkbox.
                 val mark = if (item.checked) green else red
                 OutlinedTextField(
                     value = item.text, readOnly = !editable, onValueChange = onText,
                     placeholder = { Text(stringResource(R.string.item_hint)) },
+                    // The text starts 32 dp from the left edge (16 dp content padding plus this room); the symbols are drawn on top.
                     // In a numbered list the number stands in front of the text and is not part of what is edited.
-                    prefix = number?.let { { Text("$it.", color = MaterialTheme.colorScheme.onSurfaceVariant) } },
-                    // Only reserves the room the two symbols take; they are drawn on top.
-                    leadingIcon = { Spacer(Modifier.width(30.dp)) },
+                    prefix = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Spacer(Modifier.width(16.dp))
+                            number?.let { Text("$it. ", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                        }
+                    },
                     textStyle = if (item.checked) {
                         LocalTextStyle.current.copy(
                             textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough,
@@ -1098,11 +1104,10 @@ class EditNoteActivity : ComponentActivity() {
                     },
                     modifier = Modifier.fillMaxWidth(),
                 )
-                Icon(
-                    painterResource(R.drawable.ic_drag_handle),
-                    contentDescription = stringResource(R.string.drag_handle),
-                    modifier = Modifier
-                        .align(Alignment.TopStart).padding(start = 8.dp, top = 8.dp).size(20.dp)
+                // The handle: two short bars, 8 dp from the top and the left edge. The touch area around them is a little larger.
+                Box(
+                    Modifier
+                        .align(Alignment.TopStart).padding(start = 2.dp, top = 2.dp).size(26.dp)
                         .onGloballyPositioned { handle = it }
                         .pointerInput(item.id, editable) {
                             if (!editable) return@pointerInput
@@ -1115,19 +1120,29 @@ class EditNoteActivity : ComponentActivity() {
                                 onDragEnd = { onDragEnd() },
                                 onDragCancel = { onDragEnd() },
                             )
-                        },
-                )
-                // The checkbox: a green check when done, a red cross while still open.
-                Box(
-                    Modifier.align(Alignment.BottomStart).padding(start = 10.dp, bottom = 10.dp).size(18.dp)
-                        .border(1.5.dp, mark, androidx.compose.foundation.shape.RoundedCornerShape(3.dp))
-                        .clickable(enabled = editable) { onToggle() },
-                    contentAlignment = Alignment.Center,
+                        }
+                        .semantics { contentDescription = "drag" },
                 ) {
-                    Icon(
-                        painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close),
-                        contentDescription = null, tint = mark, modifier = Modifier.size(13.dp),
-                    )
+                    Column(Modifier.padding(start = 6.dp, top = 6.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                        val bar = MaterialTheme.colorScheme.onSurfaceVariant
+                        Box(Modifier.size(width = 16.dp, height = 2.dp).background(bar))
+                        Box(Modifier.size(width = 16.dp, height = 2.dp).background(bar))
+                    }
+                }
+                // The checkbox: a green check when done, a red cross while still open; 8 dp from the left and the bottom edge.
+                Box(
+                    Modifier.align(Alignment.BottomStart).size(28.dp).clickable(enabled = editable) { onToggle() },
+                ) {
+                    Box(
+                        Modifier.align(Alignment.BottomStart).padding(start = 8.dp, bottom = 8.dp).size(16.dp)
+                            .border(1.5.dp, mark, androidx.compose.foundation.shape.RoundedCornerShape(3.dp)),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close),
+                            contentDescription = null, tint = mark, modifier = Modifier.size(11.dp),
+                        )
+                    }
                 }
             }
         }
