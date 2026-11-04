@@ -1022,10 +1022,45 @@ class EditNoteActivity : ComponentActivity() {
                         },
                     )
             ) {
-                // Two lines tall, so the symbols at the bottom corners have a strip of their own.
+                // The move handle with the checkbox right below it fill the left side of the field, so the text keeps clear of them.
+                val mark = if (item.checked) green else red
                 OutlinedTextField(
-                    value = item.text, readOnly = !editable, onValueChange = onText, minLines = 2,
+                    value = item.text, readOnly = !editable, onValueChange = onText,
                     placeholder = { Text(stringResource(R.string.item_hint)) },
+                    leadingIcon = {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Icon(
+                                painterResource(R.drawable.ic_drag_handle),
+                                contentDescription = stringResource(R.string.drag_handle),
+                                modifier = Modifier
+                                    .size(28.dp).padding(2.dp)
+                                    .onGloballyPositioned { handle = it }
+                                    .pointerInput(item.id, editable) {
+                                        if (!editable) return@pointerInput
+                                        detectDragGestures(
+                                            onDragStart = { onDragStart() },
+                                            onDrag = { change, _ ->
+                                                change.consume()
+                                                handle?.localToRoot(change.position)?.y?.let(onDragTo)
+                                            },
+                                            onDragEnd = { onDragEnd() },
+                                            onDragCancel = { onDragEnd() },
+                                        )
+                                    },
+                            )
+                            // The checkbox: a green check when done, a red cross while still open.
+                            Box(
+                                Modifier.size(24.dp).border(2.dp, mark, androidx.compose.foundation.shape.RoundedCornerShape(4.dp))
+                                    .clickable(enabled = editable) { onToggle() },
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close),
+                                    contentDescription = null, tint = mark, modifier = Modifier.size(16.dp),
+                                )
+                            }
+                        }
+                    },
                     textStyle = if (item.checked) {
                         LocalTextStyle.current.copy(
                             textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough,
@@ -1035,37 +1070,6 @@ class EditNoteActivity : ComponentActivity() {
                         LocalTextStyle.current
                     },
                     modifier = Modifier.fillMaxWidth(),
-                )
-                // Bottom right: a checkbox that holds a green check when done, a red cross while still open.
-                val mark = if (item.checked) green else red
-                Box(
-                    Modifier.align(Alignment.BottomEnd).padding(end = 10.dp, bottom = 8.dp).size(22.dp)
-                        .border(2.dp, mark, androidx.compose.foundation.shape.RoundedCornerShape(4.dp)),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close),
-                        contentDescription = null, tint = mark, modifier = Modifier.size(16.dp),
-                    )
-                }
-                // Bottom left: the handle that moves the row.
-                if (editable) Icon(
-                    painterResource(R.drawable.ic_drag_handle),
-                    contentDescription = stringResource(R.string.drag_handle),
-                    modifier = Modifier
-                        .align(Alignment.BottomStart).padding(start = 8.dp, bottom = 4.dp).size(28.dp).padding(4.dp)
-                        .onGloballyPositioned { handle = it }
-                        .pointerInput(item.id) {
-                            detectDragGestures(
-                                onDragStart = { onDragStart() },
-                                onDrag = { change, _ ->
-                                    change.consume()
-                                    handle?.localToRoot(change.position)?.y?.let(onDragTo)
-                                },
-                                onDragEnd = { onDragEnd() },
-                                onDragCancel = { onDragEnd() },
-                            )
-                        },
                 )
             }
         }

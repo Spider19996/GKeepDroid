@@ -174,7 +174,10 @@ class NotesWidget : GlanceAppWidget() {
         // A small pin shows that the note is pinned in Keep or shown at the widget's bottom.
         val pinned = note.pinned || note.id in settings.pinBottom
         // No title (and nothing else for that line): no room is kept for it, as in the app.
-        val hasTitleRow = note.title.isNotBlank() || pinned || reordering || isPrivate || (settings.showProgress && progressText(note) != null)
+        val hasTitleRow = note.title.isNotBlank() || reordering || isPrivate
+        // Without a title the pin and the progress sit beside the fold arrow in the corner.
+        val showProgress = settings.showProgress && progressText(note) != null
+        val cornerExtra = if (hasTitleRow) 0 else (if (pinned) 24 else 0) + (if (showProgress) 36 else 0)
         Column(GlanceModifier.fillMaxWidth().padding(bottom = 6.dp)) {
             // A box, so the fold arrow can float over the corner without making the title line taller.
             Box(
@@ -186,7 +189,8 @@ class NotesWidget : GlanceAppWidget() {
             ) {
                 Column(
                     GlanceModifier.fillMaxWidth().padding(
-                        start = 8.dp, top = 8.dp, bottom = 8.dp, end = if (settings.foldable && !hasTitleRow) 40.dp else 8.dp,
+                        start = 8.dp, top = 8.dp, bottom = 8.dp,
+                        end = if (!hasTitleRow && (settings.foldable || cornerExtra > 0)) ((if (settings.foldable) 40 else 0) + cornerExtra).dp else 8.dp,
                     )
                 ) {
                     // Inside the padding, so the image stays within the note and its border stays visible.
@@ -260,16 +264,24 @@ class NotesWidget : GlanceAppWidget() {
                         EditedTime(note, settings, palette)
                     }
                 }
-                if (settings.foldable) {
+                if (settings.foldable || cornerExtra > 0) {
                     Box(GlanceModifier.fillMaxWidth().padding(top = 2.dp, end = 2.dp), contentAlignment = Alignment.TopEnd) {
-                        // The same arrows as in the app: down when open, left when folded.
-                        ArrowButton(
-                            if (folded) R.drawable.ic_arrow_left else R.drawable.ic_arrow_down, textColor,
-                            LocalContext.current.getString(if (folded) R.string.unfold_all else R.string.fold_all),
-                            actionRunCallback<ToggleFoldAction>(
-                                actionParametersOf(NoteIdKey to note.id, AccountKey to account, CollapsedKey to !folded)
-                            ),
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (!hasTitleRow) {
+                                if (!isPrivate) ProgressIndicator(note, settings, palette)
+                                if (pinned) PinIndicator(settings, palette)
+                            }
+                            if (settings.foldable) {
+                                // The same arrows as in the app: down when open, left when folded.
+                                ArrowButton(
+                                    if (folded) R.drawable.ic_arrow_left else R.drawable.ic_arrow_down, textColor,
+                                    LocalContext.current.getString(if (folded) R.string.unfold_all else R.string.fold_all),
+                                    actionRunCallback<ToggleFoldAction>(
+                                        actionParametersOf(NoteIdKey to note.id, AccountKey to account, CollapsedKey to !folded)
+                                    ),
+                                )
+                            }
+                        }
                     }
                 }
             }

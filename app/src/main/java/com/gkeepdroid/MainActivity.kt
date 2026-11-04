@@ -847,8 +847,9 @@ class MainActivity : ComponentActivity() {
         }
         val lines = if (app.previewLines <= 0) Int.MAX_VALUE else app.previewLines
         val progress = progressText(note)?.takeIf { app.showProgress && !hidden }
-        // No title (and nothing else for that line): no room is kept for it.
-        val hasTitleRow = note.title.isNotBlank() || note.pinned || progress != null
+        // No title: no room is kept for one. The pin and the progress then sit beside the fold arrow in the corner.
+        val hasTitleRow = note.title.isNotBlank()
+        val cornerExtra = if (hasTitleRow) 0 else (if (note.pinned) 22 else 0) + (if (progress != null) 36 else 0)
         // The fold arrow floats over the card's corner: its touch area can be large without making the title row taller.
         Box(modifier.fillMaxWidth()) {
         Column(
@@ -866,7 +867,7 @@ class MainActivity : ComponentActivity() {
                 // Tall enough for the fold arrow, also when a folded note has nothing else to show.
                 .then(if (app.foldNotes) Modifier.heightIn(min = 44.dp) else Modifier)
                 // Without a title row the arrow floats over the first line, so that line stops short of it.
-                .padding(start = 12.dp, top = 12.dp, bottom = 12.dp, end = if (app.foldNotes && !hasTitleRow) 36.dp else 12.dp),
+                .padding(start = 12.dp, top = 12.dp, bottom = 12.dp, end = if (!hasTitleRow && (app.foldNotes || cornerExtra > 0)) ((if (app.foldNotes) 36 else 0) + cornerExtra).dp else 12.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             if (thumb != null) {
@@ -997,22 +998,33 @@ class MainActivity : ComponentActivity() {
             }
             actions?.let { Column { it() } }
         }
-        if (app.foldNotes) {
-            Box(
-                Modifier.align(Alignment.TopEnd).size(40.dp).clickable(
-                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
-                    indication = null,
+        if (app.foldNotes || cornerExtra > 0) {
+            Row(Modifier.align(Alignment.TopEnd).padding(end = if (app.foldNotes) 0.dp else 12.dp, top = if (app.foldNotes) 0.dp else 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                if (!hasTitleRow) {
+                    if (progress != null) Text(progress, color = textColor.copy(alpha = 0.7f), style = MaterialTheme.typography.labelMedium)
+                    if (note.pinned) {
+                        Icon(
+                            painterResource(R.drawable.ic_push_pin), contentDescription = stringResource(R.string.pinned_section),
+                            tint = textColor, modifier = Modifier.padding(start = 6.dp).size(16.dp),
+                        )
+                    }
+                }
+                if (app.foldNotes) Box(
+                    Modifier.size(40.dp).clickable(
+                        interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                        indication = null,
+                    ) {
+                        FoldStore.set(context, account, note.id, !folded)
+                        scope.launch { WidgetRefresh.all(context) }
+                    },
+                    contentAlignment = Alignment.Center,
                 ) {
-                    FoldStore.set(context, account, note.id, !folded)
-                    scope.launch { WidgetRefresh.all(context) }
-                },
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    painterResource(if (folded) R.drawable.ic_arrow_left else R.drawable.ic_arrow_down),
-                    contentDescription = stringResource(if (folded) R.string.unfold_all else R.string.fold_all),
-                    tint = textColor, modifier = Modifier.size(24.dp),
-                )
+                    Icon(
+                        painterResource(if (folded) R.drawable.ic_arrow_left else R.drawable.ic_arrow_down),
+                        contentDescription = stringResource(if (folded) R.string.unfold_all else R.string.fold_all),
+                        tint = textColor, modifier = Modifier.size(24.dp),
+                    )
+                }
             }
         }
         }
