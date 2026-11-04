@@ -9,6 +9,8 @@ import android.app.KeyguardManager
 import android.os.Bundle
 import androidx.compose.ui.draw.alpha
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.material3.LocalTextStyle
@@ -1104,46 +1106,53 @@ class EditNoteActivity : ComponentActivity() {
                     },
                     modifier = Modifier.fillMaxWidth(),
                 )
-                // One capsule for both jobs, 8 dp from the left, top and bottom edge. It is the housing of the check (green) or
-                // cross (red) in its upper half and of the grip that moves the row in its lower half; both sit in the middle of their half.
-                Column(
+                // One button for both jobs: a tap switches the item between done and open, holding it and dragging moves the row.
+                // The whole strip at the left is the touch area; the capsule in it is the housing of the check (green) or cross (red),
+                // with the grip below it as a hint that it can be dragged. Both sit in the middle of their half.
+                val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+                Box(
                     Modifier
-                        .align(Alignment.CenterStart).padding(start = 8.dp).size(width = 26.dp, height = 40.dp)
-                        .border(1.5.dp, MaterialTheme.colorScheme.outline, androidx.compose.foundation.shape.RoundedCornerShape(13.dp))
-                        // The border is drawn inside the size, so the halves are measured inside it.
-                        .padding(1.5.dp),
+                        .align(Alignment.CenterStart).width(44.dp).height(56.dp)
+                        .onGloballyPositioned { handle = it }
+                        .pointerInput(item.id, editable) {
+                            if (!editable) return@pointerInput
+                            detectTapGestures(onTap = { onToggle() })
+                        }
+                        .pointerInput(item.id, editable) {
+                            if (!editable) return@pointerInput
+                            detectDragGesturesAfterLongPress(
+                                onDragStart = {
+                                    haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                                    onDragStart()
+                                },
+                                onDrag = { change, _ ->
+                                    change.consume()
+                                    handle?.localToRoot(change.position)?.y?.let(onDragTo)
+                                },
+                                onDragEnd = { onDragEnd() },
+                                onDragCancel = { onDragEnd() },
+                            )
+                        }
+                        .semantics { contentDescription = "check" },
+                    contentAlignment = Alignment.CenterStart,
                 ) {
-                    Box(
-                        Modifier.weight(1f).fillMaxWidth().clickable(enabled = editable) { onToggle() },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close),
-                            contentDescription = null, tint = mark, modifier = Modifier.size(14.dp),
-                        )
-                    }
-                    Box(Modifier.fillMaxWidth().height(1.5.dp).background(MaterialTheme.colorScheme.outline))
-                    Box(
+                    Column(
                         Modifier
-                            .weight(1f).fillMaxWidth()
-                            .onGloballyPositioned { handle = it }
-                            .pointerInput(item.id, editable) {
-                                if (!editable) return@pointerInput
-                                detectDragGestures(
-                                    onDragStart = { onDragStart() },
-                                    onDrag = { change, _ ->
-                                        change.consume()
-                                        handle?.localToRoot(change.position)?.y?.let(onDragTo)
-                                    },
-                                    onDragEnd = { onDragEnd() },
-                                    onDragCancel = { onDragEnd() },
-                                )
-                            }
-                            .semantics { contentDescription = "drag" },
-                        contentAlignment = Alignment.Center,
+                            .padding(start = 8.dp).size(width = 26.dp, height = 40.dp)
+                            .border(1.5.dp, MaterialTheme.colorScheme.outline, androidx.compose.foundation.shape.RoundedCornerShape(6.dp))
+                            // The border is drawn inside the size, so the halves are measured inside it.
+                            .padding(1.5.dp),
                     ) {
-                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            repeat(3) { Box(Modifier.size(width = 12.dp, height = 1.5.dp).background(MaterialTheme.colorScheme.onSurfaceVariant)) }
+                        Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            Icon(
+                                painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close),
+                                contentDescription = null, tint = mark, modifier = Modifier.size(14.dp),
+                            )
+                        }
+                        Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                repeat(3) { Box(Modifier.size(width = 12.dp, height = 1.5.dp).background(MaterialTheme.colorScheme.onSurfaceVariant)) }
+                            }
                         }
                     }
                 }
