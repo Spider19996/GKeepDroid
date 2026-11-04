@@ -356,4 +356,5 @@
     <string name="prefix_star">* 星印</string>
     <string name="prefix_box">[ ] 角括弧</string>
     <string name="prefix_number">1. 番号</string>
+    <string name="list_tools">チェックリストツール</string>
 </resources>

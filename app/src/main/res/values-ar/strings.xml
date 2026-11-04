@@ -356,4 +356,5 @@
     <string name="prefix_star">* نجمة</string>
     <string name="prefix_box">[ ] أقواس</string>
     <string name="prefix_number">1. أرقام</string>
+    <string name="list_tools">أدوات القائمة</string>
 </resources>

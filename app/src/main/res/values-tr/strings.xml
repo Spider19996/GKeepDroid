@@ -356,4 +356,5 @@
     <string name="prefix_star">* Yıldız</string>
     <string name="prefix_box">[ ] Köşeli</string>
     <string name="prefix_number">1. Numaralar</string>
+    <string name="list_tools">Liste araçları</string>
 </resources>

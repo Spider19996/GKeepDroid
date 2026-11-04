@@ -356,4 +356,5 @@
     <string name="prefix_star">* Asterisco</string>
     <string name="prefix_box">[ ] Parentesi</string>
     <string name="prefix_number">1. Numeri</string>
+    <string name="list_tools">Strumenti checklist</string>
 </resources>

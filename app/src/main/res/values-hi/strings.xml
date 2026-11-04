@@ -356,4 +356,5 @@
     <string name="prefix_star">* तारा</string>
     <string name="prefix_box">[ ] कोष्ठक</string>
     <string name="prefix_number">1. संख्याएँ</string>
+    <string name="list_tools">चेकलिस्ट टूल</string>
 </resources>

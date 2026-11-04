@@ -356,4 +356,5 @@
     <string name="prefix_star">* 별표</string>
     <string name="prefix_box">[ ] 대괄호</string>
     <string name="prefix_number">1. 번호</string>
+    <string name="list_tools">체크리스트 도구</string>
 </resources>

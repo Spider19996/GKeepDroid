@@ -356,4 +356,5 @@
     <string name="prefix_star">* Étoile</string>
     <string name="prefix_box">[ ] Crochets</string>
     <string name="prefix_number">1. Numéros</string>
+    <string name="list_tools">Outils de liste</string>
 </resources>

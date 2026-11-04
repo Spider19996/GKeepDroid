@@ -359,4 +359,5 @@
     <string name="prefix_star">* Star</string>
     <string name="prefix_box">[ ] Brackets</string>
     <string name="prefix_number">1. Numbers</string>
+    <string name="list_tools">Checklist tools</string>
 </resources>

@@ -356,4 +356,5 @@
     <string name="prefix_star">* Звёздочка</string>
     <string name="prefix_box">[ ] Скобки</string>
     <string name="prefix_number">1. Номера</string>
+    <string name="list_tools">Инструменты списка</string>
 </resources>

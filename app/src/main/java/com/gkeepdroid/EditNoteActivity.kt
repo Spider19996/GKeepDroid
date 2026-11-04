@@ -50,6 +50,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -237,6 +238,8 @@ class EditNoteActivity : ComponentActivity() {
         var hiddenInWidgets by remember { mutableStateOf(wasHidden) }
         var saving by remember { mutableStateOf(false) }
         var menuOpen by remember { mutableStateOf(false) }
+        var menuPage by remember { mutableStateOf(0) }
+        LaunchedEffect(menuOpen) { if (!menuOpen) menuPage = 0 }
         val isLocal = CredentialStore.isLocal(account)
         // A change that Keep does not have yet (and why, if sending it failed).
         val unsent = remember {
@@ -468,22 +471,27 @@ class EditNoteActivity : ComponentActivity() {
                             )
                         }
                         DropdownMenu(expanded = menuOpen && canEdit, onDismissRequest = { menuOpen = false }) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(if (isList) R.string.convert_to_note else R.string.convert_to_list)) },
-                                leadingIcon = { Icon(painterResource(R.drawable.ic_checklist), contentDescription = null) },
-                                onClick = { menuOpen = false; requestConvert() },
-                            )
-                            if (isList) {
+                            if (menuPage == 1) {
+                                // The checklist tools have a page of their own, so the main menu stays short.
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.list_tools)) },
+                                    leadingIcon = { Icon(painterResource(R.drawable.ic_arrow_left), contentDescription = null) },
+                                    onClick = { menuPage = 0 },
+                                )
+                                HorizontalDivider()
                                 DropdownMenuItem(
                                     text = { Text(stringResource(R.string.list_check_all)) },
+                                    leadingIcon = { Icon(painterResource(R.drawable.ic_done), contentDescription = null) },
                                     onClick = { menuOpen = false; for (i in items.indices) items[i] = items[i].copy(checked = true) },
                                 )
                                 DropdownMenuItem(
                                     text = { Text(stringResource(R.string.list_uncheck_all)) },
+                                    leadingIcon = { Icon(painterResource(R.drawable.ic_close), contentDescription = null) },
                                     onClick = { menuOpen = false; for (i in items.indices) items[i] = items[i].copy(checked = false) },
                                 )
                                 DropdownMenuItem(
                                     text = { Text(stringResource(R.string.list_sort_alpha)) },
+                                    leadingIcon = { Icon(painterResource(R.drawable.ic_sort), contentDescription = null) },
                                     onClick = {
                                         menuOpen = false
                                         // Sub-items lose their parent when the order changes, so they become ordinary items.
@@ -494,13 +502,26 @@ class EditNoteActivity : ComponentActivity() {
                                 )
                                 DropdownMenuItem(
                                     text = { Text(stringResource(R.string.list_delete_checked)) },
+                                    leadingIcon = { Icon(painterResource(R.drawable.ic_delete), contentDescription = null) },
                                     onClick = {
                                         menuOpen = false
                                         items.removeAll { it.checked }
                                         if (items.isEmpty()) items.add(KeepItem(UUID.randomUUID().toString(), "", false))
                                     },
                                 )
+                                return@DropdownMenu
                             }
+                            DropdownMenuItem(
+                                text = { Text(stringResource(if (isList) R.string.convert_to_note else R.string.convert_to_list)) },
+                                leadingIcon = { Icon(painterResource(R.drawable.ic_checklist), contentDescription = null) },
+                                onClick = { menuOpen = false; requestConvert() },
+                            )
+                            if (isList) DropdownMenuItem(
+                                text = { Text(stringResource(R.string.list_tools)) },
+                                leadingIcon = { Icon(painterResource(R.drawable.ic_done), contentDescription = null) },
+                                trailingIcon = { Text("›") },
+                                onClick = { menuPage = 1 },
+                            )
                             if (existing != null) {
                             if (existing.serverId.isNotEmpty()) {
                                 DropdownMenuItem(
@@ -784,10 +805,17 @@ class EditNoteActivity : ComponentActivity() {
             )
 
             if (isList) {
+                if (canEdit) Text(
+                    stringResource(R.string.list_swipe_hint),
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                // The handle of a row moves it; the bounds tell which row the finger is over.
+                var dragging by remember { mutableStateOf<String?>(null) }
+                val rowBounds = remember { mutableStateMapOf<String, Rect>() }
                 items.forEachIndexed { index, item ->
                     key(item.id) {
                         ChecklistRow(
-                            item, canEdit,
+                            item, canEdit, dragging == item.id,
                             onText = { text -> items.indexOfFirst { it.id == item.id }.let { i -> if (i >= 0) items[i] = items[i].copy(text = text) } },
                             onToggle = { items.indexOfFirst { it.id == item.id }.let { i -> if (i >= 0) items[i] = items[i].copy(checked = !items[i].checked) } },
                             onRemove = {
@@ -795,16 +823,23 @@ class EditNoteActivity : ComponentActivity() {
                                 if (items.isEmpty()) items.add(KeepItem(UUID.randomUUID().toString(), "", false))
                                 if (items.isNotEmpty() && items[0].indent) items[0] = items[0].copy(indent = false)
                             },
+                            onBounds = { rowBounds[item.id] = it },
+                            onDragStart = { dragging = item.id },
+                            onDragTo = { y ->
+                                val from = items.indexOfFirst { it.id == item.id }
+                                val to = items.indexOfFirst { rowBounds[it.id]?.let { r -> y >= r.top && y < r.bottom } == true }
+                                if (from >= 0 && to >= 0 && to != from) {
+                                    items.add(to, items.removeAt(from))
+                                    if (items.isNotEmpty() && items[0].indent) items[0] = items[0].copy(indent = false)
+                                }
+                            },
+                            onDragEnd = { dragging = null },
                         )
                     }
                 }
                 if (canEdit) OutlinedButton(onClick = { items.add(KeepItem(UUID.randomUUID().toString(), "", false)) }) {
                     Text("＋ " + stringResource(R.string.add_item))
                 }
-                if (canEdit) Text(
-                    stringResource(R.string.list_swipe_hint),
-                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
             } else {
                 // Lines that start with "-" (or "*", "[ ]") are a list: offer to make it one, once.
                 if (!convertDismissed && ChecklistText.looksLikeList(text) && existing?.images.isNullOrEmpty()) {
@@ -934,13 +969,18 @@ class EditNoteActivity : ComponentActivity() {
      * done. Swiping right ticks (or unticks) it, swiping left removes it, and the row stops where the symbol is shown.
      */
     @Composable
-    private fun ChecklistRow(item: KeepItem, editable: Boolean, onText: (String) -> Unit, onToggle: () -> Unit, onRemove: () -> Unit) {
+    private fun ChecklistRow(
+        item: KeepItem, editable: Boolean, dragged: Boolean,
+        onText: (String) -> Unit, onToggle: () -> Unit, onRemove: () -> Unit,
+        onBounds: (Rect) -> Unit, onDragStart: () -> Unit, onDragTo: (Float) -> Unit, onDragEnd: () -> Unit,
+    ) {
         val maxPx = with(androidx.compose.ui.platform.LocalDensity.current) { 72.dp.toPx() }
         val trigger = maxPx * 0.75f
         var offsetX by remember { mutableStateOf(0f) }
+        var handle by remember { mutableStateOf<LayoutCoordinates?>(null) }
         val green = Color(0xFF2E7D32)
         val red = Color(0xFFC62828)
-        Box(Modifier.fillMaxWidth()) {
+        Box(Modifier.fillMaxWidth().onGloballyPositioned { onBounds(it.boundsInRoot()) }.alpha(if (dragged) 0.5f else 1f)) {
             if (offsetX != 0f) {
                 val toRight = offsetX > 0f
                 Box(
@@ -974,9 +1014,11 @@ class EditNoteActivity : ComponentActivity() {
                         },
                     )
             ) {
+                // Two lines tall, so the symbols at the bottom corners have a strip of their own.
                 OutlinedTextField(
-                    value = item.text, readOnly = !editable, onValueChange = onText,
+                    value = item.text, readOnly = !editable, onValueChange = onText, minLines = 2,
                     placeholder = { Text(stringResource(R.string.item_hint)) },
+                    leadingIcon = { androidx.compose.material3.Checkbox(checked = item.checked, onCheckedChange = { onToggle() }, enabled = editable) },
                     textStyle = if (item.checked) {
                         LocalTextStyle.current.copy(
                             textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough,
@@ -987,12 +1029,31 @@ class EditNoteActivity : ComponentActivity() {
                     },
                     modifier = Modifier.fillMaxWidth(),
                 )
-                if (item.checked) {
-                    Icon(
-                        painterResource(R.drawable.ic_done), contentDescription = null, tint = green,
-                        modifier = Modifier.align(Alignment.BottomEnd).padding(end = 10.dp, bottom = 8.dp).size(18.dp),
-                    )
-                }
+                // Bottom right: a green check when done, a red cross while still open.
+                Icon(
+                    painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close),
+                    contentDescription = null, tint = if (item.checked) green else red,
+                    modifier = Modifier.align(Alignment.BottomEnd).padding(end = 10.dp, bottom = 8.dp).size(18.dp),
+                )
+                // Bottom left: the handle that moves the row.
+                if (editable) Icon(
+                    painterResource(R.drawable.ic_drag_handle),
+                    contentDescription = stringResource(R.string.drag_handle),
+                    modifier = Modifier
+                        .align(Alignment.BottomStart).padding(start = 8.dp, bottom = 4.dp).size(28.dp).padding(4.dp)
+                        .onGloballyPositioned { handle = it }
+                        .pointerInput(item.id) {
+                            detectDragGestures(
+                                onDragStart = { onDragStart() },
+                                onDrag = { change, _ ->
+                                    change.consume()
+                                    handle?.localToRoot(change.position)?.y?.let(onDragTo)
+                                },
+                                onDragEnd = { onDragEnd() },
+                                onDragCancel = { onDragEnd() },
+                            )
+                        },
+                )
             }
         }
     }

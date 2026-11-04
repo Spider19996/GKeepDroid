@@ -356,4 +356,5 @@
     <string name="prefix_star">* Sterretje</string>
     <string name="prefix_box">[ ] Haakjes</string>
     <string name="prefix_number">1. Nummers</string>
+    <string name="list_tools">Checklist-hulpmiddelen</string>
 </resources>

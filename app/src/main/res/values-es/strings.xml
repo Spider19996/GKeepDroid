@@ -356,4 +356,5 @@
     <string name="prefix_star">* Asterisco</string>
     <string name="prefix_box">[ ] Corchetes</string>
     <string name="prefix_number">1. Números</string>
+    <string name="list_tools">Herramientas de lista</string>
 </resources>

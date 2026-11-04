@@ -356,4 +356,5 @@
     <string name="prefix_star">* Stern</string>
     <string name="prefix_box">[ ] Klammern</string>
     <string name="prefix_number">1. Nummern</string>
+    <string name="list_tools">Checklisten-Werkzeuge</string>
 </resources>

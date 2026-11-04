@@ -356,4 +356,5 @@
     <string name="prefix_star">* Gwiazdka</string>
     <string name="prefix_box">[ ] Nawiasy</string>
     <string name="prefix_number">1. Numery</string>
+    <string name="list_tools">Narzędzia listy</string>
 </resources>
