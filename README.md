@@ -4,9 +4,9 @@ An unofficial Android app for your Google Keep notes: home screen widgets with a
 
 > **Not affiliated with Google.** GKeepDroid is an independent, unofficial project. Google Keep and Google are trademarks of Google LLC. This app is neither made, endorsed nor supported by Google.
 
-| Notes | Editor | Button bar | Synchronization |
-|---|---|---|---|
-| <img src="docs/screenshots/notes.png" width="200"> | <img src="docs/screenshots/editor.png" width="200"> | <img src="docs/screenshots/button-bar.png" width="200"> | <img src="docs/screenshots/sync.png" width="200"> |
+| Notes | Checklist editor | Swipe gestures | Settings | Synchronization | Button bar |
+|---|---|---|---|---|---|
+| <img src="docs/screenshots/notes.png" width="150"> | <img src="docs/screenshots/editor.png" width="150"> | <img src="docs/screenshots/gestures.png" width="150"> | <img src="docs/screenshots/settings.png" width="150"> | <img src="docs/screenshots/sync.png" width="150"> | <img src="docs/screenshots/button-bar.png" width="150"> |
 
 ## Features
 

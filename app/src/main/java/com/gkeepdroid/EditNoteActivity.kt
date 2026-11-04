@@ -159,6 +159,11 @@ class EditNoteActivity : ComponentActivity() {
 
         LaunchedEffect(Unit) {
             if (noteId == null) return@LaunchedEffect
+            // The sample notes of the demo mode are made anew every time they are read, so they would always look "changed in Keep".
+            if (DemoNotes.enabled(this@EditNoteActivity)) {
+                loaded = true
+                return@LaunchedEffect
+            }
             val recentlySynced = cached != null && System.currentTimeMillis() - SyncPolicy.lastSuccess(this@EditNoteActivity) < 90_000
             if (!recentlySynced) {
                 try {

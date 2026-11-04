@@ -49,16 +49,35 @@ fun KeepTheme(themeMode: Int, opaque: Boolean = true, content: @Composable () ->
     }
 
     val view = LocalView.current
-    // Demo mode (for screenshots) runs full screen: the status bar is hidden, and a swipe from the top brings it back.
+    // Demo mode (for screenshots) runs full screen: the status bar and the three buttons are hidden, and a swipe from the edge brings them back.
     val fullScreen = DemoNotes.version.intValue >= 0 && DemoNotes.enabled(context)
+    // Switching the demo mode on or off changes how the window is laid out; a fresh activity does that cleanly.
+    val shownFullScreen = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(fullScreen) }
     SideEffect {
+        if (shownFullScreen.value != fullScreen) {
+            shownFullScreen.value = fullScreen
+            (view.context as Activity).recreate()
+            return@SideEffect
+        }
         val window = (view.context as Activity).window
+        // The window sits below the system bars; hiding the status bar alone leaves its strip empty, so demo mode lets the app draw there.
+        WindowCompat.setDecorFitsSystemWindows(window, !fullScreen)
         WindowCompat.getInsetsController(window, view).apply {
             isAppearanceLightStatusBars = !dark
             isAppearanceLightNavigationBars = !dark
             systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            if (fullScreen) hide(androidx.core.view.WindowInsetsCompat.Type.statusBars())
-            else show(androidx.core.view.WindowInsetsCompat.Type.statusBars())
+            if (fullScreen) hide(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+            else show(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+        }
+        // Hiding the bar is not enough on a phone with a camera hole: the strip next to it stays black unless the app may draw there.
+        if (Build.VERSION.SDK_INT >= 28) {
+            val attributes = window.attributes
+            attributes.layoutInDisplayCutoutMode = if (fullScreen) {
+                android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            } else {
+                android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
+            }
+            window.attributes = attributes
         }
     }
 
