@@ -49,11 +49,16 @@ fun KeepTheme(themeMode: Int, opaque: Boolean = true, content: @Composable () ->
     }
 
     val view = LocalView.current
+    // Demo mode (for screenshots) runs full screen: the status bar is hidden, and a swipe from the top brings it back.
+    val fullScreen = DemoNotes.version.intValue >= 0 && DemoNotes.enabled(context)
     SideEffect {
         val window = (view.context as Activity).window
         WindowCompat.getInsetsController(window, view).apply {
             isAppearanceLightStatusBars = !dark
             isAppearanceLightNavigationBars = !dark
+            systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            if (fullScreen) hide(androidx.core.view.WindowInsetsCompat.Type.statusBars())
+            else show(androidx.core.view.WindowInsetsCompat.Type.statusBars())
         }
     }
 
