@@ -362,4 +362,6 @@
     <string name="number_offer">يبدو هذا كقائمة مرقّمة. ترقيم كل العناصر؟</string>
     <string name="renumber_display">إعادة عدّ القوائم المرقّمة في البطاقات والأدوات</string>
     <string name="renumber_display_hint">إيقاف: تُعرض الأرقام المحفوظة حتى عند انتقال المحدد إلى النهاية. تشغيل: تتبع الأرقام الترتيب المعروض.</string>
+    <string name="reset_hints">إعادة ضبط التلميحات</string>
+    <string name="reset_hints_done">ستظهر كل التلميحات مجددًا.</string>
 </resources>

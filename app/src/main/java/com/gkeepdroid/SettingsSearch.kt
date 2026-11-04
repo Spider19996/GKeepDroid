@@ -130,6 +130,7 @@ internal fun settingEntries(isSingleNote: Boolean): List<SettingEntry> = buildLi
     }
 
     add(SettingEntry(R.string.md_sync_title, Page.Backup))
+    add(SettingEntry(R.string.reset_hints, Page.Main))
     add(SettingEntry(R.string.md_sync_enable, Page.Backup))
     add(SettingEntry(R.string.md_sync_choose, Page.Backup))
     add(SettingEntry(R.string.md_sync_now, Page.Backup))

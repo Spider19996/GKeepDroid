@@ -362,4 +362,6 @@
     <string name="number_offer">Parece uma lista numerada. Numerar todos os itens?</string>
     <string name="renumber_display">Recontar listas numeradas em cartões e widgets</string>
     <string name="renumber_display_hint">Desativado: mostram-se os números guardados, mesmo que os marcados passem para o fim. Ativado: os números seguem a ordem mostrada.</string>
+    <string name="reset_hints">Repor dicas</string>
+    <string name="reset_hints_done">Todas as dicas voltarão a ser mostradas.</string>
 </resources>

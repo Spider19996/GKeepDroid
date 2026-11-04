@@ -467,6 +467,19 @@ object CollapseStore {
     }
 }
 
+/**
+ * Every hint the user can dismiss for good (or that is shown only once), kept in three small stores:
+ * the explanation above checklists, the notification notice and the one-time questions about notifications
+ * and exact alarms, and the "No" to the offer to turn a note into a checklist. Resetting shows them all again.
+ */
+object Hints {
+    private val stores = listOf("hints", "reminder_hints", "convert_hints")
+
+    fun resetAll(context: Context) {
+        stores.forEach { context.getSharedPreferences(it, Context.MODE_PRIVATE).edit().clear().apply() }
+    }
+}
+
 /** Notes folded to their title, in the app and in the widgets; stays on this device. */
 object FoldStore {
     private fun prefs(context: Context) = context.getSharedPreferences("folded_notes", Context.MODE_PRIVATE)

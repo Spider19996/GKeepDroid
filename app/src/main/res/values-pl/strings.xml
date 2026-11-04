@@ -362,4 +362,6 @@
     <string name="number_offer">To wygląda na listę numerowaną. Ponumerować wszystkie pozycje?</string>
     <string name="renumber_display">Przeliczaj listy numerowane w kartach i widżetach</string>
     <string name="renumber_display_hint">Wył.: pokazywane są zapisane numery, także gdy zaznaczone trafiają na koniec. Wł.: numery podążają za wyświetlaną kolejnością.</string>
+    <string name="reset_hints">Zresetuj podpowiedzi</string>
+    <string name="reset_hints_done">Wszystkie podpowiedzi będą znów pokazywane.</string>
 </resources>

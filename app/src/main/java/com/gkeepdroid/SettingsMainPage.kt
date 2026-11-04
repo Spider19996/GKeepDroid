@@ -115,6 +115,11 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
             MenuRow(stringResource(R.string.section_security), null) { goTo(Page.Security) }
 
             MenuRow(stringResource(R.string.tab_backup), if (mdEnabled) mdFolder else null) { page = Page.Backup }
+            // Brings back every hint that was dismissed and every one-time question.
+            MenuRow(stringResource(R.string.reset_hints), null, chevron = "") {
+                Hints.resetAll(context)
+                android.widget.Toast.makeText(context, R.string.reset_hints_done, android.widget.Toast.LENGTH_SHORT).show()
+            }
         }
         val widgetSection: @Composable () -> Unit = {
             if (hasWidget) {

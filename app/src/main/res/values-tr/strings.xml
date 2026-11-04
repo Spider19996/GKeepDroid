@@ -362,4 +362,6 @@
     <string name="number_offer">Bu numaralı bir listeye benziyor. Tüm öğeler numaralandırılsın mı?</string>
     <string name="renumber_display">Numaralı listeleri kartlarda ve widget’larda yeniden say</string>
     <string name="renumber_display_hint">Kapalı: kayıtlı numaralar gösterilir, işaretliler sona geçse de. Açık: numaralar gösterilen sırayı izler.</string>
+    <string name="reset_hints">İpuçlarını sıfırla</string>
+    <string name="reset_hints_done">Tüm ipuçları yeniden gösterilecek.</string>
 </resources>

@@ -362,4 +362,6 @@
     <string name="number_offer">这看起来像编号列表。为所有项目编号吗？</string>
     <string name="renumber_display">在卡片和小组件中重新计数编号列表</string>
     <string name="renumber_display_hint">关闭：即使已勾选项移到末尾，也显示已保存的编号。开启：编号跟随显示顺序。</string>
+    <string name="reset_hints">重置提示</string>
+    <string name="reset_hints_done">所有提示将再次显示。</string>
 </resources>

@@ -362,4 +362,6 @@
     <string name="number_offer">Похоже на нумерованный список. Пронумеровать все пункты?</string>
     <string name="renumber_display">Пересчитывать нумерованные списки в карточках и виджетах</string>
     <string name="renumber_display_hint">Выкл.: показываются сохранённые номера, даже если отмеченные уходят в конец. Вкл.: номера следуют показанному порядку.</string>
+    <string name="reset_hints">Сбросить подсказки</string>
+    <string name="reset_hints_done">Все подсказки снова будут показываться.</string>
 </resources>

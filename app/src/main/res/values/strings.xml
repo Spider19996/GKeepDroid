@@ -365,4 +365,6 @@
     <string name="number_offer">This looks like a numbered list. Number all items?</string>
     <string name="renumber_display">Count numbered lists again in cards and widgets</string>
     <string name="renumber_display_hint">Off: the saved numbers are shown, also when checked items move to the end. On: the numbers follow the order shown.</string>
+    <string name="reset_hints">Reset hints</string>
+    <string name="reset_hints_done">All hints will show again.</string>
 </resources>

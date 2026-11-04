@@ -362,4 +362,6 @@
     <string name="number_offer">Dit lijkt op een genummerde lijst. Alle items nummeren?</string>
     <string name="renumber_display">Genummerde lijsten opnieuw tellen in kaarten en widgets</string>
     <string name="renumber_display_hint">Uit: de opgeslagen nummers worden getoond, ook als afgevinkte items naar het einde gaan. Aan: de nummers volgen de getoonde volgorde.</string>
+    <string name="reset_hints">Tips terugzetten</string>
+    <string name="reset_hints_done">Alle tips worden weer getoond.</string>
 </resources>

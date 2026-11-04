@@ -362,4 +362,6 @@
     <string name="number_offer">Das sieht nach einer nummerierten Liste aus. Alle Einträge nummerieren?</string>
     <string name="renumber_display">Nummerierte Listen in Karten und Widgets neu durchzählen</string>
     <string name="renumber_display_hint">Aus: Es werden die gespeicherten Nummern gezeigt, auch wenn Erledigte ans Ende rutschen. An: Die Nummern folgen der angezeigten Reihenfolge.</string>
+    <string name="reset_hints">Hinweise zurücksetzen</string>
+    <string name="reset_hints_done">Alle Hinweise werden wieder angezeigt.</string>
 </resources>

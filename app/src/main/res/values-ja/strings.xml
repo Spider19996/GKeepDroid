@@ -362,4 +362,6 @@
     <string name="number_offer">番号付きリストのようです。すべての項目に番号を付けますか？</string>
     <string name="renumber_display">カードとウィジェットで番号付きリストを数え直す</string>
     <string name="renumber_display_hint">オフ：チェック済みが末尾に移っても保存された番号を表示。オン：表示順に番号が従います。</string>
+    <string name="reset_hints">ヒントをリセット</string>
+    <string name="reset_hints_done">すべてのヒントが再び表示されます。</string>
 </resources>

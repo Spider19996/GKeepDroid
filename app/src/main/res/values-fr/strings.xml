@@ -362,4 +362,6 @@
     <string name="number_offer">On dirait une liste numérotée. Numéroter tous les éléments ?</string>
     <string name="renumber_display">Recompter les listes numérotées dans les cartes et widgets</string>
     <string name="renumber_display_hint">Désactivé : les numéros enregistrés s’affichent, même si les éléments cochés passent à la fin. Activé : les numéros suivent l’ordre affiché.</string>
+    <string name="reset_hints">Réinitialiser les astuces</string>
+    <string name="reset_hints_done">Toutes les astuces s’afficheront de nouveau.</string>
 </resources>
