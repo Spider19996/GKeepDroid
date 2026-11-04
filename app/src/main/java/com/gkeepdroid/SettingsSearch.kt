@@ -75,7 +75,7 @@ internal fun settingEntries(isSingleNote: Boolean): List<SettingEntry> = buildLi
     add(SettingEntry(R.string.lock_widget_tick, Page.Security))
     add(SettingEntry(R.string.widget_titles_only, Page.Security))
     add(SettingEntry(R.string.list_section, Page.AppChecklists))
-    listOf(R.string.check_on_card, R.string.delete_checked, R.string.checked_to_end, R.string.collapse_checked, R.string.convert_prefix_title)
+    listOf(R.string.check_on_card, R.string.delete_checked, R.string.checked_to_end, R.string.collapse_checked, R.string.convert_prefix_title, R.string.renumber_display)
         .forEach { add(SettingEntry(it, Page.AppChecklists)) }
     listOf(R.string.list_spacing, R.string.checkbox_style, R.string.checkbox_size).forEach { add(SettingEntry(it, Page.AppCheckbox)) }
     add(SettingEntry(R.string.reminder_show_widget, Page.AppCards))

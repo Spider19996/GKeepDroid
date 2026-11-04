@@ -357,4 +357,9 @@
     <string name="prefix_box">[ ] Crochets</string>
     <string name="prefix_number">1. Numéros</string>
     <string name="list_tools">Outils de liste</string>
+    <string name="list_number">Numéroter</string>
+    <string name="list_unnumber">Retirer la numérotation</string>
+    <string name="number_offer">On dirait une liste numérotée. Numéroter tous les éléments ?</string>
+    <string name="renumber_display">Recompter les listes numérotées dans les cartes et widgets</string>
+    <string name="renumber_display_hint">Désactivé : les numéros enregistrés s’affichent, même si les éléments cochés passent à la fin. Activé : les numéros suivent l’ordre affiché.</string>
 </resources>

@@ -357,4 +357,9 @@
     <string name="prefix_box">[ ] Скобки</string>
     <string name="prefix_number">1. Номера</string>
     <string name="list_tools">Инструменты списка</string>
+    <string name="list_number">Нумеровать</string>
+    <string name="list_unnumber">Убрать нумерацию</string>
+    <string name="number_offer">Похоже на нумерованный список. Пронумеровать все пункты?</string>
+    <string name="renumber_display">Пересчитывать нумерованные списки в карточках и виджетах</string>
+    <string name="renumber_display_hint">Выкл.: показываются сохранённые номера, даже если отмеченные уходят в конец. Вкл.: номера следуют показанному порядку.</string>
 </resources>

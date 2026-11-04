@@ -410,6 +410,8 @@ internal fun ColumnScope.AppChecklistsPage(s: SettingsState) {
             }
         }
         Hint(R.string.convert_prefix_hint)
+        SwitchRow(R.string.renumber_display, appRenumberDisplay) { appRenumberDisplay = it }
+        Hint(R.string.renumber_display_hint)
         MenuRow(stringResource(R.string.checkbox_style), null) { page = Page.AppCheckbox }
     }
 }

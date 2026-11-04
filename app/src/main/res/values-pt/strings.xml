@@ -357,4 +357,9 @@
     <string name="prefix_box">[ ] Parênteses</string>
     <string name="prefix_number">1. Números</string>
     <string name="list_tools">Ferramentas da lista</string>
+    <string name="list_number">Numerar</string>
+    <string name="list_unnumber">Remover numeração</string>
+    <string name="number_offer">Parece uma lista numerada. Numerar todos os itens?</string>
+    <string name="renumber_display">Recontar listas numeradas em cartões e widgets</string>
+    <string name="renumber_display_hint">Desativado: mostram-se os números guardados, mesmo que os marcados passem para o fim. Ativado: os números seguem a ordem mostrada.</string>
 </resources>

@@ -360,4 +360,9 @@
     <string name="prefix_box">[ ] Brackets</string>
     <string name="prefix_number">1. Numbers</string>
     <string name="list_tools">Checklist tools</string>
+    <string name="list_number">Number items</string>
+    <string name="list_unnumber">Remove numbering</string>
+    <string name="number_offer">This looks like a numbered list. Number all items?</string>
+    <string name="renumber_display">Count numbered lists again in cards and widgets</string>
+    <string name="renumber_display_hint">Off: the saved numbers are shown, also when checked items move to the end. On: the numbers follow the order shown.</string>
 </resources>

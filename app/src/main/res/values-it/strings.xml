@@ -357,4 +357,9 @@
     <string name="prefix_box">[ ] Parentesi</string>
     <string name="prefix_number">1. Numeri</string>
     <string name="list_tools">Strumenti checklist</string>
+    <string name="list_number">Numera</string>
+    <string name="list_unnumber">Rimuovi numerazione</string>
+    <string name="number_offer">Sembra un elenco numerato. Numerare tutte le voci?</string>
+    <string name="renumber_display">Ricontare le liste numerate in schede e widget</string>
+    <string name="renumber_display_hint">Disattivato: si mostrano i numeri salvati, anche se le voci spuntate vanno in fondo. Attivato: i numeri seguono l’ordine mostrato.</string>
 </resources>

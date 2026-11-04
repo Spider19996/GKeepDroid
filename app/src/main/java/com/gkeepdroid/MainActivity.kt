@@ -943,7 +943,9 @@ class MainActivity : ComponentActivity() {
                 // Checked items go last, and can be left out altogether.
                 val ordered = if (app.listCheckedToEnd) open + done else note.items
                 val visible = if (app.listCheckedToEnd && app.listCollapseChecked) open else ordered
-                visible.take(lines).forEach { item ->
+                // With the setting on, a numbered list counts again in the order shown here.
+                val shownItems = ListNumbering.display(note.items, visible.take(lines), app.renumberDisplay)
+                shownItems.forEach { item ->
                     Row(Modifier.padding(vertical = (app.listSpacingDp / 2f).dp), verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.clickable(enabled = app.listCheckInApp) { toggleItem(item) }.padding(2.dp)) {
                             CheckboxPreview(app.listCheckboxStyle, item.checked, app.listCheckboxSizeDp, textColor.copy(alpha = if (item.checked) 0.55f else 1f))

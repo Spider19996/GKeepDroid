@@ -357,4 +357,9 @@
     <string name="prefix_box">[ ] Haakjes</string>
     <string name="prefix_number">1. Nummers</string>
     <string name="list_tools">Checklist-hulpmiddelen</string>
+    <string name="list_number">Nummeren</string>
+    <string name="list_unnumber">Nummering verwijderen</string>
+    <string name="number_offer">Dit lijkt op een genummerde lijst. Alle items nummeren?</string>
+    <string name="renumber_display">Genummerde lijsten opnieuw tellen in kaarten en widgets</string>
+    <string name="renumber_display_hint">Uit: de opgeslagen nummers worden getoond, ook als afgevinkte items naar het einde gaan. Aan: de nummers volgen de getoonde volgorde.</string>
 </resources>

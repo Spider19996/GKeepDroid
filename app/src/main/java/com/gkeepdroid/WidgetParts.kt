@@ -552,8 +552,10 @@ internal fun ChecklistBody(
     val unchecked = if (settings.checkedToEnd) note.items.filter { !it.checked } else note.items
     val checked = if (settings.checkedToEnd) note.items.filter { it.checked } else emptyList()
     val shown = if (rowLimit > 0) unchecked.take(rowLimit) else unchecked
+    // With the setting on, a numbered list counts again in the order shown here.
+    val renumber = AppSettingsStore.load(context).renumberDisplay
 
-    shown.forEach { ItemRow(note, it, account, settings, palette) }
+    ListNumbering.display(note.items, shown, renumber).forEach { ItemRow(note, it, account, settings, palette) }
     if (shown.size < unchecked.size) {
         Text(
             context.getString(R.string.items_more, unchecked.size - shown.size),
@@ -564,7 +566,7 @@ internal fun ChecklistBody(
     AddItemRow(note, account, settings, palette)
     if (checked.isNotEmpty()) {
         CheckedHeader(note, account, settings, palette, collapsed, checked.size)
-        if (!collapsed) checked.forEach { ItemRow(note, it, account, settings, palette) }
+        if (!collapsed) ListNumbering.display(note.items, checked, renumber, startAt = shown.size + 1).forEach { ItemRow(note, it, account, settings, palette) }
     }
 }
 

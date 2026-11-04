@@ -357,4 +357,9 @@
     <string name="prefix_box">[ ] कोष्ठक</string>
     <string name="prefix_number">1. संख्याएँ</string>
     <string name="list_tools">चेकलिस्ट टूल</string>
+    <string name="list_number">क्रमांक दें</string>
+    <string name="list_unnumber">क्रमांक हटाएँ</string>
+    <string name="number_offer">यह क्रमांकित सूची जैसी लगती है। सभी आइटम को क्रमांक दें?</string>
+    <string name="renumber_display">कार्ड और विजेट में क्रमांकित सूचियाँ दोबारा गिनें</string>
+    <string name="renumber_display_hint">बंद: चेक किए आइटम अंत में जाएँ तो भी सहेजे गए क्रमांक दिखते हैं। चालू: क्रमांक दिखाए गए क्रम का पालन करते हैं।</string>
 </resources>

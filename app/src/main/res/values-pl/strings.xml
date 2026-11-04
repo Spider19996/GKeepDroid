@@ -357,4 +357,9 @@
     <string name="prefix_box">[ ] Nawiasy</string>
     <string name="prefix_number">1. Numery</string>
     <string name="list_tools">Narzędzia listy</string>
+    <string name="list_number">Numeruj</string>
+    <string name="list_unnumber">Usuń numerację</string>
+    <string name="number_offer">To wygląda na listę numerowaną. Ponumerować wszystkie pozycje?</string>
+    <string name="renumber_display">Przeliczaj listy numerowane w kartach i widżetach</string>
+    <string name="renumber_display_hint">Wył.: pokazywane są zapisane numery, także gdy zaznaczone trafiają na koniec. Wł.: numery podążają za wyświetlaną kolejnością.</string>
 </resources>

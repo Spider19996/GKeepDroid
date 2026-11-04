@@ -357,4 +357,9 @@
     <string name="prefix_box">[ ] أقواس</string>
     <string name="prefix_number">1. أرقام</string>
     <string name="list_tools">أدوات القائمة</string>
+    <string name="list_number">ترقيم</string>
+    <string name="list_unnumber">إزالة الترقيم</string>
+    <string name="number_offer">يبدو هذا كقائمة مرقّمة. ترقيم كل العناصر؟</string>
+    <string name="renumber_display">إعادة عدّ القوائم المرقّمة في البطاقات والأدوات</string>
+    <string name="renumber_display_hint">إيقاف: تُعرض الأرقام المحفوظة حتى عند انتقال المحدد إلى النهاية. تشغيل: تتبع الأرقام الترتيب المعروض.</string>
 </resources>

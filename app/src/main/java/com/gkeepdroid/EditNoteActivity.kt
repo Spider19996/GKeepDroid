@@ -227,11 +227,19 @@ class EditNoteActivity : ComponentActivity() {
         var addedLabels by remember { mutableStateOf(setOf<String>()) }
         var removedLabels by remember { mutableStateOf(setOf<String>()) }
         var labelToDelete by remember { mutableStateOf<String?>(null) }
+        // A numbered checklist keeps "1. ", "2. " in the text of its items (so Keep shows them too); in the editor
+        // the number is a label in front of the field and the field holds only the text.
+        val startNumbered = existing != null && existing.isList && ListNumbering.isNumbered(existing.items)
+        var numbered by remember { mutableStateOf(startNumbered) }
+        var numberOfferDismissed by remember { mutableStateOf(false) }
         val items = remember {
             mutableStateListOf<KeepItem>().apply {
-                addAll(existing?.items ?: if (isList) listOf(KeepItem(UUID.randomUUID().toString(), "", false)) else emptyList())
+                val start = existing?.items ?: if (isList) listOf(KeepItem(UUID.randomUUID().toString(), "", false)) else emptyList()
+                addAll(if (startNumbered) ListNumbering.strip(start) else start)
             }
         }
+        /** The items as they are saved: with their numbers in the text when the list is numbered. */
+        fun outItems(): List<KeepItem> = if (numbered) ListNumbering.apply(items.toList()) else items.toList()
         val allAccounts = remember { CredentialStore.accounts(this@EditNoteActivity) }
         var targetAccount by remember { mutableStateOf(account) }
         val wasHidden = existing != null && PrivateNotes.isPrivate(existing, account, PrivateNotes.load(this@EditNoteActivity))
@@ -308,9 +316,9 @@ class EditNoteActivity : ComponentActivity() {
             val converting = convertFrom != null
             val function = if (existing != null && !converting) "update_note" else "create_note"
             val args = if (existing != null && !converting) {
-                KeepRepository.updateNoteArgs(existing.id, title, text, items.toList(), color, pinned, removedImages.toList(), withHiddenLabel(labels, hiddenInWidgets))
+                KeepRepository.updateNoteArgs(existing.id, title, text, outItems(), color, pinned, removedImages.toList(), withHiddenLabel(labels, hiddenInWidgets))
             } else {
-                KeepRepository.createNoteArgs(title, text, isList, items.toList(), color, pinned, withHiddenLabel(labels, hiddenInWidgets))
+                KeepRepository.createNoteArgs(title, text, isList, outItems(), color, pinned, withHiddenLabel(labels, hiddenInWidgets))
             }
             // The mark in Keep replaces the older one that only this phone knew.
             if (existing != null) PrivateNotes.set(this@EditNoteActivity, account, existing.id, false)
@@ -356,6 +364,9 @@ class EditNoteActivity : ComponentActivity() {
         fun convertedContent(toList: Boolean): Pair<String, List<KeepItem>> =
             if (toList) {
                 "" to ChecklistText.items(text).ifEmpty { listOf(KeepItem(UUID.randomUUID().toString(), "", false)) }
+            } else if (numbered) {
+                // A numbered list becomes lines that start with their numbers.
+                outItems().filter { it.text.isNotBlank() }.joinToString("\n") { it.text } to emptyList()
             } else {
                 // The chosen prefix keeps a trace of the list: "- ", "* ", "[ ] / [x] " or numbers.
                 val prefix = AppSettingsStore.load(this@EditNoteActivity).convertPrefix
@@ -371,6 +382,16 @@ class EditNoteActivity : ComponentActivity() {
             }
 
         /** A new note changes its kind right here; an existing one is saved as a new note and the old one goes to the trash. */
+        /** After text became items: lines that all start with numbers make a numbered list. */
+        fun adoptNumbering() {
+            numbered = ListNumbering.isNumbered(items.toList())
+            if (numbered) {
+                val stripped = ListNumbering.strip(items.toList())
+                items.clear()
+                items.addAll(stripped)
+            }
+        }
+
         fun requestConvert() {
             if (!canEdit) {
                 askEdit()
@@ -380,6 +401,7 @@ class EditNoteActivity : ComponentActivity() {
                 items.addAll(newItems)
                 text = newText
                 isList = !isList
+                if (isList) adoptNumbering() else numbered = false
             } else if (existing.images.isNotEmpty()) {
                 Toast.makeText(this@EditNoteActivity, R.string.convert_images_blocked, Toast.LENGTH_LONG).show()
             } else {
@@ -388,12 +410,13 @@ class EditNoteActivity : ComponentActivity() {
                 items.addAll(newItems)
                 text = newText
                 isList = !isList
+                if (isList) adoptNumbering() else numbered = false
                 convertFrom = if (isList != existing.isList) existing else null
             }
         }
 
         fun hasChanges() = if (existing != null) {
-            title != existing.title || text != existing.text || items.toList() != existing.items || color != existing.color ||
+            title != existing.title || text != existing.text || outItems() != existing.items || color != existing.color ||
                 pinned != existing.pinned || labels != existing.labels || removedImages.isNotEmpty() || convertFrom != null || hiddenInWidgets != wasHidden
         } else {
             title.isNotBlank() || text.isNotBlank() || items.any { it.text.isNotBlank() }
@@ -481,6 +504,18 @@ class EditNoteActivity : ComponentActivity() {
                                 )
                                 HorizontalDivider()
                                 DropdownMenuItem(
+                                    text = { Text(stringResource(if (numbered) R.string.list_unnumber else R.string.list_number)) },
+                                    leadingIcon = { Text("1.") },
+                                    onClick = {
+                                        menuOpen = false
+                                        // Numbers are shown from the position; an old "1. " typed by hand is not counted twice.
+                                        val stripped = ListNumbering.strip(items.toList())
+                                        items.clear()
+                                        items.addAll(stripped)
+                                        numbered = !numbered
+                                    },
+                                )
+                                DropdownMenuItem(
                                     text = { Text(stringResource(R.string.list_check_all)) },
                                     leadingIcon = { Icon(painterResource(R.drawable.ic_done), contentDescription = null) },
                                     onClick = { menuOpen = false; for (i in items.indices) items[i] = items[i].copy(checked = true) },
@@ -536,7 +571,7 @@ class EditNoteActivity : ComponentActivity() {
                                 leadingIcon = { Icon(painterResource(R.drawable.ic_share), contentDescription = null) },
                                 onClick = {
                                     menuOpen = false
-                                    shareNote(title, text, isList, items.toList())
+                                    shareNote(title, text, isList, outItems())
                                 },
                             )
                             DropdownMenuItem(
@@ -813,10 +848,31 @@ class EditNoteActivity : ComponentActivity() {
                 // The handle of a row moves it; the bounds tell which row the finger is over.
                 var dragging by remember { mutableStateOf<String?>(null) }
                 val rowBounds = remember { mutableStateMapOf<String, Rect>() }
+                // "1. " typed at the start of the first item offers to number the whole list.
+                val firstFilled = items.firstOrNull { it.text.isNotBlank() }?.text.orEmpty()
+                if (canEdit && !numbered && !numberOfferDismissed && Regex("""^\s*1[.)]\s""").containsMatchIn(firstFilled)) {
+                    Column(
+                        Modifier.fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.secondaryContainer, androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                            .padding(start = 16.dp, top = 12.dp, end = 8.dp, bottom = 4.dp),
+                    ) {
+                        Text(stringResource(R.string.number_offer), color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.bodyMedium)
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                            TextButton(onClick = { numberOfferDismissed = true }) { Text(stringResource(R.string.convert_to_list_no)) }
+                            TextButton(onClick = {
+                                val stripped = ListNumbering.strip(items.toList())
+                                items.clear()
+                                items.addAll(stripped)
+                                numbered = true
+                            }) { Text(stringResource(R.string.list_number)) }
+                        }
+                    }
+                }
                 items.forEachIndexed { index, item ->
                     key(item.id) {
                         ChecklistRow(
                             item, canEdit, dragging == item.id,
+                            number = if (numbered) items.take(index).count { it.text.isNotBlank() } + 1 else null,
                             onText = { text -> items.indexOfFirst { it.id == item.id }.let { i -> if (i >= 0) items[i] = items[i].copy(text = text) } },
                             onToggle = { items.indexOfFirst { it.id == item.id }.let { i -> if (i >= 0) items[i] = items[i].copy(checked = !items[i].checked) } },
                             onRemove = {
@@ -978,7 +1034,7 @@ class EditNoteActivity : ComponentActivity() {
      */
     @Composable
     private fun ChecklistRow(
-        item: KeepItem, editable: Boolean, dragged: Boolean,
+        item: KeepItem, editable: Boolean, dragged: Boolean, number: Int?,
         onText: (String) -> Unit, onToggle: () -> Unit, onRemove: () -> Unit,
         onBounds: (Rect) -> Unit, onDragStart: () -> Unit, onDragTo: (Float) -> Unit, onDragEnd: () -> Unit,
     ) {
@@ -1022,45 +1078,16 @@ class EditNoteActivity : ComponentActivity() {
                         },
                     )
             ) {
-                // The move handle with the checkbox right below it fill the left side of the field, so the text keeps clear of them.
+                // Handle and checkbox sit in the left corners, one above the other and small, so a one-line field is tall enough.
+                // The handle keeps the same gap to the top and the left edge, the checkbox the same gap to the bottom and the left edge.
                 val mark = if (item.checked) green else red
                 OutlinedTextField(
                     value = item.text, readOnly = !editable, onValueChange = onText,
                     placeholder = { Text(stringResource(R.string.item_hint)) },
-                    leadingIcon = {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Icon(
-                                painterResource(R.drawable.ic_drag_handle),
-                                contentDescription = stringResource(R.string.drag_handle),
-                                modifier = Modifier
-                                    .size(28.dp).padding(2.dp)
-                                    .onGloballyPositioned { handle = it }
-                                    .pointerInput(item.id, editable) {
-                                        if (!editable) return@pointerInput
-                                        detectDragGestures(
-                                            onDragStart = { onDragStart() },
-                                            onDrag = { change, _ ->
-                                                change.consume()
-                                                handle?.localToRoot(change.position)?.y?.let(onDragTo)
-                                            },
-                                            onDragEnd = { onDragEnd() },
-                                            onDragCancel = { onDragEnd() },
-                                        )
-                                    },
-                            )
-                            // The checkbox: a green check when done, a red cross while still open.
-                            Box(
-                                Modifier.size(24.dp).border(2.dp, mark, androidx.compose.foundation.shape.RoundedCornerShape(4.dp))
-                                    .clickable(enabled = editable) { onToggle() },
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Icon(
-                                    painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close),
-                                    contentDescription = null, tint = mark, modifier = Modifier.size(16.dp),
-                                )
-                            }
-                        }
-                    },
+                    // In a numbered list the number stands in front of the text and is not part of what is edited.
+                    prefix = number?.let { { Text("$it.", color = MaterialTheme.colorScheme.onSurfaceVariant) } },
+                    // Only reserves the room the two symbols take; they are drawn on top.
+                    leadingIcon = { Spacer(Modifier.width(30.dp)) },
                     textStyle = if (item.checked) {
                         LocalTextStyle.current.copy(
                             textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough,
@@ -1071,6 +1098,37 @@ class EditNoteActivity : ComponentActivity() {
                     },
                     modifier = Modifier.fillMaxWidth(),
                 )
+                Icon(
+                    painterResource(R.drawable.ic_drag_handle),
+                    contentDescription = stringResource(R.string.drag_handle),
+                    modifier = Modifier
+                        .align(Alignment.TopStart).padding(start = 8.dp, top = 8.dp).size(20.dp)
+                        .onGloballyPositioned { handle = it }
+                        .pointerInput(item.id, editable) {
+                            if (!editable) return@pointerInput
+                            detectDragGestures(
+                                onDragStart = { onDragStart() },
+                                onDrag = { change, _ ->
+                                    change.consume()
+                                    handle?.localToRoot(change.position)?.y?.let(onDragTo)
+                                },
+                                onDragEnd = { onDragEnd() },
+                                onDragCancel = { onDragEnd() },
+                            )
+                        },
+                )
+                // The checkbox: a green check when done, a red cross while still open.
+                Box(
+                    Modifier.align(Alignment.BottomStart).padding(start = 10.dp, bottom = 10.dp).size(18.dp)
+                        .border(1.5.dp, mark, androidx.compose.foundation.shape.RoundedCornerShape(3.dp))
+                        .clickable(enabled = editable) { onToggle() },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close),
+                        contentDescription = null, tint = mark, modifier = Modifier.size(13.dp),
+                    )
+                }
             }
         }
     }
@@ -1138,7 +1196,11 @@ internal object ChecklistText {
     fun looksLikeList(text: String): Boolean =
         text.lineSequence().any { line -> marker.matchEntire(line)?.groupValues?.get(3)?.isNotBlank() == true }
 
+    private val numberedLine = Regex("""^\s*\d{1,3}[.)]\s+\S""")
+
     fun items(text: String): List<KeepItem> = text.lineSequence().filter { it.isNotBlank() }.map { line ->
+        // A numbered line keeps its number in the text: the list is then a numbered list.
+        if (numberedLine.containsMatchIn(line)) return@map KeepItem(UUID.randomUUID().toString(), line.trim(), false)
         val m = marker.find(line)
         val checked = m != null && (m.groupValues[1].equals("x", true) || m.groupValues[2].equals("x", true))
         KeepItem(UUID.randomUUID().toString(), (m?.groupValues?.get(3) ?: line).trim(), checked)
@@ -1253,4 +1315,27 @@ internal object ListContinue {
             )
         }
     }
+}
+
+/** Numbered checklists: the numbers are part of the items' text ("1. Milk"), so Keep shows them as well. */
+internal object ListNumbering {
+    private val marker = Regex("""^\s*\d{1,3}[.)]\s+""")
+
+    /** Every filled item starts with a number. */
+    fun isNumbered(items: List<KeepItem>): Boolean {
+        val filled = items.filter { it.text.isNotBlank() }
+        return filled.isNotEmpty() && filled.all { marker.containsMatchIn(it.text) }
+    }
+
+    fun strip(items: List<KeepItem>): List<KeepItem> = items.map { it.copy(text = it.text.replaceFirst(marker, "")) }
+
+    /** Puts "1. ", "2. " ... in front of the filled items, counting from [startAt]. */
+    fun apply(items: List<KeepItem>, startAt: Int = 1): List<KeepItem> {
+        var n = startAt - 1
+        return items.map { if (it.text.isBlank()) it else { n++; it.copy(text = "$n. ${it.text}") } }
+    }
+
+    /** For cards and widgets: with the setting on, a numbered list counts again in the order it is shown. */
+    fun display(all: List<KeepItem>, shown: List<KeepItem>, renumber: Boolean, startAt: Int = 1): List<KeepItem> =
+        if (renumber && isNumbered(all)) apply(strip(shown), startAt) else shown
 }

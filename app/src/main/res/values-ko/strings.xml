@@ -357,4 +357,9 @@
     <string name="prefix_box">[ ] 대괄호</string>
     <string name="prefix_number">1. 번호</string>
     <string name="list_tools">체크리스트 도구</string>
+    <string name="list_number">번호 매기기</string>
+    <string name="list_unnumber">번호 제거</string>
+    <string name="number_offer">번호 목록처럼 보입니다. 모든 항목에 번호를 매길까요?</string>
+    <string name="renumber_display">카드와 위젯에서 번호 목록 다시 세기</string>
+    <string name="renumber_display_hint">끔: 체크한 항목이 끝으로 가도 저장된 번호를 표시합니다. 켬: 번호가 표시 순서를 따릅니다.</string>
 </resources>

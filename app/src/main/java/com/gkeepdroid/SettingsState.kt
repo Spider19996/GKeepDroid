@@ -66,6 +66,7 @@ internal class SettingsState(val context: SettingsActivity) {
     var appListCheckInApp by mutableStateOf(initialApp.listCheckInApp)
     var appListDeleteChecked by mutableStateOf(initialApp.listDeleteChecked)
     var appConvertPrefix by mutableIntStateOf(initialApp.convertPrefix)
+    var appRenumberDisplay by mutableStateOf(initialApp.renumberDisplay)
     var appWidgetGrace by mutableIntStateOf(initialApp.lockWidgetGraceSec)
     var appWidgetTitlesOnly by mutableStateOf(initialApp.widgetTitlesOnly)
     var appLockWidgetTick by mutableStateOf(initialApp.lockWidgetTick)
@@ -219,7 +220,7 @@ internal class SettingsState(val context: SettingsActivity) {
     fun currentApp() = AppSettings(
         appLayout, appSort, appPinnedSection, appShowImages, appShowColors, appPlainStyle, appPreviewLines, appShowEdited, appEditedAsDate, appShowLabels, appShowProgress, appLockPrivate, appLockApp, appLockEdit, appLockGrace,
         appShowReminders, appListCheckedToEnd, appListCollapseChecked, appListCheckboxStyle, appListCheckboxSize, appListSpacing,
-        appListCheckInApp, appListDeleteChecked, appConvertPrefix, appWidgetGrace, appWidgetTitlesOnly, appLockWidgetTick, appSwipeRight, appSwipeLeft, appFoldNotes, appFilterBar, appFilterChips,
+        appListCheckInApp, appListDeleteChecked, appConvertPrefix, appRenumberDisplay, appWidgetGrace, appWidgetTitlesOnly, appLockWidgetTick, appSwipeRight, appSwipeLeft, appFoldNotes, appFilterBar, appFilterChips,
     )
 
     /** Opens a page; the security page asks for the lock first (whenever the phone has one). */
