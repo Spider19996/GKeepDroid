@@ -348,7 +348,7 @@
     <string name="swipe_title">स्वाइप जेस्चर</string>
     <string name="swipe_hint">काफ़ी दूर स्वाइप करके छोड़ने पर क्रिया चलती है।</string>
     <string name="btn_fold">सभी नोट समेटें / फैलाएँ</string>
-    <string name="list_swipe_hint">आइटम टिक करने के लिए दाएँ, हटाने के लिए बाएँ स्वाइप करें।</string>
+    <string name="list_swipe_hint">बॉक्स पर टैप करके आइटम टिक या अनटिक करें, दबाए रखकर खींचें तो खिसकेगा। दाएँ स्वाइप से टिक, बाएँ से हटाएँ।</string>
     <string name="convert_prefix_title">चेकलिस्ट नोट बनने पर पंक्तियाँ शुरू होंगी</string>
     <string name="convert_prefix_hint">नोट को फिर चेकलिस्ट बनाने पर संख्याएँ और डैश पहचाने जाते हैं।</string>
     <string name="prefix_none">कोई नहीं</string>

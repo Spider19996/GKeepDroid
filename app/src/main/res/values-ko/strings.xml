@@ -348,7 +348,7 @@
     <string name="swipe_title">스와이프 동작</string>
     <string name="swipe_hint">충분히 밀고 손을 떼면 동작이 실행됩니다.</string>
     <string name="btn_fold">모든 메모 접기 / 펼치기</string>
-    <string name="list_swipe_hint">오른쪽으로 밀면 항목 체크, 왼쪽으로 밀면 삭제됩니다.</string>
+    <string name="list_swipe_hint">왼쪽 상자를 누르면 체크가 바뀌고, 길게 눌러 드래그하면 이동합니다. 오른쪽으로 밀면 체크, 왼쪽으로 밀면 삭제됩니다.</string>
     <string name="convert_prefix_title">체크리스트를 메모로 바꿀 때 줄 앞에 붙일 것</string>
     <string name="convert_prefix_hint">메모를 다시 체크리스트로 바꾸면 번호와 대시가 인식됩니다.</string>
     <string name="prefix_none">없음</string>

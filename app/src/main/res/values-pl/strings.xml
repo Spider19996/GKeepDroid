@@ -348,7 +348,7 @@
     <string name="swipe_title">Gesty przesuwania</string>
     <string name="swipe_hint">Akcja wykona się po puszczeniu palca po wystarczająco długim przesunięciu.</string>
     <string name="btn_fold">Zwiń / rozwiń wszystkie notatki</string>
-    <string name="list_swipe_hint">Przesuń w prawo, aby odhaczyć pozycję, w lewo, aby ją usunąć.</string>
+    <string name="list_swipe_hint">Dotknij pola, aby odhaczyć lub cofnąć, przytrzymaj i przeciągnij, aby przenieść. Przesuń w prawo, aby odhaczyć, w lewo, aby usunąć.</string>
     <string name="convert_prefix_title">Gdy lista staje się notatką, wiersze zaczynają się od</string>
     <string name="convert_prefix_hint">Numery i myślniki są rozpoznawane, gdy notatka znów staje się listą.</string>
     <string name="prefix_none">Brak</string>

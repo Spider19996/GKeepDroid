@@ -348,7 +348,7 @@
     <string name="swipe_title">إيماءات التمرير</string>
     <string name="swipe_hint">يُنفَّذ الإجراء عند رفع الإصبع بعد التمرير بما يكفي.</string>
     <string name="btn_fold">طيّ / توسيع كل الملاحظات</string>
-    <string name="list_swipe_hint">اسحب لليمين لتحديد عنصر ولليسار لإزالته.</string>
+    <string name="list_swipe_hint">اضغط على المربع لتحديد العنصر أو إلغائه، واضغط مطولًا واسحب للنقل. اسحب لليمين للتحديد ولليسار للإزالة.</string>
     <string name="convert_prefix_title">عند تحويل القائمة إلى ملاحظة تبدأ الأسطر بـ</string>
     <string name="convert_prefix_hint">يتم التعرف على الأرقام والشرطات عند إعادة الملاحظة إلى قائمة.</string>
     <string name="prefix_none">بدون</string>

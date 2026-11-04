@@ -351,7 +351,7 @@
     <string name="swipe_title">Swipe gestures</string>
     <string name="swipe_hint">The action runs when you let go after swiping far enough.</string>
     <string name="btn_fold">Fold / unfold all notes</string>
-    <string name="list_swipe_hint">Swipe right to tick an item, left to remove it.</string>
+    <string name="list_swipe_hint">Tap the box to tick or untick an item, hold it and drag to move. Swipe right to tick, left to remove.</string>
     <string name="convert_prefix_title">When a checklist becomes a note, start lines with</string>
     <string name="convert_prefix_hint">Numbers and dashes are recognized again when the note is turned back into a checklist.</string>
     <string name="prefix_none">None</string>

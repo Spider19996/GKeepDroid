@@ -845,10 +845,22 @@ class EditNoteActivity : ComponentActivity() {
             )
 
             if (isList) {
-                if (canEdit) Text(
-                    stringResource(R.string.list_swipe_hint),
-                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                // How the rows work; the cross hides this explanation for good.
+                val hintPrefs = remember { getSharedPreferences("hints", MODE_PRIVATE) }
+                var hintHidden by remember { mutableStateOf(hintPrefs.getBoolean("list_hint_hidden", false)) }
+                if (canEdit && !hintHidden) Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        stringResource(R.string.list_swipe_hint),
+                        Modifier.weight(1f),
+                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    IconButton(onClick = {
+                        hintPrefs.edit().putBoolean("list_hint_hidden", true).apply()
+                        hintHidden = true
+                    }) {
+                        Icon(painterResource(R.drawable.ic_close), contentDescription = stringResource(R.string.notif_hint_dismiss), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
                 // The handle of a row moves it; the bounds tell which row the finger is over.
                 var dragging by remember { mutableStateOf<String?>(null) }
                 val rowBounds = remember { mutableStateMapOf<String, Rect>() }
@@ -1149,6 +1161,8 @@ class EditNoteActivity : ComponentActivity() {
                                 contentDescription = null, tint = mark, modifier = Modifier.size(14.dp),
                             )
                         }
+                        // The line between the check and the grip.
+                        Box(Modifier.fillMaxWidth().height(1.5.dp).background(MaterialTheme.colorScheme.outline))
                         Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                                 repeat(3) { Box(Modifier.size(width = 12.dp, height = 1.5.dp).background(MaterialTheme.colorScheme.onSurfaceVariant)) }
