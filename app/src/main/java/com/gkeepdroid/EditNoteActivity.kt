@@ -1086,11 +1086,11 @@ class EditNoteActivity : ComponentActivity() {
                 OutlinedTextField(
                     value = item.text, readOnly = !editable, onValueChange = onText,
                     placeholder = { Text(stringResource(R.string.item_hint)) },
-                    // The text starts 32 dp from the left edge (16 dp content padding plus this room); the symbols are drawn on top.
+                    // The text starts 42 dp from the left edge (16 dp content padding plus this room); the capsule is drawn on top.
                     // In a numbered list the number stands in front of the text and is not part of what is edited.
                     prefix = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Spacer(Modifier.width(16.dp))
+                            Spacer(Modifier.width(26.dp))
                             number?.let { Text("$it. ", color = MaterialTheme.colorScheme.onSurfaceVariant) }
                         }
                     },
@@ -1104,44 +1104,50 @@ class EditNoteActivity : ComponentActivity() {
                     },
                     modifier = Modifier.fillMaxWidth(),
                 )
-                // The handle: two short bars, 8 dp from the top and the left edge. The touch area around them is a little larger.
-                Box(
+                // One capsule for both jobs, 8 dp from the left, top and bottom edge: the upper half is the checkbox
+                // (a green check when done, a red cross while open), the lower half is the grip that moves the row.
+                Column(
                     Modifier
-                        .align(Alignment.TopStart).padding(start = 2.dp, top = 2.dp).size(26.dp)
-                        .onGloballyPositioned { handle = it }
-                        .pointerInput(item.id, editable) {
-                            if (!editable) return@pointerInput
-                            detectDragGestures(
-                                onDragStart = { onDragStart() },
-                                onDrag = { change, _ ->
-                                    change.consume()
-                                    handle?.localToRoot(change.position)?.y?.let(onDragTo)
-                                },
-                                onDragEnd = { onDragEnd() },
-                                onDragCancel = { onDragEnd() },
-                            )
-                        }
-                        .semantics { contentDescription = "drag" },
-                ) {
-                    Column(Modifier.padding(start = 6.dp, top = 6.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                        val bar = MaterialTheme.colorScheme.onSurfaceVariant
-                        Box(Modifier.size(width = 16.dp, height = 2.dp).background(bar))
-                        Box(Modifier.size(width = 16.dp, height = 2.dp).background(bar))
-                    }
-                }
-                // The checkbox: a green check when done, a red cross while still open; 8 dp from the left and the bottom edge.
-                Box(
-                    Modifier.align(Alignment.BottomStart).size(28.dp).clickable(enabled = editable) { onToggle() },
+                        .align(Alignment.CenterStart).padding(start = 8.dp).size(width = 26.dp, height = 40.dp)
+                        .border(1.5.dp, MaterialTheme.colorScheme.outline, androidx.compose.foundation.shape.RoundedCornerShape(8.dp)),
                 ) {
                     Box(
-                        Modifier.align(Alignment.BottomStart).padding(start = 8.dp, bottom = 8.dp).size(16.dp)
-                            .border(1.5.dp, mark, androidx.compose.foundation.shape.RoundedCornerShape(3.dp)),
+                        Modifier.weight(1f).fillMaxWidth().clickable(enabled = editable) { onToggle() },
                         contentAlignment = Alignment.Center,
                     ) {
-                        Icon(
-                            painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close),
-                            contentDescription = null, tint = mark, modifier = Modifier.size(11.dp),
-                        )
+                        Box(
+                            Modifier.size(14.dp).border(1.5.dp, mark, androidx.compose.foundation.shape.RoundedCornerShape(3.dp)),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close),
+                                contentDescription = null, tint = mark, modifier = Modifier.size(10.dp),
+                            )
+                        }
+                    }
+                    Box(Modifier.fillMaxWidth().height(1.5.dp).background(MaterialTheme.colorScheme.outline))
+                    Box(
+                        Modifier
+                            .weight(1f).fillMaxWidth()
+                            .onGloballyPositioned { handle = it }
+                            .pointerInput(item.id, editable) {
+                                if (!editable) return@pointerInput
+                                detectDragGestures(
+                                    onDragStart = { onDragStart() },
+                                    onDrag = { change, _ ->
+                                        change.consume()
+                                        handle?.localToRoot(change.position)?.y?.let(onDragTo)
+                                    },
+                                    onDragEnd = { onDragEnd() },
+                                    onDragCancel = { onDragEnd() },
+                                )
+                            }
+                            .semantics { contentDescription = "drag" },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            repeat(3) { Box(Modifier.size(width = 12.dp, height = 1.5.dp).background(MaterialTheme.colorScheme.onSurfaceVariant)) }
+                        }
                     }
                 }
             }
