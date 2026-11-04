@@ -74,6 +74,7 @@ const val BTN_APP = "app"
 const val BTN_KEEP = "keep"
 const val BTN_REMINDER = "reminder"
 const val BTN_SETTINGS = "settings"
+const val BTN_FOLD = "fold"
 
 const val ALIGN_START = 1
 const val ALIGN_CENTER = 2
@@ -83,17 +84,18 @@ const val ALIGN_END = 3
 val DEFAULT_SIDES = mapOf(
     BTN_ADD_ITEM to POS_TOP, BTN_REMINDER to POS_TOP, BTN_REFRESH to POS_TOP, BTN_SORT to POS_TOP, BTN_KEEP to POS_TOP, BTN_SETTINGS to POS_TOP,
     BTN_NEW_NOTE to POS_BOTTOM, BTN_NEW_LIST to POS_BOTTOM, BTN_SEARCH to POS_BOTTOM, BTN_APP to POS_BOTTOM,
+    BTN_FOLD to POS_TOP,
 )
 val DEFAULT_ORDER = listOf(
-    BTN_ADD_ITEM, BTN_REMINDER, BTN_KEEP, BTN_NEW_NOTE, BTN_NEW_LIST, BTN_REFRESH, BTN_SETTINGS, BTN_SEARCH, BTN_APP, BTN_SORT,
+    BTN_ADD_ITEM, BTN_REMINDER, BTN_KEEP, BTN_NEW_NOTE, BTN_NEW_LIST, BTN_REFRESH, BTN_SETTINGS, BTN_SEARCH, BTN_APP, BTN_SORT, BTN_FOLD,
 )
 val DEFAULT_SLOTS = mapOf(
     BTN_NEW_NOTE to ALIGN_START, BTN_REFRESH to ALIGN_END, BTN_SETTINGS to ALIGN_END, BTN_NEW_LIST to ALIGN_START,
     BTN_SORT to ALIGN_START, BTN_SEARCH to ALIGN_END, BTN_APP to ALIGN_END, BTN_KEEP to ALIGN_START,
-    BTN_REMINDER to ALIGN_START,
+    BTN_REMINDER to ALIGN_START, BTN_FOLD to ALIGN_START,
 )
 
-val ALL_BUTTONS = listOf(BTN_REFRESH, BTN_ADD_ITEM, BTN_REMINDER, BTN_NEW_NOTE, BTN_NEW_LIST, BTN_SORT, BTN_SEARCH, BTN_APP, BTN_KEEP, BTN_SETTINGS)
+val ALL_BUTTONS = listOf(BTN_REFRESH, BTN_ADD_ITEM, BTN_REMINDER, BTN_NEW_NOTE, BTN_NEW_LIST, BTN_SORT, BTN_SEARCH, BTN_APP, BTN_KEEP, BTN_SETTINGS, BTN_FOLD)
 
 fun idsFromJson(json: String?): List<String> = try {
     val a = JSONArray(json ?: "[]")
@@ -826,6 +828,8 @@ data class AppSettings(
     /** Tap a box on a card to tick the item; with [listDeleteChecked] the ticked item is removed instead. */
     val listCheckInApp: Boolean = true,
     val listDeleteChecked: Boolean = false,
+    /** What a checklist turns into when it becomes a note: no prefix, or "- ", "* ", "[ ] / [x] ", "1. ". */
+    val convertPrefix: Int = PREFIX_NONE,
     /** Ticking in a widget with the edit lock on: seconds during which the lock is not asked again. */
     val lockWidgetGraceSec: Int = 10,
     /** While the whole app is locked, widgets show only the titles. */
@@ -849,6 +853,12 @@ const val FILTER_RECENT = 8
 const val FILTER_IMAGE = 16
 const val FILTER_PINNED = 32
 const val FILTER_LABELS = 64
+
+const val PREFIX_NONE = 0
+const val PREFIX_DASH = 1
+const val PREFIX_STAR = 2
+const val PREFIX_BOX = 3
+const val PREFIX_NUMBER = 4
 
 const val SWIPE_NONE = 0
 const val SWIPE_ARCHIVE = 1
@@ -888,6 +898,7 @@ object AppSettingsStore {
             listSpacingDp = p.getInt("list_spacing_dp", d.listSpacingDp),
             listCheckInApp = p.getBoolean("list_check_in_app", d.listCheckInApp),
             listDeleteChecked = p.getBoolean("list_delete_checked", d.listDeleteChecked),
+            convertPrefix = p.getInt("convert_prefix", d.convertPrefix),
             lockWidgetGraceSec = p.getInt("lock_widget_grace_sec", d.lockWidgetGraceSec),
             widgetTitlesOnly = p.getBoolean("widget_titles_only", d.widgetTitlesOnly),
             lockWidgetTick = p.getBoolean("lock_widget_tick", d.lockWidgetTick),
@@ -924,6 +935,7 @@ object AppSettingsStore {
             .putInt("list_spacing_dp", s.listSpacingDp)
             .putBoolean("list_check_in_app", s.listCheckInApp)
             .putBoolean("list_delete_checked", s.listDeleteChecked)
+            .putInt("convert_prefix", s.convertPrefix)
             .putInt("lock_widget_grace_sec", s.lockWidgetGraceSec)
             .putBoolean("widget_titles_only", s.widgetTitlesOnly)
             .putBoolean("lock_widget_tick", s.lockWidgetTick)

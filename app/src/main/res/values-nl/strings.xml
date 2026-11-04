@@ -347,4 +347,13 @@
     <string name="app_cards">Inhoud van kaarten</string>
     <string name="swipe_title">Veegbewegingen</string>
     <string name="swipe_hint">De actie wordt uitgevoerd als je loslaat na ver genoeg vegen.</string>
+    <string name="btn_fold">Alle notities in-/uitklappen</string>
+    <string name="list_swipe_hint">Veeg naar rechts om een item af te vinken, naar links om het te verwijderen.</string>
+    <string name="convert_prefix_title">Als een checklist een notitie wordt, beginnen regels met</string>
+    <string name="convert_prefix_hint">Nummers en streepjes worden herkend als de notitie weer een checklist wordt.</string>
+    <string name="prefix_none">Geen</string>
+    <string name="prefix_dash">- Streepje</string>
+    <string name="prefix_star">* Sterretje</string>
+    <string name="prefix_box">[ ] Haakjes</string>
+    <string name="prefix_number">1. Nummers</string>
 </resources>

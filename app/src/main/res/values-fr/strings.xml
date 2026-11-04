@@ -347,4 +347,13 @@
     <string name="app_cards">Contenu des cartes</string>
     <string name="swipe_title">Gestes de balayage</string>
     <string name="swipe_hint">L’action s’exécute quand vous relâchez après avoir balayé assez loin.</string>
+    <string name="btn_fold">Réduire / développer toutes les notes</string>
+    <string name="list_swipe_hint">Balayez vers la droite pour cocher un élément, vers la gauche pour le supprimer.</string>
+    <string name="convert_prefix_title">Quand une liste devient une note, les lignes commencent par</string>
+    <string name="convert_prefix_hint">Les numéros et tirets sont reconnus quand la note redevient une liste.</string>
+    <string name="prefix_none">Aucun</string>
+    <string name="prefix_dash">- Tiret</string>
+    <string name="prefix_star">* Étoile</string>
+    <string name="prefix_box">[ ] Crochets</string>
+    <string name="prefix_number">1. Numéros</string>
 </resources>

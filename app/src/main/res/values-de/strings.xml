@@ -347,4 +347,13 @@
     <string name="app_cards">Karteninhalt</string>
     <string name="swipe_title">Wischgesten</string>
     <string name="swipe_hint">Die Aktion wird ausgeführt, wenn du nach weit genug Wischen loslässt.</string>
+    <string name="btn_fold">Alle Notizen ein-/ausklappen</string>
+    <string name="list_swipe_hint">Nach rechts wischen hakt einen Eintrag ab, nach links entfernt ihn.</string>
+    <string name="convert_prefix_title">Wird eine Checkliste zur Notiz, beginnen die Zeilen mit</string>
+    <string name="convert_prefix_hint">Nummern und Striche werden erkannt, wenn die Notiz wieder zur Checkliste wird.</string>
+    <string name="prefix_none">Keiner</string>
+    <string name="prefix_dash">- Strich</string>
+    <string name="prefix_star">* Stern</string>
+    <string name="prefix_box">[ ] Klammern</string>
+    <string name="prefix_number">1. Nummern</string>
 </resources>

@@ -347,4 +347,13 @@
     <string name="app_cards">Contenido de las tarjetas</string>
     <string name="swipe_title">Gestos de deslizamiento</string>
     <string name="swipe_hint">La acción se ejecuta al soltar tras deslizar lo suficiente.</string>
+    <string name="btn_fold">Plegar / desplegar todas las notas</string>
+    <string name="list_swipe_hint">Desliza a la derecha para marcar un elemento, a la izquierda para quitarlo.</string>
+    <string name="convert_prefix_title">Al convertir una lista en nota, las líneas empiezan con</string>
+    <string name="convert_prefix_hint">Los números y guiones se reconocen cuando la nota vuelve a ser lista.</string>
+    <string name="prefix_none">Ninguno</string>
+    <string name="prefix_dash">- Guion</string>
+    <string name="prefix_star">* Asterisco</string>
+    <string name="prefix_box">[ ] Corchetes</string>
+    <string name="prefix_number">1. Números</string>
 </resources>

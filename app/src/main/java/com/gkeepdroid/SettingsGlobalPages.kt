@@ -399,6 +399,17 @@ internal fun ColumnScope.AppChecklistsPage(s: SettingsState) {
         if (appListCheckInApp) SwitchRow(R.string.delete_checked, appListDeleteChecked) { appListDeleteChecked = it }
         SwitchRow(R.string.checked_to_end, appListCheckedToEnd) { appListCheckedToEnd = it }
         if (appListCheckedToEnd) SwitchRow(R.string.collapse_checked, appListCollapseChecked) { appListCollapseChecked = it }
+        // What the lines of a checklist start with when it is turned into a note.
+        Text(stringResource(R.string.convert_prefix_title), style = MaterialTheme.typography.titleMedium)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(
+                PREFIX_NONE to R.string.prefix_none, PREFIX_DASH to R.string.prefix_dash, PREFIX_STAR to R.string.prefix_star,
+                PREFIX_BOX to R.string.prefix_box, PREFIX_NUMBER to R.string.prefix_number,
+            ).forEach { (prefix, label) ->
+                FilterChip(selected = appConvertPrefix == prefix, onClick = { appConvertPrefix = prefix }, label = { Text(stringResource(label)) })
+            }
+        }
+        Hint(R.string.convert_prefix_hint)
         MenuRow(stringResource(R.string.checkbox_style), null) { page = Page.AppCheckbox }
     }
 }

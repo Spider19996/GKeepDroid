@@ -9,6 +9,9 @@ import android.app.KeyguardManager
 import android.os.Bundle
 import androidx.compose.ui.draw.alpha
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.boundsInRoot
@@ -350,7 +353,17 @@ class EditNoteActivity : ComponentActivity() {
             if (toList) {
                 "" to ChecklistText.items(text).ifEmpty { listOf(KeepItem(UUID.randomUUID().toString(), "", false)) }
             } else {
-                items.filter { it.text.isNotBlank() }.joinToString("\n") { it.text } to emptyList()
+                // The chosen prefix keeps a trace of the list: "- ", "* ", "[ ] / [x] " or numbers.
+                val prefix = AppSettingsStore.load(this@EditNoteActivity).convertPrefix
+                items.filter { it.text.isNotBlank() }.mapIndexed { i, item ->
+                    when (prefix) {
+                        PREFIX_DASH -> "- "
+                        PREFIX_STAR -> "* "
+                        PREFIX_BOX -> if (item.checked) "[x] " else "[ ] "
+                        PREFIX_NUMBER -> "${i + 1}. "
+                        else -> ""
+                    } + item.text
+                }.joinToString("\n") to emptyList()
             }
 
         /** A new note changes its kind right here; an existing one is saved as a new note and the old one goes to the trash. */
@@ -771,66 +784,27 @@ class EditNoteActivity : ComponentActivity() {
             )
 
             if (isList) {
-                // Rows can be dragged by their handle; the bounds tell which row the finger is over.
-                var dragging by remember { mutableStateOf<String?>(null) }
-                val rowBounds = remember { mutableStateMapOf<String, Rect>() }
-                /** The first item cannot be a sub-item, as there is nothing above it to belong to. */
-                fun fixFirst() {
-                    if (items.isNotEmpty() && items[0].indent) items[0] = items[0].copy(indent = false)
-                }
                 items.forEachIndexed { index, item ->
                     key(item.id) {
-                        var handle by remember { mutableStateOf<LayoutCoordinates?>(null) }
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .onGloballyPositioned { rowBounds[item.id] = it.boundsInRoot() }
-                                .alpha(if (dragging == item.id) 0.5f else 1f),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Icon(
-                                painterResource(R.drawable.ic_drag_handle),
-                                contentDescription = stringResource(R.string.drag_handle),
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .padding(6.dp)
-                                    .onGloballyPositioned { handle = it }
-                                    .pointerInput(item.id) {
-                                        detectDragGestures(
-                                            onDragStart = { dragging = item.id },
-                                            onDrag = { change, _ ->
-                                                change.consume()
-                                                val y = handle?.localToRoot(change.position)?.y ?: return@detectDragGestures
-                                                val from = items.indexOfFirst { it.id == item.id }
-                                                val to = items.indexOfFirst { rowBounds[it.id]?.let { r -> y >= r.top && y < r.bottom } == true }
-                                                if (from >= 0 && to >= 0 && to != from) {
-                                                    items.add(to, items.removeAt(from))
-                                                    fixFirst()
-                                                }
-                                            },
-                                            onDragEnd = { dragging = null },
-                                            onDragCancel = { dragging = null },
-                                        )
-                                    },
-                            )
-                            Checkbox(
-                                checked = item.checked,
-                                enabled = canEdit,
-                                onCheckedChange = { checked -> items.indexOfFirst { it.id == item.id }.let { items[it] = item.copy(checked = checked) } },
-                            )
-                            OutlinedTextField(
-                                value = item.text, readOnly = !canEdit,
-                                onValueChange = { text -> items.indexOfFirst { it.id == item.id }.let { items[it] = items[it].copy(text = text) } },
-                                placeholder = { Text(stringResource(R.string.item_hint)) },
-                                modifier = Modifier.weight(1f),
-                            )
-                            if (canEdit) TextButton(onClick = { items.removeAll { it.id == item.id }; fixFirst() }) { Text("✕") }
-                        }
+                        ChecklistRow(
+                            item, canEdit,
+                            onText = { text -> items.indexOfFirst { it.id == item.id }.let { i -> if (i >= 0) items[i] = items[i].copy(text = text) } },
+                            onToggle = { items.indexOfFirst { it.id == item.id }.let { i -> if (i >= 0) items[i] = items[i].copy(checked = !items[i].checked) } },
+                            onRemove = {
+                                items.removeAll { it.id == item.id }
+                                if (items.isEmpty()) items.add(KeepItem(UUID.randomUUID().toString(), "", false))
+                                if (items.isNotEmpty() && items[0].indent) items[0] = items[0].copy(indent = false)
+                            },
+                        )
                     }
                 }
                 if (canEdit) OutlinedButton(onClick = { items.add(KeepItem(UUID.randomUUID().toString(), "", false)) }) {
                     Text("＋ " + stringResource(R.string.add_item))
                 }
+                if (canEdit) Text(
+                    stringResource(R.string.list_swipe_hint),
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             } else {
                 // Lines that start with "-" (or "*", "[ ]") are a list: offer to make it one, once.
                 if (!convertDismissed && ChecklistText.looksLikeList(text) && existing?.images.isNullOrEmpty()) {
@@ -956,6 +930,74 @@ class EditNoteActivity : ComponentActivity() {
     }
 
     /**
+     * One item of a checklist while editing: just the text, with a green check at the bottom right when it is
+     * done. Swiping right ticks (or unticks) it, swiping left removes it, and the row stops where the symbol is shown.
+     */
+    @Composable
+    private fun ChecklistRow(item: KeepItem, editable: Boolean, onText: (String) -> Unit, onToggle: () -> Unit, onRemove: () -> Unit) {
+        val maxPx = with(androidx.compose.ui.platform.LocalDensity.current) { 72.dp.toPx() }
+        val trigger = maxPx * 0.75f
+        var offsetX by remember { mutableStateOf(0f) }
+        val green = Color(0xFF2E7D32)
+        val red = Color(0xFFC62828)
+        Box(Modifier.fillMaxWidth()) {
+            if (offsetX != 0f) {
+                val toRight = offsetX > 0f
+                Box(
+                    Modifier.matchParentSize().clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                        .background(if (toRight) green else red).padding(horizontal = 20.dp),
+                    contentAlignment = if (toRight) Alignment.CenterStart else Alignment.CenterEnd,
+                ) {
+                    Icon(
+                        painterResource(if (toRight) R.drawable.ic_done else R.drawable.ic_close),
+                        contentDescription = null, tint = Color.White,
+                    )
+                }
+            }
+            Box(
+                Modifier
+                    .offset { androidx.compose.ui.unit.IntOffset(offsetX.toInt(), 0) }
+                    .background(MaterialTheme.colorScheme.background)
+                    .draggable(
+                        orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
+                        enabled = editable,
+                        state = androidx.compose.foundation.gestures.rememberDraggableState { delta ->
+                            offsetX = (offsetX + delta).coerceIn(-maxPx, maxPx)
+                        },
+                        onDragStopped = {
+                            val passed = kotlin.math.abs(offsetX) >= trigger
+                            val toRight = offsetX > 0f
+                            androidx.compose.animation.core.animate(offsetX, 0f) { value, _ -> offsetX = value }
+                            if (passed) {
+                                if (toRight) onToggle() else onRemove()
+                            }
+                        },
+                    )
+            ) {
+                OutlinedTextField(
+                    value = item.text, readOnly = !editable, onValueChange = onText,
+                    placeholder = { Text(stringResource(R.string.item_hint)) },
+                    textStyle = if (item.checked) {
+                        LocalTextStyle.current.copy(
+                            textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
+                        )
+                    } else {
+                        LocalTextStyle.current
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                if (item.checked) {
+                    Icon(
+                        painterResource(R.drawable.ic_done), contentDescription = null, tint = green,
+                        modifier = Modifier.align(Alignment.BottomEnd).padding(end = 10.dp, bottom = 8.dp).size(18.dp),
+                    )
+                }
+            }
+        }
+    }
+
+    /**
      * Opens this note in the Google Keep app, or on keep.google.com if the app is not installed or
      * does not handle the link. Keep has no documented link format for the app, so the web link of
      * the note is tried with the app first.
@@ -1012,9 +1054,9 @@ class EditNoteActivity : ComponentActivity() {
 
 /** Recognises text typed as a list ("- milk", "* eggs", "[ ] bread") and turns it into checklist items. */
 internal object ChecklistText {
-    private val marker = Regex("""^\s*(?:[-–—*•](?:\s+|(?=\p{L}))(?:\[([ xX]?)\]\s*)?|\[([ xX]?)\]\s*)(.*)$""")
+    private val marker = Regex("""^\s*(?:[-–—*•](?:\s+|(?=\p{L}))(?:\[([ xX]?)\]\s*)?|\[([ xX]?)\]\s*|\d{1,3}[.)]\s+)(.*)$""")
 
-    /** At least one line that starts with a list marker ("- ", "* ", "• " or "[ ] ") followed by text. */
+    /** At least one line that starts with a list marker ("- ", "* ", "• ", "[ ] " or "1. ") followed by text. */
     fun looksLikeList(text: String): Boolean =
         text.lineSequence().any { line -> marker.matchEntire(line)?.groupValues?.get(3)?.isNotBlank() == true }
 

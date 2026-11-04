@@ -329,6 +329,8 @@ internal fun ColumnScope.ButtonBarPage(s: SettingsState) {
                 add(BTN_NEW_LIST, R.drawable.ic_checklist, R.string.btn_new_list)
                 add(BTN_SORT, R.drawable.ic_sort, R.string.btn_sort)
                 add(BTN_SEARCH, R.drawable.ic_search, R.string.btn_search)
+                // Only offered while the widget can fold its notes.
+                if (foldable) add(BTN_FOLD, R.drawable.ic_fold, R.string.btn_fold)
             }
             add(BTN_APP, R.drawable.ic_apps, R.string.btn_app)
             add(BTN_KEEP, R.drawable.ic_open_new, R.string.btn_keep)

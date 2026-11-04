@@ -347,4 +347,13 @@
     <string name="app_cards">卡片内容</string>
     <string name="swipe_title">滑动手势</string>
     <string name="swipe_hint">滑动足够远后松手即执行操作。</string>
+    <string name="btn_fold">折叠 / 展开全部笔记</string>
+    <string name="list_swipe_hint">向右滑动勾选项目，向左滑动删除。</string>
+    <string name="convert_prefix_title">清单转换为笔记时，每行以此开头</string>
+    <string name="convert_prefix_hint">笔记转回清单时，会识别编号和短横线。</string>
+    <string name="prefix_none">无</string>
+    <string name="prefix_dash">- 短横线</string>
+    <string name="prefix_star">* 星号</string>
+    <string name="prefix_box">[ ] 方括号</string>
+    <string name="prefix_number">1. 编号</string>
 </resources>

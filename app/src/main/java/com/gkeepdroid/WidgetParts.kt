@@ -264,6 +264,7 @@ private fun buttonLabelRes(id: String): Int = when (id) {
     BTN_SEARCH -> R.string.btn_search
     BTN_APP -> R.string.btn_app
     BTN_KEEP -> R.string.btn_keep
+    BTN_FOLD -> R.string.btn_fold
     else -> R.string.btn_settings
 }
 
@@ -284,6 +285,8 @@ private fun enabledSet(settings: WidgetSettings, withNewButtons: Boolean, hasAdd
             BTN_NEW_NOTE, BTN_NEW_LIST, BTN_SEARCH -> withNewButtons
             // The sort button only appears with a manual order.
             BTN_SORT -> withNewButtons && settings.sortMode == SORT_MANUAL
+            // Only when folding is switched on for the widget.
+            BTN_FOLD -> withNewButtons && settings.foldable
             else -> true
         }
     }.toSet()
@@ -319,6 +322,8 @@ internal fun HeaderBar(
     addItemNoteId: String? = null,
     /** The note the single-note widget shows; the reminder button is for this note. */
     reminderNoteId: String? = null,
+    /** Every note of the list widget is folded: the fold button then unfolds. */
+    allFolded: Boolean = false,
 ) {
     val context = LocalContext.current
     val buttons = enabledButtons(settings, withNewButtons, addItemNoteId != null)
@@ -345,6 +350,10 @@ internal fun HeaderBar(
                 BTN_SEARCH -> BarButton(
                     id, R.drawable.ic_search,
                     actionStartActivity<SearchActivity>(actionParametersOf(AccountKey to account.orEmpty(), WidgetIdKey to appWidgetId)),
+                )
+                BTN_FOLD -> BarButton(
+                    id, if (allFolded) R.drawable.ic_unfold else R.drawable.ic_fold,
+                    actionRunCallback<ToggleFoldAllAction>(actionParametersOf(WidgetIdKey to appWidgetId)),
                 )
                 BTN_APP -> BarButton(id, R.drawable.ic_apps, actionStartActivity<MainActivity>())
                 BTN_KEEP -> BarButton(id, R.drawable.ic_open_new, actionStartActivity(keepIntent(context)))
@@ -627,6 +636,21 @@ internal suspend fun applyTick(context: Context, account: String, noteId: String
     }
     if (changed) WidgetRefresh.all(context)
     ToggleItemWorker.schedule(context, account)
+}
+
+/** Folds every note of the list widget, or unfolds them all when they are all folded already. */
+class ToggleFoldAllAction : ActionCallback {
+    override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
+        val widgetId = parameters[WidgetIdKey] ?: return
+        val settings = SettingsStore.loadWidget(context, widgetId)
+        val account = CredentialStore.resolve(context, settings.account) ?: return
+        val keys = NotesCache.read(context, account)
+            .filter { settings.labelFilter.isEmpty() || settings.labelFilter in it.labels }
+            .map { FoldStore.key(account, it.id) }
+        val folded = FoldStore.load(context)
+        FoldStore.setAll(context, keys, !keys.all { it in folded })
+        WidgetRefresh.all(context)
+    }
 }
 
 /** Folds a note to its title or unfolds it. */
