@@ -166,6 +166,11 @@ fun ButtonLayoutEditor(
         val vertical = side == POS_LEFT || side == POS_RIGHT
         val places = listOf(ALIGN_START, ALIGN_CENTER, ALIGN_END)
         val dragged = buttons.firstOrNull { it.id == dragId }
+        // A region grows with the buttons in it, so a third button does not hang out of its region.
+        fun regionWeight(slot: Int) = maxOf(1f, 0.5f * buttons.count { it.side == side && it.slot == slot } + 0.5f)
+        val outerWeight = maxOf(regionWeight(ALIGN_START), regionWeight(ALIGN_END))
+        val centerWeight = regionWeight(ALIGN_CENTER)
+        fun weightOf(slot: Int) = if (slot == ALIGN_CENTER) centerWeight else outerWeight
 
         @Composable
         fun Group(slot: Int) {
@@ -208,25 +213,25 @@ fun ButtonLayoutEditor(
             // The drop regions, drawn behind the buttons.
             if (vertical) {
                 Column(Modifier.matchParentSize(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    places.forEach { Zone(side * 10 + it, Modifier.weight(1f).fillMaxWidth()) {} }
+                    places.forEach { Zone(side * 10 + it, Modifier.weight(weightOf(it)).fillMaxWidth()) {} }
                 }
             } else {
                 Row(Modifier.matchParentSize(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    places.forEach { Zone(side * 10 + it, Modifier.weight(1f).fillMaxHeight()) {} }
+                    places.forEach { Zone(side * 10 + it, Modifier.weight(weightOf(it)).fillMaxHeight()) {} }
                 }
             }
             // The buttons: equal outer groups keep the middle one centered, as in the widget.
             if (vertical) {
                 Column(Modifier.matchParentSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.TopCenter) { Group(ALIGN_START) }
+                    Box(Modifier.weight(outerWeight).fillMaxWidth(), contentAlignment = Alignment.TopCenter) { Group(ALIGN_START) }
                     Group(ALIGN_CENTER)
-                    Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.BottomCenter) { Group(ALIGN_END) }
+                    Box(Modifier.weight(outerWeight).fillMaxWidth(), contentAlignment = Alignment.BottomCenter) { Group(ALIGN_END) }
                 }
             } else {
                 Row(Modifier.matchParentSize(), verticalAlignment = Alignment.CenterVertically) {
-                    Box(Modifier.weight(1f).fillMaxHeight(), contentAlignment = Alignment.CenterStart) { Group(ALIGN_START) }
+                    Box(Modifier.weight(outerWeight).fillMaxHeight(), contentAlignment = Alignment.CenterStart) { Group(ALIGN_START) }
                     Group(ALIGN_CENTER)
-                    Box(Modifier.weight(1f).fillMaxHeight(), contentAlignment = Alignment.CenterEnd) { Group(ALIGN_END) }
+                    Box(Modifier.weight(outerWeight).fillMaxHeight(), contentAlignment = Alignment.CenterEnd) { Group(ALIGN_END) }
                 }
             }
         }
