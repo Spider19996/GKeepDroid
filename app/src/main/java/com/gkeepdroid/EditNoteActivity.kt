@@ -1122,6 +1122,7 @@ class EditNoteActivity : ComponentActivity() {
                 // The whole strip at the left is the touch area; the capsule in it is the housing of the check (green) or cross (red),
                 // with the grip below it as a hint that it can be dragged. Both sit in the middle of their half.
                 val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+                val dragDescription = stringResource(R.string.drag_handle)
                 Box(
                     Modifier
                         .align(Alignment.CenterStart).width(44.dp).height(56.dp)
@@ -1145,7 +1146,7 @@ class EditNoteActivity : ComponentActivity() {
                                 onDragCancel = { onDragEnd() },
                             )
                         }
-                        .semantics { contentDescription = "check" },
+                        .semantics { contentDescription = dragDescription },
                     contentAlignment = Alignment.CenterStart,
                 ) {
                     Column(
