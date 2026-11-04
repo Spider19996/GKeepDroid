@@ -249,6 +249,8 @@ object SettingsStore {
     }
 
     fun saveGlobal(context: Context, s: GlobalSettings) {
+        // Screens that depend on the demo mode (the debug mark) notice a change at once.
+        DemoNotes.version.intValue++
         globalPrefs(context).edit()
             .putInt("theme_mode", s.themeMode)
             .putInt("sync_interval_min", s.syncIntervalMin)

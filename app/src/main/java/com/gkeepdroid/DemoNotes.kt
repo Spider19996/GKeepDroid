@@ -9,6 +9,9 @@ import android.content.Context
 object DemoNotes {
     fun enabled(context: Context): Boolean = SettingsStore.loadGlobal(context).demoMode
 
+    /** Changes whenever the settings are saved, so screens can react to the demo mode being switched. */
+    val version = androidx.compose.runtime.mutableIntStateOf(0)
+
     const val ACCOUNT_NAME = "demo@example.com"
 
     private fun item(n: Int, text: String, checked: Boolean) = KeepItem("demo-item-$n-$text".hashCode().toString(), text, checked)

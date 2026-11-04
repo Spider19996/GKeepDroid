@@ -38,7 +38,9 @@ private val WIDGET_WATERMARK_COLOR = Color(0xCCFF3B30)
  */
 @Composable
 fun DebugWatermark() {
-    if (!isDebugBuild(LocalContext.current)) return
+    val context = LocalContext.current
+    // In demo mode (for screenshots) the mark stays away.
+    if (!isDebugBuild(context) || DemoNotes.version.intValue < 0 || DemoNotes.enabled(context)) return
     Column(
         Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -51,7 +53,8 @@ fun DebugWatermark() {
 /** The same mark for the widgets (Glance cannot rotate text). Touches pass through it as well. */
 @androidx.compose.runtime.Composable
 fun DebugWatermarkGlance() {
-    if (!isDebugBuild(androidx.glance.LocalContext.current)) return
+    val context = androidx.glance.LocalContext.current
+    if (!isDebugBuild(context) || DemoNotes.enabled(context)) return
     Box(GlanceModifier.fillMaxSize(), contentAlignment = GlanceAlignment.Center) {
         GlanceText(
             "DEBUG",
