@@ -176,7 +176,8 @@ class EditNoteActivity : ComponentActivity() {
             when {
                 fresh == null -> gone = true
                 cached == null -> existing = fresh
-                fresh != cached -> remote = fresh
+                // Our own save changes only the bookkeeping (timestamps, sort value, ids) once Keep confirms it, not what the user sees.
+                fresh.copy(updated = 0, created = 0, sort = 0, serverId = "") != cached.copy(updated = 0, created = 0, sort = 0, serverId = "") -> remote = fresh
             }
             loaded = true
         }
@@ -227,6 +228,8 @@ class EditNoteActivity : ComponentActivity() {
         var title by remember { mutableStateOf(existing?.title ?: intent.getStringExtra(EXTRA_PREFILL_TITLE).orEmpty()) }
         var text by remember { mutableStateOf(existing?.text ?: intent.getStringExtra(EXTRA_PREFILL_TEXT).orEmpty()) }
         var textSel by remember { mutableStateOf(androidx.compose.ui.text.TextRange(text.length)) }
+        // The keyboard's composing region; dropping it on every keystroke makes the word suggestions flicker.
+        var textComp by remember { mutableStateOf<androidx.compose.ui.text.TextRange?>(null) }
         var color by remember { mutableStateOf(existing?.color ?: NoteColors.DEFAULT) }
         var labels by remember { mutableStateOf(existing?.labels.orEmpty()) }
         var newLabel by remember { mutableStateOf("") }
@@ -942,11 +945,12 @@ class EditNoteActivity : ComponentActivity() {
                 }
                 OutlinedTextField(
                     // Enter after "1. ..." (or "- ...") starts the next line with "2. " (or "- "); Enter on an empty one ends the list.
-                    value = androidx.compose.ui.text.input.TextFieldValue(text, textSel),
+                    value = androidx.compose.ui.text.input.TextFieldValue(text, textSel, textComp),
                     onValueChange = { typed ->
                         val result = ListContinue.apply(text, typed)
                         text = result.text
                         textSel = result.selection
+                        textComp = if (result === typed) typed.composition else null
                     },
                     readOnly = !canEdit,
                     label = { Text(stringResource(R.string.note_hint)) },
