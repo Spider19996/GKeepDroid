@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalLayoutApi::class)
+@file:OptIn(ExperimentalLayoutApi::class, androidx.compose.material3.ExperimentalMaterial3Api::class)
 
 package com.gkeepdroid
 
@@ -28,6 +28,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.material3.FilterChip
@@ -50,29 +56,73 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
 /** Asks for a date, then a time; neither may lie in the past, so an earlier time today is asked for again. */
-internal fun pickDateTime(activity: Activity, current: Long?, onPicked: (Long) -> Unit) {
+@Composable
+internal fun DateTimePickerDialog(current: Long?, onPicked: (Long) -> Unit, onDismiss: () -> Unit) {
+    val context = LocalContext.current
     val now = System.currentTimeMillis()
-    val start = java.util.Calendar.getInstance().apply { timeInMillis = current?.takeIf { it > now } ?: (now + 3_600_000L) }
-    val dateDialog = android.app.DatePickerDialog(activity, { _, year, month, day ->
-        fun askTime(hour: Int, minute: Int) {
-            android.app.TimePickerDialog(activity, { _, pickedHour, pickedMinute ->
+    val start = remember {
+        java.util.Calendar.getInstance().apply { timeInMillis = current?.takeIf { it > now } ?: (now + 3_600_000L) }
+    }
+    // The date picker works in UTC days; today's local date as a UTC day is the first one that can be chosen.
+    val todayUtc = remember {
+        val local = java.util.Calendar.getInstance()
+        java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC")).apply {
+            clear()
+            set(local.get(java.util.Calendar.YEAR), local.get(java.util.Calendar.MONTH), local.get(java.util.Calendar.DAY_OF_MONTH))
+        }.timeInMillis
+    }
+    val dateState = rememberDatePickerState(
+        initialSelectedDateMillis = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC")).apply {
+            clear()
+            set(start.get(java.util.Calendar.YEAR), start.get(java.util.Calendar.MONTH), start.get(java.util.Calendar.DAY_OF_MONTH))
+        }.timeInMillis,
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long) = utcTimeMillis >= todayUtc
+            override fun isSelectableYear(year: Int) = year >= java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)
+        },
+    )
+    var day by remember { mutableStateOf<Long?>(null) }
+    val chosenDay = day
+    if (chosenDay == null) {
+        DatePickerDialog(
+            onDismissRequest = onDismiss,
+            confirmButton = {
+                TextButton(enabled = dateState.selectedDateMillis != null, onClick = { day = dateState.selectedDateMillis }) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            },
+            dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.cancel)) } },
+        ) { DatePicker(dateState) }
+    } else {
+        val utc = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC")).apply { timeInMillis = chosenDay }
+        TimePickerAlert(
+            hour = start.get(java.util.Calendar.HOUR_OF_DAY), minute = start.get(java.util.Calendar.MINUTE),
+            onConfirm = { hour, minute ->
                 val picked = java.util.Calendar.getInstance().apply {
-                    set(year, month, day, pickedHour, pickedMinute, 0)
+                    set(utc.get(java.util.Calendar.YEAR), utc.get(java.util.Calendar.MONTH), utc.get(java.util.Calendar.DAY_OF_MONTH), hour, minute, 0)
                     set(java.util.Calendar.MILLISECOND, 0)
                 }
                 if (picked.timeInMillis <= System.currentTimeMillis()) {
-                    android.widget.Toast.makeText(activity, R.string.reminder_past, android.widget.Toast.LENGTH_SHORT).show()
-                    askTime(pickedHour, pickedMinute)
+                    Toast.makeText(context, R.string.reminder_past, Toast.LENGTH_SHORT).show()
                 } else {
                     onPicked(picked.timeInMillis)
                 }
-            }, hour, minute, android.text.format.DateFormat.is24HourFormat(activity)).show()
-        }
-        askTime(start.get(java.util.Calendar.HOUR_OF_DAY), start.get(java.util.Calendar.MINUTE))
-    }, start.get(java.util.Calendar.YEAR), start.get(java.util.Calendar.MONTH), start.get(java.util.Calendar.DAY_OF_MONTH))
-    // The calendar starts today; earlier days cannot be chosen.
-    dateDialog.datePicker.minDate = now - 1000
-    dateDialog.show()
+            },
+            onDismiss = onDismiss,
+        )
+    }
+}
+
+/** A time of day in a dialog, in the system's 12 or 24 hour style. */
+@Composable
+internal fun TimePickerAlert(hour: Int, minute: Int, onConfirm: (Int, Int) -> Unit, onDismiss: () -> Unit) {
+    val state = rememberTimePickerState(hour, minute, android.text.format.DateFormat.is24HourFormat(LocalContext.current))
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        text = { TimePicker(state) },
+        confirmButton = { TextButton(onClick = { onConfirm(state.hour, state.minute) }) { Text(stringResource(android.R.string.ok)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.cancel)) } },
+    )
 }
 
 /**
@@ -175,6 +225,7 @@ private fun PresetDialog(activity: Activity, onAdd: (String) -> Unit, onCancel: 
     var relative by remember { mutableStateOf(true) }
     var minutes by remember { mutableStateOf("30") }
     var clock by remember { mutableStateOf("08:00") }
+    var pickingClock by remember { mutableStateOf(false) }
     AlertDialog(
         onDismissRequest = onCancel,
         title = { Text(stringResource(R.string.reminder_preset_add)) },
@@ -195,12 +246,16 @@ private fun PresetDialog(activity: Activity, onAdd: (String) -> Unit, onCancel: 
                 } else {
                     OutlinedButton(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            val (hour, minute) = clock.split(":").map { it.toInt() }
-                            android.app.TimePickerDialog(activity, { _, h, m -> clock = "%02d:%02d".format(h, m) }, hour, minute,
-                                android.text.format.DateFormat.is24HourFormat(activity)).show()
-                        },
+                        onClick = { pickingClock = true },
                     ) { Text(ReminderPresets.label(activity, "t:$clock")) }
+                    if (pickingClock) {
+                        val (hour, minute) = clock.split(":").map { it.toInt() }
+                        TimePickerAlert(
+                            hour, minute,
+                            onConfirm = { h, m -> clock = "%02d:%02d".format(h, m); pickingClock = false },
+                            onDismiss = { pickingClock = false },
+                        )
+                    }
                 }
             }
         },
@@ -354,10 +409,16 @@ private fun ReminderEditor(activity: Activity, initial: Reminder, onSave: (Remin
                         )
                     }
                 }
+                var pickingTime by remember { mutableStateOf(false) }
                 OutlinedButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { pickDateTime(activity, reminder.at) { reminder = reminder.copy(at = it) } },
+                    onClick = { pickingTime = true },
                 ) { Text(Reminders.label(activity, reminder.at)) }
+                if (pickingTime) DateTimePickerDialog(
+                    current = reminder.at,
+                    onPicked = { reminder = reminder.copy(at = it); pickingTime = false },
+                    onDismiss = { pickingTime = false },
+                )
 
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(stringResource(R.string.reminder_sound), style = MaterialTheme.typography.bodyMedium)
