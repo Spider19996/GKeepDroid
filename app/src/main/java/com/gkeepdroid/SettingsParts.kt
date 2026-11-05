@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
@@ -164,14 +162,14 @@ internal fun CheckboxPreview(style: Int, checked: Boolean, sizeDp: Int, tint: Co
     }
 }
 
-/** A setting with one choice: tapping the row opens a popup menu instead of a page. */
+/** A setting with one choice: tapping the row opens a popup menu instead of a page; [options] mark the current one. */
 @Composable
 internal fun PopupRow(
     open: Boolean,
     onOpened: () -> Unit,
     title: String,
     summary: String?,
-    options: List<Pair<String, () -> Unit>>,
+    options: List<MenuEntry>,
     shapes: ListItemShapes = ListItemDefaults.segmentedShapes(0, 1),
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -183,11 +181,11 @@ internal fun PopupRow(
     }
     Box {
         MenuRow(title, summary, chevron = "▾", shapes = shapes) { expanded = true }
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            options.forEach { (label, action) ->
-                DropdownMenuItem(text = { Text(label) }, onClick = { expanded = false; action() })
-            }
-        }
+        GroupedMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            groups = listOf(options.map { option -> MenuEntry(option.text, selected = option.selected) { expanded = false; option.onClick() } }),
+        )
     }
 }
 

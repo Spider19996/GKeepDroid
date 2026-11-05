@@ -100,7 +100,7 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
                             stringResource(R.string.theme_section),
                             themeLabel(themeMode),
                             listOf(THEME_SYSTEM, THEME_LIGHT, THEME_DARK, THEME_OLED).map { mode ->
-                                ((if (mode == themeMode) "✓ " else "") + themeLabel(mode)) to { themeMode = mode }
+                                MenuEntry(themeLabel(mode), selected = mode == themeMode) { themeMode = mode }
                             },
                             shapes = shapes,
                         )
@@ -111,9 +111,9 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
                             stringResource(R.string.language),
                             LocaleHelper.languages.firstOrNull { it.first == language }?.second ?: stringResource(R.string.language_system),
                             listOf(
-                                ((if (language.isEmpty()) "✓ " else "") + stringResource(R.string.language_system)) to { changeLanguage("") },
+                                MenuEntry(stringResource(R.string.language_system), selected = language.isEmpty()) { changeLanguage("") },
                             ) + LocaleHelper.languages.map { (tag, name) ->
-                                ((if (tag == language) "✓ " else "") + name) to { changeLanguage(tag) }
+                                MenuEntry(name, selected = tag == language) { changeLanguage(tag) }
                             },
                             shapes = shapes,
                         )
@@ -156,8 +156,7 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
                                 stringResource(R.string.select_note),
                                 noteCandidates.firstOrNull { it.id == noteId }?.let { noteLabel(it).ifBlank { untitled } } ?: "–",
                                 noteCandidates.map { candidate ->
-                                    ((if (candidate.id == noteId) "✓ " else "") + noteLabel(candidate).ifBlank { untitled }) to
-                                        { noteId = candidate.id }
+                                    MenuEntry(noteLabel(candidate).ifBlank { untitled }, selected = candidate.id == noteId) { noteId = candidate.id }
                                 },
                                 shapes = shapes,
                             )

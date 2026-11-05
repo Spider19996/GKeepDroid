@@ -148,9 +148,9 @@ internal fun ColumnScope.NotesPage(s: SettingsState) {
                 stringResource(R.string.label_filter),
                 labelFilter.ifEmpty { stringResource(R.string.all_notes) },
                 listOf(
-                    ((if (labelFilter.isEmpty()) "✓ " else "") + stringResource(R.string.all_notes)) to { labelFilter = "" },
+                    MenuEntry(stringResource(R.string.all_notes), selected = labelFilter.isEmpty()) { labelFilter = "" },
                 ) + labelChoices.map { name ->
-                    ((if (name == labelFilter) "✓ " else "") + name) to { labelFilter = name }
+                    MenuEntry(name, selected = name == labelFilter) { labelFilter = name }
                 },
             )
         }

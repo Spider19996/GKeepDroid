@@ -56,10 +56,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.FilledTonalIconToggleButton
@@ -513,19 +510,17 @@ class EditNoteActivity : ComponentActivity() {
                                 tint = if (canEdit) LocalContentColor.current else LocalContentColor.current.copy(alpha = 0.38f),
                             )
                         }
-                        DropdownMenu(expanded = menuOpen && canEdit, onDismissRequest = { menuOpen = false }) {
-                            if (menuPage == 1) {
+                        GroupedMenu(
+                            expanded = menuOpen && canEdit,
+                            onDismissRequest = { menuOpen = false },
+                            groups = if (menuPage == 1) listOf(
                                 // The checklist tools have a page of their own, so the main menu stays short.
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.list_tools)) },
-                                    leadingIcon = { Icon(painterResource(R.drawable.ic_arrow_left), contentDescription = null) },
-                                    onClick = { menuPage = 0 },
-                                )
-                                HorizontalDivider()
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(if (numbered) R.string.list_unnumber else R.string.list_number)) },
-                                    leadingIcon = { Text("1.") },
-                                    onClick = {
+                                listOf(MenuEntry(stringResource(R.string.list_tools), R.drawable.ic_arrow_left) { menuPage = 0 }),
+                                listOf(
+                                    MenuEntry(
+                                        stringResource(if (numbered) R.string.list_unnumber else R.string.list_number),
+                                        leading = { Text("1.") },
+                                    ) {
                                         menuOpen = false
                                         // Numbers are shown from the position; an old "1. " typed by hand is not counted twice.
                                         val stripped = ListNumbering.strip(items.toList())
@@ -533,107 +528,91 @@ class EditNoteActivity : ComponentActivity() {
                                         items.addAll(stripped)
                                         numbered = !numbered
                                     },
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.list_check_all)) },
-                                    leadingIcon = { Icon(painterResource(R.drawable.ic_done), contentDescription = null) },
-                                    onClick = { menuOpen = false; for (i in items.indices) items[i] = items[i].copy(checked = true) },
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.list_uncheck_all)) },
-                                    leadingIcon = { Icon(painterResource(R.drawable.ic_close), contentDescription = null) },
-                                    onClick = { menuOpen = false; for (i in items.indices) items[i] = items[i].copy(checked = false) },
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.list_sort_alpha)) },
-                                    leadingIcon = { Icon(painterResource(R.drawable.ic_sort), contentDescription = null) },
-                                    onClick = {
+                                    MenuEntry(stringResource(R.string.list_check_all), R.drawable.ic_done) {
+                                        menuOpen = false
+                                        for (i in items.indices) items[i] = items[i].copy(checked = true)
+                                    },
+                                    MenuEntry(stringResource(R.string.list_uncheck_all), R.drawable.ic_close) {
+                                        menuOpen = false
+                                        for (i in items.indices) items[i] = items[i].copy(checked = false)
+                                    },
+                                    MenuEntry(stringResource(R.string.list_sort_alpha), R.drawable.ic_sort) {
                                         menuOpen = false
                                         // Sub-items lose their parent when the order changes, so they become ordinary items.
                                         val sorted = items.sortedBy { it.text.lowercase() }.map { it.copy(indent = false) }
                                         items.clear()
                                         items.addAll(sorted)
                                     },
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.list_delete_checked)) },
-                                    leadingIcon = { Icon(painterResource(R.drawable.ic_delete), contentDescription = null) },
-                                    onClick = {
+                                    MenuEntry(stringResource(R.string.list_delete_checked), R.drawable.ic_delete) {
                                         menuOpen = false
                                         items.removeAll { it.checked }
                                         if (items.isEmpty()) items.add(KeepItem(UUID.randomUUID().toString(), "", false))
                                     },
-                                )
-                                return@DropdownMenu
-                            }
-                            DropdownMenuItem(
-                                text = { Text(stringResource(if (isList) R.string.convert_to_note else R.string.convert_to_list)) },
-                                leadingIcon = { Icon(painterResource(R.drawable.ic_checklist), contentDescription = null) },
-                                onClick = { menuOpen = false; requestConvert() },
-                            )
-                            if (isList) DropdownMenuItem(
-                                text = { Text(stringResource(R.string.list_tools)) },
-                                leadingIcon = { Icon(painterResource(R.drawable.ic_done), contentDescription = null) },
-                                trailingIcon = { Text("›") },
-                                onClick = { menuPage = 1 },
-                            )
-                            if (existing != null) {
-                            if (existing.serverId.isNotEmpty()) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.open_in_keep)) },
-                                    leadingIcon = { Icon(painterResource(R.drawable.ic_open_new), contentDescription = null) },
-                                    onClick = { menuOpen = false; openInKeep(account, existing) },
-                                )
-                            }
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.share_note)) },
-                                leadingIcon = { Icon(painterResource(R.drawable.ic_share), contentDescription = null) },
-                                onClick = {
-                                    menuOpen = false
-                                    shareNote(title, text, isList, outItems())
+                                ),
+                            ) else listOf(
+                                buildList {
+                                    add(
+                                        MenuEntry(
+                                            stringResource(if (isList) R.string.convert_to_note else R.string.convert_to_list),
+                                            R.drawable.ic_checklist,
+                                        ) { menuOpen = false; requestConvert() },
+                                    )
+                                    if (isList) add(
+                                        MenuEntry(stringResource(R.string.list_tools), R.drawable.ic_done, trailing = { Text("›") }) { menuPage = 1 },
+                                    )
                                 },
-                            )
-                            DropdownMenuItem(
-                                text = {
-                                    Text(stringResource(if (hiddenInWidgets) R.string.show_content else R.string.hide_content))
+                                if (existing == null) emptyList() else buildList {
+                                    if (existing.serverId.isNotEmpty()) add(
+                                        MenuEntry(stringResource(R.string.open_in_keep), R.drawable.ic_open_new) {
+                                            menuOpen = false
+                                            openInKeep(account, existing)
+                                        },
+                                    )
+                                    add(
+                                        MenuEntry(stringResource(R.string.share_note), R.drawable.ic_share) {
+                                            menuOpen = false
+                                            shareNote(title, text, isList, outItems())
+                                        },
+                                    )
+                                    add(
+                                        MenuEntry(stringResource(if (hiddenInWidgets) R.string.show_content else R.string.hide_content), R.drawable.ic_lock) {
+                                            menuOpen = false
+                                            if (canEdit) {
+                                                hiddenInWidgets = !hiddenInWidgets
+                                                scope.launch { WidgetRefresh.all(this@EditNoteActivity) }
+                                            } else {
+                                                askEdit()
+                                            }
+                                        },
+                                    )
                                 },
-                                leadingIcon = { Icon(painterResource(R.drawable.ic_lock), contentDescription = null) },
-                                onClick = {
-                                    menuOpen = false
-                                    if (!canEdit) return@DropdownMenuItem askEdit()
-                                    hiddenInWidgets = !hiddenInWidgets
-                                    scope.launch { WidgetRefresh.all(this@EditNoteActivity) }
+                                if (existing == null) emptyList() else buildList {
+                                    if (!isLocal) add(
+                                        MenuEntry(stringResource(R.string.archive_note), R.drawable.ic_archive) {
+                                            menuOpen = false
+                                            leaveNote {
+                                                KeepRepository.archiveNote(this@EditNoteActivity, account, existing.id)
+                                                UndoStore.set(account, existing.id, UndoStore.Kind.ARCHIVE)
+                                            }
+                                        },
+                                    )
+                                    add(
+                                        MenuEntry(stringResource(if (isLocal) R.string.delete_note else R.string.move_to_trash), R.drawable.ic_delete) {
+                                            menuOpen = false
+                                            // Local notes have no trash, so deleting them asks first.
+                                            if (isLocal) {
+                                                confirmDelete = true
+                                            } else {
+                                                leaveNote {
+                                                    KeepRepository.trashNote(this@EditNoteActivity, account, existing.id)
+                                                    UndoStore.set(account, existing.id, UndoStore.Kind.TRASH)
+                                                }
+                                            }
+                                        },
+                                    )
                                 },
-                            )
-                            if (!isLocal) DropdownMenuItem(
-                                text = { Text(stringResource(R.string.archive_note)) },
-                                leadingIcon = { Icon(painterResource(R.drawable.ic_archive), contentDescription = null) },
-                                onClick = {
-                                    menuOpen = false
-                                    leaveNote {
-                                        KeepRepository.archiveNote(this@EditNoteActivity, account, existing.id)
-                                        UndoStore.set(account, existing.id, UndoStore.Kind.ARCHIVE)
-                                    }
-                                },
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(if (isLocal) R.string.delete_note else R.string.move_to_trash)) },
-                                leadingIcon = { Icon(painterResource(R.drawable.ic_delete), contentDescription = null) },
-                                onClick = {
-                                    menuOpen = false
-                                    // Local notes have no trash, so deleting them asks first.
-                                    if (isLocal) {
-                                        confirmDelete = true
-                                    } else {
-                                        leaveNote {
-                                            KeepRepository.trashNote(this@EditNoteActivity, account, existing.id)
-                                            UndoStore.set(account, existing.id, UndoStore.Kind.TRASH)
-                                        }
-                                    }
-                                },
-                            )
-                            }
-                        }
+                            ),
+                        )
                     }
                 }
             }

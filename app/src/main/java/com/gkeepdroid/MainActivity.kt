@@ -48,8 +48,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButtonMenu
 import androidx.compose.material3.FloatingActionButtonMenuItem
@@ -368,55 +366,40 @@ class MainActivity : ComponentActivity() {
                         IconButton(onClick = { menuOpen = true }, shapes = IconButtonDefaults.shapes()) {
                             Icon(painterResource(R.drawable.ic_more_vert), contentDescription = stringResource(R.string.more_actions))
                         }
-                        DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.refresh_action)) },
-                                leadingIcon = { Icon(painterResource(R.drawable.ic_refresh), contentDescription = null) },
-                                onClick = { menuOpen = false; sync() },
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.archive_note)) },
-                                leadingIcon = { Icon(painterResource(R.drawable.ic_archive), contentDescription = null) },
-                                onClick = { menuOpen = false; screen = AppScreen.Archive },
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.trash_title)) },
-                                leadingIcon = { Icon(painterResource(R.drawable.ic_delete), contentDescription = null) },
-                                onClick = { menuOpen = false; screen = AppScreen.Trash },
-                            )
-                            if (screen == AppScreen.Notes) {
-                                if (app.foldNotes) {
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.fold_all)) },
-                                        leadingIcon = { Icon(painterResource(R.drawable.ic_fold), contentDescription = null) },
-                                        onClick = {
+                        GroupedMenu(
+                            expanded = menuOpen,
+                            onDismissRequest = { menuOpen = false },
+                            groups = listOf(
+                                listOf(MenuEntry(stringResource(R.string.refresh_action), R.drawable.ic_refresh) { menuOpen = false; sync() }),
+                                listOf(
+                                    MenuEntry(stringResource(R.string.archive_note), R.drawable.ic_archive) { menuOpen = false; screen = AppScreen.Archive },
+                                    MenuEntry(stringResource(R.string.trash_title), R.drawable.ic_delete) { menuOpen = false; screen = AppScreen.Trash },
+                                ),
+                                if (screen == AppScreen.Notes && app.foldNotes) listOf(
+                                    MenuEntry(stringResource(R.string.fold_all), R.drawable.ic_fold) {
+                                        menuOpen = false
+                                        FoldStore.setAll(context, shown.map { FoldStore.key(it.second, it.first.id) }, true)
+                                        scope.launch { WidgetRefresh.all(context) }
+                                    },
+                                    MenuEntry(stringResource(R.string.unfold_all), R.drawable.ic_unfold) {
+                                        menuOpen = false
+                                        FoldStore.setAll(context, shown.map { FoldStore.key(it.second, it.first.id) }, false)
+                                        scope.launch { WidgetRefresh.all(context) }
+                                    },
+                                ) else emptyList(),
+                                buildList {
+                                    if (app.lockApp && AppLock.enabled(this@MainActivity)) {
+                                        add(MenuEntry(stringResource(R.string.app_lock_title), R.drawable.ic_lock) { menuOpen = false; AppLock.lockNow() })
+                                    }
+                                    add(
+                                        MenuEntry(stringResource(R.string.menu_settings), R.drawable.ic_settings) {
                                             menuOpen = false
-                                            FoldStore.setAll(context, shown.map { FoldStore.key(it.second, it.first.id) }, true)
-                                            scope.launch { WidgetRefresh.all(context) }
+                                            startActivity(Intent(context, SettingsActivity::class.java))
                                         },
                                     )
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.unfold_all)) },
-                                        leadingIcon = { Icon(painterResource(R.drawable.ic_unfold), contentDescription = null) },
-                                        onClick = {
-                                            menuOpen = false
-                                            FoldStore.setAll(context, shown.map { FoldStore.key(it.second, it.first.id) }, false)
-                                            scope.launch { WidgetRefresh.all(context) }
-                                        },
-                                    )
-                                }
-                            }
-                            if (app.lockApp && AppLock.enabled(this@MainActivity)) DropdownMenuItem(
-                                text = { Text(stringResource(R.string.app_lock_title)) },
-                                leadingIcon = { Icon(painterResource(R.drawable.ic_lock), contentDescription = null) },
-                                onClick = { menuOpen = false; AppLock.lockNow() },
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.menu_settings)) },
-                                leadingIcon = { Icon(painterResource(R.drawable.ic_settings), contentDescription = null) },
-                                onClick = { menuOpen = false; startActivity(Intent(context, SettingsActivity::class.java)) },
-                            )
-                        }
+                                },
+                            ),
+                        )
                     }
                 }
 

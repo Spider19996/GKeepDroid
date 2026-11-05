@@ -340,30 +340,30 @@ class SettingsActivity : ComponentActivity() {
                                         contentDescription = stringResource(R.string.more_actions),
                                     )
                                 }
-                                androidx.compose.material3.DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                                    androidx.compose.material3.DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.demo_mode)) },
-                                        leadingIcon = { androidx.compose.material3.Checkbox(checked = state.demoMode, onCheckedChange = null) },
-                                        onClick = { menuOpen = false; state.demoMode = !state.demoMode },
-                                    )
-                                    androidx.compose.material3.DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.log_enable)) },
-                                        leadingIcon = { androidx.compose.material3.Checkbox(checked = logOn, onCheckedChange = null) },
-                                        onClick = {
-                                            menuOpen = false
-                                            logOn = !logOn
-                                            AppLog.setEnabled(this@SettingsActivity, logOn)
-                                        },
-                                    )
-                                    androidx.compose.material3.DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.log_create)) },
-                                        onClick = {
-                                            menuOpen = false
-                                            val stamp = java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US).format(java.util.Date())
-                                            logLauncher.launch("gkeepdroid-log-$stamp.txt")
-                                        },
-                                    )
-                                }
+                                GroupedMenu(
+                                    expanded = menuOpen,
+                                    onDismissRequest = { menuOpen = false },
+                                    groups = listOf(
+                                        listOf(
+                                            MenuEntry(stringResource(R.string.demo_mode), checked = state.demoMode) {
+                                                menuOpen = false
+                                                state.demoMode = !state.demoMode
+                                            },
+                                            MenuEntry(stringResource(R.string.log_enable), checked = logOn) {
+                                                menuOpen = false
+                                                logOn = !logOn
+                                                AppLog.setEnabled(this@SettingsActivity, logOn)
+                                            },
+                                        ),
+                                        listOf(
+                                            MenuEntry(stringResource(R.string.log_create)) {
+                                                menuOpen = false
+                                                val stamp = java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US).format(java.util.Date())
+                                                logLauncher.launch("gkeepdroid-log-$stamp.txt")
+                                            },
+                                        ),
+                                    ),
+                                )
                             }
                         }
                     },
