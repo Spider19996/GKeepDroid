@@ -350,7 +350,7 @@ class MainActivity : ComponentActivity() {
                         },
                         singleLine = true,
                         trailingIcon = {
-                            if (query.isNotEmpty()) TextButton(onClick = { query = "" }) { Text("✕") }
+                            if (query.isNotEmpty()) ClearButton(onClick = { query = "" })
                         },
                         shape = RoundedCornerShape(28.dp),
                         modifier = Modifier.weight(1f),
@@ -1012,7 +1012,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 if (app.foldNotes) Box(
-                    Modifier.size(40.dp).clickable(
+                    Modifier.size(48.dp).clickable(
                         interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
                         indication = null,
                     ) {

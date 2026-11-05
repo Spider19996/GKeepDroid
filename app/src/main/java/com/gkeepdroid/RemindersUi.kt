@@ -288,10 +288,10 @@ internal fun RemindersDialog(
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 if (!notificationsOn) {
                     Column(
-                        Modifier.fillMaxWidth().padding(bottom = 12.dp).background(Color(0xFFC62828), RoundedCornerShape(8.dp)).padding(12.dp),
+                        Modifier.fillMaxWidth().padding(bottom = 12.dp).background(MaterialTheme.colorScheme.error, RoundedCornerShape(8.dp)).padding(12.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
-                        Text(stringResource(R.string.reminder_notifications_off), color = Color.White, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.reminder_notifications_off), color = MaterialTheme.colorScheme.onError, fontWeight = FontWeight.Bold)
                         Text(
                             stringResource(R.string.reminder_open_settings),
                             color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold,

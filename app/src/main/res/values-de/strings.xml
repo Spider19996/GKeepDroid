@@ -124,6 +124,7 @@
     <string name="show_add_item_button">Button „Eintrag hinzufügen“ anzeigen</string>
     <string name="save_to_account">Konto für diese Notiz</string>
     <string name="done">Fertig</string>
+    <string name="clear_text">Leeren</string>
     <string name="share_note">Teilen</string>
     <string name="sign_in_google">Mit Google anmelden</string>
     <string name="use_local_only">Ohne Konto verwenden (nur lokal)</string>

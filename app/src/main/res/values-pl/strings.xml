@@ -124,6 +124,7 @@
     <string name="show_add_item_button">Pokaż przycisk dodawania elementu</string>
     <string name="save_to_account">Konto dla tej notatki</string>
     <string name="done">Gotowe</string>
+    <string name="clear_text">Wyczyść</string>
     <string name="share_note">Udostępnij</string>
     <string name="sign_in_google">Zaloguj się przez Google</string>
     <string name="use_local_only">Użyj bez konta (tylko lokalnie)</string>

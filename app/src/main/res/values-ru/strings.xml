@@ -124,6 +124,7 @@
     <string name="show_add_item_button">Показывать кнопку добавления пункта</string>
     <string name="save_to_account">Аккаунт для этой заметки</string>
     <string name="done">Готово</string>
+    <string name="clear_text">Очистить</string>
     <string name="share_note">Поделиться</string>
     <string name="sign_in_google">Войти через Google</string>
     <string name="use_local_only">Использовать без аккаунта (только локально)</string>

@@ -124,6 +124,7 @@
     <string name="show_add_item_button">Knop Item toevoegen tonen</string>
     <string name="save_to_account">Account voor deze notitie</string>
     <string name="done">Klaar</string>
+    <string name="clear_text">Wissen</string>
     <string name="share_note">Delen</string>
     <string name="sign_in_google">Inloggen met Google</string>
     <string name="use_local_only">Zonder account gebruiken (alleen lokaal)</string>

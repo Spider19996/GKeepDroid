@@ -124,6 +124,7 @@
     <string name="show_add_item_button">显示添加项目按钮</string>
     <string name="save_to_account">此笔记使用的账号</string>
     <string name="done">完成</string>
+    <string name="clear_text">清除</string>
     <string name="share_note">分享</string>
     <string name="sign_in_google">使用 Google 登录</string>
     <string name="use_local_only">不使用账号（仅本地）</string>

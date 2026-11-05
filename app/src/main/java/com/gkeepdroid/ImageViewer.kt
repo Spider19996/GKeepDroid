@@ -66,8 +66,11 @@ fun ImageViewerDialog(bitmap: Bitmap, onClose: () -> Unit) {
                         translationY = offset.y,
                     ),
             )
-            TextButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).padding(16.dp)) {
-                Text("✕", color = Color.White, fontSize = 28.sp)
+            androidx.compose.material3.IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).padding(16.dp)) {
+                androidx.compose.material3.Icon(
+                    androidx.compose.ui.res.painterResource(R.drawable.ic_close),
+                    contentDescription = androidx.compose.ui.res.stringResource(R.string.back), tint = Color.White,
+                )
             }
         }
     }

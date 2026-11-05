@@ -919,7 +919,8 @@ class EditNoteActivity : ComponentActivity() {
                     }
                 }
                 if (canEdit) OutlinedButton(onClick = { items.add(KeepItem(UUID.randomUUID().toString(), "", false)) }) {
-                    Text("＋ " + stringResource(R.string.add_item))
+                    Icon(painterResource(R.drawable.ic_add), contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                    Text(stringResource(R.string.add_item))
                 }
             } else {
                 // Lines that start with "-" (or "*", "[ ]") are a list: offer to make it one, once.
@@ -1042,7 +1043,7 @@ class EditNoteActivity : ComponentActivity() {
                     ) {
                         Icon(
                             painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminders_title),
-                            tint = if (notificationsOn) LocalContentColor.current else Color(0xFFC62828),
+                            tint = if (notificationsOn) LocalContentColor.current else MaterialTheme.colorScheme.error,
                         )
                     }
                 }
@@ -1067,8 +1068,8 @@ class EditNoteActivity : ComponentActivity() {
         val trigger = maxPx * 0.75f
         var offsetX by remember { mutableStateOf(0f) }
         var handle by remember { mutableStateOf<LayoutCoordinates?>(null) }
-        val green = Color(0xFF2E7D32)
-        val red = Color(0xFFC62828)
+        val green = MaterialTheme.colorScheme.tertiary
+        val red = MaterialTheme.colorScheme.error
         Box(Modifier.fillMaxWidth().onGloballyPositioned { onBounds(it.boundsInRoot()) }.alpha(if (dragged) 0.5f else 1f)) {
             if (offsetX != 0f) {
                 val toRight = offsetX > 0f
@@ -1079,7 +1080,8 @@ class EditNoteActivity : ComponentActivity() {
                 ) {
                     Icon(
                         painterResource(if (toRight) R.drawable.ic_done else R.drawable.ic_close),
-                        contentDescription = null, tint = Color.White,
+                        contentDescription = null,
+                        tint = if (toRight) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onError,
                     )
                 }
             }

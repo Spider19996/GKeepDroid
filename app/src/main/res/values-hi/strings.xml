@@ -124,6 +124,7 @@
     <string name="show_add_item_button">आइटम जोड़ें बटन दिखाएँ</string>
     <string name="save_to_account">इस नोट के लिए खाता</string>
     <string name="done">हो गया</string>
+    <string name="clear_text">साफ़ करें</string>
     <string name="share_note">साझा करें</string>
     <string name="sign_in_google">Google से साइन इन करें</string>
     <string name="use_local_only">बिना खाते के उपयोग करें (केवल स्थानीय)</string>

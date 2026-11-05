@@ -90,7 +90,7 @@ internal fun ColumnScope.AppearancePage(s: SettingsState) {
                     )
                     .clickable { showColorPicker = true },
                 contentAlignment = Alignment.Center,
-            ) { if (!isCustom) Text("＋", color = Color.White) }
+            ) { if (!isCustom) Icon(painterResource(R.drawable.ic_add), contentDescription = null, tint = Color.White) }
         }
 
         }

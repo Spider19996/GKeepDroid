@@ -37,7 +37,7 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
             placeholder = { Text(stringResource(R.string.search_settings_hint)) },
             singleLine = true,
             trailingIcon = {
-                if (settingsQuery.isNotEmpty()) TextButton(onClick = { settingsQuery = "" }) { Text("✕") }
+                if (settingsQuery.isNotEmpty()) ClearButton(onClick = { settingsQuery = "" })
             },
             modifier = Modifier.fillMaxWidth(),
         )

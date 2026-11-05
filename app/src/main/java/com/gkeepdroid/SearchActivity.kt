@@ -90,7 +90,7 @@ class SearchActivity : ComponentActivity() {
                     placeholder = { Text(stringResource(R.string.search_notes_hint)) },
                     singleLine = true,
                     trailingIcon = {
-                        if (query.isNotEmpty()) TextButton(onClick = { query = "" }) { Text("✕") }
+                        if (query.isNotEmpty()) ClearButton(onClick = { query = "" })
                     },
                     modifier = Modifier.weight(1f).focusRequester(focus),
                 )

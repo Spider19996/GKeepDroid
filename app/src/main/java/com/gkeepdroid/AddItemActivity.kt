@@ -108,7 +108,13 @@ class AddItemActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxWidth().focusRequester(focus),
                     )
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                        if (added > 0) Text("✓ $added", Modifier.weight(1f), color = MaterialTheme.colorScheme.primary)
+                        if (added > 0) Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            androidx.compose.material3.Icon(
+                                androidx.compose.ui.res.painterResource(R.drawable.ic_done), contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                            Text("$added", color = MaterialTheme.colorScheme.primary)
+                        }
                         else Box(Modifier.weight(1f)) {}
                         // Items are added at once, so this only closes the dialog: "Cancel" until something
                         // was added, "Done" after that.

@@ -124,6 +124,7 @@
     <string name="show_add_item_button">Öğe ekle düğmesini göster</string>
     <string name="save_to_account">Bu not için hesap</string>
     <string name="done">Bitti</string>
+    <string name="clear_text">Temizle</string>
     <string name="share_note">Paylaş</string>
     <string name="sign_in_google">Google ile giriş yap</string>
     <string name="use_local_only">Hesapsız kullan (yalnızca yerel)</string>

@@ -11,3 +11,4 @@ captures/
 master_token*
 *.token
 .kotlin/
+CLAUDE.md

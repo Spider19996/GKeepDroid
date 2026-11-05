@@ -127,6 +127,7 @@
     <string name="show_add_item_button">Show add item button</string>
     <string name="save_to_account">Account for this note</string>
     <string name="done">Done</string>
+    <string name="clear_text">Clear</string>
     <string name="share_note">Share</string>
     <string name="sign_in_google">Sign in with Google</string>
     <string name="use_local_only">Use without an account (local only)</string>
