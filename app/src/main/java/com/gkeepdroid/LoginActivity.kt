@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -155,6 +156,7 @@ class LoginActivity : ComponentActivity() {
                             attempt++
                         },
                         modifier = Modifier.fillMaxWidth(),
+                        shapes = ButtonDefaults.shapes(),
                     ) { Text(stringResource(R.string.login_continue)) }
                 }
                 needEmail -> Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -169,6 +171,7 @@ class LoginActivity : ComponentActivity() {
                         onClick = { webToken?.let { finishSignIn(manualEmail, it) } },
                         enabled = manualEmail.contains("@"),
                         modifier = Modifier.fillMaxWidth(),
+                        shapes = ButtonDefaults.shapes(),
                     ) { Text(stringResource(R.string.login_continue)) }
                 }
                 else -> AndroidView(

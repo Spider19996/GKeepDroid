@@ -13,6 +13,7 @@ import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.gestures.draggable
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -188,7 +189,7 @@ class EditNoteActivity : ComponentActivity() {
             }
             gone -> Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(stringResource(R.string.note_gone), style = MaterialTheme.typography.titleMedium)
-                Button(onClick = { finish() }, modifier = Modifier.fillMaxWidth()) {
+                Button(onClick = { finish() }, modifier = Modifier.fillMaxWidth(), shapes = ButtonDefaults.shapes()) {
                     Text(stringResource(android.R.string.ok))
                 }
             }
@@ -474,7 +475,7 @@ class EditNoteActivity : ComponentActivity() {
                     modifier = Modifier.weight(1f),
                 )
                 Box(Modifier.clickable(enabled = !canEdit) { toastUnlockFirst() }) {
-                FilledTonalIconToggleButton(checked = pinned, onCheckedChange = { pinned = it }, enabled = canEdit) {
+                FilledTonalIconToggleButton(checked = pinned, onCheckedChange = { pinned = it }, enabled = canEdit, shapes = IconButtonDefaults.toggleableShapes()) {
                     Icon(
                         painterResource(if (pinned) R.drawable.ic_push_pin else R.drawable.ic_push_pin_outline),
                         contentDescription = stringResource(R.string.pin_note),
@@ -493,6 +494,7 @@ class EditNoteActivity : ComponentActivity() {
                             )
                             scope.launch { WidgetRefresh.all(this@EditNoteActivity) }
                         },
+                        shapes = IconButtonDefaults.toggleableShapes(),
                     ) {
                         Icon(painterResource(R.drawable.ic_pin_bottom), contentDescription = stringResource(R.string.pin_to_bottom))
                     }
@@ -500,7 +502,7 @@ class EditNoteActivity : ComponentActivity() {
                 // Less common actions live in an overflow menu; grayed out until the note is open for editing.
                 run {
                     Box {
-                        IconButton(onClick = { if (canEdit) menuOpen = true else toastUnlockFirst() }) {
+                        IconButton(onClick = { if (canEdit) menuOpen = true else toastUnlockFirst() }, shapes = IconButtonDefaults.shapes()) {
                             Icon(
                                 painterResource(R.drawable.ic_more_vert), contentDescription = stringResource(R.string.more_actions),
                                 tint = if (canEdit) LocalContentColor.current else LocalContentColor.current.copy(alpha = 0.38f),
@@ -639,10 +641,10 @@ class EditNoteActivity : ComponentActivity() {
                         TextButton(onClick = {
                             confirmDelete = false
                             leaveNote { KeepRepository.trashNote(this@EditNoteActivity, account, existing.id) }
-                        }) { Text(stringResource(R.string.delete_note)) }
+                        }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.delete_note)) }
                     },
                     dismissButton = {
-                        TextButton(onClick = { confirmDelete = false }) { Text(stringResource(android.R.string.cancel)) }
+                        TextButton(onClick = { confirmDelete = false }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) }
                     },
                 )
             }
@@ -671,7 +673,7 @@ class EditNoteActivity : ComponentActivity() {
                     stringResource(if (allLabels.isEmpty()) R.string.no_labels else R.string.labels_title), style = MaterialTheme.typography.titleSmall,
                     modifier = Modifier.weight(1f),
                 )
-                TextButton(onClick = { manageLabels = true }) { Text(stringResource(R.string.manage_labels)) }
+                TextButton(onClick = { manageLabels = true }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.manage_labels)) }
             }
             if (allLabels.isNotEmpty()) FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 allLabels.forEach { name ->
@@ -698,6 +700,7 @@ class EditNoteActivity : ComponentActivity() {
                         if (name !in labels) labels = labels + name
                         newLabel = ""
                     },
+                    shapes = ButtonDefaults.shapes(),
                 ) { Text(stringResource(R.string.add_label)) }
             }
 
@@ -726,13 +729,14 @@ class EditNoteActivity : ComponentActivity() {
                                         labelsVersion++
                                         KeepRepository.createLabel(this@EditNoteActivity, targetAccount, name)
                                     },
+                                    shapes = ButtonDefaults.shapes(),
                                 ) { Text(stringResource(R.string.add_label)) }
                             }
                             Column(Modifier.heightIn(max = 280.dp).verticalScroll(rememberScrollState())) {
                                 knownLabels.forEach { name ->
                                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                                         Text(name, Modifier.weight(1f))
-                                        TextButton(onClick = { labelToDelete = name }) {
+                                        TextButton(onClick = { labelToDelete = name }, shapes = ButtonDefaults.shapes()) {
                                             Text(stringResource(R.string.delete_label))
                                         }
                                     }
@@ -741,7 +745,7 @@ class EditNoteActivity : ComponentActivity() {
                         }
                     },
                     confirmButton = {
-                        TextButton(onClick = { manageLabels = false }) { Text(stringResource(R.string.done)) }
+                        TextButton(onClick = { manageLabels = false }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.done)) }
                     },
                 )
             }
@@ -758,10 +762,10 @@ class EditNoteActivity : ComponentActivity() {
                             addedLabels = addedLabels - name
                             labelsVersion++
                             KeepRepository.deleteLabel(this@EditNoteActivity, targetAccount, name)
-                        }) { Text(stringResource(R.string.delete_label)) }
+                        }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.delete_label)) }
                     },
                     dismissButton = {
-                        TextButton(onClick = { labelToDelete = null }) { Text(stringResource(android.R.string.cancel)) }
+                        TextButton(onClick = { labelToDelete = null }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) }
                     },
                 )
             }
@@ -775,7 +779,7 @@ class EditNoteActivity : ComponentActivity() {
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.weight(1f),
                     )
-                    TextButton(onClick = onReload) { Text(stringResource(R.string.reload)) }
+                    TextButton(onClick = onReload, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.reload)) }
                 }
             }
 
@@ -798,7 +802,7 @@ class EditNoteActivity : ComponentActivity() {
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodyMedium,
                         )
-                        TextButton(onClick = { removedImages = removedImages - imageId }) {
+                        TextButton(onClick = { removedImages = removedImages - imageId }, shapes = ButtonDefaults.shapes()) {
                             Text(stringResource(R.string.image_undo))
                         }
                     }
@@ -814,11 +818,11 @@ class EditNoteActivity : ComponentActivity() {
                             )
                             // Centered under the image, sharing the width equally.
                             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                                TextButton(onClick = { openInGallery(account, imageId) }) {
+                                TextButton(onClick = { openInGallery(account, imageId) }, shapes = ButtonDefaults.shapes()) {
                                     Text(stringResource(R.string.image_open_gallery))
                                 }
                                 if (existing != null) {
-                                    TextButton(onClick = { removedImages = removedImages + imageId }) {
+                                    TextButton(onClick = { removedImages = removedImages + imageId }, shapes = ButtonDefaults.shapes()) {
                                         Text(stringResource(R.string.image_remove))
                                     }
                                 }
@@ -832,6 +836,7 @@ class EditNoteActivity : ComponentActivity() {
                 OutlinedButton(
                     onClick = { startActivity(keepIntent(this@EditNoteActivity)) },
                     modifier = Modifier.fillMaxWidth(),
+                    shapes = ButtonDefaults.shapes(),
                 ) { Text(stringResource(R.string.image_add_keep)) }
             }
             viewerImage?.let { imageId ->
@@ -865,7 +870,7 @@ class EditNoteActivity : ComponentActivity() {
                     IconButton(onClick = {
                         hintPrefs.edit().putBoolean("list_hint_hidden", true).apply()
                         hintHidden = true
-                    }) {
+                    }, shapes = IconButtonDefaults.shapes()) {
                         Icon(painterResource(R.drawable.ic_close), contentDescription = stringResource(R.string.notif_hint_dismiss), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
@@ -882,13 +887,13 @@ class EditNoteActivity : ComponentActivity() {
                     ) {
                         Text(stringResource(R.string.number_offer), color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.bodyMedium)
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                            TextButton(onClick = { numberOfferDismissed = true }) { Text(stringResource(R.string.convert_to_list_no)) }
+                            TextButton(onClick = { numberOfferDismissed = true }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.convert_to_list_no)) }
                             TextButton(onClick = {
                                 val stripped = ListNumbering.strip(items.toList())
                                 items.clear()
                                 items.addAll(stripped)
                                 numbered = true
-                            }) { Text(stringResource(R.string.list_number)) }
+                            }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.list_number)) }
                         }
                     }
                 }
@@ -918,7 +923,7 @@ class EditNoteActivity : ComponentActivity() {
                         )
                     }
                 }
-                if (canEdit) OutlinedButton(onClick = { items.add(KeepItem(UUID.randomUUID().toString(), "", false)) }) {
+                if (canEdit) OutlinedButton(onClick = { items.add(KeepItem(UUID.randomUUID().toString(), "", false)) }, shapes = ButtonDefaults.shapes()) {
                     Icon(painterResource(R.drawable.ic_add), contentDescription = null, modifier = Modifier.padding(end = 8.dp))
                     Text(stringResource(R.string.add_item))
                 }
@@ -939,8 +944,8 @@ class EditNoteActivity : ComponentActivity() {
                             TextButton(onClick = {
                                 convertDismissed = true
                                 convertKey?.let { convertPrefs.edit().putBoolean(it, true).apply() }
-                            }) { Text(stringResource(R.string.convert_to_list_no)) }
-                            TextButton(onClick = { requestConvert() }) { Text(stringResource(R.string.convert_to_list)) }
+                            }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.convert_to_list_no)) }
+                            TextButton(onClick = { requestConvert() }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.convert_to_list)) }
                         }
                     }
                 }
@@ -1030,6 +1035,7 @@ class EditNoteActivity : ComponentActivity() {
             Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedButton(
                     modifier = Modifier.weight(1f).fillMaxHeight(), enabled = !saving, onClick = { discard() },
+                    shapes = ButtonDefaults.shapes(),
                 ) { Text(stringResource(R.string.cancel)) }
                 Box(Modifier.align(Alignment.CenterVertically)) {
                     // Set: the accent color with a matching icon. None set: a quiet button.
@@ -1040,6 +1046,7 @@ class EditNoteActivity : ComponentActivity() {
                             checkedContainerColor = MaterialTheme.colorScheme.primary,
                             checkedContentColor = MaterialTheme.colorScheme.onPrimary,
                         ),
+                        shapes = IconButtonDefaults.toggleableShapes(),
                     ) {
                         Icon(
                             painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminders_title),
@@ -1049,6 +1056,7 @@ class EditNoteActivity : ComponentActivity() {
                 }
                 Button(
                     modifier = Modifier.weight(1f).fillMaxHeight(), onClick = { if (canEdit) save() else askEdit() },
+                    shapes = ButtonDefaults.shapes(),
                 ) { Text(stringResource(if (canEdit) R.string.save else if (isList) R.string.edit_list else R.string.edit_note)) }
             }
         }

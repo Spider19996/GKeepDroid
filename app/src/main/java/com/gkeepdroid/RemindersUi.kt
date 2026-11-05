@@ -28,8 +28,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
@@ -87,11 +89,11 @@ internal fun DateTimePickerDialog(current: Long?, onPicked: (Long) -> Unit, onDi
         DatePickerDialog(
             onDismissRequest = onDismiss,
             confirmButton = {
-                TextButton(enabled = dateState.selectedDateMillis != null, onClick = { day = dateState.selectedDateMillis }) {
+                TextButton(enabled = dateState.selectedDateMillis != null, onClick = { day = dateState.selectedDateMillis }, shapes = ButtonDefaults.shapes()) {
                     Text(stringResource(android.R.string.ok))
                 }
             },
-            dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.cancel)) } },
+            dismissButton = { TextButton(onClick = onDismiss, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) } },
         ) { DatePicker(dateState) }
     } else {
         val utc = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC")).apply { timeInMillis = chosenDay }
@@ -120,8 +122,8 @@ internal fun TimePickerAlert(hour: Int, minute: Int, onConfirm: (Int, Int) -> Un
     AlertDialog(
         onDismissRequest = onDismiss,
         text = { TimePicker(state) },
-        confirmButton = { TextButton(onClick = { onConfirm(state.hour, state.minute) }) { Text(stringResource(android.R.string.ok)) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.cancel)) } },
+        confirmButton = { TextButton(onClick = { onConfirm(state.hour, state.minute) }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.ok)) } },
+        dismissButton = { TextButton(onClick = onDismiss, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) } },
     )
 }
 
@@ -195,19 +197,19 @@ internal fun ColumnScope.RemindersPage(s: SettingsState) {
         presets.forEachIndexed { index, preset ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(ReminderPresets.label(context, preset), Modifier.weight(1f))
-                IconButton(enabled = index > 0, onClick = { move(index, -1) }) {
+                IconButton(enabled = index > 0, onClick = { move(index, -1) }, shapes = IconButtonDefaults.shapes()) {
                     Icon(painterResource(R.drawable.ic_arrow_up), contentDescription = stringResource(R.string.move_up))
                 }
-                IconButton(enabled = index < presets.lastIndex, onClick = { move(index, 1) }) {
+                IconButton(enabled = index < presets.lastIndex, onClick = { move(index, 1) }, shapes = IconButtonDefaults.shapes()) {
                     Icon(painterResource(R.drawable.ic_arrow_down), contentDescription = stringResource(R.string.move_down))
                 }
-                IconButton(onClick = { reminderPresets = (presets - preset).joinToString(",") }) {
+                IconButton(onClick = { reminderPresets = (presets - preset).joinToString(",") }, shapes = IconButtonDefaults.shapes()) {
                     Icon(painterResource(R.drawable.ic_delete), contentDescription = stringResource(R.string.reminder_remove))
                 }
             }
         }
         var adding by remember { mutableStateOf(false) }
-        OutlinedButton(onClick = { adding = true }, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.reminder_preset_add)) }
+        OutlinedButton(onClick = { adding = true }, modifier = Modifier.fillMaxWidth(), shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.reminder_preset_add)) }
         if (adding) PresetDialog(
             activity = context,
             onAdd = { preset ->
@@ -247,6 +249,7 @@ private fun PresetDialog(activity: Activity, onAdd: (String) -> Unit, onCancel: 
                     OutlinedButton(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = { pickingClock = true },
+                        shapes = ButtonDefaults.shapes(),
                     ) { Text(ReminderPresets.label(activity, "t:$clock")) }
                     if (pickingClock) {
                         val (hour, minute) = clock.split(":").map { it.toInt() }
@@ -263,9 +266,10 @@ private fun PresetDialog(activity: Activity, onAdd: (String) -> Unit, onCancel: 
             TextButton(
                 enabled = !relative || (minutes.toIntOrNull() ?: 0) > 0,
                 onClick = { onAdd(if (relative) "r:${minutes.toInt()}" else "t:$clock") },
+                shapes = ButtonDefaults.shapes(),
             ) { Text(stringResource(android.R.string.ok)) }
         },
-        dismissButton = { TextButton(onClick = onCancel) { Text(stringResource(android.R.string.cancel)) } },
+        dismissButton = { TextButton(onClick = onCancel, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) } },
     )
 }
 
@@ -309,10 +313,10 @@ internal fun RemindersDialog(
                     exactHint = false
                     Reminders.exactAlarmSettings(activity)?.let { activity.startActivity(it) }
                     newReminder()
-                }) { Text(stringResource(R.string.reminder_open_settings)) }
+                }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.reminder_open_settings)) }
             },
             dismissButton = {
-                TextButton(onClick = { exactHint = false; newReminder() }) { Text(stringResource(R.string.reminder_not_now)) }
+                TextButton(onClick = { exactHint = false; newReminder() }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.reminder_not_now)) }
             },
         )
         return
@@ -363,7 +367,7 @@ internal fun RemindersDialog(
                         IconButton(onClick = {
                             if (onRemove != null) onRemove(reminder.id) else Reminders.remove(activity, account, noteId, reminder.id)
                             onChange()
-                        }) {
+                        }, shapes = IconButtonDefaults.shapes()) {
                             Icon(painterResource(R.drawable.ic_delete), contentDescription = stringResource(R.string.reminder_remove))
                         }
                     }
@@ -383,9 +387,9 @@ internal fun RemindersDialog(
                 } else {
                     newReminder()
                 }
-            }) { Text(stringResource(R.string.reminder_add)) }
+            }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.reminder_add)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.ok)) } },
+        dismissButton = { TextButton(onClick = onDismiss, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.ok)) } },
     )
 }
 
@@ -413,6 +417,7 @@ private fun ReminderEditor(activity: Activity, initial: Reminder, onSave: (Remin
                 OutlinedButton(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { pickingTime = true },
+                    shapes = ButtonDefaults.shapes(),
                 ) { Text(Reminders.label(activity, reminder.at)) }
                 if (pickingTime) DateTimePickerDialog(
                     current = reminder.at,
@@ -446,8 +451,8 @@ private fun ReminderEditor(activity: Activity, initial: Reminder, onSave: (Remin
                 }
             }
         },
-        confirmButton = { TextButton(onClick = { onSave(reminder) }) { Text(stringResource(android.R.string.ok)) } },
-        dismissButton = { TextButton(onClick = onCancel) { Text(stringResource(android.R.string.cancel)) } },
+        confirmButton = { TextButton(onClick = { onSave(reminder) }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.ok)) } },
+        dismissButton = { TextButton(onClick = onCancel, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) } },
     )
 }
 

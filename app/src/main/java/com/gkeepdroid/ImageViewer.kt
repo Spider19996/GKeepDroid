@@ -9,6 +9,7 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -66,7 +67,7 @@ fun ImageViewerDialog(bitmap: Bitmap, onClose: () -> Unit) {
                         translationY = offset.y,
                     ),
             )
-            androidx.compose.material3.IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).padding(16.dp)) {
+            androidx.compose.material3.IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).padding(16.dp), shapes = IconButtonDefaults.shapes()) {
                 androidx.compose.material3.Icon(
                     androidx.compose.ui.res.painterResource(R.drawable.ic_close),
                     contentDescription = androidx.compose.ui.res.stringResource(R.string.back), tint = Color.White,

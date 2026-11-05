@@ -19,10 +19,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
@@ -218,12 +220,14 @@ internal fun ColumnScope.ManageNotesPage(s: SettingsState) {
                         onClick = { moveNote(ordered, index, -1) },
                         enabled = index > 0,
                         modifier = Modifier.size(52.dp),
+                        shapes = IconButtonDefaults.shapes(),
                     ) { Icon(painterResource(R.drawable.ic_arrow_up), stringResource(R.string.move_up), Modifier.size(30.dp)) }
                     Spacer(Modifier.width(8.dp))
                     FilledTonalIconButton(
                         onClick = { moveNote(ordered, index, 1) },
                         enabled = index < ordered.lastIndex,
                         modifier = Modifier.size(52.dp),
+                        shapes = IconButtonDefaults.shapes(),
                     ) { Icon(painterResource(R.drawable.ic_arrow_down), stringResource(R.string.move_down), Modifier.size(30.dp)) }
                 }
             }
@@ -370,13 +374,13 @@ internal fun ColumnScope.ButtonBarPage(s: SettingsState) {
             }
         }
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = { layoutSaveLauncher.launch("gkeepdroid-layout.json") }) {
+            OutlinedButton(onClick = { layoutSaveLauncher.launch("gkeepdroid-layout.json") }, shapes = ButtonDefaults.shapes()) {
                 Text(stringResource(R.string.layout_save))
             }
-            OutlinedButton(onClick = { layoutLoadLauncher.launch(arrayOf("*/*")) }) {
+            OutlinedButton(onClick = { layoutLoadLauncher.launch(arrayOf("*/*")) }, shapes = ButtonDefaults.shapes()) {
                 Text(stringResource(R.string.layout_load))
             }
-            OutlinedButton(enabled = !layoutResetShown, onClick = { confirmLayoutReset = true }) {
+            OutlinedButton(enabled = !layoutResetShown, onClick = { confirmLayoutReset = true }, shapes = ButtonDefaults.shapes()) {
                 Text(stringResource(if (layoutResetShown) R.string.layout_reset_done else R.string.layout_reset))
             }
         }

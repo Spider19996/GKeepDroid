@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -64,7 +65,7 @@ internal fun ColumnScope.AccountsPage(s: SettingsState) {
                         refreshAccounts()
                         scope.launch { WidgetRefresh.all(context) }
                     }
-                }) { Text(stringResource(R.string.remove_account)) }
+                }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.remove_account)) }
             }
         }
 
@@ -92,12 +93,14 @@ internal fun ColumnScope.AccountsPage(s: SettingsState) {
         Button(
             onClick = { loginLauncher.launch(Intent(context, LoginActivity::class.java)) },
             modifier = Modifier.fillMaxWidth(),
+            shapes = ButtonDefaults.shapes(),
         ) { Text(stringResource(R.string.sign_in_google)) }
 
         OutlinedButton(
             onClick = { addLocalAccount() },
             enabled = LOCAL_ACCOUNT !in accounts,
             modifier = Modifier.fillMaxWidth(),
+            shapes = ButtonDefaults.shapes(),
         ) { Text(stringResource(R.string.use_local_only)) }
         Text(
             stringResource(R.string.local_account_hint),
@@ -105,7 +108,7 @@ internal fun ColumnScope.AccountsPage(s: SettingsState) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
-        TextButton(onClick = { showTokenForm = !showTokenForm }) {
+        TextButton(onClick = { showTokenForm = !showTokenForm }, shapes = ButtonDefaults.shapes()) {
             Text(stringResource(if (showTokenForm) R.string.hide_token_form else R.string.use_token_instead))
         }
         if (showTokenForm) {
@@ -124,10 +127,10 @@ internal fun ColumnScope.AccountsPage(s: SettingsState) {
                 singleLine = true, visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth(),
             )
-            TextButton(onClick = { uriHandler.openUri(MASTER_TOKEN_HELP_URL) }) {
+            TextButton(onClick = { uriHandler.openUri(MASTER_TOKEN_HELP_URL) }, shapes = ButtonDefaults.shapes()) {
                 Text(stringResource(R.string.token_help))
             }
-            Button(onClick = { addAccount() }, modifier = Modifier.fillMaxWidth()) {
+            Button(onClick = { addAccount() }, modifier = Modifier.fillMaxWidth(), shapes = ButtonDefaults.shapes()) {
                 Text(stringResource(R.string.add_account))
             }
         }
@@ -143,6 +146,7 @@ internal fun ColumnScope.SyncPage(s: SettingsState) {
                 SyncWorker.syncNow(context)
                 Toast.makeText(context, R.string.sync_started, Toast.LENGTH_SHORT).show()
             },
+            shapes = ButtonDefaults.shapes(),
         ) { Text(stringResource(R.string.sync_now)) }
         // When the last sync worked, and what went wrong if the last one failed.
         val lastOk = SyncPolicy.lastSuccess(context)
@@ -209,6 +213,7 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
         OutlinedButton(
             onClick = { folderLauncher.launch(null) },
             modifier = Modifier.fillMaxWidth(),
+            shapes = ButtonDefaults.shapes(),
         ) { Text(stringResource(R.string.md_sync_choose)) }
         Button(
             enabled = mdEnabled,
@@ -221,6 +226,7 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
                 }
             },
             modifier = Modifier.fillMaxWidth(),
+            shapes = ButtonDefaults.shapes(),
         ) { Text(stringResource(R.string.md_sync_now)) }
 
         // Settings: one file with everything except accounts and tokens.
@@ -229,10 +235,12 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = { exportLauncher.launch("gkeepdroid-settings.json") },
+            shapes = ButtonDefaults.shapes(),
         ) { Text(stringResource(R.string.export_settings)) }
         OutlinedButton(
             modifier = Modifier.fillMaxWidth(),
             onClick = { importLauncher.launch(arrayOf("*/*")) },
+            shapes = ButtonDefaults.shapes(),
         ) { Text(stringResource(R.string.import_settings)) }
     }
 }

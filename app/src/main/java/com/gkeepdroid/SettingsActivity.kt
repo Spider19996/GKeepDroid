@@ -21,7 +21,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -251,10 +253,10 @@ class SettingsActivity : ComponentActivity() {
                             CredentialStore.remove(context, LOCAL_ACCOUNT)
                             refreshAccounts()
                             scope.launch { WidgetRefresh.all(context) }
-                        }) { Text(stringResource(R.string.remove_account)) }
+                        }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.remove_account)) }
                     },
                     dismissButton = {
-                        TextButton(onClick = { confirmRemoveLocal = false }) { Text(stringResource(android.R.string.cancel)) }
+                        TextButton(onClick = { confirmRemoveLocal = false }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) }
                     },
                 )
             }
@@ -271,10 +273,10 @@ class SettingsActivity : ComponentActivity() {
                             // The default look of the bar; the settings button is part of it, so nobody is locked out.
                             applyLayout(WidgetSettings())
                             layoutResetShown = true
-                        }) { Text(stringResource(R.string.layout_reset)) }
+                        }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.layout_reset)) }
                     },
                     dismissButton = {
-                        TextButton(onClick = { confirmLayoutReset = false }) { Text(stringResource(android.R.string.cancel)) }
+                        TextButton(onClick = { confirmLayoutReset = false }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) }
                     },
                 )
             }
@@ -289,10 +291,10 @@ class SettingsActivity : ComponentActivity() {
                         TextButton(onClick = {
                             buttonSides = buttonSides - BTN_SETTINGS
                             confirmSettingsButtonOff = false
-                        }) { Text(stringResource(R.string.turn_off)) }
+                        }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.turn_off)) }
                     },
                     dismissButton = {
-                        TextButton(onClick = { confirmSettingsButtonOff = false }) { Text(stringResource(android.R.string.cancel)) }
+                        TextButton(onClick = { confirmSettingsButtonOff = false }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) }
                     },
                 )
             }
@@ -335,7 +337,7 @@ class SettingsActivity : ComponentActivity() {
                             }
                         }
                         androidx.compose.foundation.layout.Box {
-                            androidx.compose.material3.IconButton(onClick = { menuOpen = true }) {
+                            androidx.compose.material3.IconButton(onClick = { menuOpen = true }, shapes = IconButtonDefaults.shapes()) {
                                 androidx.compose.material3.Icon(
                                     androidx.compose.ui.res.painterResource(R.drawable.ic_more_vert),
                                     contentDescription = stringResource(R.string.more_actions),
@@ -403,7 +405,7 @@ class SettingsActivity : ComponentActivity() {
                     if (status.isNotEmpty()) Text(status)
                     // Only the main page of a widget's settings needs it; from the app, Back is enough.
                     if (hasWidget && page == Page.Main) {
-                        Button(modifier = Modifier.fillMaxWidth(), onClick = { finishWithOk() }) {
+                        Button(modifier = Modifier.fillMaxWidth(), onClick = { finishWithOk() }, shapes = ButtonDefaults.shapes()) {
                             Text(stringResource(R.string.done))
                         }
                     }

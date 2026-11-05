@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
@@ -78,7 +79,7 @@ internal fun FirstSyncDialog(onConfirm: () -> Unit) {
         title = { Text(stringResource(R.string.sync_section)) },
         text = { Text(stringResource(R.string.first_sync_hint)) },
         confirmButton = {
-            TextButton(enabled = left == 0, onClick = onConfirm) {
+            TextButton(enabled = left == 0, onClick = onConfirm, shapes = ButtonDefaults.shapes()) {
                 Text(if (left > 0) "${stringResource(android.R.string.ok)} ($left)" else stringResource(android.R.string.ok))
             }
         },

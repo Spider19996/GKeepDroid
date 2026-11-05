@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -106,10 +107,10 @@ class AddItemActivity : ComponentActivity() {
                         else Spacer(Modifier.weight(1f))
                         // Items are added at once, so this only closes the dialog: "Cancel" until something
                         // was added, "Done" after that.
-                        TextButton(onClick = { finish() }) {
+                        TextButton(onClick = { finish() }, shapes = ButtonDefaults.shapes()) {
                             Text(stringResource(if (added == 0) android.R.string.cancel else R.string.done))
                         }
-                        Button(onClick = { add() }, enabled = text.isNotBlank() && !busy) {
+                        Button(onClick = { add() }, enabled = text.isNotBlank() && !busy, shapes = ButtonDefaults.shapes()) {
                             Text(stringResource(R.string.add_item))
                         }
                     }

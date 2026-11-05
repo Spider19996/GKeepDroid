@@ -2,6 +2,7 @@ package com.gkeepdroid
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -9,7 +10,7 @@ import androidx.compose.ui.res.stringResource
 /** The cross inside a search field that empties it. */
 @Composable
 fun ClearButton(onClick: () -> Unit) {
-    IconButton(onClick = onClick) {
+    IconButton(onClick = onClick, shapes = IconButtonDefaults.shapes()) {
         Icon(painterResource(R.drawable.ic_close), contentDescription = stringResource(R.string.clear_text))
     }
 }
@@ -17,7 +18,7 @@ fun ClearButton(onClick: () -> Unit) {
 /** The standard Android back arrow. */
 @Composable
 fun BackButton(onClick: () -> Unit) {
-    IconButton(onClick = onClick) {
+    IconButton(onClick = onClick, shapes = IconButtonDefaults.shapes()) {
         Icon(painterResource(R.drawable.ic_arrow_back), contentDescription = stringResource(R.string.back))
     }
 }

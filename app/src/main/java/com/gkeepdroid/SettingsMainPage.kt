@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -163,6 +164,7 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
                         val removed = SettingsStore.deleteOrphans(context, placed.map { it.first })
                         status = context.getString(R.string.orphans_removed, removed)
                     },
+                    shapes = ButtonDefaults.shapes(),
                 ) { Text(stringResource(R.string.orphans_clean)) }
                 placed.forEachIndexed { index, (id, single) ->
                     val name = stringResource(if (single) R.string.widget_label_single else R.string.widget_label_list)

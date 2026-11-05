@@ -47,12 +47,14 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -286,10 +288,10 @@ class MainActivity : ComponentActivity() {
                     TextButton(onClick = {
                         deleteTarget = null
                         act { KeepRepository.deleteForever(context, account, note.id) }
-                    }) { Text(stringResource(R.string.delete_forever)) }
+                    }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.delete_forever)) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { deleteTarget = null }) { Text(stringResource(android.R.string.cancel)) }
+                    TextButton(onClick = { deleteTarget = null }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) }
                 },
             )
         }
@@ -349,7 +351,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.weight(1f),
                     )
                     Box {
-                        IconButton(onClick = { menuOpen = true }) {
+                        IconButton(onClick = { menuOpen = true }, shapes = IconButtonDefaults.shapes()) {
                             Icon(painterResource(R.drawable.ic_more_vert), contentDescription = stringResource(R.string.more_actions))
                         }
                         DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
@@ -452,7 +454,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         // The cog at the end chooses which filters the bar offers.
-                        IconButton(onClick = { filterDialog = true }) {
+                        IconButton(onClick = { filterDialog = true }, shapes = IconButtonDefaults.shapes()) {
                             Icon(painterResource(R.drawable.ic_settings), contentDescription = stringResource(R.string.filter_bar_title))
                         }
                     }
@@ -470,7 +472,7 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         },
-                        confirmButton = { TextButton(onClick = { filterDialog = false }) { Text(stringResource(R.string.done)) } },
+                        confirmButton = { TextButton(onClick = { filterDialog = false }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.done)) } },
                     )
                 }
 
@@ -489,13 +491,13 @@ class MainActivity : ComponentActivity() {
                             style = MaterialTheme.typography.bodySmall,
                         )
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                            TextButton(onClick = { context.startActivity(Reminders.notificationSettings(context)) }) {
+                            TextButton(onClick = { context.startActivity(Reminders.notificationSettings(context)) }, shapes = ButtonDefaults.shapes()) {
                                 Text(stringResource(R.string.reminder_open_settings))
                             }
                             TextButton(onClick = {
                                 hintPrefs.edit().putBoolean("notif_hint_dismissed", true).apply()
                                 notifHintHidden = true
-                            }) { Text(stringResource(R.string.notif_hint_dismiss)) }
+                            }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.notif_hint_dismiss)) }
                         }
                     }
                 }
@@ -525,7 +527,7 @@ class MainActivity : ComponentActivity() {
                             context.startActivity(
                                 Intent(context, SettingsActivity::class.java).putExtra(SettingsActivity.EXTRA_PAGE, "accounts")
                             )
-                        }) { Text(stringResource(R.string.sign_in_again)) }
+                        }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.sign_in_again)) }
                     }
                 } else if (syncError != null && !syncing) {
                     Text(
@@ -540,7 +542,7 @@ class MainActivity : ComponentActivity() {
                     // First start: nothing to show before an account (or local mode) exists.
                     Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         Text(stringResource(R.string.no_notes), style = MaterialTheme.typography.bodyLarge)
-                        TextButton(onClick = { startActivity(Intent(context, SettingsActivity::class.java)) }) {
+                        TextButton(onClick = { startActivity(Intent(context, SettingsActivity::class.java)) }, shapes = ButtonDefaults.shapes()) {
                             Text(stringResource(R.string.menu_settings))
                         }
                     }
@@ -699,15 +701,15 @@ class MainActivity : ComponentActivity() {
                 NoteTile(note, account, app, onClick = { open(note, account, false) }, modifier = dragModifier(account + "|" + note.id)) {
                     // Archive and trash get their own actions below the note.
                     if (screen == AppScreen.Archive) {
-                        TextButton(onClick = { act({}) { KeepRepository.unarchiveNote(context, account, note.id) } }) {
+                        TextButton(onClick = { act({}) { KeepRepository.unarchiveNote(context, account, note.id) } }, shapes = ButtonDefaults.shapes()) {
                             Text(stringResource(R.string.unarchive_note))
                         }
                     }
                     if (screen == AppScreen.Trash) {
-                        TextButton(onClick = { act({}) { KeepRepository.untrashNote(context, account, note.id) } }) {
+                        TextButton(onClick = { act({}) { KeepRepository.untrashNote(context, account, note.id) } }, shapes = ButtonDefaults.shapes()) {
                             Text(stringResource(R.string.restore_note))
                         }
-                        TextButton(onClick = { askDelete(note to account) }) {
+                        TextButton(onClick = { askDelete(note to account) }, shapes = ButtonDefaults.shapes()) {
                             Text(stringResource(R.string.delete_forever), color = MaterialTheme.colorScheme.error)
                         }
                     }
