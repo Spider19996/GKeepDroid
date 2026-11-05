@@ -86,7 +86,7 @@ class SingleNoteWidget : GlanceAppWidget() {
         WithHeaderBar(
             modifier = GlanceModifier.fillMaxSize()
                 .noteBackground(noteColor, settings, Color.Black.copy(alpha = settings.backgroundAlpha))
-                .cornerRadius(16.dp)
+                .cornerRadius(R.dimen.widget_corner)
                 .padding(8.dp),
             bar = { side ->
                 HeaderBar(

@@ -1,0 +1,5 @@
+<resources>
+    <!-- Widget corners; Android 12 and later give the launcher's own radii (values-v31). -->
+    <dimen name="widget_corner">16dp</dimen>
+    <dimen name="widget_inner_corner">12dp</dimen>
+</resources>

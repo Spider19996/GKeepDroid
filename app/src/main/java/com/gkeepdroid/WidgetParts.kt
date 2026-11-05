@@ -428,7 +428,7 @@ internal fun NoteImage(bitmap: Bitmap, widthDp: Dp, modifier: GlanceModifier = G
         provider = ImageProvider(bitmap),
         contentDescription = LocalContext.current.getString(R.string.note_image),
         contentScale = ContentScale.Fit,
-        modifier = modifier.fillMaxWidth().height(height).cornerRadius(8.dp),
+        modifier = modifier.fillMaxWidth().height(height).cornerRadius(R.dimen.widget_inner_corner),
     )
 }
 

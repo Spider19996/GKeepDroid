@@ -117,7 +117,7 @@ class NotesWidget : GlanceAppWidget() {
         val background = ColorProvider(Color.Black.copy(alpha = settings.backgroundAlpha))
 
         WithHeaderBar(
-            modifier = GlanceModifier.fillMaxSize().background(background).cornerRadius(16.dp).padding(8.dp),
+            modifier = GlanceModifier.fillMaxSize().background(background).cornerRadius(R.dimen.widget_corner).padding(8.dp),
             bar = { side ->
                 HeaderBar(
                     side, appWidgetId, account, settings, textColor, withNewButtons = true, reordering = reordering,
@@ -168,7 +168,7 @@ class NotesWidget : GlanceAppWidget() {
         val palette = textPalette(settings, onNoteColor = noteColor != null)
         val textColor = palette.provider()
 
-        val cardModifier = GlanceModifier.fillMaxWidth().cornerRadius(12.dp).noteBackground(noteColor, settings)
+        val cardModifier = GlanceModifier.fillMaxWidth().cornerRadius(R.dimen.widget_inner_corner).noteBackground(noteColor, settings)
         val folded = settings.foldable && FoldStore.key(account, note.id) in foldedKeys
 
         // A small pin shows that the note is pinned in Keep or shown at the widget's bottom.
