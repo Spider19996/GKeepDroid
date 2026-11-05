@@ -12,6 +12,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,11 +23,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,6 +38,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -309,68 +312,65 @@ class SettingsActivity : ComponentActivity() {
 
             Column(Modifier.fillMaxSize()) {
                 // Title bar: the back arrow appears on every page below the main list.
-                Row(
-                    Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
+                TopAppBar(
+                    title = { Text(stringResource(if (page == Page.Main && !hasWidget) R.string.menu_settings else page.title)) },
                     // On a page the arrow leads back to the main list; on the main list it closes the settings
                     // and returns to wherever they were opened from.
-                    BackButton { if (page != Page.Main) page = Page.Main else finish() }
-                    Text(
-                        stringResource(if (page == Page.Main && !hasWidget) R.string.menu_settings else page.title),
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier.weight(1f),
-                    )
-                    // Rarely needed: the demo mode for screenshots lives in a menu of its own.
-                    if (page == Page.Main && !hasWidget) {
-                        var menuOpen by remember { androidx.compose.runtime.mutableStateOf(false) }
-                        var logOn by remember { androidx.compose.runtime.mutableStateOf(AppLog.enabled(this@SettingsActivity)) }
-                        // The log is written where the user chooses (Downloads, Documents...), as a plain text file.
-                        val logLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
-                            if (uri != null) {
-                                val ok = runCatching {
-                                    contentResolver.openOutputStream(uri)?.use { it.write(LogReport.build(this@SettingsActivity).toByteArray()) } != null
-                                }.getOrDefault(false)
-                                android.widget.Toast.makeText(
-                                    this@SettingsActivity, if (ok) R.string.log_saved else R.string.log_failed, android.widget.Toast.LENGTH_LONG,
-                                ).show()
+                    navigationIcon = { BackButton { if (page != Page.Main) page = Page.Main else finish() } },
+                    actions = {
+                        // Rarely needed: the demo mode for screenshots lives in a menu of its own.
+                        if (page == Page.Main && !hasWidget) {
+                            var menuOpen by remember { androidx.compose.runtime.mutableStateOf(false) }
+                            var logOn by remember { androidx.compose.runtime.mutableStateOf(AppLog.enabled(this@SettingsActivity)) }
+                            // The log is written where the user chooses (Downloads, Documents...), as a plain text file.
+                            val logLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
+                                if (uri != null) {
+                                    val ok = runCatching {
+                                        contentResolver.openOutputStream(uri)?.use { it.write(LogReport.build(this@SettingsActivity).toByteArray()) } != null
+                                    }.getOrDefault(false)
+                                    android.widget.Toast.makeText(
+                                        this@SettingsActivity, if (ok) R.string.log_saved else R.string.log_failed, android.widget.Toast.LENGTH_LONG,
+                                    ).show()
+                                }
+                            }
+                            androidx.compose.foundation.layout.Box {
+                                androidx.compose.material3.IconButton(onClick = { menuOpen = true }, shapes = IconButtonDefaults.shapes()) {
+                                    androidx.compose.material3.Icon(
+                                        androidx.compose.ui.res.painterResource(R.drawable.ic_more_vert),
+                                        contentDescription = stringResource(R.string.more_actions),
+                                    )
+                                }
+                                androidx.compose.material3.DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                                    androidx.compose.material3.DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.demo_mode)) },
+                                        leadingIcon = { androidx.compose.material3.Checkbox(checked = state.demoMode, onCheckedChange = null) },
+                                        onClick = { menuOpen = false; state.demoMode = !state.demoMode },
+                                    )
+                                    androidx.compose.material3.DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.log_enable)) },
+                                        leadingIcon = { androidx.compose.material3.Checkbox(checked = logOn, onCheckedChange = null) },
+                                        onClick = {
+                                            menuOpen = false
+                                            logOn = !logOn
+                                            AppLog.setEnabled(this@SettingsActivity, logOn)
+                                        },
+                                    )
+                                    androidx.compose.material3.DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.log_create)) },
+                                        onClick = {
+                                            menuOpen = false
+                                            val stamp = java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US).format(java.util.Date())
+                                            logLauncher.launch("gkeepdroid-log-$stamp.txt")
+                                        },
+                                    )
+                                }
                             }
                         }
-                        androidx.compose.foundation.layout.Box {
-                            androidx.compose.material3.IconButton(onClick = { menuOpen = true }, shapes = IconButtonDefaults.shapes()) {
-                                androidx.compose.material3.Icon(
-                                    androidx.compose.ui.res.painterResource(R.drawable.ic_more_vert),
-                                    contentDescription = stringResource(R.string.more_actions),
-                                )
-                            }
-                            androidx.compose.material3.DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                                androidx.compose.material3.DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.demo_mode)) },
-                                    leadingIcon = { androidx.compose.material3.Checkbox(checked = state.demoMode, onCheckedChange = null) },
-                                    onClick = { menuOpen = false; state.demoMode = !state.demoMode },
-                                )
-                                androidx.compose.material3.DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.log_enable)) },
-                                    leadingIcon = { androidx.compose.material3.Checkbox(checked = logOn, onCheckedChange = null) },
-                                    onClick = {
-                                        menuOpen = false
-                                        logOn = !logOn
-                                        AppLog.setEnabled(this@SettingsActivity, logOn)
-                                    },
-                                )
-                                androidx.compose.material3.DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.log_create)) },
-                                    onClick = {
-                                        menuOpen = false
-                                        val stamp = java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US).format(java.util.Date())
-                                        logLauncher.launch("gkeepdroid-log-$stamp.txt")
-                                    },
-                                )
-                            }
-                        }
-                    }
-                }
-                HorizontalDivider()
+                    },
+                    // The theme already keeps the content clear of the system bars.
+                    windowInsets = WindowInsets(0),
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                )
 
                 Column(
                     Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(20.dp),

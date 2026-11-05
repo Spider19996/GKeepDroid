@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -61,87 +60,124 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
                     pageTitle.contains(settingsQuery.trim(), ignoreCase = true)
             }.distinctBy { it.second }
             if (hits.isEmpty()) Text(stringResource(R.string.search_settings_no_results))
-            hits.forEach { (entry, label, pageTitle) ->
-                MenuRow(label, if (pageTitle == label) null else pageTitle) {
-                    settingsQuery = ""
-                    if (entry.popup != null) {
-                        page = Page.Main
-                        pendingPopup = entry.popup
-                    } else {
-                        goTo(entry.page)
+            SettingsGroup(
+                hits.map { (entry, label, pageTitle) ->
+                    { shapes ->
+                        MenuRow(label, if (pageTitle == label) null else pageTitle, shapes = shapes) {
+                            settingsQuery = ""
+                            if (entry.popup != null) {
+                                page = Page.Main
+                                pendingPopup = entry.popup
+                            } else {
+                                goTo(entry.page)
+                            }
+                        }
                     }
-                }
-            }
+                },
+            )
         } else {
         val globalSection: @Composable () -> Unit = {
             SectionTitle(stringResource(R.string.section_accounts_sync))
-            MenuRow(
-                stringResource(R.string.tab_accounts),
-                accounts.joinToString { CredentialStore.displayName(context, it, demoMode) }.ifEmpty { "–" },
-            ) { page = Page.Accounts }
-            MenuRow(stringResource(R.string.sync_section), null) { page = Page.Sync }
+            SettingsGroup(
+                listOf(
+                    { shapes ->
+                        MenuRow(
+                            stringResource(R.string.tab_accounts),
+                            accounts.joinToString { CredentialStore.displayName(context, it, demoMode) }.ifEmpty { "–" },
+                            shapes = shapes,
+                        ) { page = Page.Accounts }
+                    },
+                    { shapes -> MenuRow(stringResource(R.string.sync_section), null, shapes = shapes) { page = Page.Sync } },
+                ),
+            )
 
             SectionTitle(stringResource(R.string.section_look))
-            PopupRow(
-                pendingPopup == "theme", { pendingPopup = null },
-                stringResource(R.string.theme_section),
-                themeLabel(themeMode),
-                listOf(THEME_SYSTEM, THEME_LIGHT, THEME_DARK, THEME_OLED).map { mode ->
-                    ((if (mode == themeMode) "✓ " else "") + themeLabel(mode)) to { themeMode = mode }
-                },
-            )
-            PopupRow(
-                pendingPopup == "language", { pendingPopup = null },
-                stringResource(R.string.language),
-                LocaleHelper.languages.firstOrNull { it.first == language }?.second ?: stringResource(R.string.language_system),
+            SettingsGroup(
                 listOf(
-                    ((if (language.isEmpty()) "✓ " else "") + stringResource(R.string.language_system)) to { changeLanguage("") },
-                ) + LocaleHelper.languages.map { (tag, name) ->
-                    ((if (tag == language) "✓ " else "") + name) to { changeLanguage(tag) }
-                },
+                    { shapes ->
+                        PopupRow(
+                            pendingPopup == "theme", { pendingPopup = null },
+                            stringResource(R.string.theme_section),
+                            themeLabel(themeMode),
+                            listOf(THEME_SYSTEM, THEME_LIGHT, THEME_DARK, THEME_OLED).map { mode ->
+                                ((if (mode == themeMode) "✓ " else "") + themeLabel(mode)) to { themeMode = mode }
+                            },
+                            shapes = shapes,
+                        )
+                    },
+                    { shapes ->
+                        PopupRow(
+                            pendingPopup == "language", { pendingPopup = null },
+                            stringResource(R.string.language),
+                            LocaleHelper.languages.firstOrNull { it.first == language }?.second ?: stringResource(R.string.language_system),
+                            listOf(
+                                ((if (language.isEmpty()) "✓ " else "") + stringResource(R.string.language_system)) to { changeLanguage("") },
+                            ) + LocaleHelper.languages.map { (tag, name) ->
+                                ((if (tag == language) "✓ " else "") + name) to { changeLanguage(tag) }
+                            },
+                            shapes = shapes,
+                        )
+                    },
+                    { shapes -> MenuRow(stringResource(R.string.app_layout_sort), null, shapes = shapes) { page = Page.AppLayout } },
+                    { shapes -> MenuRow(stringResource(R.string.app_cards), null, shapes = shapes) { page = Page.AppCards } },
+                    { shapes -> MenuRow(stringResource(R.string.list_section), null, shapes = shapes) { page = Page.AppChecklists } },
+                    { shapes -> MenuRow(stringResource(R.string.swipe_title), null, shapes = shapes) { page = Page.AppSwipe } },
+                    { shapes -> MenuRow(stringResource(R.string.filter_bar_title), null, shapes = shapes) { page = Page.AppFilters } },
+                ),
             )
-            MenuRow(stringResource(R.string.app_layout_sort), null) { page = Page.AppLayout }
-            MenuRow(stringResource(R.string.app_cards), null) { page = Page.AppCards }
-            MenuRow(stringResource(R.string.list_section), null) { page = Page.AppChecklists }
-            MenuRow(stringResource(R.string.swipe_title), null) { page = Page.AppSwipe }
-            MenuRow(stringResource(R.string.filter_bar_title), null) { page = Page.AppFilters }
 
             SectionTitle(stringResource(R.string.section_misc))
-            MenuRow(stringResource(R.string.reminders_title), null) { page = Page.Reminders }
-
-            MenuRow(stringResource(R.string.section_security), null) { goTo(Page.Security) }
-
-            MenuRow(stringResource(R.string.tab_backup), if (mdEnabled) mdFolder else null) { page = Page.Backup }
-            // Brings back every hint that was dismissed and every one-time question.
-            MenuRow(stringResource(R.string.reset_hints), null, chevron = "") {
-                Hints.resetAll(context)
-                android.widget.Toast.makeText(context, R.string.reset_hints_done, android.widget.Toast.LENGTH_SHORT).show()
-            }
+            SettingsGroup(
+                listOf(
+                    { shapes -> MenuRow(stringResource(R.string.reminders_title), null, shapes = shapes) { page = Page.Reminders } },
+                    { shapes -> MenuRow(stringResource(R.string.section_security), null, shapes = shapes) { goTo(Page.Security) } },
+                    { shapes ->
+                        MenuRow(stringResource(R.string.tab_backup), if (mdEnabled) mdFolder else null, shapes = shapes) { page = Page.Backup }
+                    },
+                    // Brings back every hint that was dismissed and every one-time question.
+                    { shapes ->
+                        MenuRow(stringResource(R.string.reset_hints), null, chevron = "", shapes = shapes) {
+                            Hints.resetAll(context)
+                            android.widget.Toast.makeText(context, R.string.reset_hints_done, android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                ),
+            )
         }
         val widgetSection: @Composable () -> Unit = {
             if (hasWidget) {
                 SectionTitle(stringResource(R.string.settings_this_widget))
-                if (isSingleNote) {
-                    // One choice only, so it is a popup instead of a page of its own.
-                    PopupRow(
-                        pendingPopup == "note", { pendingPopup = null },
-                        stringResource(R.string.select_note),
-                        noteCandidates.firstOrNull { it.id == noteId }?.let { noteLabel(it).ifBlank { untitled } } ?: "–",
-                        noteCandidates.map { candidate ->
-                            ((if (candidate.id == noteId) "✓ " else "") + noteLabel(candidate).ifBlank { untitled }) to
-                                { noteId = candidate.id }
-                        },
-                    )
-                }
-                MenuRow(
-                    stringResource(R.string.tab_accounts),
-                    accounts.joinToString { CredentialStore.displayName(context, it, demoMode) }.ifEmpty { "–" },
-                ) { page = Page.Accounts }
-                MenuRow(stringResource(R.string.appearance), null) { page = Page.Appearance }
-                MenuRow(stringResource(R.string.section_notes), null) { page = Page.Notes }
-                if (!isSingleNote) MenuRow(stringResource(R.string.manage_notes), null) { page = Page.ManageNotes }
-                MenuRow(stringResource(R.string.list_section), null) { page = Page.Checklists }
-                MenuRow(stringResource(R.string.section_button_bar), null) { page = Page.ButtonBar }
+                SettingsGroup(
+                    buildList {
+                        if (isSingleNote) add { shapes ->
+                            // One choice only, so it is a popup instead of a page of its own.
+                            PopupRow(
+                                pendingPopup == "note", { pendingPopup = null },
+                                stringResource(R.string.select_note),
+                                noteCandidates.firstOrNull { it.id == noteId }?.let { noteLabel(it).ifBlank { untitled } } ?: "–",
+                                noteCandidates.map { candidate ->
+                                    ((if (candidate.id == noteId) "✓ " else "") + noteLabel(candidate).ifBlank { untitled }) to
+                                        { noteId = candidate.id }
+                                },
+                                shapes = shapes,
+                            )
+                        }
+                        add { shapes ->
+                            MenuRow(
+                                stringResource(R.string.tab_accounts),
+                                accounts.joinToString { CredentialStore.displayName(context, it, demoMode) }.ifEmpty { "–" },
+                                shapes = shapes,
+                            ) { page = Page.Accounts }
+                        }
+                        add { shapes -> MenuRow(stringResource(R.string.appearance), null, shapes = shapes) { page = Page.Appearance } }
+                        add { shapes -> MenuRow(stringResource(R.string.section_notes), null, shapes = shapes) { page = Page.Notes } }
+                        if (!isSingleNote) add { shapes ->
+                            MenuRow(stringResource(R.string.manage_notes), null, shapes = shapes) { page = Page.ManageNotes }
+                        }
+                        add { shapes -> MenuRow(stringResource(R.string.list_section), null, shapes = shapes) { page = Page.Checklists } }
+                        add { shapes -> MenuRow(stringResource(R.string.section_button_bar), null, shapes = shapes) { page = Page.ButtonBar } }
+                    },
+                )
             } else {
                 // From the app: every placed widget opens its own settings.
                 SectionTitle(stringResource(R.string.settings_widgets))
@@ -166,26 +202,27 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
                     },
                     shapes = ButtonDefaults.shapes(),
                 ) { Text(stringResource(R.string.orphans_clean)) }
-                placed.forEachIndexed { index, (id, single) ->
-                    val name = stringResource(if (single) R.string.widget_label_single else R.string.widget_label_list)
-                    val account = SettingsStore.loadWidget(context, id).account
-                        .takeIf { it.isNotEmpty() }?.let { CredentialStore.displayName(context, it, demoMode) }
-                    MenuRow("$name · ${index + 1}", account) {
-                        startActivity(
-                            Intent(context, SettingsActivity::class.java)
-                                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
-                        )
-                    }
-                }
+                SettingsGroup(
+                    placed.mapIndexed { index, (id, single) ->
+                        { shapes ->
+                            val name = stringResource(if (single) R.string.widget_label_single else R.string.widget_label_list)
+                            val account = SettingsStore.loadWidget(context, id).account
+                                .takeIf { it.isNotEmpty() }?.let { CredentialStore.displayName(context, it, demoMode) }
+                            MenuRow("$name · ${index + 1}", account, shapes = shapes) {
+                                startActivity(
+                                    Intent(context, SettingsActivity::class.java)
+                                        .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
+                                )
+                            }
+                        }
+                    },
+                )
             }
         }
         // Opened for a widget, only that widget's settings show; from the app, the rest does.
         val sections = if (hasWidget) listOf(widgetSection)
         else listOf(globalSection, widgetSection)
-        sections.forEachIndexed { index, section ->
-            if (index > 0) HorizontalDivider()
-            section()
-        }
+        sections.forEach { section -> section() }
         }
     }
 }

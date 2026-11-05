@@ -2,6 +2,7 @@ package com.gkeepdroid
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -15,8 +16,11 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -108,24 +112,34 @@ internal fun Hint(text: Int) {
     Text(stringResource(text), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 }
 
-/** One entry of the main settings list: title, optional summary and a chevron. */
+/**
+ * One entry of the settings list: title, optional summary and a chevron. In a [SettingsGroup] the group hands
+ * over the [shapes]; on its own the entry is a rounded block of its own.
+ */
 @Composable
-internal fun MenuRow(title: String, summary: String?, chevron: String = "›", onClick: () -> Unit) {
-    Row(
-        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            if (summary != null) {
-                Text(
-                    summary,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-        Text(chevron, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+internal fun MenuRow(
+    title: String,
+    summary: String?,
+    chevron: String = "›",
+    shapes: ListItemShapes = ListItemDefaults.segmentedShapes(0, 1),
+    onClick: () -> Unit,
+) {
+    SegmentedListItem(
+        onClick = onClick,
+        shapes = shapes,
+        colors = ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+        supportingContent = summary?.let { { Text(it) } },
+        trailingContent = if (chevron.isEmpty()) null else {
+            { Text(chevron, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        },
+    ) { Text(title) }
+}
+
+/** Entries that belong together, as one block with rounded ends and small gaps between the entries. */
+@Composable
+internal fun SettingsGroup(rows: List<@Composable (ListItemShapes) -> Unit>) {
+    Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
+        rows.forEachIndexed { index, row -> row(ListItemDefaults.segmentedShapes(index, rows.size)) }
     }
 }
 
@@ -158,6 +172,7 @@ internal fun PopupRow(
     title: String,
     summary: String?,
     options: List<Pair<String, () -> Unit>>,
+    shapes: ListItemShapes = ListItemDefaults.segmentedShapes(0, 1),
 ) {
     var expanded by remember { mutableStateOf(false) }
     LaunchedEffect(open) {
@@ -167,7 +182,7 @@ internal fun PopupRow(
         }
     }
     Box {
-        MenuRow(title, summary, chevron = "▾") { expanded = true }
+        MenuRow(title, summary, chevron = "▾", shapes = shapes) { expanded = true }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             options.forEach { (label, action) ->
                 DropdownMenuItem(text = { Text(label) }, onClick = { expanded = false; action() })
