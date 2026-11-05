@@ -278,11 +278,15 @@ private fun PresetDialog(activity: Activity, onAdd: (String) -> Unit, onCancel: 
 private fun TriState(label: Int, value: Boolean?, onChange: (Boolean?) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(stringResource(label), style = MaterialTheme.typography.bodyMedium)
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(value == null, { onChange(null) }, { Text(stringResource(R.string.reminder_default)) })
-            FilterChip(value == true, { onChange(true) }, { Text(stringResource(R.string.reminder_on)) })
-            FilterChip(value == false, { onChange(false) }, { Text(stringResource(R.string.reminder_off)) })
-        }
+        ChoiceGroup(
+            listOf(
+                null to stringResource(R.string.reminder_default),
+                true to stringResource(R.string.reminder_on),
+                false to stringResource(R.string.reminder_off),
+            ),
+            value,
+            onChange,
+        )
     }
 }
 

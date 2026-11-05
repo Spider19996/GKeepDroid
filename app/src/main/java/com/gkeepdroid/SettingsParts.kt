@@ -179,6 +179,23 @@ internal fun PopupRow(
 
 
 
+/** The look of a note without a color, as offered for the app and for a widget. */
+@Composable
+internal fun plainStyles(): List<Pair<Int, String>> = listOf(
+    PLAIN_TRANSPARENT to stringResource(R.string.plain_none),
+    PLAIN_GRAY to stringResource(R.string.plain_gray),
+    PLAIN_BORDER to stringResource(R.string.plain_border),
+)
+
+/** The checkbox styles of a checklist, as offered for the app and for a widget. */
+@Composable
+internal fun checkboxStyles(): List<Pair<Int, String>> = listOf(
+    CB_SQUARE to stringResource(R.string.cb_style_square),
+    CB_ROUNDED to stringResource(R.string.cb_style_rounded),
+    CB_CIRCLE to stringResource(R.string.cb_style_circle),
+    CB_CLASSIC to stringResource(R.string.cb_style_classic),
+)
+
 /** A labeled on/off switch. */
 @Composable
 internal fun SwitchRow(label: Int, checked: Boolean, onChange: (Boolean) -> Unit) {

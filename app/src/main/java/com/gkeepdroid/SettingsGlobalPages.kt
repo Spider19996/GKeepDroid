@@ -250,15 +250,10 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
 internal fun ColumnScope.AppLayoutPage(s: SettingsState) {
     with(s) {
         Text(stringResource(R.string.layout_label), style = MaterialTheme.typography.titleMedium)
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(LAYOUT_GRID to R.string.layout_grid, LAYOUT_LIST to R.string.layout_list).forEach { (layout, label) ->
-                FilterChip(
-                    selected = appLayout == layout,
-                    onClick = { appLayout = layout },
-                    label = { Text(stringResource(label)) },
-                )
-            }
-        }
+        ChoiceGroup(
+            listOf(LAYOUT_GRID to stringResource(R.string.layout_grid), LAYOUT_LIST to stringResource(R.string.layout_list)),
+            appLayout,
+        ) { appLayout = it }
 
         Text(stringResource(R.string.sort_by), style = MaterialTheme.typography.titleMedium)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -278,19 +273,7 @@ internal fun ColumnScope.AppLayoutPage(s: SettingsState) {
         SwitchRow(R.string.pinned_section_switch, appPinnedSection) { appPinnedSection = it }
 
         Text(stringResource(R.string.plain_style))
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(
-                PLAIN_TRANSPARENT to R.string.plain_none,
-                PLAIN_GRAY to R.string.plain_gray,
-                PLAIN_BORDER to R.string.plain_border,
-            ).forEach { (style, label) ->
-                FilterChip(
-                    selected = appPlainStyle == style,
-                    onClick = { appPlainStyle = style },
-                    label = { Text(stringResource(label)) },
-                )
-            }
-        }
+        ChoiceGroup(plainStyles(), appPlainStyle) { appPlainStyle = it }
 
         // 0 shows every line of a note and every item of a checklist.
         Text(
@@ -430,20 +413,7 @@ internal fun ColumnScope.AppCheckboxPage(s: SettingsState) {
         Text("${stringResource(R.string.list_spacing)}: $appListSpacing dp")
         ValueSlider(value = appListSpacing.toFloat(), onValueChange = { appListSpacing = it.toInt() }, valueRange = 0f..24f)
         Text(stringResource(R.string.checkbox_style), style = MaterialTheme.typography.titleMedium)
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(
-                CB_SQUARE to R.string.cb_style_square,
-                CB_ROUNDED to R.string.cb_style_rounded,
-                CB_CIRCLE to R.string.cb_style_circle,
-                CB_CLASSIC to R.string.cb_style_classic,
-            ).forEach { (style, label) ->
-                FilterChip(
-                    selected = appListCheckboxStyle == style,
-                    onClick = { appListCheckboxStyle = style },
-                    label = { Text(stringResource(label)) },
-                )
-            }
-        }
+        ChoiceGroup(checkboxStyles(), appListCheckboxStyle) { appListCheckboxStyle = it }
         Text(stringResource(R.string.checkbox_size, appListCheckboxSize))
         ValueSlider(value = appListCheckboxSize.toFloat(), onValueChange = { appListCheckboxSize = it.toInt() }, valueRange = 12f..40f)
         // Live preview of both states with the chosen style, size and spacing.

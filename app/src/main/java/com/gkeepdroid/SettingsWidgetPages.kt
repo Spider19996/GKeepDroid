@@ -105,22 +105,7 @@ internal fun ColumnScope.AppearancePage(s: SettingsState) {
         ValueSlider(value = noteAlpha, onValueChange = { noteAlpha = it })
 
         Text(stringResource(R.string.plain_style))
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            listOf(
-                PLAIN_TRANSPARENT to R.string.plain_none,
-                PLAIN_GRAY to R.string.plain_gray,
-                PLAIN_BORDER to R.string.plain_border,
-            ).forEach { (style, label) ->
-                FilterChip(
-                    selected = plainStyle == style,
-                    onClick = { plainStyle = style },
-                    label = { Text(stringResource(label)) },
-                )
-            }
-        }
+        ChoiceGroup(plainStyles(), plainStyle) { plainStyle = it }
     }
 }
 
@@ -268,23 +253,7 @@ internal fun ColumnScope.ChecklistsPage(s: SettingsState) {
 
         HorizontalDivider(Modifier.padding(vertical = 4.dp))
         Text(stringResource(R.string.checkbox_style), style = MaterialTheme.typography.titleMedium)
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            listOf(
-                CB_SQUARE to R.string.cb_style_square,
-                CB_ROUNDED to R.string.cb_style_rounded,
-                CB_CIRCLE to R.string.cb_style_circle,
-                CB_CLASSIC to R.string.cb_style_classic,
-            ).forEach { (style, label) ->
-                FilterChip(
-                    selected = checkboxStyle == style,
-                    onClick = { checkboxStyle = style },
-                    label = { Text(stringResource(label)) },
-                )
-            }
-        }
+        ChoiceGroup(checkboxStyles(), checkboxStyle) { checkboxStyle = it }
         Text(stringResource(R.string.checkbox_size, checkboxSizeDp))
         ValueSlider(
             value = checkboxSizeDp.toFloat(), onValueChange = { checkboxSizeDp = it.toInt() },
