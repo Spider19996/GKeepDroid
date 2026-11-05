@@ -14,6 +14,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -45,6 +46,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -90,6 +93,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.launch
@@ -472,7 +476,7 @@ class EditNoteActivity : ComponentActivity() {
                             else -> R.string.new_note
                         }
                     ),
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = MaterialTheme.typography.headlineSmallEmphasized,
                     modifier = Modifier.weight(1f),
                 )
                 Box(Modifier.clickable(enabled = !canEdit) { toastUnlockFirst() }) {
@@ -1033,32 +1037,66 @@ class EditNoteActivity : ComponentActivity() {
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 )
             }
-            Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedButton(
-                    modifier = Modifier.weight(1f).fillMaxHeight(), enabled = !saving, onClick = { discard() },
-                    shapes = ButtonDefaults.shapes(),
-                ) { Text(stringResource(R.string.cancel)) }
-                Box(Modifier.align(Alignment.CenterVertically)) {
-                    // Set: the accent color with a matching icon. None set: a quiet button.
-                    FilledTonalIconToggleButton(
-                        checked = shownReminders.isNotEmpty(),
-                        onCheckedChange = { if (canEdit) remindersOpen = true else askEdit() },
-                        colors = IconButtonDefaults.filledTonalIconToggleButtonColors(
-                            checkedContainerColor = MaterialTheme.colorScheme.primary,
-                            checkedContentColor = MaterialTheme.colorScheme.onPrimary,
-                        ),
-                        shapes = IconButtonDefaults.toggleableShapes(),
-                    ) {
-                        Icon(
-                            painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminders_title),
-                            tint = if (notificationsOn) LocalContentColor.current else MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-                Button(
-                    modifier = Modifier.weight(1f).fillMaxHeight(), onClick = { if (canEdit) save() else askEdit() },
-                    shapes = ButtonDefaults.shapes(),
-                ) { Text(stringResource(if (canEdit) R.string.save else if (isList) R.string.edit_list else R.string.edit_note)) }
+            // A button group: the pressed button grows a little and its neighbors make room. The three always fit,
+            // so nothing ever moves into the overflow menu.
+            val barHeight = ButtonDefaults.MediumContainerHeight
+            val barPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+            ButtonGroup(
+                overflowIndicator = {},
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                customItem(
+                    buttonGroupContent = {
+                        val pressed = remember { MutableInteractionSource() }
+                        OutlinedButton(
+                            onClick = { discard() }, enabled = !saving,
+                            shapes = ButtonDefaults.shapesFor(barHeight), contentPadding = barPadding, interactionSource = pressed,
+                            modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = barHeight).animateWidth(pressed),
+                        ) { Text(stringResource(R.string.cancel), style = ButtonDefaults.textStyleFor(barHeight), textAlign = TextAlign.Center) }
+                    },
+                    menuContent = {},
+                )
+                customItem(
+                    buttonGroupContent = {
+                        val pressed = remember { MutableInteractionSource() }
+                        // Set: the accent color with a matching icon. None set: a quiet button.
+                        FilledTonalIconToggleButton(
+                            checked = shownReminders.isNotEmpty(),
+                            onCheckedChange = { if (canEdit) remindersOpen = true else askEdit() },
+                            colors = IconButtonDefaults.filledTonalIconToggleButtonColors(
+                                checkedContainerColor = MaterialTheme.colorScheme.primary,
+                                checkedContentColor = MaterialTheme.colorScheme.onPrimary,
+                            ),
+                            shapes = IconButtonDefaults.toggleableShapes(),
+                            interactionSource = pressed,
+                            modifier = Modifier.size(IconButtonDefaults.mediumContainerSize()).animateWidth(pressed),
+                        ) {
+                            Icon(
+                                painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminders_title),
+                                tint = if (notificationsOn) LocalContentColor.current else MaterialTheme.colorScheme.error,
+                                modifier = Modifier.size(IconButtonDefaults.mediumIconSize),
+                            )
+                        }
+                    },
+                    menuContent = {},
+                )
+                customItem(
+                    buttonGroupContent = {
+                        val pressed = remember { MutableInteractionSource() }
+                        Button(
+                            onClick = { if (canEdit) save() else askEdit() },
+                            shapes = ButtonDefaults.shapesFor(barHeight), contentPadding = barPadding, interactionSource = pressed,
+                            modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = barHeight).animateWidth(pressed),
+                        ) {
+                            Text(
+                                stringResource(if (canEdit) R.string.save else if (isList) R.string.edit_list else R.string.edit_note),
+                                style = ButtonDefaults.textStyleFor(barHeight), textAlign = TextAlign.Center,
+                            )
+                        }
+                    },
+                    menuContent = {},
+                )
             }
         }
     }
