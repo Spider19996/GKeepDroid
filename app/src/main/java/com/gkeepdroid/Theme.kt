@@ -2,11 +2,19 @@ package com.gkeepdroid
 
 import android.app.Activity
 import android.os.Build
+import android.view.Window
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.MotionScheme
@@ -23,7 +31,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
+/** See-through system bars: the app's own background shows behind them. */
+@Suppress("DEPRECATION")
+private fun Window.makeBarsSeeThrough() {
+    statusBarColor = android.graphics.Color.TRANSPARENT
+    navigationBarColor = android.graphics.Color.TRANSPARENT
+    // The system would put a scrim behind the three buttons; the app's background is wanted there.
+    if (Build.VERSION.SDK_INT >= 29) isNavigationBarContrastEnforced = false
+}
+
 /** Applies the chosen theme mode; THEME_SYSTEM follows the phone's light/dark setting. */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun KeepTheme(themeMode: Int, opaque: Boolean = true, content: @Composable () -> Unit) {
     val dark = when (themeMode) {
@@ -61,8 +79,10 @@ fun KeepTheme(themeMode: Int, opaque: Boolean = true, content: @Composable () ->
             return@SideEffect
         }
         val window = (view.context as Activity).window
-        // The window sits below the system bars; hiding the status bar alone leaves its strip empty, so demo mode lets the app draw there.
-        WindowCompat.setDecorFitsSystemWindows(window, !fullScreen)
+        // Edge to edge: the window reaches behind the system bars, so the app's background fills the whole screen
+        // (no strip in another color above or below). The content keeps clear of the bars through the padding below.
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.makeBarsSeeThrough()
         WindowCompat.getInsetsController(window, view).apply {
             isAppearanceLightStatusBars = !dark
             isAppearanceLightNavigationBars = !dark
@@ -70,14 +90,10 @@ fun KeepTheme(themeMode: Int, opaque: Boolean = true, content: @Composable () ->
             if (fullScreen) hide(androidx.core.view.WindowInsetsCompat.Type.systemBars())
             else show(androidx.core.view.WindowInsetsCompat.Type.systemBars())
         }
-        // Hiding the bar is not enough on a phone with a camera hole: the strip next to it stays black unless the app may draw there.
+        // The strip next to a camera hole stays black unless the app may draw there.
         if (Build.VERSION.SDK_INT >= 28) {
             val attributes = window.attributes
-            attributes.layoutInDisplayCutoutMode = if (fullScreen) {
-                android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-            } else {
-                android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
-            }
+            attributes.layoutInDisplayCutoutMode = android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
             window.attributes = attributes
         }
     }
@@ -91,7 +107,10 @@ fun KeepTheme(themeMode: Int, opaque: Boolean = true, content: @Composable () ->
             contentColor = colors.onBackground,
         ) {
             Box(Modifier.fillMaxSize()) {
-                Box(Modifier.systemBarsPadding().imePadding()) { content() }
+                // The content keeps clear of the bars, the keyboard and, in landscape, a camera hole at the side. The top
+                // cutout is left out: the status bar covers it, and the full-screen demo draws into that strip on purpose.
+                val clear = WindowInsets.systemBars.union(WindowInsets.ime).union(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
+                Box(Modifier.windowInsetsPadding(clear)) { content() }
                 // Debug builds only; it lies above everything and lets touches through.
                 DebugWatermark()
             }
