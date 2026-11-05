@@ -1,7 +1,7 @@
 package com.gkeepdroid
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
@@ -111,14 +112,14 @@ internal fun Hint(text: Int) {
 }
 
 /**
- * One entry of the settings list: title, optional summary and a chevron. In a [SettingsGroup] the group hands
- * over the [shapes]; on its own the entry is a rounded block of its own.
+ * One entry of the settings list: title, optional summary and an icon at the end ([chevron], none with null). In a
+ * [SettingsGroup] the group hands over the [shapes]; on its own the entry is a rounded block of its own.
  */
 @Composable
 internal fun MenuRow(
     title: String,
     summary: String?,
-    chevron: String = "›",
+    @DrawableRes chevron: Int? = R.drawable.ic_chevron_right,
     shapes: ListItemShapes = ListItemDefaults.segmentedShapes(0, 1),
     onClick: () -> Unit,
 ) {
@@ -127,8 +128,8 @@ internal fun MenuRow(
         shapes = shapes,
         colors = ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
         supportingContent = summary?.let { { Text(it) } },
-        trailingContent = if (chevron.isEmpty()) null else {
-            { Text(chevron, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        trailingContent = chevron?.let { icon ->
+            { Icon(painterResource(icon), contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant) }
         },
     ) { Text(title) }
 }
@@ -180,7 +181,7 @@ internal fun PopupRow(
         }
     }
     Box {
-        MenuRow(title, summary, chevron = "▾", shapes = shapes) { expanded = true }
+        MenuRow(title, summary, chevron = R.drawable.ic_arrow_drop_down, shapes = shapes) { expanded = true }
         GroupedMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },

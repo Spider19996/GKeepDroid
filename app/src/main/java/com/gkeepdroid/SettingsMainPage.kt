@@ -136,7 +136,7 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
                     },
                     // Brings back every hint that was dismissed and every one-time question.
                     { shapes ->
-                        MenuRow(stringResource(R.string.reset_hints), null, chevron = "", shapes = shapes) {
+                        MenuRow(stringResource(R.string.reset_hints), null, chevron = null, shapes = shapes) {
                             Hints.resetAll(context)
                             android.widget.Toast.makeText(context, R.string.reset_hints_done, android.widget.Toast.LENGTH_SHORT).show()
                         }
