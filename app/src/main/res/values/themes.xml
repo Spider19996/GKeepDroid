@@ -1,5 +1,11 @@
 <resources>
-    <style name="Theme.GKeepDroid" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.GKeepDroid" parent="android:Theme.DeviceDefault.Light.NoActionBar" />
+    <!-- The start screen of the app: the icon on its own background, then the normal theme. -->
+    <style name="Theme.GKeepDroid.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/ic_launcher_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.GKeepDroid</item>
+    </style>
     <!-- A see-through window for the small add-item dialog. -->
     <style name="Theme.GKeepDroid.Translucent" parent="Theme.GKeepDroid">
         <item name="android:windowIsTranslucent">true</item>

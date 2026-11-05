@@ -7,6 +7,7 @@ import android.os.SystemClock
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -98,6 +99,8 @@ class MainActivity : ComponentActivity() {
     private var themeMode by mutableIntStateOf(THEME_SYSTEM)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Switches from the start-screen theme to the normal one; must come before super.onCreate.
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent { KeepTheme(themeMode) { AppLock.Gate(this) { NotesApp() } } }
     }
