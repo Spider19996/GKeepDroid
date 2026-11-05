@@ -558,7 +558,7 @@ class EditNoteActivity : ComponentActivity() {
                                         ) { menuOpen = false; requestConvert() },
                                     )
                                     if (isList) add(
-                                        MenuEntry(stringResource(R.string.list_tools), R.drawable.ic_done, trailing = { Text("›") }) { menuPage = 1 },
+                                        MenuEntry(stringResource(R.string.list_tools), R.drawable.ic_done, trailing = { Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null) }) { menuPage = 1 },
                                     )
                                 },
                                 if (existing == null) emptyList() else buildList {
@@ -966,26 +966,25 @@ class EditNoteActivity : ComponentActivity() {
             }
 
             Text(stringResource(R.string.color))
-            Row(
-                Modifier.horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
+            Row(Modifier.horizontalScroll(rememberScrollState())) {
                 NoteColors.names.forEach { name ->
                     val argb = NoteColors.argb(name)
-                    Box(
-                        Modifier.size(if (name == color) 44.dp else 36.dp)
-                            .clip(CircleShape)
-                            .background(if (argb != null) Color(argb) else Color.Transparent)
-                            .border(
-                                if (name == color) 3.dp else 1.dp,
-                                if (name == color) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                                CircleShape,
-                            )
-                            .clickable(enabled = canEdit) { color = name },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        // The default (uncolored) swatch is transparent, so mark it.
-                        if (argb == null) Text("∅")
+                    // The circle keeps its size; the touch area around it is 48 dp.
+                    RoundTouchTarget(onClick = { color = name }, enabled = canEdit) {
+                        Box(
+                            Modifier.size(if (name == color) 44.dp else 36.dp)
+                                .clip(CircleShape)
+                                .background(if (argb != null) Color(argb) else Color.Transparent)
+                                .border(
+                                    if (name == color) 3.dp else 1.dp,
+                                    if (name == color) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                                    CircleShape,
+                                ),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            // The default (uncolored) swatch is transparent, so mark it.
+                            if (argb == null) Icon(painterResource(R.drawable.ic_color_none), contentDescription = null, modifier = Modifier.size(20.dp))
+                        }
                     }
                 }
             }
@@ -1137,11 +1136,12 @@ class EditNoteActivity : ComponentActivity() {
                 OutlinedTextField(
                     value = item.text, readOnly = !editable, onValueChange = onText,
                     placeholder = { Text(stringResource(R.string.item_hint)) },
-                    // The text starts 42 dp from the left edge (16 dp content padding plus this room); the capsule is drawn on top.
-                    // In a numbered list the number stands in front of the text and is not part of what is edited.
+                    // The text starts 48 dp from the left edge (16 dp content padding plus this room), where the strip with the
+                    // capsule ends; the strip is drawn on top. In a numbered list the number stands in front of the text and is
+                    // not part of what is edited.
                     prefix = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Spacer(Modifier.width(26.dp))
+                            Spacer(Modifier.width(32.dp))
                             number?.let { Text("$it. ", color = MaterialTheme.colorScheme.onSurfaceVariant) }
                         }
                     },
@@ -1156,13 +1156,14 @@ class EditNoteActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth(),
                 )
                 // One button for both jobs: a tap switches the item between done and open, holding it and dragging moves the row.
-                // The whole strip at the left is the touch area; the capsule in it is the housing of the check (green) or cross (red),
-                // with the grip below it as a hint that it can be dragged. Both sit in the middle of their half.
+                // The whole strip at the left is the touch area, 48 dp wide as Material asks; the capsule in it is the housing of the
+                // check (green) or cross (red), with the grip below it as a hint that it can be dragged. Both sit in the middle of
+                // their half, and the capsule has the same 11 dp to the left edge and to the text.
                 val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
                 val dragDescription = stringResource(R.string.drag_handle)
                 Box(
                     Modifier
-                        .align(Alignment.CenterStart).width(44.dp).height(56.dp)
+                        .align(Alignment.CenterStart).width(48.dp).height(56.dp)
                         .onGloballyPositioned { handle = it }
                         .pointerInput(item.id, editable) {
                             if (!editable) return@pointerInput
@@ -1188,7 +1189,7 @@ class EditNoteActivity : ComponentActivity() {
                 ) {
                     Column(
                         Modifier
-                            .padding(start = 8.dp).size(width = 26.dp, height = 40.dp)
+                            .padding(start = 11.dp).size(width = 26.dp, height = 40.dp)
                             .border(1.5.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.extraSmall)
                             // The border is drawn inside the size, so the halves are measured inside it.
                             .padding(1.5.dp),

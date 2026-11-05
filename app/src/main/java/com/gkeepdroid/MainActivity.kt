@@ -937,9 +937,16 @@ class MainActivity : ComponentActivity() {
                 val visible = if (app.listCheckedToEnd && app.listCollapseChecked) open else ordered
                 // With the setting on, a numbered list counts again in the order shown here.
                 val shownItems = ListNumbering.display(note.items, visible.take(lines), app.renumberDisplay)
+                // The spacing between the rows belongs to the rows themselves, so the check box taps over the whole height of its
+                // row, and a little further to the right than it is drawn. 48 dp would make every row taller than the spacing
+                // setting says.
+                val rowGap = (app.listSpacingDp / 2f).dp
                 shownItems.forEach { item ->
-                    Row(Modifier.padding(vertical = (app.listSpacingDp / 2f).dp), verticalAlignment = Alignment.CenterVertically) {
-                        Box(Modifier.clickable(enabled = app.listCheckInApp) { toggleItem(item) }.padding(2.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            Modifier.clickable(enabled = app.listCheckInApp) { toggleItem(item) }
+                                .padding(start = 2.dp, top = rowGap + 2.dp, end = 8.dp, bottom = rowGap + 2.dp),
+                        ) {
                             CheckboxPreview(app.listCheckboxStyle, item.checked, app.listCheckboxSizeDp, textColor.copy(alpha = if (item.checked) 0.55f else 1f))
                         }
                         Text(
@@ -948,7 +955,7 @@ class MainActivity : ComponentActivity() {
                             style = MaterialTheme.typography.bodyMedium,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(start = 6.dp),
+                            modifier = Modifier.padding(vertical = rowGap),
                         )
                     }
                 }

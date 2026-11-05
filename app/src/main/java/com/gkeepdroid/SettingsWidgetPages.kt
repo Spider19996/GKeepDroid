@@ -5,7 +5,6 @@ package com.gkeepdroid
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -60,37 +59,37 @@ internal fun ColumnScope.AppearancePage(s: SettingsState) {
         SwitchRow(R.string.text_color_auto, textColorAuto) { textColorAuto = it }
         if (!textColorAuto) {
         Text(stringResource(R.string.text_color))
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
+        // Every circle sits in a 48 dp touch area, which also sets the distance between the circles.
+        FlowRow {
             TEXT_COLORS.forEach { color ->
-                Box(
-                    Modifier.size(if (color == textColor) 44.dp else 36.dp)
-                        .clip(CircleShape).background(Color(color))
-                        .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
-                        .clickable { textColor = color },
-                )
+                RoundTouchTarget(onClick = { textColor = color }) {
+                    Box(
+                        Modifier.size(if (color == textColor) 44.dp else 36.dp)
+                            .clip(CircleShape).background(Color(color))
+                            .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape),
+                    )
+                }
             }
             // Opens the color picker; shows the current color when it is a custom one.
             val isCustom = textColor !in TEXT_COLORS
-            Box(
-                Modifier.size(if (isCustom) 44.dp else 36.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (isCustom) Brush.linearGradient(listOf(Color(textColor), Color(textColor)))
-                        else Brush.sweepGradient(
-                            listOf(Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red)
+            RoundTouchTarget(onClick = { showColorPicker = true }) {
+                Box(
+                    Modifier.size(if (isCustom) 44.dp else 36.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (isCustom) Brush.linearGradient(listOf(Color(textColor), Color(textColor)))
+                            else Brush.sweepGradient(
+                                listOf(Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red)
+                            )
                         )
-                    )
-                    .border(
-                        if (isCustom) 3.dp else 1.dp,
-                        if (isCustom) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                        CircleShape,
-                    )
-                    .clickable { showColorPicker = true },
-                contentAlignment = Alignment.Center,
-            ) { if (!isCustom) Icon(painterResource(R.drawable.ic_add), contentDescription = null, tint = Color.White) }
+                        .border(
+                            if (isCustom) 3.dp else 1.dp,
+                            if (isCustom) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                            CircleShape,
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) { if (!isCustom) Icon(painterResource(R.drawable.ic_add), contentDescription = null, tint = Color.White) }
+            }
         }
 
         }
