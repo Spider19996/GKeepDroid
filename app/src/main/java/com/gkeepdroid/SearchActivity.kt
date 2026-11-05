@@ -83,15 +83,12 @@ class SearchActivity : ComponentActivity() {
         Column(Modifier.fillMaxSize().padding(horizontal = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 BackButton { finish() }
-                OutlinedTextField(
-                    value = query,
-                    onValueChange = { query = it },
-                    placeholder = { Text(stringResource(R.string.search_notes_hint)) },
-                    singleLine = true,
-                    trailingIcon = {
-                        if (query.isNotEmpty()) ClearButton(onClick = { query = "" })
-                    },
-                    modifier = Modifier.weight(1f).focusRequester(focus),
+                AppSearchField(
+                    query = query,
+                    onQueryChange = { query = it },
+                    placeholder = stringResource(R.string.search_notes_hint),
+                    modifier = Modifier.weight(1f),
+                    focusRequester = focus,
                 )
             }
 

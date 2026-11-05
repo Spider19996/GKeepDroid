@@ -338,23 +338,14 @@ class MainActivity : ComponentActivity() {
                     if (screen != AppScreen.Notes) {
                         BackButton { screen = AppScreen.Notes }
                     }
-                    OutlinedTextField(
-                        value = query,
-                        onValueChange = { query = it },
-                        placeholder = {
-                            Text(
-                                when (screen) {
-                                    AppScreen.Notes -> stringResource(R.string.search_notes_hint)
-                                    AppScreen.Archive -> stringResource(R.string.archive_note)
-                                    AppScreen.Trash -> stringResource(R.string.trash_title)
-                                }
-                            )
+                    AppSearchField(
+                        query = query,
+                        onQueryChange = { query = it },
+                        placeholder = when (screen) {
+                            AppScreen.Notes -> stringResource(R.string.search_notes_hint)
+                            AppScreen.Archive -> stringResource(R.string.archive_note)
+                            AppScreen.Trash -> stringResource(R.string.trash_title)
                         },
-                        singleLine = true,
-                        trailingIcon = {
-                            if (query.isNotEmpty()) ClearButton(onClick = { query = "" })
-                        },
-                        shape = MaterialTheme.shapes.extraLarge,
                         modifier = Modifier.weight(1f),
                     )
                     Box {

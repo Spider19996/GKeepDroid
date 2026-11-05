@@ -31,14 +31,10 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
         val noteCandidates = remember(widgetAccount, accounts.size) {
             NotesCache.read(context, CredentialStore.resolve(context, widgetAccount))
         }
-        OutlinedTextField(
-            value = settingsQuery,
-            onValueChange = { settingsQuery = it },
-            placeholder = { Text(stringResource(R.string.search_settings_hint)) },
-            singleLine = true,
-            trailingIcon = {
-                if (settingsQuery.isNotEmpty()) ClearButton(onClick = { settingsQuery = "" })
-            },
+        AppSearchField(
+            query = settingsQuery,
+            onQueryChange = { settingsQuery = it },
+            placeholder = stringResource(R.string.search_settings_hint),
             modifier = Modifier.fillMaxWidth(),
         )
         if (!hasWidget && settingsQuery.isBlank()) {
