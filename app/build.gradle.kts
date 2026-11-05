@@ -14,8 +14,8 @@ android {
         applicationId = "com.gkeepdroid"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
-        versionName = "1.3.0"
+        versionCode = 6
+        versionName = "1.4.0"
 
         ndk {
             // -Pabis=arm64-v8a builds only for phones, which makes the APK much smaller.
