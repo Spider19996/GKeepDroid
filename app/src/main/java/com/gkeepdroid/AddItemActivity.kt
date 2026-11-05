@@ -3,19 +3,14 @@ package com.gkeepdroid
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -33,10 +28,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.launch
 
 /**
@@ -83,18 +78,11 @@ class AddItemActivity : ComponentActivity() {
             focus.requestFocus()
         }
 
-        // Tapping next to the dialog closes it.
-        Box(
-            Modifier.fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
-                .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { finish() },
-            contentAlignment = Alignment.Center,
-        ) {
+        // A real dialog window: tapping next to it or Back closes the activity.
+        Dialog(onDismissRequest = { finish() }) {
             Surface(
-                shape = RoundedCornerShape(24.dp),
+                shape = MaterialTheme.shapes.extraLarge,
                 tonalElevation = 6.dp,
-                modifier = Modifier.padding(24.dp).fillMaxWidth()
-                    .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {},
             ) {
                 Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(stringResource(R.string.add_item), style = MaterialTheme.typography.titleLarge)
@@ -115,7 +103,7 @@ class AddItemActivity : ComponentActivity() {
                             )
                             Text("$added", color = MaterialTheme.colorScheme.primary)
                         }
-                        else Box(Modifier.weight(1f)) {}
+                        else Spacer(Modifier.weight(1f))
                         // Items are added at once, so this only closes the dialog: "Cancel" until something
                         // was added, "Done" after that.
                         TextButton(onClick = { finish() }) {
