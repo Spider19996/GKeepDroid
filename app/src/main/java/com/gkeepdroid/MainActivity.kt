@@ -51,11 +51,12 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonMenu
+import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -66,6 +67,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.ToggleFloatingActionButton
+import androidx.compose.material3.ToggleFloatingActionButtonDefaults.animateIcon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -147,6 +150,8 @@ class MainActivity : ComponentActivity() {
         LaunchedEffect(cacheVersion) { if (cacheVersion > 0) reloadKey++ }
 
         BackHandler(enabled = screen != AppScreen.Notes) { screen = AppScreen.Notes }
+        // Back folds the open new-note menu before it does anything else.
+        BackHandler(enabled = newMenuOpen) { newMenuOpen = false }
 
         fun sync() {
             scope.launch {
@@ -311,22 +316,31 @@ class MainActivity : ComponentActivity() {
             },
             floatingActionButton = {
                 if (screen == AppScreen.Notes && accounts.isNotEmpty()) {
-                    Box {
-                        FloatingActionButton(onClick = { newMenuOpen = true }) {
-                            Icon(painterResource(R.drawable.ic_add), contentDescription = stringResource(R.string.new_note))
-                        }
-                        DropdownMenu(expanded = newMenuOpen, onDismissRequest = { newMenuOpen = false }) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.new_note)) },
-                                leadingIcon = { Icon(painterResource(R.drawable.ic_add), contentDescription = null) },
-                                onClick = { newMenuOpen = false; openEditor(null, filterAccount ?: accounts.first(), newList = false) },
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.new_list)) },
-                                leadingIcon = { Icon(painterResource(R.drawable.ic_checklist), contentDescription = null) },
-                                onClick = { newMenuOpen = false; openEditor(null, filterAccount ?: accounts.first(), newList = true) },
-                            )
-                        }
+                    // The button unfolds the two kinds of new note above itself. The menu keeps its own distance to the
+                    // screen edges, and so does the scaffold; the offset takes back the scaffold's.
+                    FloatingActionButtonMenu(
+                        expanded = newMenuOpen,
+                        modifier = Modifier.offset(x = 16.dp, y = 16.dp),
+                        button = {
+                            ToggleFloatingActionButton(checked = newMenuOpen, onCheckedChange = { newMenuOpen = it }) {
+                                Icon(
+                                    painterResource(if (checkedProgress > 0.5f) R.drawable.ic_close else R.drawable.ic_add),
+                                    contentDescription = stringResource(R.string.new_note),
+                                    modifier = Modifier.animateIcon({ checkedProgress }),
+                                )
+                            }
+                        },
+                    ) {
+                        FloatingActionButtonMenuItem(
+                            onClick = { newMenuOpen = false; openEditor(null, filterAccount ?: accounts.first(), newList = true) },
+                            text = { Text(stringResource(R.string.new_list)) },
+                            icon = { Icon(painterResource(R.drawable.ic_checklist), contentDescription = null) },
+                        )
+                        FloatingActionButtonMenuItem(
+                            onClick = { newMenuOpen = false; openEditor(null, filterAccount ?: accounts.first(), newList = false) },
+                            text = { Text(stringResource(R.string.new_note)) },
+                            icon = { Icon(painterResource(R.drawable.ic_add), contentDescription = null) },
+                        )
                     }
                 }
             },
@@ -510,7 +524,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(top = 4.dp),
                     )
                 }
-                if (syncing) LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 4.dp))
+                if (syncing) LinearWavyProgressIndicator(Modifier.fillMaxWidth().padding(top = 4.dp))
                 // A failed sync stays visible until the next one works.
                 val syncError = remember(reloadKey, syncing) { SyncPolicy.lastError(context) }
                 val expired = remember(reloadKey, syncing) { SyncPolicy.expiredAccount(context) }

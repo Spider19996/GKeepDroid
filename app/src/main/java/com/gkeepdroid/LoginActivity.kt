@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -63,6 +63,7 @@ class LoginActivity : ComponentActivity() {
         setContent { KeepTheme(themeMode) { LoginScreen() } }
     }
 
+    @OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
     @Composable
     private fun LoginScreen() {
         val scope = rememberCoroutineScope()
@@ -144,7 +145,7 @@ class LoginActivity : ComponentActivity() {
             )
             when {
                 working -> Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    CircularProgressIndicator()
+                    LoadingIndicator()
                     Text(stringResource(R.string.login_working))
                 }
                 error.isNotEmpty() -> Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {

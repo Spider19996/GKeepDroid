@@ -58,7 +58,7 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.FilledTonalIconToggleButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -148,6 +148,7 @@ class EditNoteActivity : ComponentActivity() {
      * An existing note opens at once from the cache. Keep is asked in the background (unless a sync
      * just ran); if the note changed there, a hint offers to reload it, so nothing typed is lost.
      */
+    @OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
     @Composable
     private fun Loader(account: String, noteId: String?, newList: Boolean, pinWidgetId: Int?) {
         val cached = remember { noteId?.let { id -> NotesCache.readAll(this@EditNoteActivity, account).firstOrNull { it.id == id } } }
@@ -185,7 +186,7 @@ class EditNoteActivity : ComponentActivity() {
 
         when {
             !loaded -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+                LoadingIndicator()
             }
             gone -> Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(stringResource(R.string.note_gone), style = MaterialTheme.typography.titleMedium)
