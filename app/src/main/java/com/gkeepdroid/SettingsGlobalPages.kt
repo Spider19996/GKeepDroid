@@ -21,7 +21,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -290,7 +289,7 @@ internal fun ColumnScope.AppLayoutPage(s: SettingsState) {
             if (appPreviewLines == 0) stringResource(R.string.max_lines_unlimited)
             else stringResource(R.string.preview_lines, appPreviewLines),
         )
-        Slider(
+        ValueSlider(
             value = appPreviewLines.toFloat(), onValueChange = { appPreviewLines = it.toInt() },
             valueRange = 0f..30f, steps = 29,
         )
@@ -421,7 +420,7 @@ internal fun ColumnScope.AppChecklistsPage(s: SettingsState) {
 internal fun ColumnScope.AppCheckboxPage(s: SettingsState) {
     with(s) {
         Text("${stringResource(R.string.list_spacing)}: $appListSpacing dp")
-        Slider(value = appListSpacing.toFloat(), onValueChange = { appListSpacing = it.toInt() }, valueRange = 0f..24f)
+        ValueSlider(value = appListSpacing.toFloat(), onValueChange = { appListSpacing = it.toInt() }, valueRange = 0f..24f)
         Text(stringResource(R.string.checkbox_style), style = MaterialTheme.typography.titleMedium)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(
@@ -438,7 +437,7 @@ internal fun ColumnScope.AppCheckboxPage(s: SettingsState) {
             }
         }
         Text(stringResource(R.string.checkbox_size, appListCheckboxSize))
-        Slider(value = appListCheckboxSize.toFloat(), onValueChange = { appListCheckboxSize = it.toInt() }, valueRange = 12f..40f)
+        ValueSlider(value = appListCheckboxSize.toFloat(), onValueChange = { appListCheckboxSize = it.toInt() }, valueRange = 12f..40f)
         // Live preview of both states with the chosen style, size and spacing.
         listOf(false, true).forEach { checked ->
             Row(Modifier.padding(vertical = (appListSpacing / 2).dp), verticalAlignment = Alignment.CenterVertically) {

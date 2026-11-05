@@ -1,22 +1,26 @@
 package com.gkeepdroid
 
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 
 /**
- * The Material 3 search bar. It stays a bar (never expands to its own screen), because the lists below
- * are filtered while typing.
+ * The search bar of Material 3, in its collapsed look. Material's own search bar opens a search screen
+ * of its own when tapped; here the lists below are filtered while typing, so it is built from a text field.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppSearchField(
     query: String,
@@ -25,24 +29,24 @@ fun AppSearchField(
     modifier: Modifier = Modifier,
     focusRequester: FocusRequester? = null,
 ) {
-    SearchBar(
-        inputField = {
-            SearchBarDefaults.InputField(
-                query = query,
-                onQueryChange = onQueryChange,
-                onSearch = {},
-                expanded = false,
-                onExpandedChange = {},
-                placeholder = { Text(placeholder) },
-                leadingIcon = { Icon(painterResource(R.drawable.ic_search), contentDescription = null) },
-                trailingIcon = { if (query.isNotEmpty()) ClearButton(onClick = { onQueryChange("") }) },
-                modifier = if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier,
-            )
-        },
-        expanded = false,
-        onExpandedChange = {},
-        modifier = modifier,
-        windowInsets = WindowInsets(0),
-        content = {},
-    )
+    val keyboard = LocalSoftwareKeyboardController.current
+    Surface(
+        shape = SearchBarDefaults.inputFieldShape,
+        color = SearchBarDefaults.colors().containerColor,
+        tonalElevation = SearchBarDefaults.TonalElevation,
+        modifier = modifier.height(SearchBarDefaults.InputFieldHeight),
+    ) {
+        TextField(
+            value = query,
+            onValueChange = onQueryChange,
+            placeholder = { Text(placeholder) },
+            leadingIcon = { Icon(painterResource(R.drawable.ic_search), contentDescription = null) },
+            trailingIcon = { if (query.isNotEmpty()) ClearButton(onClick = { onQueryChange("") }) },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(onSearch = { keyboard?.hide() }),
+            colors = SearchBarDefaults.inputFieldColors(),
+            modifier = Modifier.fillMaxWidth().then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier),
+        )
+    }
 }

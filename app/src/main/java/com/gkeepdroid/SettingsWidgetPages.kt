@@ -25,7 +25,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,10 +47,10 @@ import kotlinx.coroutines.launch
 internal fun ColumnScope.AppearancePage(s: SettingsState) {
     with(s) {
         Text(stringResource(R.string.bg_opacity, (backgroundAlpha * 100).toInt()))
-        Slider(value = backgroundAlpha, onValueChange = { backgroundAlpha = it })
+        ValueSlider(value = backgroundAlpha, onValueChange = { backgroundAlpha = it })
 
         Text(stringResource(R.string.text_size, textSize))
-        Slider(
+        ValueSlider(
             value = textSize.toFloat(), onValueChange = { textSize = it.toInt() },
             valueRange = 10f..24f,
         )
@@ -101,7 +100,7 @@ internal fun ColumnScope.AppearancePage(s: SettingsState) {
             Switch(checked = showNoteColors, onCheckedChange = { showNoteColors = it })
         }
         Text(stringResource(R.string.note_opacity, (noteAlpha * 100).toInt()))
-        Slider(value = noteAlpha, onValueChange = { noteAlpha = it })
+        ValueSlider(value = noteAlpha, onValueChange = { noteAlpha = it })
 
         Text(stringResource(R.string.plain_style))
         FlowRow(
@@ -176,7 +175,7 @@ internal fun ColumnScope.NotesPage(s: SettingsState) {
                 if (maxLines == 0) stringResource(R.string.max_lines_unlimited)
                 else stringResource(R.string.max_lines, maxLines),
             )
-            Slider(
+            ValueSlider(
                 value = maxLines.toFloat(), onValueChange = { maxLines = it.toInt() },
                 valueRange = 0f..30f, steps = 29,
             )
@@ -258,7 +257,7 @@ internal fun ColumnScope.ChecklistsPage(s: SettingsState) {
         }
         HorizontalDivider(Modifier.padding(vertical = 4.dp))
         Text("${stringResource(R.string.list_spacing)}: $listSpacingDp dp")
-        Slider(
+        ValueSlider(
             value = listSpacingDp.toFloat(), onValueChange = { listSpacingDp = it.toInt() },
             valueRange = 0f..24f,
         )
@@ -283,7 +282,7 @@ internal fun ColumnScope.ChecklistsPage(s: SettingsState) {
             }
         }
         Text(stringResource(R.string.checkbox_size, checkboxSizeDp))
-        Slider(
+        ValueSlider(
             value = checkboxSizeDp.toFloat(), onValueChange = { checkboxSizeDp = it.toInt() },
             valueRange = 14f..56f,
         )
@@ -353,7 +352,7 @@ internal fun ColumnScope.ButtonBarPage(s: SettingsState) {
         }
         Text(stringResource(R.string.header_size, headerSize))
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Slider(
+            ValueSlider(
                 value = headerSize.toFloat(), onValueChange = { headerSize = it.toInt() },
                 valueRange = 16f..40f,
                 modifier = Modifier.weight(1f),

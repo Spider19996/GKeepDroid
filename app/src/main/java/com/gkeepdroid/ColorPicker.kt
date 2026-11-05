@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -47,18 +46,18 @@ fun ColorPickerDialog(initial: Int, onDismiss: () -> Unit, onPick: (Int) -> Unit
                         .border(1.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.medium),
                 ) {}
                 Text(stringResource(R.string.color_hue))
-                Slider(
+                ValueSlider(
                     value = hue,
                     onValueChange = { hue = it; hexText = hex(AndroidColor.HSVToColor(floatArrayOf(hue, saturation, value))) },
                     valueRange = 0f..360f,
                 )
                 Text(stringResource(R.string.color_saturation))
-                Slider(
+                ValueSlider(
                     value = saturation,
                     onValueChange = { saturation = it; hexText = hex(AndroidColor.HSVToColor(floatArrayOf(hue, saturation, value))) },
                 )
                 Text(stringResource(R.string.color_brightness))
-                Slider(
+                ValueSlider(
                     value = value,
                     onValueChange = { value = it; hexText = hex(AndroidColor.HSVToColor(floatArrayOf(hue, saturation, value))) },
                 )
