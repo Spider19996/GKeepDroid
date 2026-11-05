@@ -877,7 +877,7 @@ class EditNoteActivity : ComponentActivity() {
                 if (canEdit && !numbered && !numberOfferDismissed && Regex("""^\s*1[.)]\s""").containsMatchIn(firstFilled)) {
                     Column(
                         Modifier.fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.secondaryContainer, androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                            .background(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.shapes.medium)
                             .padding(start = 16.dp, top = 12.dp, end = 8.dp, bottom = 4.dp),
                     ) {
                         Text(stringResource(R.string.number_offer), color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.bodyMedium)
@@ -927,7 +927,7 @@ class EditNoteActivity : ComponentActivity() {
                 if (!convertDismissed && ChecklistText.looksLikeList(text) && existing?.images.isNullOrEmpty()) {
                     Column(
                         Modifier.fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.secondaryContainer, androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                            .background(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.shapes.medium)
                             .padding(start = 16.dp, top = 12.dp, end = 8.dp, bottom = 4.dp),
                     ) {
                         Text(
@@ -1074,7 +1074,7 @@ class EditNoteActivity : ComponentActivity() {
             if (offsetX != 0f) {
                 val toRight = offsetX > 0f
                 Box(
-                    Modifier.matchParentSize().clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                    Modifier.matchParentSize().clip(MaterialTheme.shapes.medium)
                         .background(if (toRight) green else red).padding(horizontal = 20.dp),
                     contentAlignment = if (toRight) Alignment.CenterStart else Alignment.CenterEnd,
                 ) {
@@ -1163,7 +1163,7 @@ class EditNoteActivity : ComponentActivity() {
                     Column(
                         Modifier
                             .padding(start = 8.dp).size(width = 26.dp, height = 40.dp)
-                            .border(1.5.dp, MaterialTheme.colorScheme.outline, androidx.compose.foundation.shape.RoundedCornerShape(6.dp))
+                            .border(1.5.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.extraSmall)
                             // The border is drawn inside the size, so the halves are measured inside it.
                             .padding(1.5.dp),
                     ) {

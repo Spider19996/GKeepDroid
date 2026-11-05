@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.background
 import android.widget.Toast
 import androidx.compose.foundation.layout.padding
@@ -288,7 +287,7 @@ internal fun RemindersDialog(
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 if (!notificationsOn) {
                     Column(
-                        Modifier.fillMaxWidth().padding(bottom = 12.dp).background(MaterialTheme.colorScheme.error, RoundedCornerShape(8.dp)).padding(12.dp),
+                        Modifier.fillMaxWidth().padding(bottom = 12.dp).background(MaterialTheme.colorScheme.error, MaterialTheme.shapes.small).padding(12.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
                         Text(stringResource(R.string.reminder_notifications_off), color = MaterialTheme.colorScheme.onError, fontWeight = FontWeight.Bold)

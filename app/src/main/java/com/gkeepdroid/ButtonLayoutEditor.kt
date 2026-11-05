@@ -23,7 +23,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -113,8 +112,8 @@ fun ButtonLayoutEditor(
             Modifier
                 .onGloballyPositioned { coords = it; chips[button.id] = it.boundsInRoot() }
                 .alpha(if (dragId == button.id) 0.25f else 1f)
-                .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
+                .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), MaterialTheme.shapes.medium)
+                .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.medium)
                 .pointerInput(button.id) {
                     detectDragGesturesAfterLongPress(
                         onDragStart = { start ->
@@ -152,7 +151,7 @@ fun ButtonLayoutEditor(
                 .onGloballyPositioned { zones[key] = it.boundsInRoot() }
                 .background(
                     if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-                    RoundedCornerShape(10.dp),
+                    MaterialTheme.shapes.medium,
                 )
                 .padding(2.dp),
             contentAlignment = Alignment.Center,
@@ -181,8 +180,8 @@ fun ButtonLayoutEditor(
                 Box(
                     Modifier
                         .size(chipSize)
-                        .border(BorderStroke(2.dp, MaterialTheme.colorScheme.primary), RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.18f), RoundedCornerShape(12.dp)),
+                        .border(BorderStroke(2.dp, MaterialTheme.colorScheme.primary), MaterialTheme.shapes.medium)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.18f), MaterialTheme.shapes.medium),
                     contentAlignment = Alignment.Center,
                 ) {
                     if (dragged != null) {
@@ -260,7 +259,7 @@ fun ButtonLayoutEditor(
             Row(
                 Modifier
                     .offset { IntOffset((pointer.x - origin.x).roundToInt() - 28, (pointer.y - origin.y).roundToInt() - 80) }
-                    .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.primary, MaterialTheme.shapes.large)
                     .padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),

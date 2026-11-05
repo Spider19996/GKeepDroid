@@ -45,7 +45,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridS
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -352,7 +351,7 @@ class MainActivity : ComponentActivity() {
                         trailingIcon = {
                             if (query.isNotEmpty()) ClearButton(onClick = { query = "" })
                         },
-                        shape = RoundedCornerShape(28.dp),
+                        shape = MaterialTheme.shapes.extraLarge,
                         modifier = Modifier.weight(1f),
                     )
                     Box {
@@ -488,7 +487,7 @@ class MainActivity : ComponentActivity() {
                 if (!notificationsOn && !notifHintHidden) {
                     Column(
                         Modifier.fillMaxWidth().padding(top = 4.dp)
-                            .background(MaterialTheme.colorScheme.errorContainer, RoundedCornerShape(12.dp)).padding(12.dp),
+                            .background(MaterialTheme.colorScheme.errorContainer, MaterialTheme.shapes.medium).padding(12.dp),
                     ) {
                         Text(
                             stringResource(R.string.notif_off_main),
@@ -745,7 +744,7 @@ class MainActivity : ComponentActivity() {
         Box(modifier) {
             if (offsetX != 0f && kind != SWIPE_NONE) {
                 Box(
-                    Modifier.matchParentSize().clip(RoundedCornerShape(14.dp))
+                    Modifier.matchParentSize().clip(MaterialTheme.shapes.medium)
                         .background(
                             if (kind == SWIPE_TRASH) MaterialTheme.colorScheme.errorContainer
                             else MaterialTheme.colorScheme.secondaryContainer
@@ -837,7 +836,7 @@ class MainActivity : ComponentActivity() {
             app.plainCardStyle == PLAIN_BORDER -> MaterialTheme.colorScheme.surface
             else -> Color.Transparent
         }
-        val shape = RoundedCornerShape(14.dp)
+        val shape = MaterialTheme.shapes.medium
         // Web addresses, e-mail addresses and phone numbers open in the app made for them.
         val linkColor = if (noteColor != null) Color(0xFF0B57D0) else MaterialTheme.colorScheme.primary
         // A private note shows only its title until it is opened with the device lock.
@@ -875,7 +874,7 @@ class MainActivity : ComponentActivity() {
                     bitmap = thumb.asImageBitmap(),
                     contentDescription = stringResource(R.string.note_image),
                     contentScale = ContentScale.FillWidth,
-                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)),
+                    modifier = Modifier.fillMaxWidth().clip(MaterialTheme.shapes.small),
                 )
             }
             if (hasTitleRow) {
