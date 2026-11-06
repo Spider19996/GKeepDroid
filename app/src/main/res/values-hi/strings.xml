@@ -165,8 +165,9 @@
     <string name="layout_list">सूची</string>
     <string name="pinned_section_switch">पिन किए गए नोट अलग अनुभाग में दिखाएँ</string>
     <string name="pull_to_refresh_switch">रीफ़्रेश करने के लिए सूची को नीचे खींचें</string>
-    <string name="note_background">पृष्ठभूमि</string>
-    <string name="note_background_none">कोई पृष्ठभूमि नहीं</string>
+    <string name="color_and_background">रंग / पृष्ठभूमि</string>
+    <string name="color_background_remove">हटाएँ</string>
+    <string name="background_own">अपनी फ़ोटो</string>
     <string name="selected_count">%d चुने गए</string>
     <string name="select_all">सभी चुनें</string>
     <string name="duplicate_note">डुप्लिकेट करें</string>

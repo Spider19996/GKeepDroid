@@ -101,7 +101,8 @@ class NotesWidget : GlanceAppWidget() {
                 var budget = PICTURE_BUDGET_BYTES
                 notes.forEach { note ->
                     val name = RichNotes.of(context, account, note.id)?.background.orEmpty()
-                    val bitmap = if (name.isEmpty()) null else NoteBackgrounds.forWidget(context, name, settings.noteAlpha)
+                    val bitmap = CustomBackgrounds.forWidget(context, account, note.id, settings.noteAlpha, 0.45f)
+                        ?: if (name.isEmpty()) null else NoteBackgrounds.forWidget(context, name, settings.noteAlpha, 0.45f)
                     if (bitmap != null && budget >= bitmap.byteCount) {
                         budget -= bitmap.byteCount
                         result[note.id] = bitmap

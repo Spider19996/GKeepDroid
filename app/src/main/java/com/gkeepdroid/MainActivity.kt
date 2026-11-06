@@ -1081,8 +1081,17 @@ class MainActivity : ComponentActivity() {
         // Formatting and the background picture that Keep's own editor gave the note.
         val rich = remember(resumeKey, NotesCache.version.intValue, note.id) { RichNotes.of(context, account, note.id) }
         val backgroundName = rich?.background?.takeIf { app.showNoteColors && it.isNotEmpty() && it != "default" }
-        val backgroundImage by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, backgroundName) {
-            value = if (backgroundName == null) null else kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { NoteBackgrounds.load(context, backgroundName) }
+        // A photo of the user's own wins over Keep's pictures (choosing it takes Keep's picture away).
+        val customStamp = remember(resumeKey, NotesCache.version.intValue, note.id) { CustomBackgrounds.stamp(context, account, note.id) }
+        val backgroundImage by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, backgroundName, customStamp, app.showNoteColors) {
+            value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                when {
+                    !app.showNoteColors -> null
+                    customStamp != 0L -> CustomBackgrounds.load(context, account, note.id)
+                    backgroundName != null -> NoteBackgrounds.load(context, backgroundName)
+                    else -> null
+                }
+            }
         }
         val noteColor = if (app.showNoteColors) NoteColors.argb(note.color) else null
         val gray = noteColor == null && app.plainCardStyle == PLAIN_GRAY

@@ -79,8 +79,13 @@ class SingleNoteWidget : GlanceAppWidget() {
 
         val noteColor = if (settings.showNoteColors && note != null) NoteColors.argb(note.color) else null
         val picture = remember(version) {
-            val name = if (settings.showNoteColors && note != null && account != null) RichNotes.of(context, account, note.id)?.background.orEmpty() else ""
-            if (name.isEmpty()) null else NoteBackgrounds.forWidget(context, name, settings.noteAlpha)
+            if (!settings.showNoteColors || note == null || account == null) {
+                null
+            } else {
+                val name = RichNotes.of(context, account, note.id)?.background.orEmpty()
+                CustomBackgrounds.forWidget(context, account, note.id, settings.noteAlpha, 0.8f)
+                    ?: if (name.isEmpty()) null else NoteBackgrounds.forWidget(context, name, settings.noteAlpha, 0.8f)
+            }
         }
         val palette = textPalette(settings, onNoteColor = noteColor != null || picture != null)
         val textColor = palette.provider()

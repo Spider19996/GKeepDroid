@@ -44,22 +44,39 @@ object NoteBackgrounds {
     private val small = HashMap<String, Bitmap>()
 
     /**
-     * The picture for a widget: small, with the card's transparency applied, and only from what is on the device
-     * already (a widget is drawn without waiting for the network; the sync fetches the pictures).
+     * The picture for a widget card: the lower part of it ([fraction] of its height, as in the app, where the artwork sits at
+     * the bottom), small, with the card's transparency applied, and only from what is on the device already (a widget is drawn
+     * without waiting for the network; the sync fetches the pictures).
      */
-    fun forWidget(context: Context, name: String, alpha: Float): Bitmap? {
+    fun forWidget(context: Context, name: String, alpha: Float, fraction: Float): Bitmap? {
         if (!name.matches(Regex("[a-z0-9_]{1,40}"))) return null
-        val key = "$name|${(alpha * 100).toInt()}"
+        val key = "$name|${(alpha * 100).toInt()}|${(fraction * 100).toInt()}"
         synchronized(small) { small[key]?.let { return it } }
         val file = File(File(context.cacheDir, "backgrounds"), "$name.png")
         val full = if (file.exists()) BitmapFactory.decodeFile(file.path) else null
         if (full == null) return null
-        val bitmap = Bitmap.createBitmap(WIDGET_SIZE, WIDGET_SIZE, Bitmap.Config.ARGB_8888)
+        val bitmap = widgetCrop(full, alpha, fraction, fromBottom = true)
+        synchronized(small) { small[key] = bitmap }
+        return bitmap
+    }
+
+    /** [full] cut to the shape of a widget card (width : height = 1 : [fraction]) and shrunk; the cut is at the bottom or in the middle. */
+    internal fun widgetCrop(full: Bitmap, alpha: Float, fraction: Float, fromBottom: Boolean): Bitmap {
+        val height = (WIDGET_SIZE * fraction).toInt().coerceAtLeast(1)
+        // The part of the picture that has the card's proportions, as wide as possible.
+        var sourceWidth = full.width
+        var sourceHeight = (full.width * fraction).toInt()
+        if (sourceHeight > full.height) {
+            sourceHeight = full.height
+            sourceWidth = (full.height / fraction).toInt()
+        }
+        val left = (full.width - sourceWidth) / 2
+        val top = if (fromBottom) full.height - sourceHeight else (full.height - sourceHeight) / 2
+        val bitmap = Bitmap.createBitmap(WIDGET_SIZE, height, Bitmap.Config.ARGB_8888)
         Canvas(bitmap).drawBitmap(
-            full, null, android.graphics.Rect(0, 0, WIDGET_SIZE, WIDGET_SIZE),
+            full, android.graphics.Rect(left, top, left + sourceWidth, top + sourceHeight), android.graphics.Rect(0, 0, WIDGET_SIZE, height),
             android.graphics.Paint(android.graphics.Paint.FILTER_BITMAP_FLAG).apply { this.alpha = (alpha * 255).toInt().coerceIn(0, 255) },
         )
-        synchronized(small) { small[key] = bitmap }
         return bitmap
     }
 
@@ -110,5 +127,70 @@ fun Modifier.noteBackground(bitmap: Bitmap): Modifier {
             srcSize = IntSize(visible.width.toInt().coerceAtLeast(1), visible.height.toInt().coerceAtLeast(1)),
             dstSize = IntSize(size.width.toInt(), size.height.toInt()),
         )
+    }
+}
+
+
+/**
+ * A photo of the user's own as the background of a note. Keep has no such thing, so it stays on this phone: the app and its
+ * widgets show it, Keep does not know about it. A white veil over it keeps the dark text readable.
+ */
+object CustomBackgrounds {
+    private const val MAX = 1280
+
+    private val memory = HashMap<String, Pair<Long, Bitmap>>()
+
+    private fun file(context: Context, account: String, noteId: String): File {
+        val name = java.security.MessageDigest.getInstance("SHA-1").digest("$account|$noteId".toByteArray())
+            .joinToString("") { "%02x".format(it) }.take(24)
+        return File(File(context.filesDir, "custom_backgrounds").apply { mkdirs() }, "$name.jpg")
+    }
+
+    /** Changes whenever the note's photo changes; 0 if it has none. */
+    fun stamp(context: Context, account: String, noteId: String): Long = file(context, account, noteId).let { if (it.exists()) it.lastModified() else 0L }
+
+    fun remove(context: Context, account: String, noteId: String) {
+        file(context, account, noteId).delete()
+    }
+
+    /** Keeps the photo behind [uri] as the note's background, shrunk to a size that is enough for a screen. */
+    fun save(context: Context, account: String, noteId: String, uri: android.net.Uri): Boolean {
+        val bitmap = decode(context, uri) ?: return false
+        return runCatching { file(context, account, noteId).outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 88, it) } }.getOrDefault(false)
+    }
+
+    private fun decode(context: Context, uri: android.net.Uri): Bitmap? = runCatching {
+        val resolver = context.contentResolver
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
+        var sample = 1
+        while (bounds.outWidth / (sample * 2) >= MAX || bounds.outHeight / (sample * 2) >= MAX) sample *= 2
+        resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inSampleSize = sample }) }
+    }.getOrNull()
+
+    private fun veil(bitmap: Bitmap): Bitmap {
+        val copy = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+        Canvas(copy).drawColor(android.graphics.Color.argb(150, 255, 255, 255))
+        return copy
+    }
+
+    /** The saved photo with the veil; call off the main thread. */
+    fun load(context: Context, account: String, noteId: String): Bitmap? {
+        val file = file(context, account, noteId)
+        if (!file.exists()) return null
+        val key = file.path
+        synchronized(memory) { memory[key]?.let { if (it.first == file.lastModified()) return it.second } }
+        val bitmap = BitmapFactory.decodeFile(file.path)?.let(::veil) ?: return null
+        synchronized(memory) { memory[key] = file.lastModified() to bitmap }
+        return bitmap
+    }
+
+    /** A photo that was just picked, before it is saved. */
+    fun preview(context: Context, uri: android.net.Uri): Bitmap? = decode(context, uri)?.let(::veil)
+
+    /** The photo for a widget card, in the card's proportions and with its transparency. */
+    fun forWidget(context: Context, account: String, noteId: String, alpha: Float, fraction: Float): Bitmap? {
+        val photo = BitmapFactory.decodeFile(file(context, account, noteId).takeIf { it.exists() }?.path ?: return null) ?: return null
+        return NoteBackgrounds.widgetCrop(veil(photo), alpha, fraction, fromBottom = false)
     }
 }

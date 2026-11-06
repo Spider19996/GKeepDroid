@@ -95,6 +95,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.launch
 
+/** What the background choice holds while the note's background is a photo of the user's own. */
+private const val CUSTOM_BACKGROUND = "custom"
+
 /** Edits an existing note (EXTRA_NOTE_ID) or creates a new note or checklist. */
 class EditNoteActivity : ComponentActivity() {
     override fun attachBaseContext(newBase: android.content.Context) {
@@ -104,6 +107,13 @@ class EditNoteActivity : ComponentActivity() {
 
     /** Set by the open editor: saves what was typed when the user leaves with the Home button. */
     private var onHome: (() -> Unit)? = null
+
+    // The color or picture behind this editor; it belongs to this activity, so the screen it returns to is not tinted by it.
+    private val screenTint = ScreenTint()
+
+    /** A photo chosen as the note's own background (kept on this phone only), until the note is saved. */
+    private var pickedBackground by androidx.compose.runtime.mutableStateOf<android.net.Uri?>(null)
+    private val pickBackground = registerForActivityResult(ActivityResultContracts.GetContent()) { uri -> if (uri != null) pickedBackground = uri }
 
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
@@ -142,7 +152,7 @@ class EditNoteActivity : ComponentActivity() {
             @Suppress("DEPRECATION")
             unlock.launch(keyguard.createConfirmDeviceCredentialIntent(getString(R.string.app_name), getString(R.string.note_private_hint)))
         }
-        setContent { KeepTheme(themeMode) { AppLock.Gate(this) { if (unlocked) Loader(account, noteId, newList, pinWidgetId) } } }
+        setContent { KeepTheme(themeMode, tint = screenTint) { AppLock.Gate(this) { if (unlocked) Loader(account, noteId, newList, pinWidgetId) } } }
     }
 
     /**
@@ -234,20 +244,34 @@ class EditNoteActivity : ComponentActivity() {
         // The keyboard's composing region; dropping it on every keystroke makes the word suggestions flicker.
         var textComp by remember { mutableStateOf<androidx.compose.ui.text.TextRange?>(null) }
         var color by remember { mutableStateOf(existing?.color ?: NoteColors.DEFAULT) }
-        // The note's own look fills the screen behind the editor, as long as it has a color or a picture.
-        val originalBackground = remember { existing?.let { RichNotes.of(this@EditNoteActivity, account, it.id)?.background }.orEmpty() }
-        var background by remember { mutableStateOf(originalBackground) }
+        // The note's own look fills the screen behind the editor: a color, one of Keep's pictures or a photo of the user's own.
+        // Only one of them at a time; CUSTOM_BACKGROUND stands for the photo.
+        val originalGallery = remember { existing?.let { RichNotes.of(this@EditNoteActivity, account, it.id)?.background }.orEmpty() }
+        val originalCustom = remember { existing != null && CustomBackgrounds.stamp(this@EditNoteActivity, account, existing.id) != 0L }
+        var background by remember { mutableStateOf(if (originalCustom) CUSTOM_BACKGROUND else originalGallery) }
+        val picked = pickedBackground
+        LaunchedEffect(picked) {
+            if (picked != null) { background = CUSTOM_BACKGROUND; color = NoteColors.DEFAULT }
+        }
         val showColors = remember { AppSettingsStore.load(this@EditNoteActivity).showNoteColors }
-        val picture by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, background) {
-            value = if (background.isEmpty()) null else kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { NoteBackgrounds.load(this@EditNoteActivity, background) }
+        val picture by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, background, picked) {
+            value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                when {
+                    background == CUSTOM_BACKGROUND ->
+                        if (picked != null) CustomBackgrounds.preview(this@EditNoteActivity, picked)
+                        else existing?.let { CustomBackgrounds.load(this@EditNoteActivity, account, it.id) }
+                    background.isEmpty() -> null
+                    else -> NoteBackgrounds.load(this@EditNoteActivity, background)
+                }
+            }
         }
         val tint = if (showColors) NoteColors.argb(color) else null
         val shownPicture = if (showColors) picture else null
         val tinted = tint != null || shownPicture != null
         DisposableEffect(tint, shownPicture) {
-            ScreenTint.color = tint
-            ScreenTint.image = shownPicture
-            onDispose { ScreenTint.color = null; ScreenTint.image = null }
+            screenTint.color = tint
+            screenTint.image = shownPicture
+            onDispose { screenTint.color = null; screenTint.image = null }
         }
         var labels by remember { mutableStateOf(existing?.labels.orEmpty()) }
         var newLabel by remember { mutableStateOf("") }
@@ -343,16 +367,24 @@ class EditNoteActivity : ComponentActivity() {
             saving = true
             error = ""
             val target = if (existing != null) account else targetAccount
+            val galleryNow = if (background == CUSTOM_BACKGROUND) "" else background
+            // The photo of one's own stays on this phone; the widgets learn of a change right away.
+            if (existing != null && (background == CUSTOM_BACKGROUND && picked != null || background != CUSTOM_BACKGROUND && originalCustom)) {
+                if (background == CUSTOM_BACKGROUND) CustomBackgrounds.save(this@EditNoteActivity, account, existing.id, picked!!)
+                else CustomBackgrounds.remove(this@EditNoteActivity, account, existing.id)
+                pickedBackground = null
+                scope.launch { WidgetRefresh.all(this@EditNoteActivity) }
+            }
             val converting = convertFrom != null
             val function = if (existing != null && !converting) "update_note" else "create_note"
             val args = if (existing != null && !converting) {
                 KeepRepository.updateNoteArgs(
                     existing.id, title, text, outItems(), color, pinned, removedImages.toList(), withHiddenLabel(labels, hiddenInWidgets),
-                    // Only a changed picture is sent; "default" takes it away.
-                    if (background != originalBackground) background.ifEmpty { "default" } else "",
+                    // Only a changed picture of Keep's is sent; "default" takes it away.
+                    if (isLocal || galleryNow == originalGallery) "" else galleryNow.ifEmpty { "default" },
                 )
             } else {
-                KeepRepository.createNoteArgs(title, text, isList, outItems(), color, pinned, withHiddenLabel(labels, hiddenInWidgets), background)
+                KeepRepository.createNoteArgs(title, text, isList, outItems(), color, pinned, withHiddenLabel(labels, hiddenInWidgets), galleryNow)
             }
             // The mark in Keep replaces the older one that only this phone knew.
             if (existing != null) PrivateNotes.set(this@EditNoteActivity, account, existing.id, false)
@@ -451,7 +483,8 @@ class EditNoteActivity : ComponentActivity() {
 
         fun hasChanges() = if (existing != null) {
             title != existing.title || text != existing.text || outItems() != existing.items || color != existing.color ||
-                pinned != existing.pinned || labels != existing.labels || removedImages.isNotEmpty() || convertFrom != null || hiddenInWidgets != wasHidden
+                pinned != existing.pinned || labels != existing.labels || removedImages.isNotEmpty() || convertFrom != null || hiddenInWidgets != wasHidden ||
+                background != (if (originalCustom) CUSTOM_BACKGROUND else originalGallery) || picked != null
         } else {
             title.isNotBlank() || text.isNotBlank() || items.any { it.text.isNotBlank() }
         }
@@ -984,52 +1017,55 @@ class EditNoteActivity : ComponentActivity() {
                 }
             }
 
-            Text(stringResource(R.string.color))
+            // Color, Keep's pictures and the user's own photo are one choice: picking one takes the others away.
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.color_and_background), modifier = Modifier.weight(1f))
+                if (color != NoteColors.DEFAULT || background.isNotEmpty()) {
+                    TextButton(
+                        onClick = { color = NoteColors.DEFAULT; background = ""; pickedBackground = null },
+                        enabled = canEdit, shapes = ButtonDefaults.shapes(),
+                    ) { Text(stringResource(R.string.color_background_remove)) }
+                }
+            }
             Row(Modifier.horizontalScroll(rememberScrollState())) {
-                NoteColors.names.forEach { name ->
+                NoteColors.names.filter { it != NoteColors.DEFAULT }.forEach { name ->
                     val argb = NoteColors.argb(name)
+                    // A picture hides the color behind it, so then no color counts as chosen.
+                    val chosen = name == color && background.isEmpty()
                     // The circle keeps its size; the touch area around it is 48 dp.
-                    RoundTouchTarget(onClick = { color = name }, enabled = canEdit) {
+                    RoundTouchTarget(onClick = { color = name; background = ""; pickedBackground = null }, enabled = canEdit) {
                         Box(
-                            Modifier.size(if (name == color) 44.dp else 36.dp)
+                            Modifier.size(if (chosen) 44.dp else 36.dp)
                                 .clip(CircleShape)
                                 .background(if (argb != null) Color(argb) else Color.Transparent)
                                 .border(
-                                    if (name == color) 3.dp else 1.dp,
-                                    if (name == color) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                                    if (chosen) 3.dp else 1.dp,
+                                    if (chosen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                                     CircleShape,
                                 ),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            // The default (uncolored) swatch is transparent, so mark it.
-                            if (argb == null) Icon(painterResource(R.drawable.ic_color_none), contentDescription = null, modifier = Modifier.size(20.dp))
-                        }
+                        )
                     }
                 }
             }
-
-            // Keep's pictures behind a note: they exist in Keep only, so local notes have none.
-            if (!isLocal) {
-                Text(stringResource(R.string.note_background))
-                Row(Modifier.horizontalScroll(rememberScrollState())) {
-                    listOf("") .plus(NoteBackgrounds.NAMES).forEach { name ->
-                        val thumb by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, name) {
-                            value = if (name.isEmpty()) null else kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { NoteBackgrounds.load(this@EditNoteActivity, name) }
+            // Keep's pictures exist in Keep only, so local notes have none; the photo of one's own works for every note that exists.
+            Row(Modifier.horizontalScroll(rememberScrollState())) {
+                if (!isLocal) NoteBackgrounds.NAMES.forEach { name ->
+                    val thumb by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, name) {
+                        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { NoteBackgrounds.load(this@EditNoteActivity, name) }
+                    }
+                    RoundTouchTarget(onClick = { background = name; color = NoteColors.DEFAULT; pickedBackground = null }, enabled = canEdit) {
+                        BackgroundTile(name == background) {
+                            thumb?.let { Image(it.asImageBitmap(), contentDescription = name, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()) }
                         }
-                        RoundTouchTarget(onClick = { background = name }, enabled = canEdit) {
-                            Box(
-                                Modifier.size(if (name == background) 44.dp else 36.dp)
-                                    .clip(MaterialTheme.shapes.small)
-                                    .border(
-                                        if (name == background) 3.dp else 1.dp,
-                                        if (name == background) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                                        MaterialTheme.shapes.small,
-                                    ),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                if (name.isEmpty()) Icon(painterResource(R.drawable.ic_color_none), contentDescription = stringResource(R.string.note_background_none), modifier = Modifier.size(20.dp))
-                                else thumb?.let { Image(it.asImageBitmap(), contentDescription = name, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()) }
-                            }
+                    }
+                }
+                if (existing != null) RoundTouchTarget(onClick = { pickBackground.launch("image/*") }, enabled = canEdit) {
+                    BackgroundTile(background == CUSTOM_BACKGROUND) {
+                        val own = picture
+                        if (background == CUSTOM_BACKGROUND && own != null) {
+                            Image(own.asImageBitmap(), contentDescription = stringResource(R.string.background_own), contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+                        } else {
+                            Icon(painterResource(R.drawable.ic_add), contentDescription = stringResource(R.string.background_own), modifier = Modifier.size(20.dp))
                         }
                     }
                 }
@@ -1126,6 +1162,21 @@ class EditNoteActivity : ComponentActivity() {
         }
     }
 
+    /** A square preview in the background row; the chosen one is larger and has a thick frame. */
+    @Composable
+    private fun BackgroundTile(chosen: Boolean, content: @Composable () -> Unit) {
+        Box(
+            Modifier.size(if (chosen) 44.dp else 36.dp)
+                .clip(MaterialTheme.shapes.small)
+                .border(
+                    if (chosen) 3.dp else 1.dp,
+                    if (chosen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                    MaterialTheme.shapes.small,
+                ),
+            contentAlignment = Alignment.Center,
+        ) { content() }
+    }
+
     /**
      * One item of a checklist while editing: just the text, with a green check at the bottom right when it is
      * done. Swiping right ticks (or unticks) it, swiping left removes it, and the row stops where the symbol is shown.
@@ -1160,7 +1211,8 @@ class EditNoteActivity : ComponentActivity() {
             Box(
                 Modifier
                     .offset { androidx.compose.ui.unit.IntOffset(offsetX.toInt(), 0) }
-                    .background(MaterialTheme.colorScheme.background)
+                    // On a note's own color or picture the rows show it instead of covering it.
+                    .background(if (LocalOnNote.current) Color.Transparent else MaterialTheme.colorScheme.background)
                     .draggable(
                         orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
                         enabled = editable,

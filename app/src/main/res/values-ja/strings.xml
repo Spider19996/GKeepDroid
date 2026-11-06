@@ -165,8 +165,9 @@
     <string name="layout_list">リスト</string>
     <string name="pinned_section_switch">ピン留めしたメモを別セクションに表示</string>
     <string name="pull_to_refresh_switch">リストを下に引いて更新</string>
-    <string name="note_background">背景</string>
-    <string name="note_background_none">背景なし</string>
+    <string name="color_and_background">色 / 背景</string>
+    <string name="color_background_remove">削除</string>
+    <string name="background_own">自分の写真</string>
     <string name="selected_count">%d 件を選択</string>
     <string name="select_all">すべて選択</string>
     <string name="duplicate_note">複製</string>

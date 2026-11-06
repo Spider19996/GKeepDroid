@@ -165,8 +165,9 @@
     <string name="layout_list">Lijst</string>
     <string name="pinned_section_switch">Vastgezette notities in een eigen sectie tonen</string>
     <string name="pull_to_refresh_switch">Lijst omlaag trekken om te vernieuwen</string>
-    <string name="note_background">Achtergrond</string>
-    <string name="note_background_none">Geen achtergrond</string>
+    <string name="color_and_background">Kleur / achtergrond</string>
+    <string name="color_background_remove">Verwijderen</string>
+    <string name="background_own">Eigen foto</string>
     <string name="selected_count">%d geselecteerd</string>
     <string name="select_all">Alles selecteren</string>
     <string name="duplicate_note">Dupliceren</string>

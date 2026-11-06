@@ -165,8 +165,9 @@
     <string name="layout_list">Liste</string>
     <string name="pinned_section_switch">Sabitlenen notları ayrı bölümde göster</string>
     <string name="pull_to_refresh_switch">Yenilemek için listeyi aşağı çek</string>
-    <string name="note_background">Arka plan</string>
-    <string name="note_background_none">Arka plan yok</string>
+    <string name="color_and_background">Renk / arka plan</string>
+    <string name="color_background_remove">Kaldır</string>
+    <string name="background_own">Kendi fotoğrafım</string>
     <string name="selected_count">%d seçildi</string>
     <string name="select_all">Tümünü seç</string>
     <string name="duplicate_note">Çoğalt</string>

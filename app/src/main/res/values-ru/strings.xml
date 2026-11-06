@@ -165,8 +165,9 @@
     <string name="layout_list">Список</string>
     <string name="pinned_section_switch">Показывать закреплённые заметки в отдельном разделе</string>
     <string name="pull_to_refresh_switch">Потянуть список вниз для обновления</string>
-    <string name="note_background">Фон</string>
-    <string name="note_background_none">Без фона</string>
+    <string name="color_and_background">Цвет / фон</string>
+    <string name="color_background_remove">Убрать</string>
+    <string name="background_own">Своё фото</string>
     <string name="selected_count">Выбрано: %d</string>
     <string name="select_all">Выбрать все</string>
     <string name="duplicate_note">Дублировать</string>
