@@ -226,14 +226,15 @@ def _utf16(text):
     return [raw[i] | (raw[i + 1] << 8) for i in range(0, len(raw), 2)]
 
 
-def _parse_docs(ops):
-    """Rebuild the texts of a note from Keep's change log and collect their styles.
+def _apply_ops(docs, ops):
+    """Apply Keep's change log to the texts of a note, given as {document id: {"u": UTF-16 units, "f": flags per unit}}.
 
-    Positions in the log are 1-based UTF-16 positions, like the strings of the app. Returns
-    {document id: {"t": text, "r": [[start, end, flags], ...]}} for the documents that have any style.
+    Positions in the log are 1-based UTF-16 positions, like the strings of the app.
     """
-    docs = {}
     for op in ops:
+        if op[0] == "cbx-rm":
+            docs.pop(op[2], None)
+            continue
         if op[0] != "docs-nestedModel":
             continue
         body = op[2]
@@ -265,33 +266,57 @@ def _parse_docs(ops):
                     for key, bit in _STYLE_BITS.items():
                         if key in marks:
                             flags[i] = flags[i] | bit if marks[key] else flags[i] & ~bit
-    result = {}
+
+
+def _text(units):
+    return b"".join(u.to_bytes(2, "little") for u in units).decode("utf-16-le", "surrogatepass")
+
+
+def _runs(flags):
+    """The styled stretches [start, end, flags] of a document."""
+    runs, start = [], 0
+    for i in range(1, len(flags) + 1):
+        if i == len(flags) or flags[i] != flags[start]:
+            if flags[start]:
+                runs.append([start, i, flags[start]])
+            start = i
+    return runs
+
+
+def _pack(docs):
+    """Documents as they are kept between syncs: the text and the flags in run-length form."""
+    packed = {}
     for key, doc in docs.items():
-        runs, start = [], 0
-        flags = doc["f"]
-        for i in range(1, len(flags) + 1):
-            if i == len(flags) or flags[i] != flags[start]:
-                if flags[start]:
-                    runs.append([start, i, flags[start]])
-                start = i
-        if runs:
-            text = b"".join(u.to_bytes(2, "little") for u in doc["u"]).decode("utf-16-le", "surrogatepass")
-            result[key] = {"t": text, "r": runs}
-    return result
+        counts = []
+        for flag in doc["f"]:
+            if counts and counts[-1][1] == flag:
+                counts[-1][0] += 1
+            else:
+                counts.append([1, flag])
+        packed[key] = {"t": _text(doc["u"]), "c": counts}
+    return packed
+
+
+def _unpack(packed):
+    docs = {}
+    for key, doc in packed.items():
+        docs[key] = {"u": _utf16(doc["t"]), "f": [flag for count, flag in doc["c"] for _ in range(count)]}
+    return docs
 
 
 def _fetch_rich(keep, state_path):
-    """Formatting and background of the notes, which gkeepapi does not know, into a file of their own.
+    """Formatting and background of the notes, which gkeepapi does not know, into files of their own.
 
-    Keep only sends them to clients that call themselves collaborative ("CL"), and then it sends the whole
-    text as a change log. So this is a second, separate request, and its own version makes it incremental.
+    Keep only sends them to clients that call themselves collaborative ("CL"), and then it sends the text of
+    a note as a change log: the whole log the first time, afterwards only what is new. So this is a second,
+    separate request with its own version, and the model of every note is kept between syncs.
     """
-    path = state_path.rsplit(".json", 1)[0] + "_rich.json"
-    store = {"v": None, "n": {}}
-    if os.path.exists(path):
+    base = state_path.rsplit(".json", 1)[0]
+    model = {"v": None, "n": {}}
+    if os.path.exists(base + "_richmodel.json"):
         try:
-            with open(path) as f:
-                store = json.load(f)
+            with open(base + "_richmodel.json") as f:
+                model = json.load(f)
         except (OSError, ValueError):
             pass
     api = keep._keep_api
@@ -305,31 +330,49 @@ def _fetch_rich(keep, state_path):
 
     api.send = with_capability
     try:
-        version = store["v"]
+        version = model["v"]
         while True:
             changes = api.changes(target_version=version)
             if changes.get("forceFullResync"):
-                store = {"v": None, "n": {}}
+                model = {"v": None, "n": {}}
             for node in changes.get("nodes", []):
                 if node.get("parentId") != "root":
                     continue
-                ops = []
-                for chunk in node.get("serverChanges", {}).get("snapshot", {}).get("serializedChunks", []):
-                    ops += json.loads(chunk)
-                background = (node.get("background") or {}).get("name") or ""
-                docs = _parse_docs(ops)
-                if background and background != "default" or docs:
-                    store["n"][node["id"]] = {"bg": background, "d": docs}
+                entry = model["n"].get(node["id"], {"bg": "", "m": {}})
+                server = node.get("serverChanges", {})
+                snapshot = server.get("snapshot")
+                if snapshot is not None:
+                    docs = {}
+                    ops = [op for chunk in snapshot.get("serializedChunks", []) for op in json.loads(chunk)]
                 else:
-                    store["n"].pop(node["id"], None)
+                    docs = _unpack(entry["m"])
+                    ops = [json.loads(change["serializedCommand"]) for change in server.get("changes", [])]
+                _apply_ops(docs, ops)
+                entry["m"] = _pack(docs)
+                if "background" in node or snapshot is not None:
+                    entry["bg"] = (node.get("background") or {}).get("name") or ""
+                model["n"][node["id"]] = entry
             version = changes["toVersion"]
             if not changes.get("truncated"):
                 break
-        store["v"] = version
+        model["v"] = version
     finally:
         api.send = send
-    with open(path, "w") as f:
-        json.dump(store, f)
+    with open(base + "_richmodel.json", "w") as f:
+        json.dump(model, f)
+    # What the app reads: only the notes that have a background or any styled text.
+    rich = {}
+    for node_id, entry in model["n"].items():
+        docs = {}
+        for key, doc in _unpack(entry["m"]).items():
+            runs = _runs(doc["f"])
+            if runs:
+                docs[key] = {"t": _text(doc["u"]), "r": runs}
+        background = entry["bg"] if entry["bg"] != "default" else ""
+        if background or docs:
+            rich[node_id] = {"bg": background, "d": docs}
+    with open(base + "_rich.json", "w") as f:
+        json.dump({"n": rich}, f)
 
 
 def _find_child(keep, note_id, child_id):

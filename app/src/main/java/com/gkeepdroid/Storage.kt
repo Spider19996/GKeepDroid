@@ -714,6 +714,7 @@ object NotesCache {
         file(context, email).delete()
         stateFile(context, email).delete()
         richFile(context, email).delete()
+        File(richFile(context, email).path.removeSuffix(".json") + "model.json").delete()
         imageDir(context, email).deleteRecursively()
     }
 
