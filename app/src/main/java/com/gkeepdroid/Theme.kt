@@ -50,6 +50,8 @@ class ScreenTint {
     var image by androidx.compose.runtime.mutableStateOf<android.graphics.Bitmap?>(null)
     /** The picture is the dark version of one of Keep's, so the screen stays dark and its text light. */
     var darkImage by androidx.compose.runtime.mutableStateOf(false)
+    /** While true, changes of the color and picture show at once instead of fading (a screen opens in its final look). */
+    var instant by androidx.compose.runtime.mutableStateOf(false)
 }
 
 /** Whether the app is in a dark theme (dark or OLED, or the phone's dark mode when the app follows it). */
@@ -222,11 +224,16 @@ fun KeepTheme(themeMode: Int, opaque: Boolean = true, tint: ScreenTint? = null, 
             contentColor = colors.onBackground,
         ) {
             // A color or picture behind the screen fades in and out.
+            val instant = tint?.instant == true
             val tintColor by androidx.compose.animation.animateColorAsState(
-                tint?.color?.let { Color(it) } ?: Color.Transparent, androidx.compose.animation.core.tween(450), label = "tint",
+                tint?.color?.let { Color(it) } ?: Color.Transparent,
+                if (instant) androidx.compose.animation.core.snap() else androidx.compose.animation.core.tween(450), label = "tint",
             )
             Box(Modifier.fillMaxSize().background(tintColor)) {
-                androidx.compose.animation.Crossfade(targetState = tint?.image, animationSpec = androidx.compose.animation.core.tween(450), label = "tintImage") { image ->
+                androidx.compose.animation.Crossfade(
+                    targetState = tint?.image,
+                    animationSpec = if (instant) androidx.compose.animation.core.snap() else androidx.compose.animation.core.tween(450), label = "tintImage",
+                ) { image ->
                     if (image != null) Box(Modifier.fillMaxSize().noteBackground(image))
                 }
                 // The content keeps clear of the bars, the keyboard and, in landscape, a camera hole at the side. The top

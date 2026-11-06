@@ -39,8 +39,18 @@ object NoteBackgrounds {
     /** Keep has a light and a dark version of every picture; the files are named after the version. */
     private fun key(name: String, dark: Boolean) = if (dark) "${name}_dark" else name
 
-    private fun cacheFile(context: Context, name: String, dark: Boolean) =
-        File(File(context.cacheDir, "backgrounds").apply { mkdirs() }, "${key(name, dark)}.png")
+    /** The pictures live with the app's files, not in the cache, so Android does not clear them when it needs room. */
+    private fun dir(context: Context): File {
+        val dir = File(context.filesDir, "backgrounds")
+        if (!dir.exists()) {
+            // Earlier versions kept them in the cache.
+            val old = File(context.cacheDir, "backgrounds")
+            if (!(old.exists() && old.renameTo(dir))) dir.mkdirs()
+        }
+        return dir
+    }
+
+    private fun cacheFile(context: Context, name: String, dark: Boolean) = File(dir(context), "${key(name, dark)}.png")
 
     /** Whether the phone is in its dark mode (what the widgets follow). */
     fun isNight(context: Context): Boolean =
@@ -112,15 +122,18 @@ object NoteBackgrounds {
         return bitmap
     }
 
-    /** Fetches the pictures that notes of any account use; true if one was new, so the widgets should be redrawn. */
+    /**
+     * Fetches every picture Keep offers, in both versions (and any other a note uses), once, so none has to be waited for later
+     * and the widgets never meet a missing one. True if something new arrived, so the widgets should be redrawn.
+     */
     fun prefetch(context: Context): Boolean {
+        val accounts = CredentialStore.accounts(context).filter { !CredentialStore.isLocal(it) }
+        if (accounts.isEmpty()) return false
+        val names = (NAMES + accounts.flatMap { RichNotes.backgrounds(context, it) }).distinct()
         var fetched = false
-        CredentialStore.accounts(context).forEach { account ->
-            RichNotes.backgrounds(context, account).forEach { name ->
-                // Both versions, so the app and the widgets can follow the phone's light and dark mode.
-                for (dark in listOf(false, true)) {
-                    if (!cacheFile(context, name, dark).exists() && load(context, name, dark) != null) fetched = true
-                }
+        names.forEach { name ->
+            for (dark in listOf(false, true)) {
+                if (!cacheFile(context, name, dark).exists() && load(context, name, dark) != null) fetched = true
             }
         }
         return fetched

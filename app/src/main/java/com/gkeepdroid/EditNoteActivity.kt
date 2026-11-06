@@ -83,6 +83,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -109,7 +110,7 @@ class EditNoteActivity : ComponentActivity() {
     private var onHome: (() -> Unit)? = null
 
     // The color or picture behind this editor; it belongs to this activity, so the screen it returns to is not tinted by it.
-    private val screenTint = ScreenTint()
+    private val screenTint = ScreenTint().apply { instant = true }
 
     /** A photo chosen as the note's own background (kept on this phone only), until the note is saved. */
     private var pickedBackground by androidx.compose.runtime.mutableStateOf<android.net.Uri?>(null)
@@ -560,6 +561,8 @@ class EditNoteActivity : ComponentActivity() {
         }
 
         val scroll = rememberScrollState()
+        // The editor opens in its final look; only changes made while it is open fade.
+        LaunchedEffect(Unit) { kotlinx.coroutines.delay(500); screenTint.instant = false }
         OnNoteTheme(
             active = tinted && !(shownPicture != null && darkPicture), accent = accent, transparentRows = tinted,
             darkOnPicture = shownPicture != null && darkPicture, textColor = ownText,
@@ -1081,12 +1084,20 @@ class EditNoteActivity : ComponentActivity() {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.color_and_background), modifier = Modifier.weight(1f))
                 // Light or dark version of Keep's picture; on the phone only, and the theme decides until it is chosen here.
-                if (existing != null && background.isNotEmpty() && background != CUSTOM_BACKGROUND) {
-                    FilledTonalIconToggleButton(
-                        checked = darkVersion, onCheckedChange = { variantDark = it }, enabled = canEdit,
-                        shapes = IconButtonDefaults.toggleableShapes(),
-                    ) {
-                        Icon(painterResource(R.drawable.ic_contrast), contentDescription = stringResource(R.string.background_dark_version))
+                // The row keeps its height whether the button shows or not.
+                Box(Modifier.size(48.dp), contentAlignment = Alignment.Center) {
+                    if (existing != null && background.isNotEmpty() && background != CUSTOM_BACKGROUND) {
+                        androidx.compose.material3.IconToggleButton(
+                            checked = darkVersion, onCheckedChange = { variantDark = it }, enabled = canEdit,
+                            colors = IconButtonDefaults.iconToggleButtonColors(
+                                contentColor = LocalContentColor.current, checkedContentColor = LocalContentColor.current,
+                            ),
+                        ) {
+                            Icon(
+                                painterResource(R.drawable.ic_contrast), contentDescription = stringResource(R.string.background_dark_version),
+                                modifier = Modifier.rotate(if (darkVersion) 180f else 0f),
+                            )
+                        }
                     }
                 }
             }
