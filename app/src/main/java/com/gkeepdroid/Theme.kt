@@ -48,7 +48,12 @@ private fun Window.makeBarsSeeThrough() {
 class ScreenTint {
     var color by androidx.compose.runtime.mutableStateOf<Int?>(null)
     var image by androidx.compose.runtime.mutableStateOf<android.graphics.Bitmap?>(null)
+    /** The picture is the dark version of one of Keep's, so the screen stays dark and its text light. */
+    var darkImage by androidx.compose.runtime.mutableStateOf(false)
 }
+
+/** Whether the app is in a dark theme (dark or OLED, or the phone's dark mode when the app follows it). */
+val LocalDarkTheme = androidx.compose.runtime.compositionLocalOf { false }
 
 /** True where content sits on a note's own color or picture. */
 val LocalOnNote = androidx.compose.runtime.compositionLocalOf { false }
@@ -99,7 +104,7 @@ private fun fadingScheme(target: ColorScheme, key: Any?): ColorScheme {
  * colors change), so switching a color or picture on or off does not rebuild the content and lose its state, such as the scroll position.
  */
 @Composable
-fun OnNoteTheme(active: Boolean, accent: Int? = null, content: @Composable () -> Unit) {
+fun OnNoteTheme(active: Boolean, accent: Int? = null, transparentRows: Boolean = active, content: @Composable () -> Unit) {
     val context = LocalContext.current
     val outer = MaterialTheme.colorScheme
     val outerContent = androidx.compose.material3.LocalContentColor.current
@@ -125,7 +130,7 @@ fun OnNoteTheme(active: Boolean, accent: Int? = null, content: @Composable () ->
     MaterialExpressiveTheme(colorScheme = shown, motionScheme = MotionScheme.expressive()) {
         androidx.compose.runtime.CompositionLocalProvider(
             androidx.compose.material3.LocalContentColor provides contentColor,
-            LocalOnNote provides active,
+            LocalOnNote provides transparentRows,
         ) { content() }
     }
 }
@@ -158,7 +163,7 @@ fun KeepTheme(themeMode: Int, opaque: Boolean = true, tint: ScreenTint? = null, 
     }
 
     val view = LocalView.current
-    val tinted = tint != null && (tint.color != null || tint.image != null)
+    val tinted = tint != null && (if (tint.image != null) !tint.darkImage else tint.color != null)
     // Demo mode (for screenshots) runs full screen: the status bar and the three buttons are hidden, and a swipe from the edge brings them back.
     val fullScreen = DemoNotes.version.intValue >= 0 && DemoNotes.enabled(context)
     // Switching the demo mode on or off changes how the window is laid out; a fresh activity does that cleanly.
@@ -208,7 +213,9 @@ fun KeepTheme(themeMode: Int, opaque: Boolean = true, tint: ScreenTint? = null, 
                 // The content keeps clear of the bars, the keyboard and, in landscape, a camera hole at the side. The top
                 // cutout is left out: the status bar covers it, and the full-screen demo draws into that strip on purpose.
                 val clear = WindowInsets.systemBars.union(WindowInsets.ime).union(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
-                Box(Modifier.windowInsetsPadding(clear)) { content() }
+                androidx.compose.runtime.CompositionLocalProvider(LocalDarkTheme provides dark) {
+                    Box(Modifier.windowInsetsPadding(clear)) { content() }
+                }
                 // Debug builds only; it lies above everything and lets touches through.
                 DebugWatermark()
             }

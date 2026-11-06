@@ -26,6 +26,7 @@ import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
+import androidx.glance.ImageProvider
 import androidx.glance.background
 import androidx.glance.currentState
 import androidx.glance.layout.Alignment
@@ -102,7 +103,7 @@ class NotesWidget : GlanceAppWidget() {
                 notes.forEach { note ->
                     val name = RichNotes.of(context, account, note.id)?.background.orEmpty()
                     val bitmap = CustomBackgrounds.forWidget(context, account, note.id, settings.noteAlpha, 0.45f)
-                        ?: if (name.isEmpty()) null else NoteBackgrounds.forWidget(context, name, settings.noteAlpha, 0.45f)
+                        ?: if (name.isEmpty()) null else NoteBackgrounds.forWidget(context, name, settings.noteAlpha, 0.45f, NoteBackgrounds.isNight(context))
                     if (bitmap != null && budget >= bitmap.byteCount) {
                         budget -= bitmap.byteCount
                         result[note.id] = bitmap
@@ -184,10 +185,27 @@ class NotesWidget : GlanceAppWidget() {
         foldedKeys: Set<String>,
     ) {
         val noteColor = if (settings.showNoteColors) NoteColors.argb(note.color) else null
-        val palette = textPalette(settings, onNoteColor = noteColor != null || picture != null)
+        // Keep's pictures come in a dark version for the phone's dark mode; a photo of one's own never does.
+        val onDarkPicture = picture != null && NoteBackgrounds.isNight(LocalContext.current) &&
+            CustomBackgrounds.stamp(LocalContext.current, account, note.id) == 0L
+        val palette = textPalette(settings, onNoteColor = noteColor != null || picture != null, onDarkPicture = onDarkPicture)
         val textColor = palette.provider()
 
         val cardModifier = GlanceModifier.fillMaxWidth().cornerRadius(R.dimen.widget_inner_corner).noteBackground(noteColor, settings, picture = picture)
+        // With a picture, the note's color is a frame around it.
+        val framed = picture != null && noteColor != null
+        val outerModifier = if (framed) {
+            GlanceModifier.fillMaxWidth().cornerRadius(R.dimen.widget_inner_corner)
+                .background(ColorProvider(Color(noteColor!!).copy(alpha = settings.noteAlpha))).padding(3.dp)
+        } else {
+            cardModifier
+        }
+        val innerModifier = if (framed) {
+            GlanceModifier.fillMaxWidth().cornerRadius(R.dimen.widget_inner_corner)
+                .background(ImageProvider(picture!!), androidx.glance.layout.ContentScale.Crop)
+        } else {
+            GlanceModifier.fillMaxWidth()
+        }
         val folded = settings.foldable && FoldStore.key(account, note.id) in foldedKeys
 
         // A small pin shows that the note is pinned in Keep or shown at the widget's bottom.
@@ -200,12 +218,13 @@ class NotesWidget : GlanceAppWidget() {
         Column(GlanceModifier.fillMaxWidth().padding(bottom = 6.dp)) {
             // A box, so the fold arrow can float over the corner without making the title line taller.
             Box(
-                cardModifier.clickable(
+                outerModifier.clickable(
                     actionStartActivity<EditNoteActivity>(
                         actionParametersOf(NoteIdKey to note.id, AccountKey to account, WidgetIdKey to appWidgetId)
                     )
                 )
             ) {
+              Box(innerModifier) {
                 Column(
                     GlanceModifier.fillMaxWidth().padding(
                         start = 8.dp, top = 8.dp, bottom = 8.dp,
@@ -303,6 +322,7 @@ class NotesWidget : GlanceAppWidget() {
                         }
                     }
                 }
+              }
             }
         }
     }

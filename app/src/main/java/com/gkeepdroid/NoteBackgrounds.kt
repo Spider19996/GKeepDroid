@@ -36,18 +36,29 @@ object NoteBackgrounds {
     private const val SIZE = 768
     private val memory = HashMap<String, Bitmap>()
 
+    /** Keep has a light and a dark version of every picture; the files are named after the version. */
+    private fun key(name: String, dark: Boolean) = if (dark) "${name}_dark" else name
+
+    private fun cacheFile(context: Context, name: String, dark: Boolean) =
+        File(File(context.cacheDir, "backgrounds").apply { mkdirs() }, "${key(name, dark)}.png")
+
+    /** Whether the phone is in its dark mode (what the widgets follow). */
+    fun isNight(context: Context): Boolean =
+        context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES
+
     /** Null when the picture is not on the device yet and cannot be fetched now. Call off the main thread. */
-    fun load(context: Context, name: String): Bitmap? {
+    fun load(context: Context, name: String, dark: Boolean = false): Bitmap? {
         // The name comes from Keep's answer and ends up in a file name and an address.
         if (!name.matches(Regex("[a-z0-9_]{1,40}"))) return null
-        synchronized(memory) { memory[name]?.let { return it } }
-        val file = File(File(context.cacheDir, "backgrounds").apply { mkdirs() }, "$name.png")
+        val key = key(name, dark)
+        synchronized(memory) { memory[key]?.let { return it } }
+        val file = cacheFile(context, name, dark)
         var bitmap = if (file.exists()) BitmapFactory.decodeFile(file.path) else null
         if (bitmap == null) {
-            bitmap = runCatching { render(download(name)) }.getOrNull() ?: return null
+            bitmap = runCatching { render(download(name, dark)) }.getOrNull() ?: return null
             runCatching { file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) } }
         }
-        synchronized(memory) { memory[name] = bitmap }
+        synchronized(memory) { memory[key] = bitmap }
         return bitmap
     }
 
@@ -58,11 +69,11 @@ object NoteBackgrounds {
      * the bottom), small, with the card's transparency applied, and only from what is on the device already (a widget is drawn
      * without waiting for the network; the sync fetches the pictures).
      */
-    fun forWidget(context: Context, name: String, alpha: Float, fraction: Float): Bitmap? {
+    fun forWidget(context: Context, name: String, alpha: Float, fraction: Float, dark: Boolean = false): Bitmap? {
         if (!name.matches(Regex("[a-z0-9_]{1,40}"))) return null
-        val key = "$name|${(alpha * 100).toInt()}|${(fraction * 100).toInt()}"
+        val key = "${key(name, dark)}|${(alpha * 100).toInt()}|${(fraction * 100).toInt()}"
         synchronized(small) { small[key]?.let { return it } }
-        val file = File(File(context.cacheDir, "backgrounds"), "$name.png")
+        val file = cacheFile(context, name, dark)
         val full = if (file.exists()) BitmapFactory.decodeFile(file.path) else null
         if (full == null) return null
         val bitmap = widgetCrop(full, alpha, fraction, fromBottom = true)
@@ -95,7 +106,10 @@ object NoteBackgrounds {
         var fetched = false
         CredentialStore.accounts(context).forEach { account ->
             RichNotes.backgrounds(context, account).forEach { name ->
-                if (!File(File(context.cacheDir, "backgrounds"), "$name.png").exists() && load(context, name) != null) fetched = true
+                // Both versions, so the app and the widgets can follow the phone's light and dark mode.
+                for (dark in listOf(false, true)) {
+                    if (!cacheFile(context, name, dark).exists() && load(context, name, dark) != null) fetched = true
+                }
             }
         }
         return fetched
@@ -103,10 +117,10 @@ object NoteBackgrounds {
 
     private const val WIDGET_SIZE = 360
 
-    private fun download(name: String): ByteArray {
+    private fun download(name: String, dark: Boolean): ByteArray {
         // Two pictures are named differently in their files than in the notes.
         val file = when (name) { "groceries" -> "grocery"; "recipes" -> "recipe"; else -> name }
-        val connection = URL("https://www.gstatic.com/keep/backgrounds/${file}_light_0609.svg").openConnection() as HttpURLConnection
+        val connection = URL("https://www.gstatic.com/keep/backgrounds/${file}_${if (dark) "dark" else "light"}_0609.svg").openConnection() as HttpURLConnection
         connection.connectTimeout = 10_000
         connection.readTimeout = 15_000
         return try {

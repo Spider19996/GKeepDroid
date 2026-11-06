@@ -1083,19 +1083,23 @@ class MainActivity : ComponentActivity() {
         val backgroundName = rich?.background?.takeIf { app.showNoteColors && it.isNotEmpty() && it != "default" }
         // A photo of the user's own wins over Keep's pictures (choosing it takes Keep's picture away).
         val customStamp = remember(resumeKey, NotesCache.version.intValue, note.id) { CustomBackgrounds.stamp(context, account, note.id) }
-        val backgroundImage by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, backgroundName, customStamp, app.showNoteColors) {
+        // In a dark theme Keep's pictures come in their dark version, with light text on them.
+        val darkTheme = LocalDarkTheme.current
+        val backgroundImage by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, backgroundName, customStamp, app.showNoteColors, darkTheme) {
             value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
                 when {
                     !app.showNoteColors -> null
                     customStamp != 0L -> CustomBackgrounds.load(context, account, note.id)
-                    backgroundName != null -> NoteBackgrounds.load(context, backgroundName)
+                    backgroundName != null -> NoteBackgrounds.load(context, backgroundName, darkTheme)
                     else -> null
                 }
             }
         }
+        val onDarkPicture = backgroundImage != null && customStamp == 0L && darkTheme
         val noteColor = if (app.showNoteColors) NoteColors.argb(note.color) else null
         val gray = noteColor == null && app.plainCardStyle == PLAIN_GRAY
         val textColor = when {
+            onDarkPicture -> LightNoteText
             noteColor != null || backgroundImage != null -> DarkNoteText
             gray -> Color.White
             else -> MaterialTheme.colorScheme.onSurface
@@ -1109,7 +1113,11 @@ class MainActivity : ComponentActivity() {
         val shape = MaterialTheme.shapes.medium
         val markColor = Color(0x80FFC107)
         // Web addresses, e-mail addresses and phone numbers open in the app made for them.
-        val linkColor = if (noteColor != null) Color(0xFF0B57D0) else MaterialTheme.colorScheme.primary
+        val linkColor = when {
+            onDarkPicture -> Color(0xFF8AB4F8)
+            noteColor != null || backgroundImage != null -> Color(0xFF0B57D0)
+            else -> MaterialTheme.colorScheme.primary
+        }
         // A private note shows only its title until it is opened with the device lock.
         val hidden = PrivateNotes.isPrivate(note, account, remember(PrivateNotes.version.intValue) { PrivateNotes.load(context) })
         val thumb = remember(note.id, note.images.firstOrNull(), app.showImages, hidden) {

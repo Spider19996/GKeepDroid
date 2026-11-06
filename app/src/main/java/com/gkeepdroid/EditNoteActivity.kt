@@ -285,26 +285,30 @@ class EditNoteActivity : ComponentActivity() {
             )
         }
         val showColors = remember { AppSettingsStore.load(this@EditNoteActivity).showNoteColors }
-        val picture by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, background, picked) {
+        val darkTheme = LocalDarkTheme.current
+        val picture by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, background, picked, darkTheme) {
             value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
                 when {
                     background == CUSTOM_BACKGROUND ->
                         if (picked != null) CustomBackgrounds.preview(this@EditNoteActivity, picked)
                         else existing?.let { CustomBackgrounds.load(this@EditNoteActivity, account, it.id) }
                     background.isEmpty() -> null
-                    else -> NoteBackgrounds.load(this@EditNoteActivity, background)
+                    else -> NoteBackgrounds.load(this@EditNoteActivity, background, darkTheme)
                 }
             }
         }
+        // The dark version of one of Keep's pictures keeps the editor dark, with light text.
+        val darkPicture = darkTheme && background != CUSTOM_BACKGROUND && background.isNotEmpty()
         val tint = if (showColors) NoteColors.argb(color) else null
         val shownPicture = if (showColors) picture else null
         val tinted = tint != null || shownPicture != null
         // The buttons take their colors from the note's color; without one, from the average color of its picture.
         val accent = tint ?: shownPicture?.let { remember(it) { NoteBackgrounds.averageColor(it) } }
-        DisposableEffect(tint, shownPicture) {
+        DisposableEffect(tint, shownPicture, darkPicture) {
             screenTint.color = tint
             screenTint.image = shownPicture
-            onDispose { screenTint.color = null; screenTint.image = null }
+            screenTint.darkImage = darkPicture
+            onDispose { screenTint.color = null; screenTint.image = null; screenTint.darkImage = false }
         }
         var labels by remember { mutableStateOf(existing?.labels.orEmpty()) }
         var newLabel by remember { mutableStateOf("") }
@@ -537,7 +541,7 @@ class EditNoteActivity : ComponentActivity() {
         }
 
         val scroll = rememberScrollState()
-        OnNoteTheme(tinted, accent = accent) {
+        OnNoteTheme(tinted && !(shownPicture != null && darkPicture), accent = accent, transparentRows = tinted) {
         Column(
             Modifier.verticalScroll(scroll).padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),

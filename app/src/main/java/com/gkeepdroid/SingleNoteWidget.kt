@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
+import androidx.glance.background
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
@@ -84,19 +85,20 @@ class SingleNoteWidget : GlanceAppWidget() {
             } else {
                 val name = RichNotes.of(context, account, note.id)?.background.orEmpty()
                 CustomBackgrounds.forWidget(context, account, note.id, settings.noteAlpha, 0.8f)
-                    ?: if (name.isEmpty()) null else NoteBackgrounds.forWidget(context, name, settings.noteAlpha, 0.8f)
+                    ?: if (name.isEmpty()) null else NoteBackgrounds.forWidget(context, name, settings.noteAlpha, 0.8f, NoteBackgrounds.isNight(context))
             }
         }
-        val palette = textPalette(settings, onNoteColor = noteColor != null || picture != null)
+        val onDarkPicture = picture != null && note != null && account != null && NoteBackgrounds.isNight(context) &&
+            CustomBackgrounds.stamp(context, account, note.id) == 0L
+        val palette = textPalette(settings, onNoteColor = noteColor != null || picture != null, onDarkPicture = onDarkPicture)
         val textColor = palette.provider()
         val settingsAction = actionStartActivity<SettingsActivity>(actionParametersOf(WidgetIdKey to appWidgetId))
 
-        // The whole widget is the note's card: its color, or the widget background if it has none.
+        // The whole widget is the note's card: its color, or the widget background if it has none. With a picture, the color is a frame.
+        val framed = picture != null && noteColor != null
+        val card: @Composable (GlanceModifier) -> Unit = { cardModifier ->
         WithHeaderBar(
-            modifier = GlanceModifier.fillMaxSize()
-                .noteBackground(noteColor, settings, Color.Black.copy(alpha = settings.backgroundAlpha), picture)
-                .cornerRadius(R.dimen.widget_corner)
-                .padding(8.dp),
+            modifier = cardModifier,
             bar = { side ->
                 HeaderBar(
                     side, appWidgetId, account, settings, textColor, withNewButtons = false,
@@ -120,6 +122,23 @@ class SingleNoteWidget : GlanceAppWidget() {
                     isPrivate = hideAll || PrivateNotes.isPrivate(note, account, privateKeys),
                 )
             }
+        }
+        }
+        if (framed) {
+            Box(
+                GlanceModifier.fillMaxSize().cornerRadius(R.dimen.widget_corner)
+                    .background(ColorProvider(Color(noteColor!!).copy(alpha = settings.noteAlpha))).padding(3.dp),
+            ) {
+                card(
+                    GlanceModifier.fillMaxSize().noteBackground(noteColor, settings, Color.Black.copy(alpha = settings.backgroundAlpha), picture)
+                        .cornerRadius(R.dimen.widget_corner).padding(8.dp),
+                )
+            }
+        } else {
+            card(
+                GlanceModifier.fillMaxSize().noteBackground(noteColor, settings, Color.Black.copy(alpha = settings.backgroundAlpha), picture)
+                    .cornerRadius(R.dimen.widget_corner).padding(8.dp),
+            )
         }
     }
 

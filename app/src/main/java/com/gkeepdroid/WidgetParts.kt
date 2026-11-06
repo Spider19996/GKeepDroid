@@ -64,6 +64,9 @@ internal val WidgetIdKey = ActionParameters.Key<Int>(AppWidgetManager.EXTRA_APPW
 
 internal val DarkNoteText = Color(0xFF202124)
 
+/** Text on the dark versions of Keep's pictures. */
+internal val LightNoteText = Color(0xFFE8EAED)
+
 /**
  * The text color of a card. With different day and night colors the widget itself switches when
  * the system theme changes, without being redrawn.
@@ -78,7 +81,8 @@ internal class TextPalette(private val day: Color, private val night: Color) {
 }
 
 /** Notes with a color always get dark text, which suits the light note colors. */
-internal fun textPalette(settings: WidgetSettings, onNoteColor: Boolean): TextPalette = when {
+internal fun textPalette(settings: WidgetSettings, onNoteColor: Boolean, onDarkPicture: Boolean = false): TextPalette = when {
+    onDarkPicture -> TextPalette(LightNoteText, LightNoteText)
     onNoteColor -> TextPalette(DarkNoteText, DarkNoteText)
     settings.textColorAuto -> TextPalette(DarkNoteText, Color.White)
     else -> Color(settings.textColor).let { TextPalette(it, it) }
