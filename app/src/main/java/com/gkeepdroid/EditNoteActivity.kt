@@ -652,13 +652,12 @@ class EditNoteActivity : ComponentActivity() {
             }
         }) {
         Column(Modifier.fillMaxSize()) {
-        // The bar stays on screen while the note scrolls: discard, undo and redo, the note's switches, save.
+        // The bar stays on screen while the note scrolls: discard, the note's switches, save.
             Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                // Discard on the left, save on the right; Undo and Redo next to Discard.
+                // Discard on the left, save on the right.
                 IconButton(onClick = { if (hasChanges()) confirmDiscard = true else discard() }, enabled = !saving, shapes = IconButtonDefaults.shapes(), modifier = Modifier.size(40.dp)) {
                     Icon(painterResource(R.drawable.ic_close), contentDescription = stringResource(R.string.cancel))
                 }
-                if (canEdit) UndoRedoButtons(history.canUndo, history.canRedo, undo, redo)
                 Spacer(Modifier.weight(1f))
                 Box(Modifier.clickable(enabled = !canEdit) { toastUnlockFirst() }) {
                 FilledTonalIconToggleButton(
@@ -823,7 +822,7 @@ class EditNoteActivity : ComponentActivity() {
                 }
             }
         Column(
-            Modifier.weight(1f).verticalScroll(scroll).padding(20.dp),
+            Modifier.weight(1f).verticalScroll(scroll).padding(EDITOR_PADDING),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             if (unsent != null) {
@@ -1122,6 +1121,10 @@ class EditNoteActivity : ComponentActivity() {
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 )
             }
+        }
+        // Undo and Redo sit above the keyboard, where the thumb is while typing, and stay when the note scrolls.
+        if (canEdit) Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            UndoRedoButtons(history.canUndo, history.canRedo, undo, redo)
         }
         }
         if (confirmDiscard) AlertDialog(

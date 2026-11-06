@@ -47,6 +47,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
@@ -59,6 +60,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 /** The parts of the note editor that stand on their own: its sections, each with the state it needs only itself. */
+
+/** The side padding of the editor's content, which scrolling rows reach through to the screen edge. */
+internal val EDITOR_PADDING = 20.dp
+
+/** Makes the row as wide as the screen: its items scroll out under the edge instead of being cut off at the padding. */
+private fun Modifier.fullBleed() = layout { measurable, constraints ->
+    val extra = EDITOR_PADDING.roundToPx()
+    val wide = measurable.measure(constraints.copy(minWidth = constraints.maxWidth + 2 * extra, maxWidth = constraints.maxWidth + 2 * extra))
+    layout(constraints.maxWidth, wide.height) { wide.place(-extra, 0) }
+}
 
 /** A square preview in the background row; the chosen one is larger and has a thick frame. */
 @Composable
@@ -112,7 +123,7 @@ internal fun ColumnScope.AppearanceSection(
             }
         }
     }
-    Row(Modifier.horizontalScroll(rememberScrollState())) {
+    Row(Modifier.fullBleed().horizontalScroll(rememberScrollState()).padding(horizontal = EDITOR_PADDING)) {
         NoteColors.names.forEach { name ->
             val argb = NoteColors.argb(name, darkVersion)
             val chosen = name == color
@@ -136,7 +147,7 @@ internal fun ColumnScope.AppearanceSection(
         }
     }
     // Keep's pictures exist in Keep only, so local notes have none; the photo of one's own works for every note that exists.
-    Row(Modifier.horizontalScroll(rememberScrollState())) {
+    Row(Modifier.fullBleed().horizontalScroll(rememberScrollState()).padding(horizontal = EDITOR_PADDING)) {
         RoundTouchTarget(onClick = { onBackground("") }, enabled = canEdit, shape = MaterialTheme.shapes.small) {
             BackgroundTile(background.isEmpty()) {
                 Icon(painterResource(R.drawable.ic_color_none), contentDescription = stringResource(R.string.color_background_remove), modifier = Modifier.size(20.dp))
@@ -167,7 +178,7 @@ internal fun ColumnScope.AppearanceSection(
     // The note's own text color (only on this phone), for a note of an own photo above all.
     if (isExisting) {
         Text(stringResource(R.string.note_text_color))
-        Row(Modifier.horizontalScroll(rememberScrollState())) {
+        Row(Modifier.fullBleed().horizontalScroll(rememberScrollState()).padding(horizontal = EDITOR_PADDING)) {
             val textChoices = listOf(
                 null, 0xFF202124.toInt(), 0xFFFFFFFF.toInt(), 0xFFD93025.toInt(), 0xFFE8710A.toInt(), 0xFFF9AB00.toInt(),
                 0xFF188038.toInt(), 0xFF1A73E8.toInt(), 0xFF9334E6.toInt(),
