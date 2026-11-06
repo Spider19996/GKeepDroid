@@ -31,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -167,7 +168,14 @@ fun OnNoteTheme(
     // A text color of the note's own wins over the theme's.
     textColor?.let {
         val own = Color(it)
-        scheme = scheme.copy(onSurface = own, onBackground = own, onSurfaceVariant = own.copy(alpha = 0.75f))
+        // Everything that is text or an icon takes it, buttons included: their texts, and the accent of text buttons.
+        val onOwn = if (own.luminance() > 0.5f) DarkNoteText else Color.White
+        scheme = scheme.copy(
+            onSurface = own, onBackground = own, onSurfaceVariant = own.copy(alpha = 0.75f),
+            primary = own, onPrimary = onOwn,
+            onPrimaryContainer = own, onSecondaryContainer = own, onTertiaryContainer = own,
+            secondary = own, onSecondary = onOwn, tertiary = own, onTertiary = onOwn,
+        )
     }
     val shown = fadingScheme(scheme, listOf(active, accent, darkOnPicture, textColor))
     val target = textColor?.let { Color(it) } ?: if (darkOnPicture) scheme.onSurface else if (active) DarkNoteText else outerContent

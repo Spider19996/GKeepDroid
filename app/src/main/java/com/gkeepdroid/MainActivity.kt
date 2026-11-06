@@ -1104,7 +1104,8 @@ class MainActivity : ComponentActivity() {
             }
         }
         val onDarkPicture = backgroundImage != null && customStamp == 0L && darkVariant
-        val darkCard = LocalDarkTheme.current
+        // The note's own choice of the light or dark version also decides its color.
+        val darkCard = darkVariant
         val noteColor = if (app.showNoteColors) NoteColors.argb(note.color, darkCard) else null
         val gray = noteColor == null && app.plainCardStyle == PLAIN_GRAY
         val textColor = look.textColor?.let { Color(it) } ?: when {

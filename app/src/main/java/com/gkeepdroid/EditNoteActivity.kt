@@ -321,11 +321,11 @@ class EditNoteActivity : ComponentActivity() {
         }
         // The dark version of one of Keep's pictures keeps the editor dark, with light text.
         val darkPicture = darkVersion && background != CUSTOM_BACKGROUND && background.isNotEmpty()
-        val tint = if (showColors) NoteColors.argb(color, darkTheme) else null
+        val tint = if (showColors) NoteColors.argb(color, darkVersion) else null
         val shownPicture = if (showColors) picture else null
         val tinted = tint != null || shownPicture != null
         // Dark colors and dark pictures keep the editor dark, with light text.
-        val darkLook = (shownPicture != null && darkPicture) || (shownPicture == null && tint != null && darkTheme)
+        val darkLook = (shownPicture != null && darkPicture) || (shownPicture == null && tint != null && darkVersion)
         // The buttons take their colors from the note's color; without one, from the average color of its picture.
         val accent = tint ?: shownPicture?.let { remember(it) { NoteBackgrounds.averageColor(it) } }
         DisposableEffect(tint, shownPicture, darkLook) {
@@ -1200,10 +1200,10 @@ class EditNoteActivity : ComponentActivity() {
             // The color and the picture (Keep's or the user's own photo) are set separately; the first item of each row takes it away.
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.color_and_background), modifier = Modifier.weight(1f))
-                // Light or dark version of Keep's picture; on the phone only, and the theme decides until it is chosen here.
+                // Light or dark version of the color and of Keep's picture; on the phone only, and the theme decides until it is chosen here.
                 // The row keeps its height whether the button shows or not.
                 Box(Modifier.size(48.dp), contentAlignment = Alignment.Center) {
-                    if (existing != null && background.isNotEmpty() && background != CUSTOM_BACKGROUND) {
+                    if (existing != null && (color != NoteColors.DEFAULT || (background.isNotEmpty() && background != CUSTOM_BACKGROUND))) {
                         androidx.compose.material3.IconToggleButton(
                             checked = darkVersion, onCheckedChange = { variantDark = it }, enabled = canEdit,
                             colors = IconButtonDefaults.iconToggleButtonColors(
@@ -1220,7 +1220,7 @@ class EditNoteActivity : ComponentActivity() {
             }
             Row(Modifier.horizontalScroll(rememberScrollState())) {
                 NoteColors.names.forEach { name ->
-                    val argb = NoteColors.argb(name, darkTheme)
+                    val argb = NoteColors.argb(name, darkVersion)
                     val chosen = name == color
                     // The circle keeps its size; the touch area around it is 48 dp.
                     RoundTouchTarget(onClick = { color = name }, enabled = canEdit) {
@@ -1465,8 +1465,13 @@ class EditNoteActivity : ComponentActivity() {
             Box(
                 Modifier
                     .offset { androidx.compose.ui.unit.IntOffset(offsetX.toInt(), 0) }
-                    // On a note's own color or picture the rows show it instead of covering it.
-                    .background(if (LocalOnNote.current) Color.Transparent else MaterialTheme.colorScheme.background)
+                    // On a note's own color or picture the rows show it instead of covering it; the change fades like the rest.
+                    .background(
+                        androidx.compose.animation.animateColorAsState(
+                            MaterialTheme.colorScheme.background.let { if (LocalOnNote.current) it.copy(alpha = 0f) else it },
+                            androidx.compose.animation.core.tween(450), label = "row",
+                        ).value,
+                    )
                     .draggable(
                         orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
                         enabled = editable,

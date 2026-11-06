@@ -78,7 +78,8 @@ class SingleNoteWidget : GlanceAppWidget() {
             }
         }
 
-        val night = NoteBackgrounds.isNight(context)
+        val look = if (note != null && account != null) NoteLook.of(context, account, note.id) else null
+        val night = look?.dark ?: NoteBackgrounds.isNight(context)
         val noteColor = if (settings.showNoteColors && note != null) NoteColors.argb(note.color, night) else null
         val picture = remember(version) {
             if (!settings.showNoteColors || note == null || account == null) {
@@ -89,8 +90,7 @@ class SingleNoteWidget : GlanceAppWidget() {
                     ?: if (name.isEmpty()) null else NoteBackgrounds.forWidget(context, name, settings.noteAlpha, 0.8f, NoteLook.of(context, account, note.id).dark ?: NoteBackgrounds.isNight(context))
             }
         }
-        val look = if (note != null && account != null) NoteLook.of(context, account, note.id) else null
-        val onDarkPicture = picture != null && note != null && account != null && (look?.dark ?: NoteBackgrounds.isNight(context)) &&
+        val onDarkPicture = picture != null && note != null && account != null && night &&
             CustomBackgrounds.stamp(context, account, note.id) == 0L
         val palette = textPalette(
             settings, onNoteColor = noteColor != null || picture != null,
