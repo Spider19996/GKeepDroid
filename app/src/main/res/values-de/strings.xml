@@ -389,5 +389,9 @@
     <string name="renumber_display">Nummerierte Listen in Karten und Widgets neu durchzählen</string>
     <string name="renumber_display_hint">Aus: Es werden die gespeicherten Nummern gezeigt, auch wenn Erledigte ans Ende rutschen. An: Die Nummern folgen der angezeigten Reihenfolge.</string>
     <string name="reset_hints">Hinweise zurücksetzen</string>
+    <string name="credits_title">Open Source und Danksagung</string>
+    <string name="credits_intro">GKeepDroid baut auf der Arbeit anderer auf. Tippe auf einen Eintrag, um seine Seite zu öffnen.</string>
+    <string name="credits_not_affiliated">GKeepDroid stammt nicht von Google und steht in keiner Verbindung zu Google. Google Keep ist eine Marke von Google LLC.</string>
+    <string name="credits_license">GKeepDroid selbst ist freie Software unter der GNU General Public License, Version 3.</string>
     <string name="reset_hints_done">Alle Hinweise werden wieder angezeigt.</string>
 </resources>

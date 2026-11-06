@@ -389,5 +389,9 @@
     <string name="renumber_display">Volver a contar las listas numeradas en tarjetas y widgets</string>
     <string name="renumber_display_hint">Desactivado: se muestran los números guardados, aunque los marcados pasen al final. Activado: los números siguen el orden mostrado.</string>
     <string name="reset_hints">Restablecer avisos</string>
+    <string name="credits_title">Código abierto y créditos</string>
+    <string name="credits_intro">GKeepDroid se apoya en el trabajo de otros. Toca una entrada para abrir su página.</string>
+    <string name="credits_not_affiliated">GKeepDroid no está hecho por Google ni está afiliado a Google. Google Keep es una marca de Google LLC.</string>
+    <string name="credits_license">GKeepDroid es software libre bajo la Licencia Pública General de GNU, versión 3.</string>
     <string name="reset_hints_done">Todos los avisos volverán a mostrarse.</string>
 </resources>

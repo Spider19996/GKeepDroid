@@ -394,6 +394,7 @@ class SettingsActivity : ComponentActivity() {
                         Page.Sync -> SyncPage(state)
                         Page.Reminders -> RemindersPage(state)
                         Page.Backup -> BackupPage(state)
+                        Page.Credits -> CreditsPage(state)
                     }
                 }
 

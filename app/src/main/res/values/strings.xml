@@ -392,5 +392,9 @@
     <string name="renumber_display">Count numbered lists again in cards and widgets</string>
     <string name="renumber_display_hint">Off: the saved numbers are shown, also when checked items move to the end. On: the numbers follow the order shown.</string>
     <string name="reset_hints">Reset hints</string>
+    <string name="credits_title">Open source and credits</string>
+    <string name="credits_intro">GKeepDroid is built on the work of others. Tap an entry to open its page.</string>
+    <string name="credits_not_affiliated">GKeepDroid is not made by or affiliated with Google. Google Keep is a trademark of Google LLC.</string>
+    <string name="credits_license">GKeepDroid itself is free software under the GNU General Public License, version 3.</string>
     <string name="reset_hints_done">All hints will show again.</string>
 </resources>

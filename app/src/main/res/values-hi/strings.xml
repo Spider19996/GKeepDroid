@@ -386,5 +386,9 @@
     <string name="renumber_display">कार्ड और विजेट में क्रमांकित सूचियाँ दोबारा गिनें</string>
     <string name="renumber_display_hint">बंद: चेक किए आइटम अंत में जाएँ तो भी सहेजे गए क्रमांक दिखते हैं। चालू: क्रमांक दिखाए गए क्रम का पालन करते हैं।</string>
     <string name="reset_hints">संकेत रीसेट करें</string>
+    <string name="credits_title">ओपन सोर्स और श्रेय</string>
+    <string name="credits_intro">GKeepDroid दूसरों के काम पर बना है। किसी प्रविष्टि का पेज खोलने के लिए उस पर टैप करें।</string>
+    <string name="credits_not_affiliated">GKeepDroid को Google ने नहीं बनाया है और यह Google से संबद्ध नहीं है। Google Keep, Google LLC का ट्रेडमार्क है।</string>
+    <string name="credits_license">GKeepDroid स्वयं GNU जनरल पब्लिक लाइसेंस, संस्करण 3 के अंतर्गत मुक्त सॉफ़्टवेयर है।</string>
     <string name="reset_hints_done">सभी संकेत फिर दिखाई देंगे।</string>
 </resources>

@@ -389,5 +389,9 @@
     <string name="renumber_display">Recompter les listes numérotées dans les cartes et widgets</string>
     <string name="renumber_display_hint">Désactivé : les numéros enregistrés s’affichent, même si les éléments cochés passent à la fin. Activé : les numéros suivent l’ordre affiché.</string>
     <string name="reset_hints">Réinitialiser les astuces</string>
+    <string name="credits_title">Open source et crédits</string>
+    <string name="credits_intro">GKeepDroid repose sur le travail d\'autres personnes. Touchez une entrée pour ouvrir sa page.</string>
+    <string name="credits_not_affiliated">GKeepDroid n\'est pas créé par Google et n\'est pas affilié à Google. Google Keep est une marque de Google LLC.</string>
+    <string name="credits_license">GKeepDroid est un logiciel libre sous licence GNU General Public License, version 3.</string>
     <string name="reset_hints_done">Toutes les astuces s’afficheront de nouveau.</string>
 </resources>

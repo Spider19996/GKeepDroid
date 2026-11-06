@@ -154,7 +154,7 @@ data class WidgetSettings(
     val pinBottom: Set<String> = emptySet(),
     val manualOrder: List<String> = emptyList(),
     /** Look of the checklist checkboxes: one of the CB_* constants. */
-    val checkboxStyle: Int = CB_SQUARE,
+    val checkboxStyle: Int = CB_ROUNDED,
     /** Size of the checkbox in dp, independent of the text size. */
     val checkboxSizeDp: Int = 28,
     /** Ticks an item when its whole row is tapped, not only the checkbox. */
@@ -860,7 +860,8 @@ data class AppSettings(
     /** Checklists on the cards: checked items last, optionally hidden, and how the boxes look. */
     val listCheckedToEnd: Boolean = true,
     val listCollapseChecked: Boolean = false,
-    val listCheckboxStyle: Int = CB_CLASSIC,
+    // The rounded box is the checkbox of Material 3 Expressive.
+    val listCheckboxStyle: Int = CB_ROUNDED,
     val listCheckboxSizeDp: Int = 18,
     val listSpacingDp: Int = 2,
     /** Tap a box on a card to tick the item; with [listDeleteChecked] the ticked item is removed instead. */
@@ -915,6 +916,13 @@ object AppSettingsStore {
     fun load(context: Context): AppSettings {
         val d = AppSettings()
         val p = prefs(context)
+        // The default checkbox became the rounded one of Material 3 Expressive; the old default (classic) is moved over once.
+        if (!p.getBoolean("cb_expressive_default", false)) {
+            p.edit().apply {
+                if (p.getInt("list_checkbox_style", CB_ROUNDED) == CB_CLASSIC) putInt("list_checkbox_style", CB_ROUNDED)
+                putBoolean("cb_expressive_default", true)
+            }.apply()
+        }
         return AppSettings(
             layout = p.getInt("layout", d.layout),
             sortMode = p.getInt("sort_mode", d.sortMode),

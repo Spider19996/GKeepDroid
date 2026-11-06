@@ -386,5 +386,9 @@
     <string name="renumber_display">カードとウィジェットで番号付きリストを数え直す</string>
     <string name="renumber_display_hint">オフ：チェック済みが末尾に移っても保存された番号を表示。オン：表示順に番号が従います。</string>
     <string name="reset_hints">ヒントをリセット</string>
+    <string name="credits_title">オープンソースとクレジット</string>
+    <string name="credits_intro">GKeepDroid は他の人々の成果の上に作られています。項目をタップするとそのページが開きます。</string>
+    <string name="credits_not_affiliated">GKeepDroid は Google によって作られたものでも、Google と提携しているものでもありません。Google Keep は Google LLC の商標です。</string>
+    <string name="credits_license">GKeepDroid 自体は GNU General Public License バージョン 3 の自由ソフトウェアです。</string>
     <string name="reset_hints_done">すべてのヒントが再び表示されます。</string>
 </resources>

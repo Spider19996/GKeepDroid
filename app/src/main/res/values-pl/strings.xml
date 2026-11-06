@@ -386,5 +386,9 @@
     <string name="renumber_display">Przeliczaj listy numerowane w kartach i widżetach</string>
     <string name="renumber_display_hint">Wył.: pokazywane są zapisane numery, także gdy zaznaczone trafiają na koniec. Wł.: numery podążają za wyświetlaną kolejnością.</string>
     <string name="reset_hints">Zresetuj podpowiedzi</string>
+    <string name="credits_title">Open source i podziękowania</string>
+    <string name="credits_intro">GKeepDroid powstał dzięki pracy innych. Dotknij pozycji, aby otworzyć jej stronę.</string>
+    <string name="credits_not_affiliated">GKeepDroid nie jest tworzony przez Google ani z nim powiązany. Google Keep jest znakiem towarowym Google LLC.</string>
+    <string name="credits_license">GKeepDroid jest wolnym oprogramowaniem na licencji GNU General Public License, wersja 3.</string>
     <string name="reset_hints_done">Wszystkie podpowiedzi będą znów pokazywane.</string>
 </resources>

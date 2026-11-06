@@ -386,5 +386,9 @@
     <string name="renumber_display">إعادة عدّ القوائم المرقّمة في البطاقات والأدوات</string>
     <string name="renumber_display_hint">إيقاف: تُعرض الأرقام المحفوظة حتى عند انتقال المحدد إلى النهاية. تشغيل: تتبع الأرقام الترتيب المعروض.</string>
     <string name="reset_hints">إعادة ضبط التلميحات</string>
+    <string name="credits_title">المصدر المفتوح والشكر</string>
+    <string name="credits_intro">يعتمد GKeepDroid على أعمال الآخرين. اضغط على أي عنصر لفتح صفحته.</string>
+    <string name="credits_not_affiliated">GKeepDroid ليس من تطوير Google ولا يرتبط بها. Google Keep علامة تجارية لشركة Google LLC.</string>
+    <string name="credits_license">GKeepDroid نفسه برنامج حر بموجب رخصة GNU العامة، الإصدار 3.</string>
     <string name="reset_hints_done">ستظهر كل التلميحات مجددًا.</string>
 </resources>

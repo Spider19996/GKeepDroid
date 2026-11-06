@@ -389,5 +389,9 @@
     <string name="renumber_display">Recontar listas numeradas em cartões e widgets</string>
     <string name="renumber_display_hint">Desativado: mostram-se os números guardados, mesmo que os marcados passem para o fim. Ativado: os números seguem a ordem mostrada.</string>
     <string name="reset_hints">Repor dicas</string>
+    <string name="credits_title">Código aberto e créditos</string>
+    <string name="credits_intro">O GKeepDroid se baseia no trabalho de outras pessoas. Toque em um item para abrir sua página.</string>
+    <string name="credits_not_affiliated">O GKeepDroid não é feito pelo Google nem é afiliado ao Google. Google Keep é uma marca da Google LLC.</string>
+    <string name="credits_license">O próprio GKeepDroid é software livre sob a Licença Pública Geral GNU, versão 3.</string>
     <string name="reset_hints_done">Todas as dicas voltarão a ser mostradas.</string>
 </resources>

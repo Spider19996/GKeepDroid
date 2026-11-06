@@ -134,6 +134,7 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
                     { shapes ->
                         MenuRow(stringResource(R.string.tab_backup), if (mdEnabled) mdFolder else null, shapes = shapes) { page = Page.Backup }
                     },
+                    { shapes -> MenuRow(stringResource(R.string.credits_title), null, shapes = shapes) { page = Page.Credits } },
                     // Brings back every hint that was dismissed and every one-time question.
                     { shapes ->
                         MenuRow(stringResource(R.string.reset_hints), null, chevron = null, shapes = shapes) {

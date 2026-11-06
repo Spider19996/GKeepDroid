@@ -386,5 +386,9 @@
     <string name="renumber_display">Numaralı listeleri kartlarda ve widget’larda yeniden say</string>
     <string name="renumber_display_hint">Kapalı: kayıtlı numaralar gösterilir, işaretliler sona geçse de. Açık: numaralar gösterilen sırayı izler.</string>
     <string name="reset_hints">İpuçlarını sıfırla</string>
+    <string name="credits_title">Açık kaynak ve teşekkürler</string>
+    <string name="credits_intro">GKeepDroid başkalarının emeği üzerine kurulmuştur. Sayfasını açmak için bir girdiye dokunun.</string>
+    <string name="credits_not_affiliated">GKeepDroid Google tarafından yapılmamıştır ve Google ile bağlantılı değildir. Google Keep, Google LLC\'nin ticari markasıdır.</string>
+    <string name="credits_license">GKeepDroid\'in kendisi, GNU Genel Kamu Lisansı sürüm 3 altında özgür yazılımdır.</string>
     <string name="reset_hints_done">Tüm ipuçları yeniden gösterilecek.</string>
 </resources>

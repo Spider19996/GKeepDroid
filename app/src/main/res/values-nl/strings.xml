@@ -389,5 +389,9 @@
     <string name="renumber_display">Genummerde lijsten opnieuw tellen in kaarten en widgets</string>
     <string name="renumber_display_hint">Uit: de opgeslagen nummers worden getoond, ook als afgevinkte items naar het einde gaan. Aan: de nummers volgen de getoonde volgorde.</string>
     <string name="reset_hints">Tips terugzetten</string>
+    <string name="credits_title">Open source en dank</string>
+    <string name="credits_intro">GKeepDroid is gebouwd op het werk van anderen. Tik op een item om de pagina ervan te openen.</string>
+    <string name="credits_not_affiliated">GKeepDroid is niet gemaakt door Google en is niet verbonden met Google. Google Keep is een handelsmerk van Google LLC.</string>
+    <string name="credits_license">GKeepDroid zelf is vrije software onder de GNU General Public License, versie 3.</string>
     <string name="reset_hints_done">Alle tips worden weer getoond.</string>
 </resources>

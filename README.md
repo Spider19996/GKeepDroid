@@ -79,6 +79,10 @@ The debug build is its own app (`com.gkeepdroid.debug`, named "GKeepDroid Debug"
 
 Pushing a tag such as `v1.0.0` (it has to match `versionName`) builds the signed release APK `gkeepdroid-1.0.0.apk` on GitHub Actions and attaches it to a release. The workflow needs the secrets `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS` and `KEY_PASSWORD`.
 
+## Credits
+
+GKeepDroid builds on the work of others: Jetpack Compose and Material 3, AndroidSVG, Chaquopy, gkeepapi, gpsoauth and the Python libraries they need. The full list with authors and licenses is in the app under *Settings → Open source and credits*.
+
 ## License
 
 GPL-3.0, see [LICENSE](LICENSE).

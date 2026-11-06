@@ -26,6 +26,7 @@ internal enum class Page(val title: Int) {
     Reminders(R.string.reminders_title),
     Security(R.string.section_security),
     AppChecklists(R.string.list_section),
+    Credits(R.string.credits_title),
 }
 
 /** One searchable setting: its label, the page it lives on, and the popup it opens (if any). */
@@ -138,6 +139,7 @@ internal fun settingEntries(isSingleNote: Boolean): List<SettingEntry> = buildLi
     add(SettingEntry(R.string.demo_mode, Page.Main))
     add(SettingEntry(R.string.language, Page.Main, popup = "language"))
     add(SettingEntry(R.string.tab_backup, Page.Backup))
+    add(SettingEntry(R.string.credits_title, Page.Credits))
     add(SettingEntry(R.string.export_settings, Page.Backup))
     add(SettingEntry(R.string.import_settings, Page.Backup))
 }

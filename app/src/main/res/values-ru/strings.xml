@@ -386,5 +386,9 @@
     <string name="renumber_display">Пересчитывать нумерованные списки в карточках и виджетах</string>
     <string name="renumber_display_hint">Выкл.: показываются сохранённые номера, даже если отмеченные уходят в конец. Вкл.: номера следуют показанному порядку.</string>
     <string name="reset_hints">Сбросить подсказки</string>
+    <string name="credits_title">Открытый код и благодарности</string>
+    <string name="credits_intro">GKeepDroid построен на работе других людей. Нажмите на пункт, чтобы открыть его страницу.</string>
+    <string name="credits_not_affiliated">GKeepDroid создан не Google и не связан с Google. Google Keep — товарный знак Google LLC.</string>
+    <string name="credits_license">Сам GKeepDroid — свободное программное обеспечение по лицензии GNU General Public License, версия 3.</string>
     <string name="reset_hints_done">Все подсказки снова будут показываться.</string>
 </resources>
