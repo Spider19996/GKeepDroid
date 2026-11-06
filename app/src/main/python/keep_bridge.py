@@ -5,6 +5,7 @@ so the Kotlin side only has to parse text and refresh its cache.
 """
 import json
 import os
+import random
 import re
 
 import gkeepapi
@@ -239,6 +240,8 @@ def _apply_ops(docs, ops):
             continue
         body = op[2]
         doc = docs.setdefault(op[1][-1], {"u": [], "f": []})
+        # Where the document sits in Keep's model; needed to address it when formatting is sent.
+        doc["p"] = op[1]
         kind = body.get("ty")
         units, flags = doc["u"], doc["f"]
         if kind == "is":
@@ -293,14 +296,14 @@ def _pack(docs):
                 counts[-1][0] += 1
             else:
                 counts.append([1, flag])
-        packed[key] = {"t": _text(doc["u"]), "c": counts}
+        packed[key] = {"t": _text(doc["u"]), "c": counts, "p": doc.get("p")}
     return packed
 
 
 def _unpack(packed):
     docs = {}
     for key, doc in packed.items():
-        docs[key] = {"u": _utf16(doc["t"]), "f": [flag for count, flag in doc["c"] for _ in range(count)]}
+        docs[key] = {"u": _utf16(doc["t"]), "f": [flag for count, flag in doc["c"] for _ in range(count)], "p": doc.get("p")}
     return docs
 
 
@@ -381,6 +384,12 @@ def _fetch_rich(keep, state_path):
                     ops = [json.loads(change["serializedCommand"]) for change in server.get("changes", [])]
                 _apply_ops(docs, ops)
                 entry["m"] = _pack(docs)
+                # The revision of the note's model, which Keep wants to hear back when formatting is sent.
+                if snapshot is not None and snapshot.get("revision"):
+                    entry["rev"] = snapshot["revision"]
+                revisions = [change.get("revision") for change in server.get("changes", []) if change.get("revision")]
+                if revisions:
+                    entry["rev"] = revisions[-1]
                 if "background" in node or snapshot is not None:
                     entry["bg"] = (node.get("background") or {}).get("name") or ""
                 model["n"][node["id"]] = entry
@@ -405,6 +414,96 @@ def _fetch_rich(keep, state_path):
             rich[node_id] = {"bg": background, "d": docs}
     with open(base + "_rich.json", "w") as f:
         json.dump({"n": rich}, f)
+
+
+_STYLE_KEYS = {1: "ts_bd", 2: "ts_it", 4: "ts_un", 8: "ts_st"}
+
+
+def format_note(email, master_token, state_path, note_id, docs_json):
+    """Sends text formatting for a note: the styles the app wants, compared with the ones Keep has.
+
+    docs_json: {"text" or an item id: {"t": the text, "r": [[start, end, flags], ...]}}. Only the differences are sent, as
+    commands of Keep's text model, together with the note.
+    """
+    keep = _login(email, master_token, state_path, pull=False)
+    note = keep.get(note_id)
+    if note is None:
+        keep.sync()
+        note = keep.get(note_id)
+    if note is None:
+        raise ValueError("Note not found")
+    # The model and its revision must be up to date, as an edit of the text may have been sent just before.
+    _fetch_rich(keep, state_path)
+    base = state_path.rsplit(".json", 1)[0]
+    with open(base + "_richmodel.json") as f:
+        entry = json.load(f)["n"].get(note.id)
+    if not entry or not entry.get("rev"):
+        raise ValueError("The formatting of this note is not known yet")
+    docs = _unpack(entry["m"])
+    commands = []
+    for key, want in json.loads(docs_json).items():
+        if key == "text":
+            # The body of a text note is its only document.
+            keys = [k for k, d in docs.items() if d.get("p") and len(d["p"]) == 3]
+            key = keys[0] if len(keys) == 1 else None
+        doc = docs.get(key) if key else None
+        if doc is None or not doc.get("p"):
+            continue
+        desired = _utf16(want["t"])
+        # Styles only make sense on the text Keep has.
+        if desired != doc["u"]:
+            continue
+        flags = [0] * len(desired)
+        for start, end, value in want["r"]:
+            for i in range(start, min(end, len(flags))):
+                flags[i] = value
+        i = 0
+        while i < len(flags):
+            diff = (flags[i] ^ doc["f"][i]) & 15
+            if not diff:
+                i += 1
+                continue
+            j = i
+            while j < len(flags) and ((flags[j] ^ doc["f"][j]) & 15) == diff and (flags[j] & diff) == (flags[i] & diff):
+                j += 1
+            marks = {}
+            for bit, name in _STYLE_KEYS.items():
+                if diff & bit:
+                    marks[name] = bool(flags[i] & bit)
+                    marks[name + "_i"] = False
+            commands.append(["docs-nestedModel", doc["p"], {"ty": "as", "st": "text", "si": i + 1, "ei": j, "sm": marks}])
+            i = j
+    if commands:
+        api = keep._keep_api
+        changes = api.changes
+        send = api.send
+        bundle = {
+            "sessionId": str(random.getrandbits(62)), "requestId": "1",
+            "serializedCommands": json.dumps(commands, separators=(",", ":")),
+        }
+
+        def with_changes(target_version=None, nodes=None, labels=None):
+            for node in nodes or []:
+                if node.get("id") == note.id:
+                    node["clientChanges"] = {"clientRevision": str(entry["rev"]), "commandBundles": [bundle]}
+            return changes(target_version=target_version, nodes=nodes, labels=labels)
+
+        def with_capability(**kwargs):
+            body = kwargs.get("json")
+            if body and "requestHeader" in body:
+                body["requestHeader"]["capabilities"].append({"type": "CL"})
+            return send(**kwargs)
+
+        api.changes = with_changes
+        api.send = with_capability
+        try:
+            note.touch()
+            keep.sync()
+        finally:
+            api.changes = changes
+            api.send = send
+        _fetch_rich(keep, state_path)
+    return _finish(keep, state_path, images=False)
 
 
 def _find_child(keep, note_id, child_id):
