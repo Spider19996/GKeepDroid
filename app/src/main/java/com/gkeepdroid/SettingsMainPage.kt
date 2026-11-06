@@ -198,7 +198,7 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
                         val removed = SettingsStore.deleteOrphans(context, placed.map { it.first })
-                        status = context.getString(R.string.orphans_removed, removed)
+                        status = context.resources.getQuantityString(R.plurals.orphans_removed, removed, removed)
                     },
                     shapes = ButtonDefaults.shapes(),
                 ) { Text(stringResource(R.string.orphans_clean)) }

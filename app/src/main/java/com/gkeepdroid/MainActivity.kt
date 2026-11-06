@@ -1,6 +1,7 @@
 package com.gkeepdroid
 
 import android.content.Intent
+import androidx.core.content.edit
 import android.text.format.DateUtils
 import android.os.Bundle
 import android.os.SystemClock
@@ -549,7 +550,7 @@ class MainActivity : ComponentActivity() {
                         Icon(painterResource(R.drawable.ic_close), contentDescription = stringResource(android.R.string.cancel))
                     }
                     Text(
-                        stringResource(R.string.selected_count, selected.size),
+                        androidx.compose.ui.res.pluralStringResource(R.plurals.selected_count, selected.size, selected.size),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.weight(1f),
                     )
@@ -709,7 +710,7 @@ class MainActivity : ComponentActivity() {
                                 Text(stringResource(R.string.reminder_open_settings))
                             }
                             TextButton(onClick = {
-                                hintPrefs.edit().putBoolean("notif_hint_dismissed", true).apply()
+                                hintPrefs.edit { putBoolean("notif_hint_dismissed", true) }
                                 notifHintHidden = true
                             }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.notif_hint_dismiss)) }
                         }

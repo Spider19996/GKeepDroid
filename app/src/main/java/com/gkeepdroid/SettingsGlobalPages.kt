@@ -220,7 +220,7 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
             onClick = {
                 scope.launch {
                     status = runCatching { MarkdownSync.syncNow(context) }.fold(
-                        onSuccess = { context.getString(R.string.md_sync_done, it) },
+                        onSuccess = { context.resources.getQuantityString(R.plurals.md_sync_done, it, it) },
                         onFailure = { context.getString(R.string.md_sync_failed, it.message ?: it.javaClass.simpleName) },
                     )
                 }

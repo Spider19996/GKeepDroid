@@ -1,6 +1,7 @@
 package com.gkeepdroid
 
 import android.content.Context
+import androidx.core.content.edit
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
@@ -52,7 +53,7 @@ object PendingToggles {
                     .put("checked", it.checked).put("delete", it.delete)
             )
         }
-        prefs(context).edit().putString("ops", array.toString()).apply()
+        prefs(context).edit { putString("ops", array.toString()) }
     }
 
     /** Queues a tick; ticking the same item again replaces the earlier one. */

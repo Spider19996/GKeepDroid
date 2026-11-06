@@ -1,6 +1,8 @@
 package com.gkeepdroid
 
 import android.content.Context
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.scale
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -49,12 +51,12 @@ object NoteImages {
             val decoded = BitmapFactory.decodeFile(source.path, BitmapFactory.Options().apply { inSampleSize = sample })
                 ?: return null
             val scaled = if (decoded.width > MAX_WIDTH) {
-                Bitmap.createScaledBitmap(decoded, MAX_WIDTH, decoded.height * MAX_WIDTH / decoded.width, true)
+                decoded.scale(MAX_WIDTH, decoded.height * MAX_WIDTH / decoded.width)
             } else {
                 decoded
             }
             // Drawings are transparent PNGs; JPEG has no alpha, so put them on white first.
-            val flat = Bitmap.createBitmap(scaled.width, scaled.height, Bitmap.Config.ARGB_8888).also {
+            val flat = createBitmap(scaled.width, scaled.height).also {
                 Canvas(it).apply { drawColor(Color.WHITE); drawBitmap(scaled, 0f, 0f, null) }
             }
             thumb.outputStream().use { flat.compress(Bitmap.CompressFormat.JPEG, 85, it) }
@@ -74,7 +76,7 @@ object NoteImages {
         val decoded = BitmapFactory.decodeFile(source.path, BitmapFactory.Options().apply { inSampleSize = sample })
             ?: return null
         // Drawings are transparent; show them on white like in Keep.
-        return Bitmap.createBitmap(decoded.width, decoded.height, Bitmap.Config.ARGB_8888).also {
+        return createBitmap(decoded.width, decoded.height).also {
             Canvas(it).apply { drawColor(Color.WHITE); drawBitmap(decoded, 0f, 0f, null) }
         }
     }

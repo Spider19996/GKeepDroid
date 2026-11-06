@@ -1,6 +1,8 @@
 package com.gkeepdroid
 
 import android.content.Context
+import androidx.core.content.edit
+import androidx.core.net.toUri
 import android.database.ContentObserver
 import android.net.Uri
 import android.os.Handler
@@ -37,12 +39,12 @@ object MarkdownSync {
 
     private fun prefs(context: Context) = context.getSharedPreferences("md_sync", Context.MODE_PRIVATE)
 
-    fun treeUri(context: Context): Uri? = prefs(context).getString("tree", null)?.let { Uri.parse(it) }
+    fun treeUri(context: Context): Uri? = prefs(context).getString("tree", null)?.let { it.toUri() }
 
     fun isEnabled(context: Context) = prefs(context).getBoolean("enabled", false) && treeUri(context) != null
 
     fun setEnabled(context: Context, on: Boolean) {
-        prefs(context).edit().putBoolean("enabled", on).apply()
+        prefs(context).edit { putBoolean("enabled", on) }
         if (on) {
             startObserving(context)
             request(context)
@@ -138,7 +140,7 @@ object MarkdownSync {
         state.forEach { (id, s) ->
             json.put(id, JSONObject().put("doc", s.docId).put("name", s.name).put("hash", s.hash).put("sig", s.sig))
         }
-        prefs(context).edit().putString("state_$folder", json.toString()).apply()
+        prefs(context).edit { putString("state_$folder", json.toString()) }
     }
 
     // ---- the sync itself ---------------------------------------------------------------------

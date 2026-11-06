@@ -1,6 +1,8 @@
 package com.gkeepdroid
 
 import android.appwidget.AppWidgetManager
+import androidx.core.content.edit
+import androidx.core.net.toUri
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
@@ -281,7 +283,7 @@ class EditNoteActivity : ComponentActivity() {
                 },
                 confirmButton = {
                     TextButton(onClick = {
-                        if (never) hintPrefs.edit().putBoolean("own_photo_local_dismissed", true).apply()
+                        if (never) hintPrefs.edit { putBoolean("own_photo_local_dismissed", true) }
                         localHint = false
                         pickBackground.launch("image/*")
                     }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.ok)) }
@@ -479,7 +481,7 @@ class EditNoteActivity : ComponentActivity() {
                 Toast.makeText(applicationContext, R.string.note_saved, Toast.LENGTH_SHORT).show()
                 val prefs = getSharedPreferences("reminder_hints", MODE_PRIVATE)
                 if (!fromHome && !CredentialStore.isLocal(target) && android.os.Build.VERSION.SDK_INT >= 33 && !notificationsOn && !prefs.getBoolean("save_asked", false)) {
-                    prefs.edit().putBoolean("save_asked", true).apply()
+                    prefs.edit { putBoolean("save_asked", true) }
                     askAfterSave.launch(android.Manifest.permission.POST_NOTIFICATIONS)
                 } else {
                     finish()
@@ -994,7 +996,7 @@ class EditNoteActivity : ComponentActivity() {
                         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     IconButton(onClick = {
-                        hintPrefs.edit().putBoolean("list_hint_hidden", true).apply()
+                        hintPrefs.edit { putBoolean("list_hint_hidden", true) }
                         hintHidden = true
                     }, shapes = IconButtonDefaults.shapes()) {
                         Icon(painterResource(R.drawable.ic_close), contentDescription = stringResource(R.string.notif_hint_dismiss), tint = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -1081,7 +1083,7 @@ class EditNoteActivity : ComponentActivity() {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                             TextButton(onClick = {
                                 convertDismissed = true
-                                convertKey?.let { convertPrefs.edit().putBoolean(it, true).apply() }
+                                convertKey?.let { convertPrefs.edit { putBoolean(it, true) } }
                             }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.convert_to_list_no)) }
                             TextButton(onClick = { requestConvert() }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.convert_to_list)) }
                         }
@@ -1512,7 +1514,7 @@ class EditNoteActivity : ComponentActivity() {
         val kind = if (note.isList) "LIST" else "NOTE"
         // With several signed-in accounts the web link has to say which one it means.
         val authUser = if (CredentialStore.accounts(this).size > 1) "?authuser=${Uri.encode(account)}" else ""
-        val web = Intent(Intent.ACTION_VIEW, Uri.parse("https://keep.google.com/$authUser#$kind/${note.serverId}"))
+        val web = Intent(Intent.ACTION_VIEW, "https://keep.google.com/$authUser#$kind/${note.serverId}".toUri())
         val app = Intent(web).setPackage("com.google.android.keep")
         try {
             startActivity(if (app.resolveActivity(packageManager) != null) app else web)
@@ -1631,14 +1633,14 @@ internal object NoteLinks {
         android.util.Patterns.WEB_URL.matcher(all).let { m ->
             while (m.find()) {
                 val url = m.group()
-                add(url, Intent(Intent.ACTION_VIEW, Uri.parse(if (url.contains("://")) url else "https://$url")))
+                add(url, Intent(Intent.ACTION_VIEW, (if (url.contains("://")) url else "https://$url").toUri()))
             }
         }
         android.util.Patterns.EMAIL_ADDRESS.matcher(all).let { m ->
-            while (m.find()) add(m.group(), Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + m.group())))
+            while (m.find()) add(m.group(), Intent(Intent.ACTION_SENDTO, ("mailto:" + m.group()).toUri()))
         }
         phone.findAll(all).forEach { m ->
-            if (m.value.count { it.isDigit() } >= 7) add(m.value.trim(), Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + m.value.filter { it.isDigit() || it == '+' })))
+            if (m.value.count { it.isDigit() } >= 7) add(m.value.trim(), Intent(Intent.ACTION_DIAL, ("tel:" + m.value.filter { it.isDigit() || it == '+' }).toUri()))
         }
         // An address that is part of an e-mail address is not offered a second time.
         return found.values.filterNot { link -> link.intent.action == Intent.ACTION_VIEW && found.keys.any { it.contains("@") && it.contains(link.label) } }

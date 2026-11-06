@@ -1,6 +1,7 @@
 package com.gkeepdroid
 
 import android.content.Context
+import androidx.core.content.edit
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -51,7 +52,7 @@ object SearchHistory {
     }.getOrDefault(emptyList())
 
     private fun save(context: Context, list: List<String>) {
-        prefs(context).edit().putString("list", JSONArray(list).toString()).apply()
+        prefs(context).edit { putString("list", JSONArray(list).toString()) }
     }
 
     /** Remembers a search that was used; one letter is not worth keeping. */

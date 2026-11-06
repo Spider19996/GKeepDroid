@@ -1,6 +1,9 @@
 package com.gkeepdroid
 
 import android.content.Context
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.scale
+import androidx.core.content.edit
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -22,7 +25,7 @@ import java.net.URL
 object NoteBackgrounds {
     /** The average color of a picture, as ARGB. */
     fun averageColor(bitmap: Bitmap): Int {
-        val small = Bitmap.createScaledBitmap(bitmap, 16, 16, true)
+        val small = bitmap.scale(16, 16)
         var r = 0L; var g = 0L; var b = 0L
         val pixels = IntArray(16 * 16).also { small.getPixels(it, 0, 16, 0, 0, 16, 16) }
         pixels.forEach { r += android.graphics.Color.red(it); g += android.graphics.Color.green(it); b += android.graphics.Color.blue(it) }
@@ -109,7 +112,7 @@ object NoteBackgrounds {
         }
         val left = (full.width - sourceWidth) / 2
         val top = if (fromBottom) full.height - sourceHeight else (full.height - sourceHeight) / 2
-        val bitmap = Bitmap.createBitmap(WIDGET_SIZE, height, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(WIDGET_SIZE, height)
         Canvas(bitmap).drawBitmap(
             full, android.graphics.Rect(left, top, left + sourceWidth, top + sourceHeight), android.graphics.Rect(0, 0, WIDGET_SIZE, height),
             android.graphics.Paint(android.graphics.Paint.FILTER_BITMAP_FLAG).apply { this.alpha = (alpha * 255).toInt().coerceIn(0, 255) },
@@ -148,7 +151,7 @@ object NoteBackgrounds {
                 }
             }
         }
-        if (due) prefs.edit().putLong("checked", System.currentTimeMillis()).apply()
+        if (due) prefs.edit { putLong("checked", System.currentTimeMillis()) }
         return changed
     }
 
@@ -175,7 +178,7 @@ object NoteBackgrounds {
         val svg = SVG.getFromInputStream(svgBytes.inputStream())
         svg.setDocumentWidth(SIZE.toFloat())
         svg.setDocumentHeight(SIZE.toFloat())
-        val bitmap = Bitmap.createBitmap(SIZE, SIZE, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(SIZE, SIZE)
         svg.renderToCanvas(Canvas(bitmap))
         return bitmap
     }

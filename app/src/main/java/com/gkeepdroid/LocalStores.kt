@@ -1,6 +1,7 @@
 package com.gkeepdroid
 
 import android.content.Context
+import androidx.core.content.edit
 
 /** Per-note override of whether the checked items of a checklist are collapsed in the widget. */
 object CollapseStore {
@@ -12,7 +13,7 @@ object CollapseStore {
         prefs(context).all.mapNotNull { (k, v) -> (v as? Boolean)?.let { k to it } }.toMap()
 
     fun set(context: Context, account: String, noteId: String, collapsed: Boolean) {
-        prefs(context).edit().putBoolean(key(account, noteId), collapsed).apply()
+        prefs(context).edit { putBoolean(key(account, noteId), collapsed) }
     }
 }
 
@@ -25,7 +26,7 @@ object Hints {
     private val stores = listOf("hints", "reminder_hints", "convert_hints")
 
     fun resetAll(context: Context) {
-        stores.forEach { context.getSharedPreferences(it, Context.MODE_PRIVATE).edit().clear().apply() }
+        stores.forEach { context.getSharedPreferences(it, Context.MODE_PRIVATE).edit { clear() } }
     }
 }
 
@@ -43,7 +44,7 @@ object FoldStore {
     fun setAll(context: Context, keys: Collection<String>, folded: Boolean) {
         val all = load(context).toMutableSet()
         if (folded) all.addAll(keys) else all.removeAll(keys.toSet())
-        prefs(context).edit().putStringSet("keys", all).apply()
+        prefs(context).edit { putStringSet("keys", all) }
         version.intValue++
     }
 
@@ -68,6 +69,6 @@ object PrivateNotes {
         version.intValue++
         val keys = load(context).toMutableSet()
         if (hidden) keys.add(key(account, noteId)) else keys.remove(key(account, noteId))
-        prefs(context).edit().putStringSet("keys", keys).apply()
+        prefs(context).edit { putStringSet("keys", keys) }
     }
 }

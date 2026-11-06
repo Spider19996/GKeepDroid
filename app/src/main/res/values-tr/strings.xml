@@ -142,7 +142,10 @@
     <string name="md_sync_choose">Klasör seç</string>
     <string name="md_sync_now">Şimdi senkronize et</string>
     <string name="md_sync_hint">Her not, seçtiğiniz klasörde (hesap başına bir alt klasör) kendi .md dosyası olarak tutulur ve iki yönlü senkron kalır: bir notu widget\'ta veya Keep\'te düzenlerseniz dosya değişir; dosyayı başka bir uygulamada (Obsidian, Markor…) düzenlerseniz not değişir. Klasördeki yeni .md dosyaları yeni not olur. Bir dosyayı silmek notu silmez; Keep\'te kaldırılan bir notun dosyası _removed alt klasörüne taşınır. İki taraf da değiştiyse yenisi kazanır, diğeri .conflict dosyası olarak saklanır. Görseller dosyaların yanına kopyalanır ama orada değiştirilemez. Diğer uygulamalardan gelen değişiklikler uygulama çalışırken hemen, aksi halde sonraki senkronizasyonda gelir.</string>
-    <string name="md_sync_done">Markdown klasörü senkronize edildi (%1$d değişiklik).</string>
+    <plurals name="md_sync_done">
+        <item quantity="one">Markdown klasörü senkronize edildi (%1$d değişiklik).</item>
+        <item quantity="other">Markdown klasörü senkronize edildi (%1$d değişiklik).</item>
+    </plurals>
     <string name="md_sync_failed">Markdown senkronizasyonu başarısız: %1$s</string>
     <string name="md_sync_folder">Klasör: %1$s</string>
     <string name="pinned_section">Sabitlenenler</string>
@@ -176,7 +179,10 @@
     <string name="own_photo_hint">Bu fotoğraf yalnızca bu telefonda kalır. Google Keep\'e kaydedilmez; bu yüzden diğer cihazlarda veya Keep\'in kendisinde görünmez.</string>
     <string name="dont_show_again">Bir daha gösterme</string>
     <string name="background_own">Kendi fotoğrafım</string>
-    <string name="selected_count">%d seçildi</string>
+    <plurals name="selected_count">
+        <item quantity="one">%d seçildi</item>
+        <item quantity="other">%d seçildi</item>
+    </plurals>
     <string name="select_all">Tümünü seç</string>
     <string name="duplicate_note">Çoğalt</string>
     <string name="empty_trash">Çöp kutusunu boşalt</string>
@@ -209,7 +215,10 @@
     <string name="sync_now">Şimdi eşitle</string>
     <string name="sync_started">Eşitleme başlatıldı.</string>
     <string name="orphans_clean">Artık kullanılmayan widget’ları temizle</string>
-    <string name="orphans_removed">%d artık kullanılmayan widget’ın ayarları silindi. Ana ekrandaki widget’ları orada kaldırın (uzun basın).</string>
+    <plurals name="orphans_removed">
+        <item quantity="one">%d artık kullanılmayan widget’ın ayarları silindi. Ana ekrandaki widget’ları orada kaldırın (uzun basın).</item>
+        <item quantity="other">%d artık kullanılmayan widget’ın ayarları silindi. Ana ekrandaki widget’ları orada kaldırın (uzun basın).</item>
+    </plurals>
     <string name="btn_refresh">Yenile</string>
     <string name="btn_add_item">Öğe ekle</string>
     <string name="btn_new_note">Yeni not</string>

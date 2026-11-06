@@ -1,6 +1,7 @@
 package com.gkeepdroid
 
 import android.appwidget.AppWidgetManager
+import androidx.core.net.toUri
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -125,14 +126,14 @@ private const val KEEP_WEB_URL = "https://keep.google.com"
 /** Opens the Google Keep app, or keep.google.com in the browser when the app is not installed. */
 internal fun keepIntent(context: Context): Intent =
     context.packageManager.getLaunchIntentForPackage(KEEP_PACKAGE)
-        ?: Intent(Intent.ACTION_VIEW, Uri.parse(KEEP_WEB_URL)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        ?: Intent(Intent.ACTION_VIEW, KEEP_WEB_URL.toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
 private fun newNoteIntent(context: Context, appWidgetId: Int, account: String?, isList: Boolean) =
     Intent(context, EditNoteActivity::class.java)
         .putExtra(EditNoteActivity.EXTRA_NEW_LIST, isList)
         .putExtra(EditNoteActivity.EXTRA_ACCOUNT, account.orEmpty())
         // A distinct data URI keeps the PendingIntents of different buttons and widgets apart.
-        .setData(Uri.parse("gkeepdroid://new/${if (isList) "list" else "note"}/$appWidgetId"))
+        .setData(("gkeepdroid://new/${if (isList) "list" else "note"}/$appWidgetId").toUri())
 
 /** Stable id of a list row; with ids the widget keeps its scroll position when it is redrawn. */
 internal fun stableId(kind: String, id: String): Long = "$kind:$id".hashCode().toLong()

@@ -1,6 +1,7 @@
 package com.gkeepdroid
 
 import androidx.compose.foundation.background
+import androidx.core.graphics.toColorInt
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -67,7 +68,7 @@ fun ColorPickerDialog(initial: Int, onDismiss: () -> Unit, onPick: (Int) -> Unit
                     onValueChange = { text ->
                         hexText = text
                         // Apply as soon as the text is a complete #RRGGBB value.
-                        val parsed = runCatching { AndroidColor.parseColor(text) }.getOrNull()
+                        val parsed = runCatching { text.toColorInt() }.getOrNull()
                         if (parsed != null && text.length == 7) {
                             val hsv = FloatArray(3).also { AndroidColor.colorToHSV(parsed, it) }
                             hue = hsv[0]; saturation = hsv[1]; value = hsv[2]

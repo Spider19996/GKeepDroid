@@ -142,7 +142,11 @@
     <string name="md_sync_choose">Choisir le dossier</string>
     <string name="md_sync_now">Synchroniser maintenant</string>
     <string name="md_sync_hint">Chaque note est conservée dans son propre fichier .md, dans un dossier de votre choix (un sous-dossier par compte), et reste synchronisée dans les deux sens : modifiez une note dans le widget ou dans Keep et le fichier change ; modifiez le fichier dans une autre appli (Obsidian, Markor…) et la note change. Les nouveaux fichiers .md du dossier deviennent de nouvelles notes. Supprimer un fichier ne supprime pas la note ; une note supprimée dans Keep déplace son fichier dans le sous-dossier _removed. Si les deux côtés ont changé, le plus récent l\'emporte et l\'autre est conservé en fichier .conflict. Les images sont copiées à côté des fichiers mais ne peuvent pas y être modifiées. Les modifications venant d\'autres applis arrivent aussitôt quand l\'appli tourne, sinon à la prochaine synchronisation.</string>
-    <string name="md_sync_done">Dossier Markdown synchronisé (%1$d modifications).</string>
+    <plurals name="md_sync_done">
+        <item quantity="one">Dossier Markdown synchronisé (%1$d modification).</item>
+        <item quantity="many">Dossier Markdown synchronisé (%1$d modifications).</item>
+        <item quantity="other">Dossier Markdown synchronisé (%1$d modifications).</item>
+    </plurals>
     <string name="md_sync_failed">Échec de la synchronisation Markdown : %1$s</string>
     <string name="md_sync_folder">Dossier : %1$s</string>
     <string name="pinned_section">Épinglées</string>
@@ -176,7 +180,11 @@
     <string name="own_photo_hint">Cette photo reste uniquement sur ce téléphone. Elle n\'est pas enregistrée dans Google Keep et n\'apparaîtra donc ni sur d\'autres appareils ni dans Keep.</string>
     <string name="dont_show_again">Ne plus afficher</string>
     <string name="background_own">Photo personnelle</string>
-    <string name="selected_count">%d sélectionnées</string>
+    <plurals name="selected_count">
+        <item quantity="one">%d sélectionnée</item>
+        <item quantity="many">%d sélectionnées</item>
+        <item quantity="other">%d sélectionnées</item>
+    </plurals>
     <string name="select_all">Tout sélectionner</string>
     <string name="duplicate_note">Dupliquer</string>
     <string name="empty_trash">Vider la corbeille</string>
@@ -212,7 +220,11 @@
     <string name="sync_now">Synchroniser maintenant</string>
     <string name="sync_started">Synchronisation lancée.</string>
     <string name="orphans_clean">Nettoyer les widgets orphelins</string>
-    <string name="orphans_removed">Réglages de %d widgets orphelins supprimés. Les widgets de l’écran d’accueil se retirent là-bas (appui long).</string>
+    <plurals name="orphans_removed">
+        <item quantity="one">Réglages de %d widget orphelin supprimés. Les widgets de l’écran d’accueil se retirent là-bas (appui long).</item>
+        <item quantity="many">Réglages de %d widgets orphelins supprimés. Les widgets de l’écran d’accueil se retirent là-bas (appui long).</item>
+        <item quantity="other">Réglages de %d widgets orphelins supprimés. Les widgets de l’écran d’accueil se retirent là-bas (appui long).</item>
+    </plurals>
     <string name="btn_refresh">Actualiser</string>
     <string name="btn_add_item">Ajouter un élément</string>
     <string name="btn_new_note">Nouvelle note</string>

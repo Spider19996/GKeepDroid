@@ -1,6 +1,7 @@
 package com.gkeepdroid
 
 import android.content.Intent
+import androidx.core.net.toUri
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -61,7 +62,7 @@ internal fun ColumnScope.CreditsPage(s: SettingsState) {
                     chevron = R.drawable.ic_open_new,
                     shapes = ListItemDefaults.segmentedShapes(index, credits.size),
                 ) {
-                    runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(credit.url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+                    runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, credit.url.toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
                 }
             }
         }

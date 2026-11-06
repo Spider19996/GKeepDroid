@@ -1,6 +1,7 @@
 package com.gkeepdroid
 
 import android.content.Context
+import androidx.core.content.edit
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -70,7 +71,7 @@ object AppLog {
     fun enabled(context: Context) = state(context).getBoolean("enabled", false)
 
     fun setEnabled(context: Context, on: Boolean) {
-        state(context).edit().putBoolean("enabled", on).apply()
+        state(context).edit { putBoolean("enabled", on) }
         if (!on) file(context).delete()
     }
 

@@ -1,6 +1,7 @@
 package com.gkeepdroid
 
 import android.content.Context
+import androidx.core.content.edit
 
 /** Counts the requests sent to Keep, to show how many there were in the last 24 hours. */
 object RequestStats {
@@ -16,7 +17,7 @@ object RequestStats {
     fun record(context: Context) {
         val now = System.currentTimeMillis()
         val kept = (times(context, now) + now).takeLast(MAX_KEPT)
-        prefs(context).edit().putString("times", kept.joinToString(",")).apply()
+        prefs(context).edit { putString("times", kept.joinToString(",")) }
     }
 
     /** The count for the screen: updates as soon as a request is recorded, and as old ones drop out of the 24 hours. */

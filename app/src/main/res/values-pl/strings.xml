@@ -142,7 +142,12 @@
     <string name="md_sync_choose">Wybierz folder</string>
     <string name="md_sync_now">Synchronizuj teraz</string>
     <string name="md_sync_hint">Każda notatka jest osobnym plikiem .md w wybranym folderze, z podfolderem na konto, i pozostaje zsynchronizowana w obie strony: zmiana notatki w widżecie lub w Keep zmienia plik; zmiana pliku w innej aplikacji (Obsidian, Markor…) zmienia notatkę. Nowe pliki .md w folderze stają się nowymi notatkami. Usunięcie pliku nie usuwa notatki; notatka usunięta w Keep przenosi swój plik do podfolderu _removed. Jeśli zmieniły się obie strony, wygrywa nowsza, a druga zostaje jako plik .conflict. Obrazy są kopiowane obok plików, ale tam nie można ich zmieniać. Zmiany z innych aplikacji docierają od razu, gdy aplikacja działa, w przeciwnym razie przy następnej synchronizacji.</string>
-    <string name="md_sync_done">Folder Markdown zsynchronizowany (zmian: %1$d).</string>
+    <plurals name="md_sync_done">
+        <item quantity="one">Folder Markdown zsynchronizowany (zmian: %1$d).</item>
+        <item quantity="few">Folder Markdown zsynchronizowany (zmian: %1$d).</item>
+        <item quantity="many">Folder Markdown zsynchronizowany (zmian: %1$d).</item>
+        <item quantity="other">Folder Markdown zsynchronizowany (zmian: %1$d).</item>
+    </plurals>
     <string name="md_sync_failed">Synchronizacja Markdown nie powiodła się: %1$s</string>
     <string name="md_sync_folder">Folder: %1$s</string>
     <string name="pinned_section">Przypięte</string>
@@ -176,7 +181,12 @@
     <string name="own_photo_hint">To zdjęcie zostaje tylko na tym telefonie. Nie jest zapisywane w Google Keep, więc nie pojawi się na innych urządzeniach ani w samym Keep.</string>
     <string name="dont_show_again">Nie pokazuj więcej</string>
     <string name="background_own">Własne zdjęcie</string>
-    <string name="selected_count">Zaznaczono: %d</string>
+    <plurals name="selected_count">
+        <item quantity="one">Zaznaczono: %d</item>
+        <item quantity="few">Zaznaczono: %d</item>
+        <item quantity="many">Zaznaczono: %d</item>
+        <item quantity="other">Zaznaczono: %d</item>
+    </plurals>
     <string name="select_all">Zaznacz wszystko</string>
     <string name="duplicate_note">Duplikuj</string>
     <string name="empty_trash">Opróżnij kosz</string>
@@ -215,7 +225,12 @@
     <string name="sync_now">Synchronizuj teraz</string>
     <string name="sync_started">Synchronizacja rozpoczęta.</string>
     <string name="orphans_clean">Wyczyść osierocone widżety</string>
-    <string name="orphans_removed">Usunięto ustawienia %d osieroconych widżetów. Widżety na ekranie głównym usuń tam (przytrzymaj widżet).</string>
+    <plurals name="orphans_removed">
+        <item quantity="one">Usunięto ustawienia %d osieroconych widżetów. Widżety na ekranie głównym usuń tam (przytrzymaj widżet).</item>
+        <item quantity="few">Usunięto ustawienia %d osieroconych widżetów. Widżety na ekranie głównym usuń tam (przytrzymaj widżet).</item>
+        <item quantity="many">Usunięto ustawienia %d osieroconych widżetów. Widżety na ekranie głównym usuń tam (przytrzymaj widżet).</item>
+        <item quantity="other">Usunięto ustawienia %d osieroconych widżetów. Widżety na ekranie głównym usuń tam (przytrzymaj widżet).</item>
+    </plurals>
     <string name="btn_refresh">Odśwież</string>
     <string name="btn_add_item">Dodaj pozycję</string>
     <string name="btn_new_note">Nowa notatka</string>

@@ -142,7 +142,9 @@
     <string name="md_sync_choose">选择文件夹</string>
     <string name="md_sync_now">立即同步</string>
     <string name="md_sync_hint">每条笔记都作为单独的 .md 文件保存在你选择的文件夹中（每个账号一个子文件夹），并保持双向同步：在小组件或 Keep 中编辑笔记，文件随之改变；在其他应用（Obsidian、Markor 等）中编辑文件，笔记随之改变。文件夹中新的 .md 文件会成为新笔记。删除文件不会删除笔记；在 Keep 中移除的笔记，其文件会移到子文件夹 _removed。如果双方都改过，较新的一方获胜，另一方保存为 .conflict 文件。图片会复制到文件旁边，但不能在那里修改。其他应用的更改在应用运行时很快送达，否则在下次同步时送达。</string>
-    <string name="md_sync_done">Markdown 文件夹已同步（%1$d 处更改）。</string>
+    <plurals name="md_sync_done">
+        <item quantity="other">Markdown 文件夹已同步（%1$d 处更改）。</item>
+    </plurals>
     <string name="md_sync_failed">Markdown 同步失败：%1$s</string>
     <string name="md_sync_folder">文件夹：%1$s</string>
     <string name="pinned_section">已置顶</string>
@@ -176,7 +178,9 @@
     <string name="own_photo_hint">此照片仅保存在这部手机上。它不会保存到 Google Keep，因此不会出现在其他设备或 Keep 本身中。</string>
     <string name="dont_show_again">不再显示</string>
     <string name="background_own">自己的照片</string>
-    <string name="selected_count">已选择 %d 项</string>
+    <plurals name="selected_count">
+        <item quantity="other">已选择 %d 项</item>
+    </plurals>
     <string name="select_all">全选</string>
     <string name="duplicate_note">复制</string>
     <string name="empty_trash">清空回收站</string>
@@ -206,7 +210,9 @@
     <string name="sync_now">立即同步</string>
     <string name="sync_started">已开始同步。</string>
     <string name="orphans_clean">清理残留的小组件</string>
-    <string name="orphans_removed">已移除 %d 个残留小组件的设置。主屏幕上的小组件需在主屏幕上移除（长按小组件）。</string>
+    <plurals name="orphans_removed">
+        <item quantity="other">已移除 %d 个残留小组件的设置。主屏幕上的小组件需在主屏幕上移除（长按小组件）。</item>
+    </plurals>
     <string name="btn_refresh">刷新</string>
     <string name="btn_add_item">添加项目</string>
     <string name="btn_new_note">新建笔记</string>

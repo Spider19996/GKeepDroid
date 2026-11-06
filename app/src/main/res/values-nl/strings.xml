@@ -142,7 +142,10 @@
     <string name="md_sync_choose">Map kiezen</string>
     <string name="md_sync_now">Nu synchroniseren</string>
     <string name="md_sync_hint">Elke notitie staat als eigen .md-bestand in een map naar keuze, één submap per account, en blijft in beide richtingen gesynchroniseerd: bewerk je een notitie in de widget of in Keep, dan verandert het bestand; bewerk je het bestand in een andere app (Obsidian, Markor, …), dan verandert de notitie. Nieuwe .md-bestanden in de map worden nieuwe notities. Een bestand verwijderen verwijdert de notitie niet; een in Keep verwijderde notitie verplaatst haar bestand naar de submap _removed. Als beide kanten zijn gewijzigd, wint de nieuwste en blijft de andere bewaard als .conflict-bestand. Afbeeldingen worden naast de bestanden gekopieerd maar kunnen daar niet worden gewijzigd. Wijzigingen uit andere apps komen direct aan zolang de app draait, anders bij de volgende synchronisatie.</string>
-    <string name="md_sync_done">Markdown-map gesynchroniseerd (%1$d wijzigingen).</string>
+    <plurals name="md_sync_done">
+        <item quantity="one">Markdown-map gesynchroniseerd (1 wijziging).</item>
+        <item quantity="other">Markdown-map gesynchroniseerd (%1$d wijzigingen).</item>
+    </plurals>
     <string name="md_sync_failed">Markdown-synchronisatie mislukt: %1$s</string>
     <string name="md_sync_folder">Map: %1$s</string>
     <string name="pinned_section">Vastgezet</string>
@@ -176,7 +179,10 @@
     <string name="own_photo_hint">Deze foto blijft alleen op deze telefoon. Hij wordt niet opgeslagen in Google Keep en verschijnt dus niet op andere apparaten of in Keep zelf.</string>
     <string name="dont_show_again">Niet meer tonen</string>
     <string name="background_own">Eigen foto</string>
-    <string name="selected_count">%d geselecteerd</string>
+    <plurals name="selected_count">
+        <item quantity="one">%d geselecteerd</item>
+        <item quantity="other">%d geselecteerd</item>
+    </plurals>
     <string name="select_all">Alles selecteren</string>
     <string name="duplicate_note">Dupliceren</string>
     <string name="empty_trash">Prullenbak legen</string>
@@ -209,7 +215,10 @@
     <string name="sync_now">Nu synchroniseren</string>
     <string name="sync_started">Synchronisatie gestart.</string>
     <string name="orphans_clean">Verweesde widgets opruimen</string>
-    <string name="orphans_removed">Instellingen van %d verweesde widgets verwijderd. Widgets op het startscherm verwijder je daar zelf (lang indrukken).</string>
+    <plurals name="orphans_removed">
+        <item quantity="one">Instellingen van 1 verweesde widget verwijderd. Widgets op het startscherm verwijder je daar zelf (lang indrukken).</item>
+        <item quantity="other">Instellingen van %d verweesde widgets verwijderd. Widgets op het startscherm verwijder je daar zelf (lang indrukken).</item>
+    </plurals>
     <string name="btn_refresh">Vernieuwen</string>
     <string name="btn_add_item">Item toevoegen</string>
     <string name="btn_new_note">Nieuwe notitie</string>

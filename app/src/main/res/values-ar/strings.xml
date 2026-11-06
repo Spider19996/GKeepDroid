@@ -142,7 +142,14 @@
     <string name="md_sync_choose">اختيار المجلد</string>
     <string name="md_sync_now">مزامنة الآن</string>
     <string name="md_sync_hint">تُحفظ كل ملاحظة في ملف .md خاص بها داخل مجلد تختاره (مجلد فرعي لكل حساب) وتبقى متزامنة في الاتجاهين: عدّل ملاحظة في الأداة أو في Keep فيتغيّر الملف، وعدّل الملف في تطبيق آخر (Obsidian وMarkor وغيرهما) فتتغيّر الملاحظة. تصبح ملفات .md الجديدة في المجلد ملاحظات جديدة. حذف ملف لا يحذف الملاحظة؛ والملاحظة المحذوفة في Keep ينتقل ملفها إلى المجلد الفرعي _removed. إذا تغيّر الطرفان يفوز الأحدث ويُحفظ الآخر كملف .conflict. تُنسخ الصور بجانب الملفات لكن لا يمكن تعديلها هناك. تصل تغييرات التطبيقات الأخرى فورًا أثناء تشغيل التطبيق، وإلا عند المزامنة التالية.</string>
-    <string name="md_sync_done">تمت مزامنة مجلد Markdown (%1$d تغييرات).</string>
+    <plurals name="md_sync_done">
+        <item quantity="zero">تمت مزامنة مجلد Markdown (%1$d تغييرات).</item>
+        <item quantity="one">تمت مزامنة مجلد Markdown (%1$d تغييرات).</item>
+        <item quantity="two">تمت مزامنة مجلد Markdown (%1$d تغييرات).</item>
+        <item quantity="few">تمت مزامنة مجلد Markdown (%1$d تغييرات).</item>
+        <item quantity="many">تمت مزامنة مجلد Markdown (%1$d تغييرات).</item>
+        <item quantity="other">تمت مزامنة مجلد Markdown (%1$d تغييرات).</item>
+    </plurals>
     <string name="md_sync_failed">فشلت مزامنة Markdown: %1$s</string>
     <string name="md_sync_folder">المجلد: %1$s</string>
     <string name="pinned_section">المثبتة</string>
@@ -176,7 +183,14 @@
     <string name="own_photo_hint">تبقى هذه الصورة على هذا الهاتف فقط. لا تُحفظ في Google Keep، لذا لن تظهر على الأجهزة الأخرى أو في Keep نفسه.</string>
     <string name="dont_show_again">عدم الإظهار مجددًا</string>
     <string name="background_own">صورتي</string>
-    <string name="selected_count">تم تحديد %d</string>
+    <plurals name="selected_count">
+        <item quantity="zero">تم تحديد %d</item>
+        <item quantity="one">تم تحديد %d</item>
+        <item quantity="two">تم تحديد %d</item>
+        <item quantity="few">تم تحديد %d</item>
+        <item quantity="many">تم تحديد %d</item>
+        <item quantity="other">تم تحديد %d</item>
+    </plurals>
     <string name="select_all">تحديد الكل</string>
     <string name="duplicate_note">تكرار</string>
     <string name="empty_trash">إفراغ سلة المهملات</string>
@@ -221,7 +235,14 @@
     <string name="sync_now">زامن الآن</string>
     <string name="sync_started">بدأت المزامنة.</string>
     <string name="orphans_clean">تنظيف الأدوات اليتيمة</string>
-    <string name="orphans_removed">تمت إزالة إعدادات %d من الأدوات اليتيمة. أزل الأدوات الموجودة على الشاشة الرئيسية من هناك (ضغط مطوّل).</string>
+    <plurals name="orphans_removed">
+        <item quantity="zero">تمت إزالة إعدادات %d من الأدوات اليتيمة. أزل الأدوات الموجودة على الشاشة الرئيسية من هناك (ضغط مطوّل).</item>
+        <item quantity="one">تمت إزالة إعدادات %d من الأدوات اليتيمة. أزل الأدوات الموجودة على الشاشة الرئيسية من هناك (ضغط مطوّل).</item>
+        <item quantity="two">تمت إزالة إعدادات %d من الأدوات اليتيمة. أزل الأدوات الموجودة على الشاشة الرئيسية من هناك (ضغط مطوّل).</item>
+        <item quantity="few">تمت إزالة إعدادات %d من الأدوات اليتيمة. أزل الأدوات الموجودة على الشاشة الرئيسية من هناك (ضغط مطوّل).</item>
+        <item quantity="many">تمت إزالة إعدادات %d من الأدوات اليتيمة. أزل الأدوات الموجودة على الشاشة الرئيسية من هناك (ضغط مطوّل).</item>
+        <item quantity="other">تمت إزالة إعدادات %d من الأدوات اليتيمة. أزل الأدوات الموجودة على الشاشة الرئيسية من هناك (ضغط مطوّل).</item>
+    </plurals>
     <string name="btn_refresh">تحديث</string>
     <string name="btn_add_item">إضافة عنصر</string>
     <string name="btn_new_note">ملاحظة جديدة</string>

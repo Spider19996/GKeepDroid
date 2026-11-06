@@ -143,7 +143,10 @@
     <string name="md_sync_choose">Choose folder</string>
     <string name="md_sync_now">Sync now</string>
     <string name="md_sync_hint">Every note is kept as its own .md file in a folder you choose, one subfolder per account, and stays in sync both ways: edit a note in the widget or in Keep and the file changes; edit the file in another app (Obsidian, Markor, …) and the note changes. New .md files in the folder become new notes. Deleting a file does not delete the note; a note removed in Keep moves its file to the subfolder _removed. If both sides changed, the newer one wins and the other is kept as a .conflict file. Images are copied next to the files but cannot be changed there. Edits from other apps arrive within moments while the app is running, otherwise at the next sync.</string>
-    <string name="md_sync_done">Markdown folder synced (%1$d changes).</string>
+    <plurals name="md_sync_done">
+        <item quantity="one">Markdown folder synced (1 change).</item>
+        <item quantity="other">Markdown folder synced (%1$d changes).</item>
+    </plurals>
     <string name="md_sync_failed">Markdown sync failed: %1$s</string>
     <string name="md_sync_folder">Folder: %1$s</string>
     <string name="pinned_section">Pinned</string>
@@ -177,7 +180,10 @@
     <string name="own_photo_hint">This photo stays on this phone only. It is not saved to Google Keep, so it will not appear on other devices or in Keep itself.</string>
     <string name="dont_show_again">Don\'t show again</string>
     <string name="background_own">Own photo</string>
-    <string name="selected_count">%d selected</string>
+    <plurals name="selected_count">
+        <item quantity="one">%d selected</item>
+        <item quantity="other">%d selected</item>
+    </plurals>
     <string name="select_all">Select all</string>
     <string name="duplicate_note">Duplicate</string>
     <string name="empty_trash">Empty trash</string>
@@ -210,7 +216,10 @@
     <string name="sync_now">Sync now</string>
     <string name="sync_started">Sync started.</string>
     <string name="orphans_clean">Clean up leftover widgets</string>
-    <string name="orphans_removed">Removed settings of %d leftover widgets. Widgets still on the home screen must be removed there (long-press the widget).</string>
+    <plurals name="orphans_removed">
+        <item quantity="one">Removed settings of 1 leftover widget. Widgets still on the home screen must be removed there (long-press the widget).</item>
+        <item quantity="other">Removed settings of %d leftover widgets. Widgets still on the home screen must be removed there (long-press the widget).</item>
+    </plurals>
     <string name="btn_refresh">Refresh</string>
     <string name="btn_add_item">Add item</string>
     <string name="btn_new_note">New note</string>

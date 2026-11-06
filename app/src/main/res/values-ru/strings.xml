@@ -142,7 +142,12 @@
     <string name="md_sync_choose">Выбрать папку</string>
     <string name="md_sync_now">Синхронизировать сейчас</string>
     <string name="md_sync_hint">Каждая заметка хранится отдельным файлом .md в выбранной папке (по подпапке на аккаунт) и синхронизируется в обе стороны: изменили заметку в виджете или в Keep — меняется файл; изменили файл в другом приложении (Obsidian, Markor…) — меняется заметка. Новые файлы .md в папке становятся новыми заметками. Удаление файла не удаляет заметку; заметка, удалённая в Keep, переносит свой файл в подпапку _removed. Если изменились обе стороны, побеждает более новая, а другая сохраняется как файл .conflict. Изображения копируются рядом с файлами, но там их нельзя менять. Изменения из других приложений приходят сразу, пока приложение работает, иначе при следующей синхронизации.</string>
-    <string name="md_sync_done">Папка Markdown синхронизирована (изменений: %1$d).</string>
+    <plurals name="md_sync_done">
+        <item quantity="one">Папка Markdown синхронизирована (изменений: %1$d).</item>
+        <item quantity="few">Папка Markdown синхронизирована (изменений: %1$d).</item>
+        <item quantity="many">Папка Markdown синхронизирована (изменений: %1$d).</item>
+        <item quantity="other">Папка Markdown синхронизирована (изменений: %1$d).</item>
+    </plurals>
     <string name="md_sync_failed">Не удалось синхронизировать Markdown: %1$s</string>
     <string name="md_sync_folder">Папка: %1$s</string>
     <string name="pinned_section">Закреплённые</string>
@@ -176,7 +181,12 @@
     <string name="own_photo_hint">Это фото остаётся только на этом телефоне. Оно не сохраняется в Google Keep и поэтому не появится на других устройствах и в самом Keep.</string>
     <string name="dont_show_again">Больше не показывать</string>
     <string name="background_own">Своё фото</string>
-    <string name="selected_count">Выбрано: %d</string>
+    <plurals name="selected_count">
+        <item quantity="one">Выбрано: %d</item>
+        <item quantity="few">Выбрано: %d</item>
+        <item quantity="many">Выбрано: %d</item>
+        <item quantity="other">Выбрано: %d</item>
+    </plurals>
     <string name="select_all">Выбрать все</string>
     <string name="duplicate_note">Дублировать</string>
     <string name="empty_trash">Очистить корзину</string>
@@ -215,7 +225,12 @@
     <string name="sync_now">Синхронизировать сейчас</string>
     <string name="sync_started">Синхронизация запущена.</string>
     <string name="orphans_clean">Очистить «осиротевшие» виджеты</string>
-    <string name="orphans_removed">Удалены настройки %d «осиротевших» виджетов. Виджеты на главном экране удаляются там (долгое нажатие).</string>
+    <plurals name="orphans_removed">
+        <item quantity="one">Удалены настройки %d «осиротевших» виджетов. Виджеты на главном экране удаляются там (долгое нажатие).</item>
+        <item quantity="few">Удалены настройки %d «осиротевших» виджетов. Виджеты на главном экране удаляются там (долгое нажатие).</item>
+        <item quantity="many">Удалены настройки %d «осиротевших» виджетов. Виджеты на главном экране удаляются там (долгое нажатие).</item>
+        <item quantity="other">Удалены настройки %d «осиротевших» виджетов. Виджеты на главном экране удаляются там (долгое нажатие).</item>
+    </plurals>
     <string name="btn_refresh">Обновить</string>
     <string name="btn_add_item">Добавить пункт</string>
     <string name="btn_new_note">Новая заметка</string>

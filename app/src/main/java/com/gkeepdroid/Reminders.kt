@@ -1,6 +1,7 @@
 package com.gkeepdroid
 
 import android.app.AlarmManager
+import androidx.core.net.toUri
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -136,7 +137,7 @@ object Reminders {
         "" -> context.getString(R.string.reminder_default)
         SOUND_NONE -> context.getString(R.string.reminder_sound_none)
         else -> try {
-            RingtoneManager.getRingtone(context, Uri.parse(sound))?.getTitle(context)
+            RingtoneManager.getRingtone(context, sound.toUri())?.getTitle(context)
         } catch (e: Exception) {
             null
         } ?: context.getString(R.string.reminder_default)
@@ -144,7 +145,7 @@ object Reminders {
 
     private fun pending(context: Context, account: String, noteId: String, reminderId: String): PendingIntent {
         val intent = Intent(context, ReminderReceiver::class.java)
-            .setData(Uri.parse("gkeepdroid://reminder/" + Uri.encode(key(account, noteId) + "|" + reminderId)))
+            .setData(("gkeepdroid://reminder/" + Uri.encode(key(account, noteId) + "|" + reminderId)).toUri())
             .putExtra(EditNoteActivity.EXTRA_ACCOUNT, account)
             .putExtra(EditNoteActivity.EXTRA_NOTE_ID, noteId)
             .putExtra(ReminderReceiver.EXTRA_REMINDER_ID, reminderId)
@@ -170,7 +171,7 @@ object Reminders {
     /** Android's screen for the "Alarms & reminders" permission, or null where there is none. */
     fun exactAlarmSettings(context: Context): Intent? =
         if (android.os.Build.VERSION.SDK_INT < 31) null
-        else Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:" + context.packageName))
+        else Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, ("package:" + context.packageName).toUri())
 
     /** Android's list of apps that are exempt from battery optimization. */
     fun batterySettings(): Intent = Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
@@ -202,7 +203,7 @@ object Reminders {
         val open = PendingIntent.getActivity(
             context, 0,
             Intent(context, EditNoteActivity::class.java)
-                .setData(Uri.parse("gkeepdroid://note/" + Uri.encode(key(account, noteId))))
+                .setData(("gkeepdroid://note/" + Uri.encode(key(account, noteId))).toUri())
                 .putExtra(EditNoteActivity.EXTRA_ACCOUNT, account)
                 .putExtra(EditNoteActivity.EXTRA_NOTE_ID, noteId),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
@@ -211,7 +212,7 @@ object Reminders {
         val done = PendingIntent.getBroadcast(
             context, 0,
             Intent(context, DoneReceiver::class.java)
-                .setData(Uri.parse("gkeepdroid://done/" + Uri.encode(key(account, noteId) + "|" + reminderId)))
+                .setData(("gkeepdroid://done/" + Uri.encode(key(account, noteId) + "|" + reminderId)).toUri())
                 .putExtra(SnoozeReceiver.EXTRA_NOTIFICATION_ID, notificationId),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
@@ -219,7 +220,7 @@ object Reminders {
         val snooze = PendingIntent.getBroadcast(
             context, 0,
             Intent(context, SnoozeReceiver::class.java)
-                .setData(Uri.parse("gkeepdroid://snooze/" + Uri.encode(key(account, noteId) + "|" + reminderId)))
+                .setData(("gkeepdroid://snooze/" + Uri.encode(key(account, noteId) + "|" + reminderId)).toUri())
                 .putExtra(EditNoteActivity.EXTRA_ACCOUNT, account)
                 .putExtra(EditNoteActivity.EXTRA_NOTE_ID, noteId)
                 .putExtra(SnoozeReceiver.EXTRA_REMINDER, reminder.toJson().toString())
@@ -314,7 +315,7 @@ object Reminders {
         val uri = when (sound) {
             SOUND_NONE -> null
             "" -> RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-            else -> Uri.parse(sound)
+            else -> sound.toUri()
         }
         val ringtone = if (uri != null && (ringing || override)) RingtoneManager.getRingtone(context, uri) else null
         if (ringtone == null) return done()

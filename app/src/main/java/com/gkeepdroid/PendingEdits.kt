@@ -1,6 +1,8 @@
 package com.gkeepdroid
 
 import android.content.Context
+import androidx.core.content.edit
+import androidx.core.net.toUri
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -88,7 +90,7 @@ object PendingEdits {
                     .put("trashAfter", edit.trashAfter)
             )
         }
-        prefs(context).edit().putString("edits", array.toString()).apply()
+        prefs(context).edit { putString("edits", array.toString()) }
     }
 
     @Synchronized
@@ -236,7 +238,7 @@ object SaveFailures {
         fun action(receiver: Class<*>, name: String) = PendingIntent.getBroadcast(
             context, 0,
             Intent(context, receiver)
-                .setData(Uri.parse("gkeepdroid://$name/" + Uri.encode(edit.id)))
+                .setData(("gkeepdroid://$name/" + Uri.encode(edit.id)).toUri())
                 .putExtra(EXTRA_EDIT, edit.id),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )

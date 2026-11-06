@@ -1,6 +1,7 @@
 package com.gkeepdroid
 
 import android.content.Context
+import androidx.core.content.edit
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 
@@ -40,7 +41,7 @@ object SyncPolicy {
             if (now - p.getLong("last_failure", 0) < FAILURE_PAUSE_MS) FAILURE_PAUSE_MS else 0L,
         )
         if (now - p.getLong("last_start", 0) < gap) return false
-        p.edit().putLong("last_start", now).apply()
+        p.edit { putLong("last_start", now) }
         return true
     }
 
@@ -73,19 +74,19 @@ object SyncPolicy {
         } else if (error != previous) {
             AppLog.e(context, "sync", "failed: $error" + if (expiredAccount != null) " (sign-in expired)" else "")
         }
-        val editor = prefs(context).edit()
-        if (error == null) editor.putLong("last_ok", System.currentTimeMillis()).remove("last_error")
-        else editor.putString("last_error", error)
-        if (expiredAccount == null) editor.remove("expired_account") else editor.putString("expired_account", expiredAccount)
-        editor.apply()
+        prefs(context).edit {
+            if (error == null) putLong("last_ok", System.currentTimeMillis()).remove("last_error")
+            else putString("last_error", error)
+            if (expiredAccount == null) remove("expired_account") else putString("expired_account", expiredAccount)
+        }
     }
 
     /** Every sync, also the manual ones, counts for the gap. */
     fun markStart(context: Context) {
-        prefs(context).edit().putLong("last_start", System.currentTimeMillis()).apply()
+        prefs(context).edit { putLong("last_start", System.currentTimeMillis()) }
     }
 
     fun markResult(context: Context, ok: Boolean) {
-        prefs(context).edit().putLong("last_failure", if (ok) 0L else System.currentTimeMillis()).apply()
+        prefs(context).edit { putLong("last_failure", if (ok) 0L else System.currentTimeMillis()) }
     }
 }

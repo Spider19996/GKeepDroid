@@ -142,7 +142,11 @@
     <string name="md_sync_choose">Escolher pasta</string>
     <string name="md_sync_now">Sincronizar agora</string>
     <string name="md_sync_hint">Cada nota fica em um arquivo .md próprio na pasta que você escolher, uma subpasta por conta, e permanece sincronizada nos dois sentidos: edite uma nota no widget ou no Keep e o arquivo muda; edite o arquivo em outro app (Obsidian, Markor…) e a nota muda. Novos arquivos .md na pasta viram novas notas. Apagar um arquivo não apaga a nota; uma nota removida no Keep move seu arquivo para a subpasta _removed. Se os dois lados mudaram, vence o mais recente e o outro fica como arquivo .conflict. As imagens são copiadas ao lado dos arquivos, mas não podem ser alteradas ali. As mudanças de outros apps chegam logo enquanto o app está em execução; senão, na próxima sincronização.</string>
-    <string name="md_sync_done">Pasta Markdown sincronizada (%1$d alterações).</string>
+    <plurals name="md_sync_done">
+        <item quantity="one">Pasta Markdown sincronizada (%1$d alteração).</item>
+        <item quantity="many">Pasta Markdown sincronizada (%1$d alterações).</item>
+        <item quantity="other">Pasta Markdown sincronizada (%1$d alterações).</item>
+    </plurals>
     <string name="md_sync_failed">Falha na sincronização Markdown: %1$s</string>
     <string name="md_sync_folder">Pasta: %1$s</string>
     <string name="pinned_section">Fixadas</string>
@@ -176,7 +180,11 @@
     <string name="own_photo_hint">Esta foto fica apenas neste telefone. Ela não é salva no Google Keep e, por isso, não aparece em outros dispositivos nem no próprio Keep.</string>
     <string name="dont_show_again">Não mostrar novamente</string>
     <string name="background_own">Foto própria</string>
-    <string name="selected_count">%d selecionadas</string>
+    <plurals name="selected_count">
+        <item quantity="one">%d selecionada</item>
+        <item quantity="many">%d selecionadas</item>
+        <item quantity="other">%d selecionadas</item>
+    </plurals>
     <string name="select_all">Selecionar tudo</string>
     <string name="duplicate_note">Duplicar</string>
     <string name="empty_trash">Esvaziar a lixeira</string>
@@ -212,7 +220,11 @@
     <string name="sync_now">Sincronizar agora</string>
     <string name="sync_started">Sincronização iniciada.</string>
     <string name="orphans_clean">Limpar widgets órfãos</string>
-    <string name="orphans_removed">Configurações de %d widgets órfãos removidas. Widgets na tela inicial devem ser removidos lá (toque longo).</string>
+    <plurals name="orphans_removed">
+        <item quantity="one">Configurações de %d widget órfão removidas. Widgets na tela inicial devem ser removidos lá (toque longo).</item>
+        <item quantity="many">Configurações de %d widgets órfãos removidas. Widgets na tela inicial devem ser removidos lá (toque longo).</item>
+        <item quantity="other">Configurações de %d widgets órfãos removidas. Widgets na tela inicial devem ser removidos lá (toque longo).</item>
+    </plurals>
     <string name="btn_refresh">Atualizar</string>
     <string name="btn_add_item">Adicionar item</string>
     <string name="btn_new_note">Nova nota</string>

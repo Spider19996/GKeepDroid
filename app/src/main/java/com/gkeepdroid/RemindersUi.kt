@@ -3,6 +3,8 @@
 package com.gkeepdroid
 
 import android.app.Activity
+import androidx.core.content.edit
+import androidx.core.net.toUri
 import android.content.Intent
 import android.media.RingtoneManager
 import android.net.Uri
@@ -156,7 +158,7 @@ internal fun rememberSoundPicker(current: String, onPicked: (String) -> Unit): (
                     when (current) {
                         "" -> Settings.System.DEFAULT_NOTIFICATION_URI
                         SOUND_NONE -> null
-                        else -> Uri.parse(current)
+                        else -> current.toUri()
                     },
                 )
         )
@@ -386,7 +388,7 @@ internal fun RemindersDialog(
                 }
                 val prefs = activity.getSharedPreferences("reminder_hints", android.content.Context.MODE_PRIVATE)
                 if (!Reminders.canScheduleExact(activity) && !prefs.getBoolean("exact_asked", false)) {
-                    prefs.edit().putBoolean("exact_asked", true).apply()
+                    prefs.edit { putBoolean("exact_asked", true) }
                     exactHint = true
                 } else {
                     newReminder()

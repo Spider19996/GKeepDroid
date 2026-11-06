@@ -1,6 +1,7 @@
 package com.gkeepdroid
 
 import android.app.PendingIntent
+import androidx.core.net.toUri
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -19,7 +20,7 @@ class NewNoteTileService : TileService() {
 
     override fun onClick() {
         val intent = Intent(this, EditNoteActivity::class.java)
-            .setData(Uri.parse("gkeepdroid://new/note/tile"))
+            .setData("gkeepdroid://new/note/tile".toUri())
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         if (Build.VERSION.SDK_INT >= 34) {
             startActivityAndCollapse(PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE))

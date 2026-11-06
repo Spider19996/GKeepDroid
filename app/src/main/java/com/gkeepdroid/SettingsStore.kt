@@ -1,6 +1,7 @@
 package com.gkeepdroid
 
 import android.content.Context
+import androidx.core.content.edit
 import android.content.SharedPreferences
 import org.json.JSONArray
 import org.json.JSONException
@@ -215,23 +216,23 @@ object SettingsStore {
     fun saveGlobal(context: Context, s: GlobalSettings) {
         // Screens that depend on the demo mode (the debug mark) notice a change at once.
         DemoNotes.version.intValue++
-        globalPrefs(context).edit()
-            .putInt("theme_mode", s.themeMode)
-            .putInt("sync_interval_min", s.syncIntervalMin)
-            .putBoolean("sync_on_unlock", s.syncOnUnlock)
-            .putBoolean("sync_on_open", s.syncOnOpen)
-            .putInt("min_gap_sec", s.minGapSec)
-            .putBoolean("background_sync", s.backgroundSync)
-            .putInt("background_interval_min", s.backgroundIntervalMin)
-            .putBoolean("wifi_only", s.wifiOnly)
-            .putBoolean("demo_mode", s.demoMode)
-            .putString("language", s.language)
-            .putString("reminder_sound", s.reminderSound)
-            .putBoolean("reminder_vibrate", s.reminderVibrate)
-            .putBoolean("reminder_override", s.reminderOverride)
-            .putInt("reminder_snooze_min", s.reminderSnoozeMin)
-            .putString("reminder_presets", s.reminderPresets)
-            .apply()
+        globalPrefs(context).edit {
+            putInt("theme_mode", s.themeMode)
+            putInt("sync_interval_min", s.syncIntervalMin)
+            putBoolean("sync_on_unlock", s.syncOnUnlock)
+            putBoolean("sync_on_open", s.syncOnOpen)
+            putInt("min_gap_sec", s.minGapSec)
+            putBoolean("background_sync", s.backgroundSync)
+            putInt("background_interval_min", s.backgroundIntervalMin)
+            putBoolean("wifi_only", s.wifiOnly)
+            putBoolean("demo_mode", s.demoMode)
+            putString("language", s.language)
+            putString("reminder_sound", s.reminderSound)
+            putBoolean("reminder_vibrate", s.reminderVibrate)
+            putBoolean("reminder_override", s.reminderOverride)
+            putInt("reminder_snooze_min", s.reminderSnoozeMin)
+            putString("reminder_presets", s.reminderPresets)
+        }
     }
 
     /** Settings of a widget; a widget without its own settings starts from the last saved ones. */
@@ -253,7 +254,7 @@ object SettingsStore {
         widgetPrefs(context, appWidgetId).getBoolean("reorder_mode", false)
 
     fun setReordering(context: Context, appWidgetId: Int, on: Boolean) {
-        widgetPrefs(context, appWidgetId).edit().putBoolean("reorder_mode", on).apply()
+        widgetPrefs(context, appWidgetId).edit { putBoolean("reorder_mode", on) }
     }
 
     fun deleteWidget(context: Context, appWidgetId: Int) {
@@ -312,40 +313,40 @@ object SettingsStore {
     }
 
     private fun write(p: SharedPreferences, s: WidgetSettings) {
-        p.edit()
-            .putFloat("background_alpha", s.backgroundAlpha)
-            .putInt("text_color", s.textColor)
-            .putInt("text_size_sp", s.textSizeSp)
-            .putBoolean("show_note_colors", s.showNoteColors)
-            .putFloat("note_alpha", s.noteAlpha)
-            .putInt("plain_card_style", s.plainCardStyle)
-            .putString("account", s.account)
-            .putInt("header_size_sp", s.headerSizeSp)
-            .putString("button_sides", sidesToJson(s.buttonSides))
-            .putString("button_order", JSONArray(s.buttonOrder).toString())
-            .putString("button_slots", sidesToJson(s.buttonSlots))
-            .putBoolean("checkable", s.checkable)
-            .putBoolean("checked_to_end", s.checkedToEnd)
-            .putBoolean("collapse_checked", s.collapseChecked)
-            .putInt("list_spacing_dp", s.listSpacingDp)
-            .putInt("sort_mode", s.sortMode)
-            .putBoolean("show_images", s.showImages)
-            .putString("note_id", s.noteId)
-            .putStringSet("hidden_notes", s.hiddenNotes)
-            .putStringSet("pin_bottom", s.pinBottom)
-            .putString("manual_order", JSONArray(s.manualOrder).toString())
-            .putInt("checkbox_style", s.checkboxStyle)
-            .putInt("checkbox_size_dp", s.checkboxSizeDp)
-            .putBoolean("tap_whole_row", s.tapWholeRow)
-            .putBoolean("delete_checked", s.deleteChecked)
-            .putInt("max_lines", s.maxLines)
-            .putBoolean("text_color_auto", s.textColorAuto)
-            .putBoolean("show_edited_time", s.showEditedTime)
-            .putBoolean("show_labels", s.showLabels)
-            .putBoolean("show_reminders", s.showReminders)
-            .putString("label_filter", s.labelFilter)
-            .putBoolean("show_progress", s.showProgress)
-            .putBoolean("foldable", s.foldable)
-            .apply()
+        p.edit {
+            putFloat("background_alpha", s.backgroundAlpha)
+            putInt("text_color", s.textColor)
+            putInt("text_size_sp", s.textSizeSp)
+            putBoolean("show_note_colors", s.showNoteColors)
+            putFloat("note_alpha", s.noteAlpha)
+            putInt("plain_card_style", s.plainCardStyle)
+            putString("account", s.account)
+            putInt("header_size_sp", s.headerSizeSp)
+            putString("button_sides", sidesToJson(s.buttonSides))
+            putString("button_order", JSONArray(s.buttonOrder).toString())
+            putString("button_slots", sidesToJson(s.buttonSlots))
+            putBoolean("checkable", s.checkable)
+            putBoolean("checked_to_end", s.checkedToEnd)
+            putBoolean("collapse_checked", s.collapseChecked)
+            putInt("list_spacing_dp", s.listSpacingDp)
+            putInt("sort_mode", s.sortMode)
+            putBoolean("show_images", s.showImages)
+            putString("note_id", s.noteId)
+            putStringSet("hidden_notes", s.hiddenNotes)
+            putStringSet("pin_bottom", s.pinBottom)
+            putString("manual_order", JSONArray(s.manualOrder).toString())
+            putInt("checkbox_style", s.checkboxStyle)
+            putInt("checkbox_size_dp", s.checkboxSizeDp)
+            putBoolean("tap_whole_row", s.tapWholeRow)
+            putBoolean("delete_checked", s.deleteChecked)
+            putInt("max_lines", s.maxLines)
+            putBoolean("text_color_auto", s.textColorAuto)
+            putBoolean("show_edited_time", s.showEditedTime)
+            putBoolean("show_labels", s.showLabels)
+            putBoolean("show_reminders", s.showReminders)
+            putString("label_filter", s.labelFilter)
+            putBoolean("show_progress", s.showProgress)
+            putBoolean("foldable", s.foldable)
+        }
     }
 }

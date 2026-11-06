@@ -142,7 +142,10 @@
     <string name="md_sync_choose">Ordner wählen</string>
     <string name="md_sync_now">Jetzt synchronisieren</string>
     <string name="md_sync_hint">Jede Notiz liegt als eigene .md-Datei in einem Ordner deiner Wahl, ein Unterordner pro Konto, und bleibt in beide Richtungen synchron: Änderst du eine Notiz im Widget oder in Keep, ändert sich die Datei; änderst du die Datei in einer anderen App (Obsidian, Markor, …), ändert sich die Notiz. Neue .md-Dateien im Ordner werden zu neuen Notizen. Das Löschen einer Datei löscht die Notiz nicht; eine in Keep entfernte Notiz verschiebt ihre Datei in den Unterordner _removed. Haben sich beide Seiten geändert, gewinnt die neuere, die andere bleibt als .conflict-Datei erhalten. Bilder werden neben die Dateien kopiert, lassen sich dort aber nicht ändern. Änderungen aus anderen Apps kommen bei laufender App sofort an, sonst beim nächsten Sync.</string>
-    <string name="md_sync_done">Markdown-Ordner synchronisiert (%1$d Änderungen).</string>
+    <plurals name="md_sync_done">
+        <item quantity="one">Markdown-Ordner synchronisiert (1 Änderung).</item>
+        <item quantity="other">Markdown-Ordner synchronisiert (%1$d Änderungen).</item>
+    </plurals>
     <string name="md_sync_failed">Markdown-Sync fehlgeschlagen: %1$s</string>
     <string name="md_sync_folder">Ordner: %1$s</string>
     <string name="pinned_section">Angeheftet</string>
@@ -176,7 +179,10 @@
     <string name="own_photo_hint">Dieses Foto bleibt nur auf diesem Handy. Es wird nicht in Google Keep gespeichert und erscheint deshalb weder auf anderen Geräten noch in Keep selbst.</string>
     <string name="dont_show_again">Nicht mehr anzeigen</string>
     <string name="background_own">Eigenes Foto</string>
-    <string name="selected_count">%d ausgewählt</string>
+    <plurals name="selected_count">
+        <item quantity="one">%d ausgewählt</item>
+        <item quantity="other">%d ausgewählt</item>
+    </plurals>
     <string name="select_all">Alle auswählen</string>
     <string name="duplicate_note">Duplizieren</string>
     <string name="empty_trash">Papierkorb leeren</string>
@@ -209,7 +215,10 @@
     <string name="sync_now">Jetzt synchronisieren</string>
     <string name="sync_started">Synchronisierung gestartet.</string>
     <string name="orphans_clean">Verwaiste Widgets aufräumen</string>
-    <string name="orphans_removed">Einstellungen von %d verwaisten Widgets entfernt. Widgets auf dem Homescreen musst du dort entfernen (Widget lange drücken).</string>
+    <plurals name="orphans_removed">
+        <item quantity="one">Einstellungen von 1 verwaistem Widget entfernt. Widgets auf dem Homescreen musst du dort entfernen (Widget lange drücken).</item>
+        <item quantity="other">Einstellungen von %d verwaisten Widgets entfernt. Widgets auf dem Homescreen musst du dort entfernen (Widget lange drücken).</item>
+    </plurals>
     <string name="btn_refresh">Aktualisieren</string>
     <string name="btn_add_item">Eintrag hinzufügen</string>
     <string name="btn_new_note">Neue Notiz</string>

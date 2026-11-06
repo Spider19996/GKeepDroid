@@ -1,6 +1,7 @@
 package com.gkeepdroid
 
 import android.content.Context
+import androidx.core.content.edit
 import android.content.SharedPreferences
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
@@ -96,20 +97,16 @@ object CredentialStore {
         val p = prefs(context)
         val list = accounts(context).toMutableList()
         if (email !in list) list.add(email)
-        val editor = p.edit().putString("accounts", JSONArray(list).toString())
-        if (token != null) {
-            editor.putString("token_$email", encrypt(token))
-            tokens[email] = token
+        p.edit {
+            putString("accounts", JSONArray(list).toString())
+            if (token != null) putString("token_$email", encrypt(token))
         }
-        editor.apply()
+        if (token != null) tokens[email] = token
     }
 
     fun remove(context: Context, email: String) {
         val list = accounts(context).filter { it != email }
-        prefs(context).edit()
-            .putString("accounts", JSONArray(list).toString())
-            .remove("token_$email")
-            .apply()
+        prefs(context).edit { putString("accounts", JSONArray(list).toString()); remove("token_$email") }
         tokens.remove(email)
         NotesCache.delete(context, email)
         if (isLocal(email)) LocalNotes.deleteAll(context)

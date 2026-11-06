@@ -142,7 +142,10 @@
     <string name="md_sync_choose">फ़ोल्डर चुनें</string>
     <string name="md_sync_now">अभी सिंक करें</string>
     <string name="md_sync_hint">हर नोट आपके चुने फ़ोल्डर में अपनी .md फ़ाइल के रूप में रहता है (हर खाते के लिए एक उप-फ़ोल्डर) और दोनों तरफ़ सिंक रहता है: विजेट या Keep में नोट बदलें तो फ़ाइल बदलती है; किसी दूसरे ऐप (Obsidian, Markor…) में फ़ाइल बदलें तो नोट बदलता है। फ़ोल्डर की नई .md फ़ाइलें नए नोट बन जाती हैं। फ़ाइल हटाने से नोट नहीं हटता; Keep में हटाए गए नोट की फ़ाइल उप-फ़ोल्डर _removed में चली जाती है। अगर दोनों तरफ़ बदलाव हो, तो नया वाला जीतता है और दूसरा .conflict फ़ाइल के रूप में रहता है। छवियाँ फ़ाइलों के बगल में कॉपी होती हैं, पर वहाँ बदली नहीं जा सकतीं। दूसरे ऐप के बदलाव ऐप चलते समय तुरंत, वरना अगले सिंक पर पहुँचते हैं।</string>
-    <string name="md_sync_done">Markdown फ़ोल्डर सिंक हुआ (%1$d बदलाव)।</string>
+    <plurals name="md_sync_done">
+        <item quantity="one">Markdown फ़ोल्डर सिंक हुआ (%1$d बदलाव)।</item>
+        <item quantity="other">Markdown फ़ोल्डर सिंक हुआ (%1$d बदलाव)।</item>
+    </plurals>
     <string name="md_sync_failed">Markdown सिंक विफल: %1$s</string>
     <string name="md_sync_folder">फ़ोल्डर: %1$s</string>
     <string name="pinned_section">पिन किए गए</string>
@@ -176,7 +179,10 @@
     <string name="own_photo_hint">यह फ़ोटो केवल इसी फ़ोन पर रहती है। यह Google Keep में सहेजी नहीं जाती, इसलिए अन्य डिवाइस या Keep में दिखाई नहीं देगी।</string>
     <string name="dont_show_again">फिर न दिखाएँ</string>
     <string name="background_own">अपनी फ़ोटो</string>
-    <string name="selected_count">%d चुने गए</string>
+    <plurals name="selected_count">
+        <item quantity="one">%d चुने गए</item>
+        <item quantity="other">%d चुने गए</item>
+    </plurals>
     <string name="select_all">सभी चुनें</string>
     <string name="duplicate_note">डुप्लिकेट करें</string>
     <string name="empty_trash">ट्रैश खाली करें</string>
@@ -209,7 +215,10 @@
     <string name="sync_now">अभी सिंक करें</string>
     <string name="sync_started">सिंक शुरू हुआ।</string>
     <string name="orphans_clean">बचे हुए विजेट साफ़ करें</string>
-    <string name="orphans_removed">%d बचे हुए विजेट की सेटिंग हटाई गईं। होम स्क्रीन के विजेट वहीं से हटाएँ (विजेट को देर तक दबाएँ)।</string>
+    <plurals name="orphans_removed">
+        <item quantity="one">%d बचे हुए विजेट की सेटिंग हटाई गईं। होम स्क्रीन के विजेट वहीं से हटाएँ (विजेट को देर तक दबाएँ)।</item>
+        <item quantity="other">%d बचे हुए विजेट की सेटिंग हटाई गईं। होम स्क्रीन के विजेट वहीं से हटाएँ (विजेट को देर तक दबाएँ)।</item>
+    </plurals>
     <string name="btn_refresh">रीफ़्रेश</string>
     <string name="btn_add_item">आइटम जोड़ें</string>
     <string name="btn_new_note">नया नोट</string>
