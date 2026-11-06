@@ -11,7 +11,6 @@
     <string name="show_note_colors">Notizfarben anzeigen</string>
     <string name="note_opacity">Deckkraft der Notizkarten: %1$d%%</string>
     <string name="sync_section">Synchronisierung</string>
-    <string name="sync_manual">Nur manuell</string>
     <string name="save">Speichern</string>
     <string name="credentials_required">E-Mail und Master-Token sind erforderlich.</string>
     <string name="no_notes">Noch keine Notizen. Öffne die Einstellungen (⚙), um dich anzumelden.</string>
@@ -174,7 +173,6 @@
     <string name="note_text_color_auto">Automatisch</string>
     <string name="background_dark_version">Dunkle Version des Bildes</string>
     <string name="color_and_background">Farbe / Hintergrund</string>
-    <string name="note_background">Hintergrund</string>
     <string name="own_photo_hint">Dieses Foto bleibt nur auf diesem Handy. Es wird nicht in Google Keep gespeichert und erscheint deshalb weder auf anderen Geräten noch in Keep selbst.</string>
     <string name="dont_show_again">Nicht mehr anzeigen</string>
     <string name="background_own">Eigenes Foto</string>

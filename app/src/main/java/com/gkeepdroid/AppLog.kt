@@ -124,7 +124,7 @@ object LogReport {
             appendLine("Contains no note texts, titles, labels, account names or tokens.")
             appendLine()
             appendLine("== App and phone ==")
-            appendLine("Version: ${info.versionName} (${info.longVersionCode})")
+            appendLine("Version: ${info.versionName} (${androidx.core.content.pm.PackageInfoCompat.getLongVersionCode(info)})")
             appendLine("Android: ${android.os.Build.VERSION.RELEASE} (API ${android.os.Build.VERSION.SDK_INT})")
             appendLine("Device: ${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}")
             appendLine()

@@ -81,7 +81,7 @@ object PendingOverlay {
                     note.put("images", JSONArray((0 until images.length()).map { images.getString(it) }.filter { it !in removed }))
                 }
             } catch (e: Exception) {
-                // An edit that does not fit (stored by an older version) is just not previewed.
+                // An edit that does not fit is just not previewed.
             }
         }
     }

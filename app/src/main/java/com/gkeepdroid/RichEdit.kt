@@ -6,13 +6,15 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.foundation.text.contextmenu.builder.item
 import androidx.compose.foundation.text.contextmenu.modifier.appendTextContextMenuComponents
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.TextRange
 import org.json.JSONArray
 import org.json.JSONObject
-
-const val STYLE_BOLD = 1
-const val STYLE_ITALIC = 2
-const val STYLE_UNDERLINE = 4
-const val STYLE_STRIKE = 8
 
 /** The bits the editor can change; headings (16) are kept as Keep has them. */
 const val TEXT_STYLE_MASK = 15
@@ -97,3 +99,97 @@ fun androidx.compose.ui.Modifier.textStyleMenu(labels: List<String>, onStyle: (I
             }
         }
     }
+
+
+/**
+ * The text styles of one note while it is edited: the styles of each of its texts (the body is "text", an item is its id),
+ * which texts were changed, and which text has the focus and what is selected in it.
+ */
+class FormatState(private val enabled: Boolean, private val rich: RichNote?) {
+    private val docs = mutableMapOf<String, DocFlags>()
+    val touched = mutableStateListOf<String>()
+    var version by mutableIntStateOf(0)
+        private set
+    var focus by mutableStateOf<String?>(null)
+    val selection = mutableStateMapOf<String, TextRange>()
+
+    fun flagsFor(key: String, current: String): DocFlags {
+        val have = docs[key]
+        if (have != null && have.flags.size == current.length) return have
+        // The text changed in a way that cannot be followed (sorting, converting): no formatting is sent for it.
+        touched.remove(key)
+        val doc = if (key == "text") rich?.docs?.values?.firstOrNull() else rich?.docs?.get(key)
+        return DocFlags(current, doc).also { docs[key] = it }
+    }
+
+    /** The text of [key] changed; the styles stay with their characters. */
+    fun edited(key: String, old: String, new: String) {
+        if (enabled) docs[key]?.edit(old, new)
+    }
+
+    /** Switches the style [bit] on for the selected text of the focused field (or off, if all of it has it). */
+    fun toggleSelected(textOf: (String) -> String, bit: Int) {
+        val key = focus ?: return
+        val range = selection[key] ?: return
+        if (range.collapsed) return
+        flagsFor(key, textOf(key)).toggle(range.min, range.max, bit)
+        if (key !in touched) touched.add(key)
+        version++
+    }
+
+    /**
+     * The changed formatting as the Python bridge wants it, or null if nothing changed. For a note that is made new (a conversion)
+     * the items have no ids in Keep yet: [order] lists them, and they are addressed by their place.
+     */
+    fun toJson(textOf: (String) -> String, order: List<String>?, newNote: Boolean): String? {
+        if (!enabled || touched.isEmpty()) return null
+        val json = JSONObject()
+        touched.toList().forEach { key ->
+            val current = textOf(key)
+            val doc = docs[key]
+            if (doc != null && doc.flags.size == current.length) {
+                val name = if (newNote && key != "text") order?.indexOf(key)?.takeIf { it >= 0 }?.let { "#$it" } else key
+                if (name != null) json.put(name, doc.toJson(current))
+            }
+        }
+        return if (json.length() == 0) null else json.toString()
+    }
+
+    /** Takes the styles along when the note changes its kind: lines become items and items become lines. */
+    fun carry(toList: Boolean, oldText: String, oldItems: List<KeepItem>, newText: String, newItems: List<KeepItem>) {
+        if (!enabled) return
+        val carried = mutableMapOf<String, DocFlags>()
+        if (toList) {
+            val body = flagsFor("text", oldText)
+            var start = 0
+            val lines = oldText.split("\n").map { line -> (start to line).also { start += line.length + 1 } }.filter { it.second.isNotBlank() }
+            newItems.forEachIndexed { i, item ->
+                val (lineStart, line) = lines.getOrNull(i) ?: return@forEachIndexed
+                val offset = line.indexOf(item.text)
+                if (item.text.isEmpty() || offset < 0) return@forEachIndexed
+                carried[item.id] = DocFlags(IntArray(item.text.length) { body.flags.getOrElse(lineStart + offset + it) { 0 } })
+            }
+        } else {
+            val flags = IntArray(newText.length)
+            var start = 0
+            val items = oldItems.filter { it.text.isNotBlank() }
+            newText.split("\n").forEachIndexed { i, line ->
+                val item = items.getOrNull(i)
+                if (item != null && line.endsWith(item.text)) {
+                    val source = flagsFor(item.id, item.text)
+                    val offset = line.length - item.text.length
+                    for (k in item.text.indices) flags[start + offset + k] = source.flags.getOrElse(k) { 0 }
+                }
+                start += line.length + 1
+            }
+            carried["text"] = DocFlags(flags)
+        }
+        docs.clear()
+        touched.clear()
+        carried.forEach { (key, doc) ->
+            docs[key] = doc
+            if (doc.flags.any { it and TEXT_STYLE_MASK != 0 }) touched.add(key)
+        }
+        version++
+    }
+}

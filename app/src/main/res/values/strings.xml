@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">GKeepDroid</string>
-    <string name="interval_min" translatable="false">%1$d min</string>
-    <string name="interval_hour" translatable="false">%1$d h</string>
     <string name="widget_description">Shows your Google Keep notes with an adjustable background.</string>
     <string name="email_label">Google account e-mail</string>
     <string name="token_label">Master token (aas_et/...)</string>
@@ -14,7 +12,6 @@
     <string name="show_note_colors">Show note colors</string>
     <string name="note_opacity">Note card opacity: %1$d%%</string>
     <string name="sync_section">Synchronization</string>
-    <string name="sync_manual">Manual only</string>
     <string name="save">Save</string>
     <string name="credentials_required">E-mail and master token are required.</string>
     <string name="no_notes">No notes yet. Open the settings (⚙) to sign in.</string>
@@ -177,7 +174,6 @@
     <string name="note_text_color_auto">Automatic</string>
     <string name="background_dark_version">Dark version of the picture</string>
     <string name="color_and_background">Color / background</string>
-    <string name="note_background">Background</string>
     <string name="own_photo_hint">This photo stays on this phone only. It is not saved to Google Keep, so it will not appear on other devices or in Keep itself.</string>
     <string name="dont_show_again">Don\'t show again</string>
     <string name="background_own">Own photo</string>

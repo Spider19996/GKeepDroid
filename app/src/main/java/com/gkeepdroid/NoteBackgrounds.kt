@@ -43,15 +43,7 @@ object NoteBackgrounds {
      * The pictures live in the cache: clearing it removes them and the app fetches them again. They are checked for changes from
      * time to time (see [refreshIfDue]), as Google may replace them.
      */
-    private fun dir(context: Context): File {
-        val dir = File(context.cacheDir, "backgrounds")
-        if (!dir.exists()) {
-            // A version of the app kept them with its files for a while.
-            val moved = File(context.filesDir, "backgrounds")
-            if (!(moved.exists() && moved.renameTo(dir))) dir.mkdirs()
-        }
-        return dir
-    }
+    private fun dir(context: Context) = File(context.cacheDir, "backgrounds").apply { mkdirs() }
 
     private fun cacheFile(context: Context, name: String, dark: Boolean) = File(dir(context), "${key(name, dark)}.png")
 
@@ -270,10 +262,17 @@ object CustomBackgrounds {
     /** A photo that was just picked, before it is saved. */
     fun preview(context: Context, uri: android.net.Uri): Bitmap? = decode(context, uri)?.let(::veil)
 
-    /** The photo for a widget card, in the card's proportions and with its transparency. */
+    private val forWidgets = HashMap<String, Pair<Long, Bitmap>>()
+
+    /** The photo for a widget card, in the card's proportions and with its transparency; kept until the photo changes. */
     fun forWidget(context: Context, account: String, noteId: String, alpha: Float, fraction: Float): Bitmap? {
-        val photo = BitmapFactory.decodeFile(file(context, account, noteId).takeIf { it.exists() }?.path ?: return null) ?: return null
-        return NoteBackgrounds.widgetCrop(veil(photo), alpha, fraction, fromBottom = false)
+        val file = file(context, account, noteId).takeIf { it.exists() } ?: return null
+        val key = "${file.path}|${(alpha * 100).toInt()}|${(fraction * 100).toInt()}"
+        synchronized(forWidgets) { forWidgets[key]?.let { if (it.first == file.lastModified()) return it.second } }
+        val photo = BitmapFactory.decodeFile(file.path) ?: return null
+        val bitmap = NoteBackgrounds.widgetCrop(veil(photo), alpha, fraction, fromBottom = false)
+        synchronized(forWidgets) { forWidgets[key] = file.lastModified() to bitmap }
+        return bitmap
     }
 }
 

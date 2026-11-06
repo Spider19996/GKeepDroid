@@ -11,7 +11,6 @@
     <string name="show_note_colors">Mostrar cores das notas</string>
     <string name="note_opacity">Opacidade das notas: %1$d%%</string>
     <string name="sync_section">Sincronização</string>
-    <string name="sync_manual">Somente manual</string>
     <string name="save">Salvar</string>
     <string name="credentials_required">E-mail e token mestre são obrigatórios.</string>
     <string name="no_notes">Ainda não há notas. Abra as configurações (⚙) para entrar.</string>
@@ -174,7 +173,6 @@
     <string name="note_text_color_auto">Automática</string>
     <string name="background_dark_version">Versão escura da imagem</string>
     <string name="color_and_background">Cor / plano de fundo</string>
-    <string name="note_background">Plano de fundo</string>
     <string name="own_photo_hint">Esta foto fica apenas neste telefone. Ela não é salva no Google Keep e, por isso, não aparece em outros dispositivos nem no próprio Keep.</string>
     <string name="dont_show_again">Não mostrar novamente</string>
     <string name="background_own">Foto própria</string>
@@ -185,15 +183,18 @@
     <string name="empty_trash_confirm">Excluir permanentemente todas as notas da lixeira? Não pode ser desfeito.</string>
     <string name="delete_selected_confirm">Excluir permanentemente as notas selecionadas? Não pode ser desfeito.</string>
     <plurals name="search_count_notes">
-        <item quantity="one">Pesquisar 1 nota</item>
+        <item quantity="one">Pesquisar %d nota</item>
+        <item quantity="many">Pesquisar %d notas</item>
         <item quantity="other">Pesquisar %d notas</item>
     </plurals>
     <plurals name="search_count_archive">
-        <item quantity="one">Pesquisar 1 nota arquivada</item>
+        <item quantity="one">Pesquisar %d nota arquivada</item>
+        <item quantity="many">Pesquisar %d notas arquivadas</item>
         <item quantity="other">Pesquisar %d notas arquivadas</item>
     </plurals>
     <plurals name="search_count_trash">
-        <item quantity="one">Pesquisar 1 nota na lixeira</item>
+        <item quantity="one">Pesquisar %d nota na lixeira</item>
+        <item quantity="many">Pesquisar %d notas na lixeira</item>
         <item quantity="other">Pesquisar %d notas na lixeira</item>
     </plurals>
     <string name="search_history_clear">Limpar histórico de pesquisa</string>

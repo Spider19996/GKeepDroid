@@ -11,7 +11,6 @@
     <string name="show_note_colors">Pokaż kolory notatek</string>
     <string name="note_opacity">Krycie notatek: %1$d%%</string>
     <string name="sync_section">Synchronizacja</string>
-    <string name="sync_manual">Tylko ręcznie</string>
     <string name="save">Zapisz</string>
     <string name="credentials_required">Adres e-mail i token główny są wymagane.</string>
     <string name="no_notes">Brak notatek. Otwórz ustawienia (⚙), aby się zalogować.</string>
@@ -174,7 +173,6 @@
     <string name="note_text_color_auto">Automatycznie</string>
     <string name="background_dark_version">Ciemna wersja obrazu</string>
     <string name="color_and_background">Kolor / tło</string>
-    <string name="note_background">Tło</string>
     <string name="own_photo_hint">To zdjęcie zostaje tylko na tym telefonie. Nie jest zapisywane w Google Keep, więc nie pojawi się na innych urządzeniach ani w samym Keep.</string>
     <string name="dont_show_again">Nie pokazuj więcej</string>
     <string name="background_own">Własne zdjęcie</string>
@@ -185,12 +183,21 @@
     <string name="empty_trash_confirm">Trwale usunąć wszystkie notatki z kosza? Tego nie można cofnąć.</string>
     <string name="delete_selected_confirm">Trwale usunąć zaznaczone notatki? Tego nie można cofnąć.</string>
     <plurals name="search_count_notes">
+        <item quantity="one">Szukaj w notatkach (%d)</item>
+        <item quantity="few">Szukaj w notatkach (%d)</item>
+        <item quantity="many">Szukaj w notatkach (%d)</item>
         <item quantity="other">Szukaj w notatkach (%d)</item>
     </plurals>
     <plurals name="search_count_archive">
+        <item quantity="one">Szukaj w archiwum (%d)</item>
+        <item quantity="few">Szukaj w archiwum (%d)</item>
+        <item quantity="many">Szukaj w archiwum (%d)</item>
         <item quantity="other">Szukaj w archiwum (%d)</item>
     </plurals>
     <plurals name="search_count_trash">
+        <item quantity="one">Szukaj w koszu (%d)</item>
+        <item quantity="few">Szukaj w koszu (%d)</item>
+        <item quantity="many">Szukaj w koszu (%d)</item>
         <item quantity="other">Szukaj w koszu (%d)</item>
     </plurals>
     <string name="search_history_clear">Wyczyść historię wyszukiwania</string>

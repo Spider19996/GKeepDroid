@@ -364,6 +364,7 @@ def _fetch_rich(keep, state_path, full=False):
         return send(**kwargs)
 
     api.send = with_capability
+    changed = full or not os.path.exists(base + "_rich.json")
     try:
         # A full pull brings the whole model of every note again (a new note may not have had its model yet).
         version = None if full else model["v"]
@@ -371,9 +372,11 @@ def _fetch_rich(keep, state_path, full=False):
             changes = api.changes(target_version=version)
             if changes.get("forceFullResync"):
                 model = {"v": None, "n": {}}
+                changed = True
             for node in changes.get("nodes", []):
                 if node.get("parentId") != "root":
                     continue
+                changed = True
                 entry = model["n"].get(node["id"], {"bg": "", "m": {}})
                 server = node.get("serverChanges", {})
                 snapshot = server.get("snapshot")
@@ -400,6 +403,9 @@ def _fetch_rich(keep, state_path, full=False):
         model["v"] = version
     finally:
         api.send = send
+    # Nothing new from Keep: the files stay as they are.
+    if not changed:
+        return
     with open(base + "_richmodel.json", "w") as f:
         json.dump(model, f)
     # What the app reads: only the notes that have a background or any styled text.

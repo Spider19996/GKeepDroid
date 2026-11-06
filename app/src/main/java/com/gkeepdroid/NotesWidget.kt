@@ -101,9 +101,7 @@ class NotesWidget : GlanceAppWidget() {
             if (settings.showNoteColors && account != null) {
                 var budget = PICTURE_BUDGET_BYTES
                 notes.forEach { note ->
-                    val name = RichNotes.of(context, account, note.id)?.background.orEmpty()
-                    val bitmap = CustomBackgrounds.forWidget(context, account, note.id, settings.noteAlpha, 0.45f)
-                        ?: if (name.isEmpty()) null else NoteBackgrounds.forWidget(context, name, settings.noteAlpha, 0.45f, NoteLook.of(context, account, note.id).dark ?: NoteBackgrounds.isNight(context))
+                    val bitmap = widgetPicture(context, settings, account, note, 0.45f)
                     if (bitmap != null && budget >= bitmap.byteCount) {
                         budget -= bitmap.byteCount
                         result[note.id] = bitmap
@@ -184,26 +182,17 @@ class NotesWidget : GlanceAppWidget() {
         isPrivate: Boolean,
         foldedKeys: Set<String>,
     ) {
-        val look = NoteLook.of(LocalContext.current, account, note.id)
-        val night = look.dark ?: NoteBackgrounds.isNight(LocalContext.current)
-        val noteColor = if (settings.showNoteColors) NoteColors.argb(note.color, night) else null
-        // Keep's pictures come in a dark version for the phone's dark mode; a photo of one's own never does.
-        val onDarkPicture = picture != null && night &&
-            CustomBackgrounds.stamp(LocalContext.current, account, note.id) == 0L
-        val palette = textPalette(
-            settings, onNoteColor = noteColor != null || picture != null,
-            onDarkPicture = onDarkPicture || (noteColor != null && night && picture == null), own = look.textColor?.let { Color(it) },
-        )
+        val look = cardLook(LocalContext.current, settings, account, note, picture)
+        val noteColor = look.noteColor
+        val palette = look.palette
         val textColor = palette.provider()
 
-        val cardModifier = GlanceModifier.fillMaxWidth().cornerRadius(R.dimen.widget_inner_corner).noteBackground(noteColor, settings, picture = picture)
-        // With a picture, the note's color is a frame around it.
-        val framed = picture != null && noteColor != null
+        val framed = look.framed
         val outerModifier = if (framed) {
             GlanceModifier.fillMaxWidth().cornerRadius(R.dimen.widget_inner_corner)
                 .background(ColorProvider(Color(noteColor!!).copy(alpha = settings.noteAlpha))).padding(3.dp)
         } else {
-            cardModifier
+            GlanceModifier.fillMaxWidth().cornerRadius(R.dimen.widget_inner_corner).noteBackground(noteColor, settings, picture = picture)
         }
         val innerModifier = if (framed) {
             GlanceModifier.fillMaxWidth().cornerRadius(R.dimen.widget_inner_corner)

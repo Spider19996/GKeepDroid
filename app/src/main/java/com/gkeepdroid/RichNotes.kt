@@ -24,15 +24,24 @@ object RichNotes {
     private const val STRIKE = 8
     private const val HEADING = 16
 
-    private class Cached(val stamp: Long, val size: Long, val notes: Map<String, RichNote>)
+    private class Cached(val stamp: Long, val size: Long, val notes: Map<String, RichNote>, var checkedAt: Long)
 
     private val cache = HashMap<String, Cached>()
+    private const val RECHECK_MS = 500L
 
     private fun load(context: Context, account: String): Map<String, RichNote> {
+        val now = android.os.SystemClock.uptimeMillis()
+        // Every card asks: the file is looked at again only after a moment, not once per card.
+        synchronized(cache) { cache[account]?.let { if (now - it.checkedAt < RECHECK_MS) return it.notes } }
         val file = NotesCache.richFile(context, account)
         if (!file.exists()) return emptyMap()
         synchronized(cache) {
-            cache[account]?.let { if (it.stamp == file.lastModified() && it.size == file.length()) return it.notes }
+            cache[account]?.let {
+                if (it.stamp == file.lastModified() && it.size == file.length()) {
+                    it.checkedAt = now
+                    return it.notes
+                }
+            }
             val notes = runCatching {
                 val all = JSONObject(file.readText()).getJSONObject("n")
                 all.keys().asSequence().associateWith { id ->
@@ -50,7 +59,7 @@ object RichNotes {
                     )
                 }
             }.getOrDefault(emptyMap())
-            cache[account] = Cached(file.lastModified(), file.length(), notes)
+            cache[account] = Cached(file.lastModified(), file.length(), notes, now)
             return notes
         }
     }

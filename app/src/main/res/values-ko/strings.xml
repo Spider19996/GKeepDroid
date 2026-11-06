@@ -11,7 +11,6 @@
     <string name="show_note_colors">메모 색상 표시</string>
     <string name="note_opacity">메모 카드 불투명도: %1$d%%</string>
     <string name="sync_section">동기화</string>
-    <string name="sync_manual">수동만</string>
     <string name="save">저장</string>
     <string name="credentials_required">이메일과 마스터 토큰이 필요합니다.</string>
     <string name="no_notes">메모가 없습니다. 설정(⚙)을 열어 로그인하세요.</string>
@@ -174,7 +173,6 @@
     <string name="note_text_color_auto">자동</string>
     <string name="background_dark_version">이미지의 어두운 버전</string>
     <string name="color_and_background">색상 / 배경</string>
-    <string name="note_background">배경</string>
     <string name="own_photo_hint">이 사진은 이 휴대전화에만 저장됩니다. Google Keep에는 저장되지 않으므로 다른 기기나 Keep 자체에는 표시되지 않습니다.</string>
     <string name="dont_show_again">다시 표시 안 함</string>
     <string name="background_own">내 사진</string>

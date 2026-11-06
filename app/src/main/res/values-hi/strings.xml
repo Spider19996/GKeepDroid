@@ -11,7 +11,6 @@
     <string name="show_note_colors">नोट के रंग दिखाएँ</string>
     <string name="note_opacity">नोट कार्ड की अपारदर्शिता: %1$d%%</string>
     <string name="sync_section">सिंक</string>
-    <string name="sync_manual">सिर्फ़ मैन्युअल</string>
     <string name="save">सहेजें</string>
     <string name="credentials_required">ईमेल और मास्टर टोकन ज़रूरी हैं।</string>
     <string name="no_notes">अभी कोई नोट नहीं है। साइन इन करने के लिए सेटिंग (⚙) खोलें।</string>
@@ -174,7 +173,6 @@
     <string name="note_text_color_auto">अपने आप</string>
     <string name="background_dark_version">चित्र का गहरा संस्करण</string>
     <string name="color_and_background">रंग / पृष्ठभूमि</string>
-    <string name="note_background">पृष्ठभूमि</string>
     <string name="own_photo_hint">यह फ़ोटो केवल इसी फ़ोन पर रहती है। यह Google Keep में सहेजी नहीं जाती, इसलिए अन्य डिवाइस या Keep में दिखाई नहीं देगी।</string>
     <string name="dont_show_again">फिर न दिखाएँ</string>
     <string name="background_own">अपनी फ़ोटो</string>
@@ -185,12 +183,15 @@
     <string name="empty_trash_confirm">ट्रैश के सभी नोट हमेशा के लिए हटाएँ? इसे पूर्ववत नहीं किया जा सकता।</string>
     <string name="delete_selected_confirm">चुने गए नोट हमेशा के लिए हटाएँ? इसे पूर्ववत नहीं किया जा सकता।</string>
     <plurals name="search_count_notes">
+        <item quantity="one">%d नोट खोजें</item>
         <item quantity="other">%d नोट्स खोजें</item>
     </plurals>
     <plurals name="search_count_archive">
+        <item quantity="one">%d संग्रहित नोट खोजें</item>
         <item quantity="other">%d संग्रहित नोट्स खोजें</item>
     </plurals>
     <plurals name="search_count_trash">
+        <item quantity="one">ट्रैश में %d नोट खोजें</item>
         <item quantity="other">ट्रैश में %d नोट्स खोजें</item>
     </plurals>
     <string name="search_history_clear">खोज इतिहास साफ़ करें</string>

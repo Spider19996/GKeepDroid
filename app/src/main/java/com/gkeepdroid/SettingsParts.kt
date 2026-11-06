@@ -51,13 +51,6 @@ internal val TEXT_COLORS = listOf(
 
 
 @Composable
-internal fun intervalLabel(minutes: Int): String = when {
-    minutes == 0 -> stringResource(R.string.sync_manual)
-    minutes < 60 -> stringResource(R.string.interval_min, minutes)
-    else -> stringResource(R.string.interval_hour, minutes / 60)
-}
-
-@Composable
 internal fun themeLabel(mode: Int): String = stringResource(
     when (mode) {
         THEME_LIGHT -> R.string.theme_light

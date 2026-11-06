@@ -24,7 +24,8 @@ class NewNoteTileService : TileService() {
         if (Build.VERSION.SDK_INT >= 34) {
             startActivityAndCollapse(PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE))
         } else {
-            @Suppress("DEPRECATION")
+            // Before Android 14 only the Intent version exists.
+            @Suppress("DEPRECATION", "StartActivityAndCollapseDeprecated")
             startActivityAndCollapse(intent)
         }
     }

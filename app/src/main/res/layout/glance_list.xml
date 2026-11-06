@@ -4,6 +4,8 @@
   scrollbar: RemoteViews offers no way to toggle it per widget at runtime.
 -->
 <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:override="true"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     style="@style/Glance.AppWidget.List"
     android:layout_width="wrap_content"

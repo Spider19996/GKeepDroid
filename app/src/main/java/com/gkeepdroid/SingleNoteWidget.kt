@@ -78,29 +78,15 @@ class SingleNoteWidget : GlanceAppWidget() {
             }
         }
 
-        val look = if (note != null && account != null) NoteLook.of(context, account, note.id) else null
-        val night = look?.dark ?: NoteBackgrounds.isNight(context)
-        val noteColor = if (settings.showNoteColors && note != null) NoteColors.argb(note.color, night) else null
-        val picture = remember(version) {
-            if (!settings.showNoteColors || note == null || account == null) {
-                null
-            } else {
-                val name = RichNotes.of(context, account, note.id)?.background.orEmpty()
-                CustomBackgrounds.forWidget(context, account, note.id, settings.noteAlpha, 0.8f)
-                    ?: if (name.isEmpty()) null else NoteBackgrounds.forWidget(context, name, settings.noteAlpha, 0.8f, NoteLook.of(context, account, note.id).dark ?: NoteBackgrounds.isNight(context))
-            }
-        }
-        val onDarkPicture = picture != null && note != null && account != null && night &&
-            CustomBackgrounds.stamp(context, account, note.id) == 0L
-        val palette = textPalette(
-            settings, onNoteColor = noteColor != null || picture != null,
-            onDarkPicture = onDarkPicture || (noteColor != null && night && picture == null), own = look?.textColor?.let { Color(it) },
-        )
+        val picture = remember(version) { widgetPicture(context, settings, account, note, 0.8f) }
+        val look = cardLook(context, settings, account, note, picture)
+        val noteColor = look.noteColor
+        val palette = look.palette
         val textColor = palette.provider()
         val settingsAction = actionStartActivity<SettingsActivity>(actionParametersOf(WidgetIdKey to appWidgetId))
 
         // The whole widget is the note's card: its color, or the widget background if it has none. With a picture, the color is a frame.
-        val framed = picture != null && noteColor != null
+        val framed = look.framed
         val card: @Composable (GlanceModifier) -> Unit = { cardModifier ->
         WithHeaderBar(
             modifier = cardModifier,

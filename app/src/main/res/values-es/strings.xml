@@ -11,7 +11,6 @@
     <string name="show_note_colors">Mostrar colores de las notas</string>
     <string name="note_opacity">Opacidad de las notas: %1$d%%</string>
     <string name="sync_section">Sincronización</string>
-    <string name="sync_manual">Solo manual</string>
     <string name="save">Guardar</string>
     <string name="credentials_required">Se requieren el correo y el token maestro.</string>
     <string name="no_notes">Aún no hay notas. Abre los ajustes (⚙) para iniciar sesión.</string>
@@ -174,7 +173,6 @@
     <string name="note_text_color_auto">Automático</string>
     <string name="background_dark_version">Versión oscura de la imagen</string>
     <string name="color_and_background">Color / fondo</string>
-    <string name="note_background">Fondo</string>
     <string name="own_photo_hint">Esta foto solo se queda en este teléfono. No se guarda en Google Keep, así que no aparecerá en otros dispositivos ni en Keep.</string>
     <string name="dont_show_again">No volver a mostrar</string>
     <string name="background_own">Foto propia</string>
@@ -186,14 +184,17 @@
     <string name="delete_selected_confirm">¿Eliminar definitivamente las notas seleccionadas? No se puede deshacer.</string>
     <plurals name="search_count_notes">
         <item quantity="one">Buscar en 1 nota</item>
+        <item quantity="many">Buscar en %d notas</item>
         <item quantity="other">Buscar en %d notas</item>
     </plurals>
     <plurals name="search_count_archive">
         <item quantity="one">Buscar en 1 nota archivada</item>
+        <item quantity="many">Buscar en %d notas archivadas</item>
         <item quantity="other">Buscar en %d notas archivadas</item>
     </plurals>
     <plurals name="search_count_trash">
         <item quantity="one">Buscar en 1 nota de la papelera</item>
+        <item quantity="many">Buscar en %d notas de la papelera</item>
         <item quantity="other">Buscar en %d notas de la papelera</item>
     </plurals>
     <string name="search_history_clear">Borrar historial de búsqueda</string>

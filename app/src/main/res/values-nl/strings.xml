@@ -11,7 +11,6 @@
     <string name="show_note_colors">Notitiekleuren tonen</string>
     <string name="note_opacity">Dekking van notities: %1$d%%</string>
     <string name="sync_section">Synchronisatie</string>
-    <string name="sync_manual">Alleen handmatig</string>
     <string name="save">Opslaan</string>
     <string name="credentials_required">E-mailadres en hoofdtoken zijn vereist.</string>
     <string name="no_notes">Nog geen notities. Open de instellingen (⚙) om in te loggen.</string>
@@ -174,7 +173,6 @@
     <string name="note_text_color_auto">Automatisch</string>
     <string name="background_dark_version">Donkere versie van de afbeelding</string>
     <string name="color_and_background">Kleur / achtergrond</string>
-    <string name="note_background">Achtergrond</string>
     <string name="own_photo_hint">Deze foto blijft alleen op deze telefoon. Hij wordt niet opgeslagen in Google Keep en verschijnt dus niet op andere apparaten of in Keep zelf.</string>
     <string name="dont_show_again">Niet meer tonen</string>
     <string name="background_own">Eigen foto</string>

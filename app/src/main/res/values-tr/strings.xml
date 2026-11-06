@@ -11,7 +11,6 @@
     <string name="show_note_colors">Not renklerini göster</string>
     <string name="note_opacity">Not kartı opaklığı: %1$d%%</string>
     <string name="sync_section">Senkronizasyon</string>
-    <string name="sync_manual">Yalnızca elle</string>
     <string name="save">Kaydet</string>
     <string name="credentials_required">E-posta ve ana jeton gereklidir.</string>
     <string name="no_notes">Henüz not yok. Giriş yapmak için ayarları (⚙) açın.</string>
@@ -174,7 +173,6 @@
     <string name="note_text_color_auto">Otomatik</string>
     <string name="background_dark_version">Resmin koyu sürümü</string>
     <string name="color_and_background">Renk / arka plan</string>
-    <string name="note_background">Arka plan</string>
     <string name="own_photo_hint">Bu fotoğraf yalnızca bu telefonda kalır. Google Keep\'e kaydedilmez; bu yüzden diğer cihazlarda veya Keep\'in kendisinde görünmez.</string>
     <string name="dont_show_again">Bir daha gösterme</string>
     <string name="background_own">Kendi fotoğrafım</string>
@@ -185,12 +183,15 @@
     <string name="empty_trash_confirm">Çöp kutusundaki tüm notlar kalıcı olarak silinsin mi? Bu geri alınamaz.</string>
     <string name="delete_selected_confirm">Seçilen notlar kalıcı olarak silinsin mi? Bu geri alınamaz.</string>
     <plurals name="search_count_notes">
+        <item quantity="one">%d notta ara</item>
         <item quantity="other">%d notta ara</item>
     </plurals>
     <plurals name="search_count_archive">
+        <item quantity="one">%d arşivlenmiş notta ara</item>
         <item quantity="other">%d arşivlenmiş notta ara</item>
     </plurals>
     <plurals name="search_count_trash">
+        <item quantity="one">Çöp kutusundaki %d notta ara</item>
         <item quantity="other">Çöp kutusundaki %d notta ara</item>
     </plurals>
     <string name="search_history_clear">Arama geçmişini temizle</string>

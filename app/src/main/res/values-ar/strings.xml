@@ -11,7 +11,6 @@
     <string name="show_note_colors">إظهار ألوان الملاحظات</string>
     <string name="note_opacity">شفافية بطاقات الملاحظات: %1$d%%</string>
     <string name="sync_section">المزامنة</string>
-    <string name="sync_manual">يدويًا فقط</string>
     <string name="save">حفظ</string>
     <string name="credentials_required">البريد الإلكتروني والرمز الرئيسي مطلوبان.</string>
     <string name="no_notes">لا توجد ملاحظات بعد. افتح الإعدادات (⚙) لتسجيل الدخول.</string>
@@ -174,7 +173,6 @@
     <string name="note_text_color_auto">تلقائي</string>
     <string name="background_dark_version">النسخة الداكنة للصورة</string>
     <string name="color_and_background">اللون / الخلفية</string>
-    <string name="note_background">الخلفية</string>
     <string name="own_photo_hint">تبقى هذه الصورة على هذا الهاتف فقط. لا تُحفظ في Google Keep، لذا لن تظهر على الأجهزة الأخرى أو في Keep نفسه.</string>
     <string name="dont_show_again">عدم الإظهار مجددًا</string>
     <string name="background_own">صورتي</string>
@@ -185,12 +183,27 @@
     <string name="empty_trash_confirm">حذف كل الملاحظات في سلة المهملات نهائيًا؟ لا يمكن التراجع عن ذلك.</string>
     <string name="delete_selected_confirm">حذف الملاحظات المحددة نهائيًا؟ لا يمكن التراجع عن ذلك.</string>
     <plurals name="search_count_notes">
+        <item quantity="zero">البحث في الملاحظات (%d)</item>
+        <item quantity="one">البحث في الملاحظات (%d)</item>
+        <item quantity="two">البحث في الملاحظات (%d)</item>
+        <item quantity="few">البحث في الملاحظات (%d)</item>
+        <item quantity="many">البحث في الملاحظات (%d)</item>
         <item quantity="other">البحث في الملاحظات (%d)</item>
     </plurals>
     <plurals name="search_count_archive">
+        <item quantity="zero">البحث في الأرشيف (%d)</item>
+        <item quantity="one">البحث في الأرشيف (%d)</item>
+        <item quantity="two">البحث في الأرشيف (%d)</item>
+        <item quantity="few">البحث في الأرشيف (%d)</item>
+        <item quantity="many">البحث في الأرشيف (%d)</item>
         <item quantity="other">البحث في الأرشيف (%d)</item>
     </plurals>
     <plurals name="search_count_trash">
+        <item quantity="zero">البحث في سلة المهملات (%d)</item>
+        <item quantity="one">البحث في سلة المهملات (%d)</item>
+        <item quantity="two">البحث في سلة المهملات (%d)</item>
+        <item quantity="few">البحث في سلة المهملات (%d)</item>
+        <item quantity="many">البحث في سلة المهملات (%d)</item>
         <item quantity="other">البحث في سلة المهملات (%d)</item>
     </plurals>
     <string name="search_history_clear">مسح سجل البحث</string>

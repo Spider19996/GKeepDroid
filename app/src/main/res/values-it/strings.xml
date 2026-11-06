@@ -11,7 +11,6 @@
     <string name="show_note_colors">Mostra i colori delle note</string>
     <string name="note_opacity">Opacità delle note: %1$d%%</string>
     <string name="sync_section">Sincronizzazione</string>
-    <string name="sync_manual">Solo manuale</string>
     <string name="save">Salva</string>
     <string name="credentials_required">E-mail e token principale sono obbligatori.</string>
     <string name="no_notes">Nessuna nota. Apri le impostazioni (⚙) per accedere.</string>
@@ -174,7 +173,6 @@
     <string name="note_text_color_auto">Automatico</string>
     <string name="background_dark_version">Versione scura dell\'immagine</string>
     <string name="color_and_background">Colore / sfondo</string>
-    <string name="note_background">Sfondo</string>
     <string name="own_photo_hint">Questa foto resta solo su questo telefono. Non viene salvata in Google Keep, quindi non apparirà su altri dispositivi né in Keep.</string>
     <string name="dont_show_again">Non mostrare più</string>
     <string name="background_own">Foto personale</string>
@@ -186,14 +184,17 @@
     <string name="delete_selected_confirm">Eliminare definitivamente le note selezionate? Non si può annullare.</string>
     <plurals name="search_count_notes">
         <item quantity="one">Cerca in 1 nota</item>
+        <item quantity="many">Cerca in %d note</item>
         <item quantity="other">Cerca in %d note</item>
     </plurals>
     <plurals name="search_count_archive">
         <item quantity="one">Cerca in 1 nota archiviata</item>
+        <item quantity="many">Cerca in %d note archiviate</item>
         <item quantity="other">Cerca in %d note archiviate</item>
     </plurals>
     <plurals name="search_count_trash">
         <item quantity="one">Cerca in 1 nota nel cestino</item>
+        <item quantity="many">Cerca in %d note nel cestino</item>
         <item quantity="other">Cerca in %d note nel cestino</item>
     </plurals>
     <string name="search_history_clear">Cancella cronologia ricerche</string>
