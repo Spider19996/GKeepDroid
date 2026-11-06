@@ -22,7 +22,6 @@
     <string name="add_item">إضافة عنصر</string>
     <string name="item_hint">عنصر القائمة</string>
     <string name="color">اللون</string>
-    <string name="cancel">إلغاء</string>
     <string name="save_failed">تعذر الحفظ: %1$s</string>
     <string name="theme_section">السمة</string>
     <string name="theme_system">النظام</string>
@@ -454,7 +453,7 @@
     <string name="keep_editing">متابعة التحرير</string>
     <string name="editor_convert">تحويل ملاحظة / قائمة</string>
     <string name="editor_buttons_title">أزرار المحرر</string>
-    <string name="editor_buttons_hint">اضغط مطولًا على زر واسحبه إلى مكان آخر: الشريطان فوق الملاحظة وتحتها، أو القائمة، أو مخفي. كل زر موجود مرة واحدة.</string>
+    <string name="editor_buttons_hint">اضغط مطولًا على زر واسحبه إلى مكان آخر: الشريطان فوق الملاحظة وتحتها، أو القائمة، أو مخفي.</string>
     <string name="editor_zone_menu">القائمة</string>
     <string name="editor_zone_hidden">مخفي</string>
     <string name="editor_buttons_reset">إعادة الضبط</string>

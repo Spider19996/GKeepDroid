@@ -22,7 +22,6 @@
     <string name="add_item">Öğe ekle</string>
     <string name="item_hint">Liste öğesi</string>
     <string name="color">Renk</string>
-    <string name="cancel">İptal</string>
     <string name="save_failed">Kaydedilemedi: %1$s</string>
     <string name="theme_section">Tema</string>
     <string name="theme_system">Sistem</string>
@@ -418,7 +417,7 @@
     <string name="keep_editing">Düzenlemeye devam et</string>
     <string name="editor_convert">Notu / listeyi dönüştür</string>
     <string name="editor_buttons_title">Düzenleyici düğmeleri</string>
-    <string name="editor_buttons_hint">Bir düğmeye uzun basıp başka bir yere sürükleyin: notun üstündeki ve altındaki çubuklar, menü ya da gizli. Her düğme bir kez bulunur.</string>
+    <string name="editor_buttons_hint">Bir düğmeye uzun basıp başka bir yere sürükleyin: notun üstündeki ve altındaki çubuklar, menü ya da gizli.</string>
     <string name="editor_zone_menu">Menü</string>
     <string name="editor_zone_hidden">Gizli</string>
     <string name="editor_buttons_reset">Varsayılana sıfırla</string>

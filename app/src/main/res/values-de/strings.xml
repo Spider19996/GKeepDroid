@@ -22,7 +22,6 @@
     <string name="add_item">Eintrag hinzufügen</string>
     <string name="item_hint">Listeneintrag</string>
     <string name="color">Farbe</string>
-    <string name="cancel">Abbrechen</string>
     <string name="save_failed">Speichern fehlgeschlagen: %1$s</string>
     <string name="theme_section">Design</string>
     <string name="theme_system">System</string>
@@ -418,7 +417,7 @@
     <string name="keep_editing">Weiter bearbeiten</string>
     <string name="editor_convert">Notiz / Checkliste umwandeln</string>
     <string name="editor_buttons_title">Editor-Tasten</string>
-    <string name="editor_buttons_hint">Taste lange drücken und an eine andere Stelle ziehen: die Leisten über und unter der Notiz, das Menü oder ausgeblendet. Jede Taste gibt es einmal.</string>
+    <string name="editor_buttons_hint">Taste lange drücken und an eine andere Stelle ziehen: die Leisten über und unter der Notiz, das Menü oder ausgeblendet.</string>
     <string name="editor_zone_menu">Menü</string>
     <string name="editor_zone_hidden">Ausgeblendet</string>
     <string name="editor_buttons_reset">Auf Standard zurücksetzen</string>

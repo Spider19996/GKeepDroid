@@ -22,7 +22,6 @@
     <string name="add_item">Item toevoegen</string>
     <string name="item_hint">Lijstitem</string>
     <string name="color">Kleur</string>
-    <string name="cancel">Annuleren</string>
     <string name="save_failed">Opslaan mislukt: %1$s</string>
     <string name="theme_section">Thema</string>
     <string name="theme_system">Systeem</string>
@@ -418,7 +417,7 @@
     <string name="keep_editing">Verder bewerken</string>
     <string name="editor_convert">Notitie / checklist omzetten</string>
     <string name="editor_buttons_title">Editorknoppen</string>
-    <string name="editor_buttons_hint">Houd een knop ingedrukt en sleep hem naar een andere plek: de balken boven en onder de notitie, het menu of verborgen. Elke knop bestaat één keer.</string>
+    <string name="editor_buttons_hint">Houd een knop ingedrukt en sleep hem naar een andere plek: de balken boven en onder de notitie, het menu of verborgen.</string>
     <string name="editor_zone_menu">Menu</string>
     <string name="editor_zone_hidden">Verborgen</string>
     <string name="editor_buttons_reset">Standaard herstellen</string>

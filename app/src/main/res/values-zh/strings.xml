@@ -22,7 +22,6 @@
     <string name="add_item">添加项目</string>
     <string name="item_hint">列表项</string>
     <string name="color">颜色</string>
-    <string name="cancel">取消</string>
     <string name="save_failed">无法保存：%1$s</string>
     <string name="theme_section">主题</string>
     <string name="theme_system">跟随系统</string>
@@ -409,7 +408,7 @@
     <string name="keep_editing">继续编辑</string>
     <string name="editor_convert">转换便签 / 清单</string>
     <string name="editor_buttons_title">编辑器按钮</string>
-    <string name="editor_buttons_hint">长按按钮并拖到其他位置：便签上方和下方的栏、菜单或隐藏。每个按钮只有一个。</string>
+    <string name="editor_buttons_hint">长按按钮并拖到其他位置：便签上方和下方的栏、菜单或隐藏。</string>
     <string name="editor_zone_menu">菜单</string>
     <string name="editor_zone_hidden">隐藏</string>
     <string name="editor_buttons_reset">恢复默认</string>

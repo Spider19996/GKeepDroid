@@ -22,7 +22,6 @@
     <string name="add_item">आइटम जोड़ें</string>
     <string name="item_hint">सूची आइटम</string>
     <string name="color">रंग</string>
-    <string name="cancel">रद्द करें</string>
     <string name="save_failed">सहेजा नहीं जा सका: %1$s</string>
     <string name="theme_section">थीम</string>
     <string name="theme_system">सिस्टम</string>
@@ -418,7 +417,7 @@
     <string name="keep_editing">संपादन जारी रखें</string>
     <string name="editor_convert">नोट / चेकलिस्ट बदलें</string>
     <string name="editor_buttons_title">संपादक बटन</string>
-    <string name="editor_buttons_hint">किसी बटन को देर तक दबाएँ और दूसरी जगह खींचें: नोट के ऊपर और नीचे की पट्टियाँ, मेन्यू या छिपा हुआ। हर बटन एक बार होता है।</string>
+    <string name="editor_buttons_hint">किसी बटन को देर तक दबाएँ और दूसरी जगह खींचें: नोट के ऊपर और नीचे की पट्टियाँ, मेन्यू या छिपा हुआ।</string>
     <string name="editor_zone_menu">मेन्यू</string>
     <string name="editor_zone_hidden">छिपा हुआ</string>
     <string name="editor_buttons_reset">डिफ़ॉल्ट पर रीसेट करें</string>

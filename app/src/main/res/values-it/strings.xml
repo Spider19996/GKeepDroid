@@ -22,7 +22,6 @@
     <string name="add_item">Aggiungi elemento</string>
     <string name="item_hint">Elemento della lista</string>
     <string name="color">Colore</string>
-    <string name="cancel">Annulla</string>
     <string name="save_failed">Impossibile salvare: %1$s</string>
     <string name="theme_section">Tema</string>
     <string name="theme_system">Sistema</string>
@@ -427,7 +426,7 @@
     <string name="keep_editing">Continua a modificare</string>
     <string name="editor_convert">Converti nota / lista</string>
     <string name="editor_buttons_title">Pulsanti dell\'editor</string>
-    <string name="editor_buttons_hint">Tieni premuto un pulsante e trascinalo altrove: le barre sopra e sotto la nota, il menu o nascosto. Ogni pulsante esiste una sola volta.</string>
+    <string name="editor_buttons_hint">Tieni premuto un pulsante e trascinalo altrove: le barre sopra e sotto la nota, il menu o nascosto.</string>
     <string name="editor_zone_menu">Menu</string>
     <string name="editor_zone_hidden">Nascosto</string>
     <string name="editor_buttons_reset">Ripristina</string>

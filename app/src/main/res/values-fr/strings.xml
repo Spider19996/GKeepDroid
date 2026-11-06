@@ -22,7 +22,6 @@
     <string name="add_item">Ajouter un élément</string>
     <string name="item_hint">Élément de liste</string>
     <string name="color">Couleur</string>
-    <string name="cancel">Annuler</string>
     <string name="save_failed">Échec de l\'enregistrement : %1$s</string>
     <string name="theme_section">Thème</string>
     <string name="theme_system">Système</string>
@@ -427,7 +426,7 @@
     <string name="keep_editing">Continuer</string>
     <string name="editor_convert">Convertir note / liste</string>
     <string name="editor_buttons_title">Boutons de l\'éditeur</string>
-    <string name="editor_buttons_hint">Appuyez longuement sur un bouton et faites-le glisser ailleurs : les barres au-dessus et au-dessous de la note, le menu ou masqué. Chaque bouton n\'existe qu\'une fois.</string>
+    <string name="editor_buttons_hint">Appuyez longuement sur un bouton et faites-le glisser ailleurs : les barres au-dessus et au-dessous de la note, le menu ou masqué.</string>
     <string name="editor_zone_menu">Menu</string>
     <string name="editor_zone_hidden">Masqué</string>
     <string name="editor_buttons_reset">Rétablir</string>

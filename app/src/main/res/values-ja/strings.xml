@@ -22,7 +22,6 @@
     <string name="add_item">項目を追加</string>
     <string name="item_hint">リスト項目</string>
     <string name="color">色</string>
-    <string name="cancel">キャンセル</string>
     <string name="save_failed">保存できませんでした：%1$s</string>
     <string name="theme_section">テーマ</string>
     <string name="theme_system">システム</string>
@@ -409,7 +408,7 @@
     <string name="keep_editing">編集を続ける</string>
     <string name="editor_convert">メモ／チェックリストに変換</string>
     <string name="editor_buttons_title">エディターのボタン</string>
-    <string name="editor_buttons_hint">ボタンを長押しして別の場所にドラッグします：メモの上下のバー、メニュー、または非表示。各ボタンは1つだけです。</string>
+    <string name="editor_buttons_hint">ボタンを長押しして別の場所にドラッグします：メモの上下のバー、メニュー、または非表示。</string>
     <string name="editor_zone_menu">メニュー</string>
     <string name="editor_zone_hidden">非表示</string>
     <string name="editor_buttons_reset">初期設定に戻す</string>

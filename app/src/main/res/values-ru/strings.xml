@@ -22,7 +22,6 @@
     <string name="add_item">Добавить пункт</string>
     <string name="item_hint">Пункт списка</string>
     <string name="color">Цвет</string>
-    <string name="cancel">Отмена</string>
     <string name="save_failed">Не удалось сохранить: %1$s</string>
     <string name="theme_section">Тема</string>
     <string name="theme_system">Системная</string>
@@ -436,7 +435,7 @@
     <string name="keep_editing">Продолжить</string>
     <string name="editor_convert">Преобразовать заметку / список</string>
     <string name="editor_buttons_title">Кнопки редактора</string>
-    <string name="editor_buttons_hint">Нажмите кнопку и перетащите её в другое место: панели над и под заметкой, меню или скрыто. Каждая кнопка есть один раз.</string>
+    <string name="editor_buttons_hint">Нажмите кнопку и перетащите её в другое место: панели над и под заметкой, меню или скрыто.</string>
     <string name="editor_zone_menu">Меню</string>
     <string name="editor_zone_hidden">Скрыто</string>
     <string name="editor_buttons_reset">Сбросить</string>
