@@ -132,9 +132,11 @@ internal fun GroupedMenu(expanded: Boolean, onDismissRequest: () -> Unit, groups
 
 /** Gives a small round control the 48 dp touch area Material asks for; the control inside keeps its own size. */
 @Composable
-internal fun RoundTouchTarget(onClick: () -> Unit, enabled: Boolean = true, content: @Composable () -> Unit) {
+internal fun RoundTouchTarget(
+    onClick: () -> Unit, enabled: Boolean = true, shape: androidx.compose.ui.graphics.Shape = CircleShape, content: @Composable () -> Unit,
+) {
     Box(
-        Modifier.size(48.dp).clip(CircleShape).clickable(enabled = enabled, role = Role.Button, onClick = onClick),
+        Modifier.size(48.dp).clip(shape).clickable(enabled = enabled, role = Role.Button, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) { content() }
 }

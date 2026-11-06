@@ -20,6 +20,16 @@ import java.net.URL
  * drawn to a bitmap and kept on the device.
  */
 object NoteBackgrounds {
+    /** The average color of a picture, as ARGB. */
+    fun averageColor(bitmap: Bitmap): Int {
+        val small = Bitmap.createScaledBitmap(bitmap, 16, 16, true)
+        var r = 0L; var g = 0L; var b = 0L
+        val pixels = IntArray(16 * 16).also { small.getPixels(it, 0, 16, 0, 0, 16, 16) }
+        pixels.forEach { r += android.graphics.Color.red(it); g += android.graphics.Color.green(it); b += android.graphics.Color.blue(it) }
+        val n = pixels.size
+        return android.graphics.Color.rgb((r / n).toInt(), (g / n).toInt(), (b / n).toInt())
+    }
+
     /** The pictures Keep offers (the names are those of its own files). */
     val NAMES = listOf("celebration", "food", "grocery", "music", "notes", "places", "recipe", "travel", "video")
 
