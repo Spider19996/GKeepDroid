@@ -194,9 +194,8 @@ class SingleNoteWidget : GlanceAppWidget() {
                     }
                 } else if (note.text.isNotBlank()) {
                     item(itemId = 4L) {
-                        Text(
-                            note.text,
-                            style = TextStyle(color = textColor, fontSize = settings.textSizeSp.sp),
+                        RichBody(
+                            note, account, TextStyle(color = textColor, fontSize = settings.textSizeSp.sp), settings.textSizeSp, maxLines = 0,
                             modifier = GlanceModifier.fillMaxWidth().clickable(openEditor),
                         )
                     }

@@ -259,6 +259,7 @@ private fun checkboxRes(style: Int, checked: Boolean): Int? = when (style) {
  */
 @Composable
 internal fun ItemRow(note: KeepNote, item: KeepItem, account: String, settings: WidgetSettings, palette: TextPalette) {
+    val context = androidx.glance.LocalContext.current
     val pad = settings.listSpacingDp.dp
     val itemColor = palette.provider(if (item.checked) 0.55f else 1f)
     val tick = if (settings.checkable && item.id.isNotEmpty()) {
@@ -295,13 +296,14 @@ internal fun ItemRow(note: KeepNote, item: KeepItem, account: String, settings: 
                 )
             }
         }
+        val flags = RichNotes.uniformFlags(RichNotes.of(context, account, note.id)?.docs?.get(item.id), item.text)
         Text(
             item.text,
             style = TextStyle(
                 color = itemColor,
                 fontSize = settings.textSizeSp.sp,
                 textDecoration = if (item.checked) TextDecoration.LineThrough else TextDecoration.None,
-            ),
+            ).withFlags(if (item.checked) flags or RichNotes.STRIKE else flags, settings.textSizeSp),
             modifier = GlanceModifier.defaultWeight().padding(top = pad, bottom = pad),
         )
     }

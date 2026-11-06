@@ -287,10 +287,9 @@ class NotesWidget : GlanceAppWidget() {
                             val collapsed = collapsedByNote[CollapseStore.key(account, note.id)] ?: settings.collapseChecked
                             ChecklistBody(note, account, settings, palette, collapsed, rowLimit = settings.maxLines)
                         } else if (note.text.isNotBlank()) {
-                            Text(
-                                note.text,
-                                maxLines = if (settings.maxLines <= 0) Int.MAX_VALUE else settings.maxLines,
-                                style = TextStyle(color = textColor, fontSize = settings.textSizeSp.sp),
+                            RichBody(
+                                note, account, TextStyle(color = textColor, fontSize = settings.textSizeSp.sp), settings.textSizeSp,
+                                maxLines = settings.maxLines,
                             )
                         }
                         EditedTime(note, settings, palette)

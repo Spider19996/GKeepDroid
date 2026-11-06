@@ -18,11 +18,11 @@ class RichNote(val background: String, val docs: Map<String, RichDoc>)
 
 /** Reads the file the Python bridge writes (see _fetch_rich in keep_bridge.py). */
 object RichNotes {
-    private const val BOLD = 1
-    private const val ITALIC = 2
-    private const val UNDERLINE = 4
-    private const val STRIKE = 8
-    private const val HEADING = 16
+    const val BOLD = 1
+    const val ITALIC = 2
+    const val UNDERLINE = 4
+    const val STRIKE = 8
+    const val HEADING = 16
 
     private class Cached(val stamp: Long, val size: Long, val notes: Map<String, RichNote>, var checkedAt: Long)
 
@@ -69,6 +69,19 @@ object RichNotes {
         load(context, account).values.map { it.background }.filter { it.isNotEmpty() }.toSet()
 
     fun of(context: Context, account: String, noteId: String): RichNote? = load(context, account)[noteId]
+
+    /**
+     * The styles that every letter of [start] until [end] of [text] has (spaces do not count); 0 if the text here is not the one
+     * Keep has, so formatting never lands in the wrong place. A widget cannot show styles inside a line, only for the whole of one.
+     */
+    fun uniformFlags(doc: RichDoc?, text: String, start: Int = 0, end: Int = text.length): Int {
+        if (doc == null || doc.text.trimEnd('\n') != text.trimEnd('\n')) return 0
+        val per = IntArray(text.length)
+        doc.runs.forEach { (from, to, flags) -> for (i in from until minOf(to, per.size)) per[i] = flags }
+        var all = -1
+        for (i in start.coerceAtLeast(0) until end.coerceAtMost(text.length)) if (!text[i].isWhitespace()) all = all and per[i]
+        return if (all == -1) 0 else all
+    }
 
     /**
      * The text with Keep's formatting. The styles are positions in the text Keep has; if the text here is a different
