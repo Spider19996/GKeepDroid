@@ -427,3 +427,13 @@ internal fun ColumnScope.AppCheckboxPage(s: SettingsState) {
         }
     }
 }
+
+/** Where the buttons of the note editor stand: in the bar above, the bar below, the menu, or nowhere. */
+@Composable
+internal fun ColumnScope.EditorButtonsPage(s: SettingsState) {
+    with(s) {
+        Hint(R.string.editor_buttons_hint)
+        EditorLayoutEditor(appEditorLayout) { appEditorLayout = it }
+        TextButton(onClick = { appEditorLayout = EditorLayout() }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.editor_buttons_reset)) }
+    }
+}

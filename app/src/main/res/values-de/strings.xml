@@ -416,4 +416,11 @@
     <string name="discard_title">Änderungen verwerfen?</string>
     <string name="discard_action">Verwerfen</string>
     <string name="keep_editing">Weiter bearbeiten</string>
+    <string name="editor_convert">Notiz / Checkliste umwandeln</string>
+    <string name="editor_buttons_title">Editor-Tasten</string>
+    <string name="editor_buttons_hint">Taste lange drücken und an eine andere Stelle ziehen: die Leisten über und unter der Notiz, das Menü oder ausgeblendet. Jede Taste gibt es einmal.</string>
+    <string name="editor_zone_menu">Menü</string>
+    <string name="editor_zone_hidden">Ausgeblendet</string>
+    <string name="editor_buttons_reset">Auf Standard zurücksetzen</string>
+    <string name="editor_buttons_note">Notiz</string>
 </resources>

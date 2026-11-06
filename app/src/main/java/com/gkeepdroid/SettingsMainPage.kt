@@ -123,6 +123,7 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
                     { shapes -> MenuRow(stringResource(R.string.list_section), null, shapes = shapes) { page = Page.AppChecklists } },
                     { shapes -> MenuRow(stringResource(R.string.swipe_title), null, shapes = shapes) { page = Page.AppSwipe } },
                     { shapes -> MenuRow(stringResource(R.string.filter_bar_title), null, shapes = shapes) { page = Page.AppFilters } },
+                    { shapes -> MenuRow(stringResource(R.string.editor_buttons_title), null, shapes = shapes) { page = Page.EditorButtons } },
                 ),
             )
 

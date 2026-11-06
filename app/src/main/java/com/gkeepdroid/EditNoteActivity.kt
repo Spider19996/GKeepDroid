@@ -641,6 +641,145 @@ class EditNoteActivity : ComponentActivity() {
         // The text styles live in the selection menu of Android (next to Cut, Copy, Paste), for the text field that has the focus.
         val styleLabels = listOf(R.string.format_bold, R.string.format_italic, R.string.format_underline, R.string.format_strike).map { stringResource(it) }
         val applyStyle: (Int) -> Unit = { bit -> format.toggleSelected(::formatTextOf, bit) }
+        // Every action of the editor with what it does now; the layout of the settings decides which bar or menu shows it.
+        val editorLayout = remember { AppSettingsStore.load(this@EditNoteActivity).editorLayout }
+        val states = mutableMapOf<String, EditorActionState>()
+        states["close"] = EditorActionState(R.drawable.ic_close, stringResource(R.string.discard_action), { if (hasChanges()) confirmDiscard = true else discard() }, enabled = !saving)
+        states["pin"] = EditorActionState(
+            if (pinned) R.drawable.ic_push_pin else R.drawable.ic_push_pin_outline, stringResource(R.string.pin_note),
+            { if (canEdit) pinned = !pinned else toastUnlockFirst() }, checked = pinned, dimmed = !canEdit,
+        )
+        states["pin_bottom"] = EditorActionState(
+            R.drawable.ic_pin_bottom, stringResource(R.string.pin_to_bottom),
+            {
+                pinBottom = !pinBottom
+                if (pinWidgetId != null && existing != null) {
+                    val widget = SettingsStore.loadWidget(this@EditNoteActivity, pinWidgetId)
+                    SettingsStore.saveWidget(
+                        this@EditNoteActivity, pinWidgetId,
+                        widget.copy(pinBottom = if (pinBottom) widget.pinBottom + existing.id else widget.pinBottom - existing.id),
+                    )
+                    scope.launch { WidgetRefresh.all(this@EditNoteActivity) }
+                }
+            },
+            visible = pinWidgetId != null && existing != null, checked = pinBottom,
+        )
+        states["reminder"] = EditorActionState(
+            R.drawable.ic_alarm, stringResource(R.string.reminders_title), { if (canEdit) remindersOpen = true else askEdit() },
+            checked = shownReminders.isNotEmpty(), tint = if (notificationsOn) null else MaterialTheme.colorScheme.error,
+        )
+        states["save"] = EditorActionState(
+            if (canEdit) R.drawable.ic_done else R.drawable.ic_lock,
+            stringResource(if (canEdit) R.string.save else if (isList) R.string.edit_list else R.string.edit_note),
+            { if (canEdit) save() else askEdit() }, enabled = !saving,
+        )
+        states["palette"] = EditorActionState(R.drawable.ic_palette, stringResource(R.string.color_and_background), { paletteOpen = true }, visible = canEdit)
+        states["labels"] = EditorActionState(R.drawable.ic_label, stringResource(R.string.labels_title), { labelsOpen = true }, visible = canEdit)
+        // Keep's API has no way to upload pictures, so adding one is left to the Keep app.
+        states["image"] = EditorActionState(
+            R.drawable.ic_image, stringResource(R.string.image_add_keep), { startActivity(keepIntent(this@EditNoteActivity)) },
+            visible = canEdit && existing != null && !isLocal && images.isEmpty(),
+        )
+        states["undo"] = EditorActionState(R.drawable.ic_undo, stringResource(R.string.undo), undo, visible = canEdit, enabled = history.canUndo)
+        states["redo"] = EditorActionState(R.drawable.ic_redo, stringResource(R.string.redo), redo, visible = canEdit, enabled = history.canRedo)
+        states["convert"] = EditorActionState(
+            R.drawable.ic_checklist, stringResource(if (isList) R.string.convert_to_note else R.string.convert_to_list), { requestConvert() },
+        )
+        states["list_number"] = EditorActionState(
+            R.drawable.ic_checklist, stringResource(if (numbered) R.string.list_unnumber else R.string.list_number),
+            {
+                // Numbers are shown from the position; an old "1. " typed by hand is not counted twice.
+                val stripped = ListNumbering.strip(items.toList())
+                items.clear()
+                items.addAll(stripped)
+                numbered = !numbered
+            },
+            visible = isList,
+        )
+        states["list_check_all"] = EditorActionState(
+            R.drawable.ic_done, stringResource(R.string.list_check_all), { for (i in items.indices) items[i] = items[i].copy(checked = true) }, visible = isList,
+        )
+        states["list_uncheck_all"] = EditorActionState(
+            R.drawable.ic_close, stringResource(R.string.list_uncheck_all), { for (i in items.indices) items[i] = items[i].copy(checked = false) }, visible = isList,
+        )
+        states["list_sort"] = EditorActionState(
+            R.drawable.ic_sort, stringResource(R.string.list_sort_alpha),
+            {
+                // Sub-items lose their parent when the order changes, so they become ordinary items.
+                val sorted = items.sortedBy { it.text.lowercase() }.map { it.copy(indent = false) }
+                items.clear()
+                items.addAll(sorted)
+            },
+            visible = isList,
+        )
+        states["list_delete_checked"] = EditorActionState(
+            R.drawable.ic_delete, stringResource(R.string.list_delete_checked),
+            {
+                items.removeAll { it.checked }
+                if (items.isEmpty()) items.add(KeepItem(UUID.randomUUID().toString(), "", false))
+            },
+            visible = isList,
+        )
+        states["open_in_keep"] = EditorActionState(
+            R.drawable.ic_open_new, stringResource(R.string.open_in_keep), { if (existing != null) openInKeep(account, existing) },
+            visible = existing != null && existing.serverId.isNotEmpty(),
+        )
+        states["share"] = EditorActionState(R.drawable.ic_share, stringResource(R.string.share_note), { shareNote(title, text, isList, outItems()) }, visible = existing != null)
+        states["hide_content"] = EditorActionState(
+            R.drawable.ic_lock, stringResource(if (hiddenInWidgets) R.string.show_content else R.string.hide_content),
+            {
+                if (canEdit) {
+                    hiddenInWidgets = !hiddenInWidgets
+                    scope.launch { WidgetRefresh.all(this@EditNoteActivity) }
+                } else {
+                    askEdit()
+                }
+            },
+            visible = existing != null,
+        )
+        states["archive"] = EditorActionState(
+            R.drawable.ic_archive, stringResource(R.string.archive_note),
+            {
+                if (existing != null) leaveNote {
+                    KeepRepository.archiveNote(this@EditNoteActivity, account, existing.id)
+                    UndoStore.set(account, existing.id, UndoStore.Kind.ARCHIVE)
+                }
+            },
+            visible = existing != null && !isLocal,
+        )
+        states["delete"] = EditorActionState(
+            R.drawable.ic_delete, stringResource(if (isLocal) R.string.delete_note else R.string.move_to_trash),
+            {
+                if (existing != null) {
+                    // Local notes have no trash, so deleting them asks first.
+                    if (isLocal) {
+                        confirmDelete = true
+                    } else {
+                        leaveNote {
+                            KeepRepository.trashNote(this@EditNoteActivity, account, existing.id)
+                            UndoStore.set(account, existing.id, UndoStore.Kind.TRASH)
+                        }
+                    }
+                }
+            },
+            visible = existing != null,
+        )
+        // The overflow menu is shown when any of its actions is possible; it grays out until the note is open for editing.
+        val listToolsLabel = stringResource(R.string.list_tools)
+        states["more"] = EditorActionState(
+            R.drawable.ic_more_vert, stringResource(R.string.more_actions), { if (canEdit) menuOpen = true else toastUnlockFirst() },
+            visible = editorLayout.inZone(ZONE_MENU).any { states[it.id]?.visible == true }, dimmed = !canEdit,
+            popup = {
+                GroupedMenu(
+                    expanded = menuOpen && canEdit,
+                    onDismissRequest = { menuOpen = false },
+                    groups = menuGroups(
+                        editorLayout, states, menuPage, { menuPage = it }, listToolsLabel, R.drawable.ic_arrow_left,
+                        { Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null) }, { menuOpen = false },
+                    ),
+                )
+            },
+        )
         val scroll = rememberScrollState()
         // The editor opens in its final look; only changes made while it is open fade.
         LaunchedEffect(Unit) { kotlinx.coroutines.delay(500); screenTint.instant = false }
@@ -659,167 +798,7 @@ class EditNoteActivity : ComponentActivity() {
         }) {
         Column(Modifier.fillMaxSize()) {
         // The bar stays on screen while the note scrolls: discard, the note's switches, save.
-            Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                // Discard on the left, save on the right.
-                IconButton(onClick = { if (hasChanges()) confirmDiscard = true else discard() }, enabled = !saving, shapes = IconButtonDefaults.shapes(), modifier = Modifier.size(40.dp)) {
-                    Icon(painterResource(R.drawable.ic_close), contentDescription = stringResource(R.string.cancel))
-                }
-                Spacer(Modifier.weight(1f))
-                Box(Modifier.clickable(enabled = !canEdit) { toastUnlockFirst() }) {
-                FilledTonalIconToggleButton(
-                    checked = pinned, onCheckedChange = { pinned = it }, enabled = canEdit, shapes = IconButtonDefaults.toggleableShapes(),
-                    colors = quietToggleColors(), modifier = Modifier.size(40.dp),
-                ) {
-                    Icon(
-                        painterResource(if (pinned) R.drawable.ic_push_pin else R.drawable.ic_push_pin_outline),
-                        contentDescription = stringResource(R.string.pin_note),
-                    )
-                }
-                }
-                if (pinWidgetId != null && existing != null) {
-                    FilledTonalIconToggleButton(
-                        checked = pinBottom,
-                        onCheckedChange = { checked ->
-                            pinBottom = checked
-                            val widget = SettingsStore.loadWidget(this@EditNoteActivity, pinWidgetId)
-                            SettingsStore.saveWidget(
-                                this@EditNoteActivity, pinWidgetId,
-                                widget.copy(pinBottom = if (checked) widget.pinBottom + existing.id else widget.pinBottom - existing.id),
-                            )
-                            scope.launch { WidgetRefresh.all(this@EditNoteActivity) }
-                        },
-                        shapes = IconButtonDefaults.toggleableShapes(),
-                        colors = quietToggleColors(), modifier = Modifier.size(40.dp),
-                    ) {
-                        Icon(painterResource(R.drawable.ic_pin_bottom), contentDescription = stringResource(R.string.pin_to_bottom))
-                    }
-                }
-                ReminderButton(shownReminders.isNotEmpty(), notificationsOn) { if (canEdit) remindersOpen = true else askEdit() }
-                // Save, then the overflow menu as the last item at the right edge; a note that is still locked shows a lock instead of the check.
-                FilledIconButton(
-                    onClick = { if (canEdit) save() else askEdit() }, enabled = !saving,
-                    shapes = IconButtonDefaults.shapes(), modifier = Modifier.padding(start = 4.dp).size(40.dp),
-                ) {
-                    Icon(
-                        painterResource(if (canEdit) R.drawable.ic_done else R.drawable.ic_lock),
-                        contentDescription = stringResource(if (canEdit) R.string.save else if (isList) R.string.edit_list else R.string.edit_note),
-                    )
-                }
-                // Less common actions live in an overflow menu; grayed out until the note is open for editing.
-                run {
-                    Box {
-                        IconButton(onClick = { if (canEdit) menuOpen = true else toastUnlockFirst() }, shapes = IconButtonDefaults.shapes(), modifier = Modifier.size(40.dp)) {
-                            Icon(
-                                painterResource(R.drawable.ic_more_vert), contentDescription = stringResource(R.string.more_actions),
-                                tint = if (canEdit) LocalContentColor.current else LocalContentColor.current.copy(alpha = 0.38f),
-                            )
-                        }
-                        GroupedMenu(
-                            expanded = menuOpen && canEdit,
-                            onDismissRequest = { menuOpen = false },
-                            groups = if (menuPage == 1) listOf(
-                                // The checklist tools have a page of their own, so the main menu stays short.
-                                listOf(MenuEntry(stringResource(R.string.list_tools), R.drawable.ic_arrow_left) { menuPage = 0 }),
-                                listOf(
-                                    MenuEntry(
-                                        stringResource(if (numbered) R.string.list_unnumber else R.string.list_number),
-                                        leading = { Text("1.") },
-                                    ) {
-                                        menuOpen = false
-                                        // Numbers are shown from the position; an old "1. " typed by hand is not counted twice.
-                                        val stripped = ListNumbering.strip(items.toList())
-                                        items.clear()
-                                        items.addAll(stripped)
-                                        numbered = !numbered
-                                    },
-                                    MenuEntry(stringResource(R.string.list_check_all), R.drawable.ic_done) {
-                                        menuOpen = false
-                                        for (i in items.indices) items[i] = items[i].copy(checked = true)
-                                    },
-                                    MenuEntry(stringResource(R.string.list_uncheck_all), R.drawable.ic_close) {
-                                        menuOpen = false
-                                        for (i in items.indices) items[i] = items[i].copy(checked = false)
-                                    },
-                                    MenuEntry(stringResource(R.string.list_sort_alpha), R.drawable.ic_sort) {
-                                        menuOpen = false
-                                        // Sub-items lose their parent when the order changes, so they become ordinary items.
-                                        val sorted = items.sortedBy { it.text.lowercase() }.map { it.copy(indent = false) }
-                                        items.clear()
-                                        items.addAll(sorted)
-                                    },
-                                    MenuEntry(stringResource(R.string.list_delete_checked), R.drawable.ic_delete) {
-                                        menuOpen = false
-                                        items.removeAll { it.checked }
-                                        if (items.isEmpty()) items.add(KeepItem(UUID.randomUUID().toString(), "", false))
-                                    },
-                                ),
-                            ) else listOf(
-                                buildList {
-                                    add(
-                                        MenuEntry(
-                                            stringResource(if (isList) R.string.convert_to_note else R.string.convert_to_list),
-                                            R.drawable.ic_checklist,
-                                        ) { menuOpen = false; requestConvert() },
-                                    )
-                                    if (isList) add(
-                                        MenuEntry(stringResource(R.string.list_tools), R.drawable.ic_done, trailing = { Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null) }) { menuPage = 1 },
-                                    )
-                                },
-                                if (existing == null) emptyList() else buildList {
-                                    if (existing.serverId.isNotEmpty()) add(
-                                        MenuEntry(stringResource(R.string.open_in_keep), R.drawable.ic_open_new) {
-                                            menuOpen = false
-                                            openInKeep(account, existing)
-                                        },
-                                    )
-                                    add(
-                                        MenuEntry(stringResource(R.string.share_note), R.drawable.ic_share) {
-                                            menuOpen = false
-                                            shareNote(title, text, isList, outItems())
-                                        },
-                                    )
-                                    add(
-                                        MenuEntry(stringResource(if (hiddenInWidgets) R.string.show_content else R.string.hide_content), R.drawable.ic_lock) {
-                                            menuOpen = false
-                                            if (canEdit) {
-                                                hiddenInWidgets = !hiddenInWidgets
-                                                scope.launch { WidgetRefresh.all(this@EditNoteActivity) }
-                                            } else {
-                                                askEdit()
-                                            }
-                                        },
-                                    )
-                                },
-                                if (existing == null) emptyList() else buildList {
-                                    if (!isLocal) add(
-                                        MenuEntry(stringResource(R.string.archive_note), R.drawable.ic_archive) {
-                                            menuOpen = false
-                                            leaveNote {
-                                                KeepRepository.archiveNote(this@EditNoteActivity, account, existing.id)
-                                                UndoStore.set(account, existing.id, UndoStore.Kind.ARCHIVE)
-                                            }
-                                        },
-                                    )
-                                    add(
-                                        MenuEntry(stringResource(if (isLocal) R.string.delete_note else R.string.move_to_trash), R.drawable.ic_delete) {
-                                            menuOpen = false
-                                            // Local notes have no trash, so deleting them asks first.
-                                            if (isLocal) {
-                                                confirmDelete = true
-                                            } else {
-                                                leaveNote {
-                                                    KeepRepository.trashNote(this@EditNoteActivity, account, existing.id)
-                                                    UndoStore.set(account, existing.id, UndoStore.Kind.TRASH)
-                                                }
-                                            }
-                                        },
-                                    )
-                                },
-                            ),
-                        )
-                    }
-                }
-                        }
+            EditorBar(editorLayout.inZone(ZONE_TOP_LEFT), editorLayout.inZone(ZONE_TOP_RIGHT), states)
         Column(
             Modifier.weight(1f).verticalScroll(scroll).padding(EDITOR_PADDING),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -1115,24 +1094,8 @@ class EditNoteActivity : ComponentActivity() {
                 )
             }
         }
-        // Undo and Redo sit above the keyboard, where the thumb is while typing, and stay when the note scrolls.
-        if (canEdit) Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            // The tools of the note's content on the left, Undo and Redo on the right.
-            IconButton(onClick = { paletteOpen = true }, shapes = IconButtonDefaults.shapes(), modifier = Modifier.size(40.dp)) {
-                Icon(painterResource(R.drawable.ic_palette), contentDescription = stringResource(R.string.color_and_background))
-            }
-            IconButton(onClick = { labelsOpen = true }, shapes = IconButtonDefaults.shapes(), modifier = Modifier.size(40.dp)) {
-                Icon(painterResource(R.drawable.ic_label), contentDescription = stringResource(R.string.labels_title))
-            }
-            // Keep's API has no way to upload pictures, so adding one is left to the Keep app.
-            if (existing != null && !isLocal && images.isEmpty()) IconButton(
-                onClick = { startActivity(keepIntent(this@EditNoteActivity)) }, shapes = IconButtonDefaults.shapes(), modifier = Modifier.size(40.dp),
-            ) {
-                Icon(painterResource(R.drawable.ic_image), contentDescription = stringResource(R.string.image_add_keep))
-            }
-            Spacer(Modifier.weight(1f))
-            UndoRedoButtons(history.canUndo, history.canRedo, undo, redo)
-        }
+        // The bottom bar sits above the keyboard, where the thumb is while typing, and stays when the note scrolls.
+        EditorBar(editorLayout.inZone(ZONE_BOTTOM_LEFT), editorLayout.inZone(ZONE_BOTTOM_RIGHT), states)
         }
         if (paletteOpen) ModalBottomSheet(onDismissRequest = { paletteOpen = false }) {
             Column(

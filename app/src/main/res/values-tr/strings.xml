@@ -416,4 +416,11 @@
     <string name="discard_title">Değişiklikler silinsin mi?</string>
     <string name="discard_action">Sil</string>
     <string name="keep_editing">Düzenlemeye devam et</string>
+    <string name="editor_convert">Notu / listeyi dönüştür</string>
+    <string name="editor_buttons_title">Düzenleyici düğmeleri</string>
+    <string name="editor_buttons_hint">Bir düğmeye uzun basıp başka bir yere sürükleyin: notun üstündeki ve altındaki çubuklar, menü ya da gizli. Her düğme bir kez bulunur.</string>
+    <string name="editor_zone_menu">Menü</string>
+    <string name="editor_zone_hidden">Gizli</string>
+    <string name="editor_buttons_reset">Varsayılana sıfırla</string>
+    <string name="editor_buttons_note">Not</string>
 </resources>

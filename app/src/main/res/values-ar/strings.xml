@@ -452,4 +452,11 @@
     <string name="discard_title">تجاهل التغييرات؟</string>
     <string name="discard_action">تجاهل</string>
     <string name="keep_editing">متابعة التحرير</string>
+    <string name="editor_convert">تحويل ملاحظة / قائمة</string>
+    <string name="editor_buttons_title">أزرار المحرر</string>
+    <string name="editor_buttons_hint">اضغط مطولًا على زر واسحبه إلى مكان آخر: الشريطان فوق الملاحظة وتحتها، أو القائمة، أو مخفي. كل زر موجود مرة واحدة.</string>
+    <string name="editor_zone_menu">القائمة</string>
+    <string name="editor_zone_hidden">مخفي</string>
+    <string name="editor_buttons_reset">إعادة الضبط</string>
+    <string name="editor_buttons_note">ملاحظة</string>
 </resources>

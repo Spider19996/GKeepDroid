@@ -407,4 +407,11 @@
     <string name="discard_title">変更を破棄しますか？</string>
     <string name="discard_action">破棄</string>
     <string name="keep_editing">編集を続ける</string>
+    <string name="editor_convert">メモ／チェックリストに変換</string>
+    <string name="editor_buttons_title">エディターのボタン</string>
+    <string name="editor_buttons_hint">ボタンを長押しして別の場所にドラッグします：メモの上下のバー、メニュー、または非表示。各ボタンは1つだけです。</string>
+    <string name="editor_zone_menu">メニュー</string>
+    <string name="editor_zone_hidden">非表示</string>
+    <string name="editor_buttons_reset">初期設定に戻す</string>
+    <string name="editor_buttons_note">メモ</string>
 </resources>

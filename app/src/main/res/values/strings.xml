@@ -417,4 +417,11 @@
     <string name="discard_title">Discard changes?</string>
     <string name="discard_action">Discard</string>
     <string name="keep_editing">Keep editing</string>
+    <string name="editor_convert">Convert note / checklist</string>
+    <string name="editor_buttons_title">Editor buttons</string>
+    <string name="editor_buttons_hint">Long-press a button and drag it to another place: the bars above and below the note, the menu, or hidden. Each button exists once.</string>
+    <string name="editor_zone_menu">Menu</string>
+    <string name="editor_zone_hidden">Hidden</string>
+    <string name="editor_buttons_reset">Reset to default</string>
+    <string name="editor_buttons_note">Note</string>
 </resources>

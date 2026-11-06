@@ -416,4 +416,11 @@
     <string name="discard_title">बदलाव छोड़ें?</string>
     <string name="discard_action">छोड़ें</string>
     <string name="keep_editing">संपादन जारी रखें</string>
+    <string name="editor_convert">नोट / चेकलिस्ट बदलें</string>
+    <string name="editor_buttons_title">संपादक बटन</string>
+    <string name="editor_buttons_hint">किसी बटन को देर तक दबाएँ और दूसरी जगह खींचें: नोट के ऊपर और नीचे की पट्टियाँ, मेन्यू या छिपा हुआ। हर बटन एक बार होता है।</string>
+    <string name="editor_zone_menu">मेन्यू</string>
+    <string name="editor_zone_hidden">छिपा हुआ</string>
+    <string name="editor_buttons_reset">डिफ़ॉल्ट पर रीसेट करें</string>
+    <string name="editor_buttons_note">नोट</string>
 </resources>

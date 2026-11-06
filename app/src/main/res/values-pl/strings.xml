@@ -434,4 +434,11 @@
     <string name="discard_title">Odrzucić zmiany?</string>
     <string name="discard_action">Odrzuć</string>
     <string name="keep_editing">Edytuj dalej</string>
+    <string name="editor_convert">Zamień notatkę / listę</string>
+    <string name="editor_buttons_title">Przyciski edytora</string>
+    <string name="editor_buttons_hint">Przytrzymaj przycisk i przeciągnij go w inne miejsce: paski nad i pod notatką, menu lub ukryte. Każdy przycisk występuje raz.</string>
+    <string name="editor_zone_menu">Menu</string>
+    <string name="editor_zone_hidden">Ukryte</string>
+    <string name="editor_buttons_reset">Przywróć domyślne</string>
+    <string name="editor_buttons_note">Notatka</string>
 </resources>

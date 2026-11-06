@@ -425,4 +425,11 @@
     <string name="discard_title">Descartar as alterações?</string>
     <string name="discard_action">Descartar</string>
     <string name="keep_editing">Continuar editando</string>
+    <string name="editor_convert">Converter nota / lista</string>
+    <string name="editor_buttons_title">Botões do editor</string>
+    <string name="editor_buttons_hint">Mantenha um botão pressionado e arraste-o para outro lugar: as barras acima e abaixo da nota, o menu ou oculto. Cada botão existe uma vez.</string>
+    <string name="editor_zone_menu">Menu</string>
+    <string name="editor_zone_hidden">Oculto</string>
+    <string name="editor_buttons_reset">Restaurar padrão</string>
+    <string name="editor_buttons_note">Nota</string>
 </resources>

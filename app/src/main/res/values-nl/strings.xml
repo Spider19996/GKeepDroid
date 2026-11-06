@@ -416,4 +416,11 @@
     <string name="discard_title">Wijzigingen weggooien?</string>
     <string name="discard_action">Weggooien</string>
     <string name="keep_editing">Verder bewerken</string>
+    <string name="editor_convert">Notitie / checklist omzetten</string>
+    <string name="editor_buttons_title">Editorknoppen</string>
+    <string name="editor_buttons_hint">Houd een knop ingedrukt en sleep hem naar een andere plek: de balken boven en onder de notitie, het menu of verborgen. Elke knop bestaat één keer.</string>
+    <string name="editor_zone_menu">Menu</string>
+    <string name="editor_zone_hidden">Verborgen</string>
+    <string name="editor_buttons_reset">Standaard herstellen</string>
+    <string name="editor_buttons_note">Notitie</string>
 </resources>

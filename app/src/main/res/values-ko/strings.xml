@@ -407,4 +407,11 @@
     <string name="discard_title">변경사항을 취소할까요?</string>
     <string name="discard_action">취소</string>
     <string name="keep_editing">계속 편집</string>
+    <string name="editor_convert">메모 / 체크리스트 변환</string>
+    <string name="editor_buttons_title">편집기 버튼</string>
+    <string name="editor_buttons_hint">버튼을 길게 눌러 다른 위치로 끌어 놓으세요: 메모 위아래의 막대, 메뉴 또는 숨김. 각 버튼은 하나씩만 있습니다.</string>
+    <string name="editor_zone_menu">메뉴</string>
+    <string name="editor_zone_hidden">숨김</string>
+    <string name="editor_buttons_reset">기본값으로 재설정</string>
+    <string name="editor_buttons_note">메모</string>
 </resources>

@@ -382,6 +382,7 @@ class SettingsActivity : ComponentActivity() {
                         Page.AppCards -> AppCardsPage(state)
                         Page.AppSwipe -> AppSwipePage(state)
                         Page.AppFilters -> AppFiltersPage(state)
+                        Page.EditorButtons -> EditorButtonsPage(state)
                         Page.AppCheckbox -> AppCheckboxPage(state)
                         Page.Security -> SecurityPage(state)
                         Page.AppChecklists -> AppChecklistsPage(state)
