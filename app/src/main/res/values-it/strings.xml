@@ -2,7 +2,7 @@
 <resources>
     <string name="widget_description">Mostra le tue note di Google Keep con uno sfondo regolabile.</string>
     <string name="email_label">E-mail dell\'account Google</string>
-    <string name="token_label">Token principale (aas_et/...)</string>
+    <string name="token_label">Token principale (aas_et/…)</string>
     <string name="token_label_saved">Token principale (salvato, lascia vuoto per mantenerlo)</string>
     <string name="appearance">Aspetto del widget</string>
     <string name="bg_opacity">Opacità dello sfondo: %1$d%%</string>

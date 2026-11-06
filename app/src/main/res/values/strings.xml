@@ -3,7 +3,7 @@
     <string name="app_name" translatable="false">GKeepDroid</string>
     <string name="widget_description">Shows your Google Keep notes with an adjustable background.</string>
     <string name="email_label">Google account e-mail</string>
-    <string name="token_label">Master token (aas_et/...)</string>
+    <string name="token_label">Master token (aas_et/…)</string>
     <string name="token_label_saved">Master token (saved, leave empty to keep)</string>
     <string name="appearance">Widget appearance</string>
     <string name="bg_opacity">Background opacity: %1$d%%</string>

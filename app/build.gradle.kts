@@ -92,7 +92,6 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.2.0")
     implementation("androidx.glance:glance-appwidget:1.2.0")
     implementation("androidx.work:work-runtime-ktx:2.12.0")
-    implementation("androidx.security:security-crypto:1.1.0")
     // Keep's background pictures are SVG files.
     implementation("com.caverock:androidsvg-aar:1.4")
 }

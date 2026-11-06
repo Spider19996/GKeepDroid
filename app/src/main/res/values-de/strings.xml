@@ -2,7 +2,7 @@
 <resources>
     <string name="widget_description">Zeigt deine Google Keep Notizen mit einstellbarem Hintergrund an.</string>
     <string name="email_label">E-Mail-Adresse des Google-Kontos</string>
-    <string name="token_label">Master-Token (aas_et/...)</string>
+    <string name="token_label">Master-Token (aas_et/…)</string>
     <string name="token_label_saved">Master-Token (gespeichert, leer lassen zum Behalten)</string>
     <string name="appearance">Widget-Darstellung</string>
     <string name="bg_opacity">Hintergrund-Deckkraft: %1$d%%</string>

@@ -2,7 +2,7 @@
 <resources>
     <string name="widget_description">Muestra tus notas de Google Keep con un fondo ajustable.</string>
     <string name="email_label">Correo de la cuenta de Google</string>
-    <string name="token_label">Token maestro (aas_et/...)</string>
+    <string name="token_label">Token maestro (aas_et/…)</string>
     <string name="token_label_saved">Token maestro (guardado, déjalo vacío para conservarlo)</string>
     <string name="appearance">Apariencia del widget</string>
     <string name="bg_opacity">Opacidad del fondo: %1$d%%</string>

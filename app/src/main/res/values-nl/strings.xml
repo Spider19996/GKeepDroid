@@ -2,7 +2,7 @@
 <resources>
     <string name="widget_description">Toont je Google Keep-notities met een instelbare achtergrond.</string>
     <string name="email_label">E-mailadres van het Google-account</string>
-    <string name="token_label">Hoofdtoken (aas_et/...)</string>
+    <string name="token_label">Hoofdtoken (aas_et/…)</string>
     <string name="token_label_saved">Hoofdtoken (opgeslagen, leeg laten om te behouden)</string>
     <string name="appearance">Uiterlijk van de widget</string>
     <string name="bg_opacity">Dekking van de achtergrond: %1$d%%</string>

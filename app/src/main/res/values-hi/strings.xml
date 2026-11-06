@@ -2,7 +2,7 @@
 <resources>
     <string name="widget_description">आपके Google Keep नोट्स को बदले जा सकने वाले बैकग्राउंड के साथ दिखाता है।</string>
     <string name="email_label">Google खाते का ईमेल</string>
-    <string name="token_label">मास्टर टोकन (aas_et/...)</string>
+    <string name="token_label">मास्टर टोकन (aas_et/…)</string>
     <string name="token_label_saved">मास्टर टोकन (सहेजा गया, रखने के लिए खाली छोड़ें)</string>
     <string name="appearance">विजेट का रूप</string>
     <string name="bg_opacity">बैकग्राउंड की अपारदर्शिता: %1$d%%</string>

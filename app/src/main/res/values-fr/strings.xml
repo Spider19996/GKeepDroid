@@ -2,7 +2,7 @@
 <resources>
     <string name="widget_description">Affiche vos notes Google Keep avec un arrière-plan réglable.</string>
     <string name="email_label">E-mail du compte Google</string>
-    <string name="token_label">Jeton maître (aas_et/...)</string>
+    <string name="token_label">Jeton maître (aas_et/…)</string>
     <string name="token_label_saved">Jeton maître (enregistré, laissez vide pour le conserver)</string>
     <string name="appearance">Apparence du widget</string>
     <string name="bg_opacity">Opacité de l\'arrière-plan : %1$d%%</string>

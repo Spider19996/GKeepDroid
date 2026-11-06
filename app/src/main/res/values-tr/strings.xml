@@ -2,7 +2,7 @@
 <resources>
     <string name="widget_description">Google Keep notlarınızı ayarlanabilir bir arka planla gösterir.</string>
     <string name="email_label">Google hesabı e-postası</string>
-    <string name="token_label">Ana jeton (aas_et/...)</string>
+    <string name="token_label">Ana jeton (aas_et/…)</string>
     <string name="token_label_saved">Ana jeton (kaydedildi, korumak için boş bırakın)</string>
     <string name="appearance">Widget görünümü</string>
     <string name="bg_opacity">Arka plan opaklığı: %1$d%%</string>

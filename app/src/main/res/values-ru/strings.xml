@@ -2,7 +2,7 @@
 <resources>
     <string name="widget_description">Показывает ваши заметки Google Keep с настраиваемым фоном.</string>
     <string name="email_label">Адрес электронной почты аккаунта Google</string>
-    <string name="token_label">Мастер-токен (aas_et/...)</string>
+    <string name="token_label">Мастер-токен (aas_et/…)</string>
     <string name="token_label_saved">Мастер-токен (сохранён, оставьте пустым, чтобы сохранить)</string>
     <string name="appearance">Внешний вид виджета</string>
     <string name="bg_opacity">Непрозрачность фона: %1$d%%</string>

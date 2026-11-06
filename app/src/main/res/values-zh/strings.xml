@@ -2,7 +2,7 @@
 <resources>
     <string name="widget_description">以可调节的背景显示你的 Google Keep 笔记。</string>
     <string name="email_label">Google 账号邮箱</string>
-    <string name="token_label">主令牌 (aas_et/...)</string>
+    <string name="token_label">主令牌 (aas_et/…)</string>
     <string name="token_label_saved">主令牌（已保存，留空则保持不变）</string>
     <string name="appearance">小组件外观</string>
     <string name="bg_opacity">背景不透明度：%1$d%%</string>

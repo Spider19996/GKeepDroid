@@ -2,7 +2,7 @@
 <resources>
     <string name="widget_description">Google Keep 메모를 배경을 조절해 표시합니다.</string>
     <string name="email_label">Google 계정 이메일</string>
-    <string name="token_label">마스터 토큰 (aas_et/...)</string>
+    <string name="token_label">마스터 토큰 (aas_et/…)</string>
     <string name="token_label_saved">마스터 토큰 (저장됨, 유지하려면 비워 두세요)</string>
     <string name="appearance">위젯 모양</string>
     <string name="bg_opacity">배경 불투명도: %1$d%%</string>

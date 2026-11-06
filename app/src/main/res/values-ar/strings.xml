@@ -2,7 +2,7 @@
 <resources>
     <string name="widget_description">يعرض ملاحظات Google Keep بخلفية قابلة للتعديل.</string>
     <string name="email_label">البريد الإلكتروني لحساب Google</string>
-    <string name="token_label">الرمز الرئيسي (aas_et/...)</string>
+    <string name="token_label">الرمز الرئيسي (aas_et/…)</string>
     <string name="token_label_saved">الرمز الرئيسي (محفوظ، اتركه فارغًا للإبقاء عليه)</string>
     <string name="appearance">مظهر الأداة</string>
     <string name="bg_opacity">شفافية الخلفية: %1$d%%</string>

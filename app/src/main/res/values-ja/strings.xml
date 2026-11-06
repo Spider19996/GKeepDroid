@@ -2,7 +2,7 @@
 <resources>
     <string name="widget_description">Google Keep のメモを、背景を調整できる形で表示します。</string>
     <string name="email_label">Google アカウントのメールアドレス</string>
-    <string name="token_label">マスタートークン (aas_et/...)</string>
+    <string name="token_label">マスタートークン (aas_et/…)</string>
     <string name="token_label_saved">マスタートークン（保存済み。変更しない場合は空欄）</string>
     <string name="appearance">ウィジェットの外観</string>
     <string name="bg_opacity">背景の不透明度：%1$d%%</string>

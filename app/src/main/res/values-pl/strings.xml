@@ -2,7 +2,7 @@
 <resources>
     <string name="widget_description">Wyświetla notatki Google Keep z regulowanym tłem.</string>
     <string name="email_label">Adres e-mail konta Google</string>
-    <string name="token_label">Token główny (aas_et/...)</string>
+    <string name="token_label">Token główny (aas_et/…)</string>
     <string name="token_label_saved">Token główny (zapisany, zostaw puste, aby zachować)</string>
     <string name="appearance">Wygląd widżetu</string>
     <string name="bg_opacity">Krycie tła: %1$d%%</string>
