@@ -55,9 +55,11 @@ object MarkdownSync {
 
     /** A new folder starts from scratch: what was in sync with the old one means nothing here. */
     fun setFolder(context: Context, tree: Uri) {
-        val editor = prefs(context).edit().putString("tree", tree.toString()).putBoolean("enabled", true)
-        prefs(context).all.keys.filter { it.startsWith("state_") }.forEach { editor.remove(it) }
-        editor.apply()
+        val stale = prefs(context).all.keys.filter { it.startsWith("state_") }
+        prefs(context).edit {
+            putString("tree", tree.toString()).putBoolean("enabled", true)
+            stale.forEach { remove(it) }
+        }
         startObserving(context)
         request(context)
     }

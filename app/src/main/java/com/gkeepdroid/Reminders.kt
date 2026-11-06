@@ -1,5 +1,6 @@
 package com.gkeepdroid
 
+import androidx.core.content.edit
 import android.app.AlarmManager
 import androidx.core.net.toUri
 import android.app.NotificationChannel
@@ -88,9 +89,9 @@ object Reminders {
     private fun write(context: Context, account: String, noteId: String, reminders: List<Reminder>) {
         val array = JSONArray()
         reminders.forEach { array.put(it.toJson()) }
-        val editor = prefs(context).edit()
-        if (reminders.isEmpty()) editor.remove(key(account, noteId)) else editor.putString(key(account, noteId), array.toString())
-        editor.apply()
+        prefs(context).edit {
+            if (reminders.isEmpty()) remove(key(account, noteId)) else putString(key(account, noteId), array.toString())
+        }
     }
 
     fun noteIds(context: Context, account: String): Set<String> = NotesCache.readAll(context, account).map { it.id }.toSet()

@@ -1,11 +1,9 @@
 package com.gkeepdroid
 
-import android.appwidget.AppWidgetManager
 import androidx.core.net.toUri
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.net.Uri
 import android.text.format.DateUtils
 import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
@@ -13,35 +11,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.glance.ColorFilter
-import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.action.Action
-import androidx.glance.action.ActionParameters
 import androidx.glance.action.actionParametersOf
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
-import androidx.glance.appwidget.GlanceAppWidgetManager
-import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.cornerRadius
-import androidx.glance.appwidget.state.updateAppWidgetState
-import androidx.glance.appwidget.updateAll
 import androidx.glance.background
-import androidx.glance.color.ColorProvider as DayNightColorProvider
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
-import androidx.glance.layout.Column
-import androidx.glance.layout.ColumnScope
 import androidx.glance.layout.ContentScale
 import androidx.glance.layout.Row
-import androidx.glance.layout.RowScope
-import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
@@ -54,72 +40,6 @@ import androidx.glance.unit.ColorProvider
 
 /** Pieces shared by the list widget and the single-note widget. */
 
-internal val NoteIdKey = ActionParameters.Key<String>(EditNoteActivity.EXTRA_NOTE_ID)
-internal val AccountKey = ActionParameters.Key<String>(EditNoteActivity.EXTRA_ACCOUNT)
-internal val ItemIdKey = ActionParameters.Key<String>("item_id")
-internal val CheckedKey = ActionParameters.Key<Boolean>("checked")
-internal val CollapsedKey = ActionParameters.Key<Boolean>("collapsed")
-internal val DeleteKey = ActionParameters.Key<Boolean>("delete")
-internal val DeltaKey = ActionParameters.Key<Int>("delta")
-internal val WidgetIdKey = ActionParameters.Key<Int>(AppWidgetManager.EXTRA_APPWIDGET_ID)
-
-internal val DarkNoteText = Color(0xFF202124)
-
-/** Text on the dark versions of Keep's pictures. */
-internal val LightNoteText = Color(0xFFE8EAED)
-
-/** Keep's picture (in the light or dark version) or the user's own photo behind a note in a widget; null if it has none. */
-internal fun widgetPicture(context: Context, settings: WidgetSettings, account: String?, note: KeepNote?, fraction: Float): Bitmap? {
-    if (!settings.showNoteColors || account == null || note == null) return null
-    CustomBackgrounds.forWidget(context, account, note.id, settings.noteAlpha, fraction)?.let { return it }
-    val name = RichNotes.of(context, account, note.id)?.background.orEmpty()
-    if (name.isEmpty()) return null
-    val night = NoteLook.of(context, account, note.id).dark ?: NoteBackgrounds.isNight(context)
-    return NoteBackgrounds.forWidget(context, name, settings.noteAlpha, fraction, night)
-}
-
-/** How a note looks in a widget: its color, picture and the text colors that go with them. */
-internal class CardLook(val noteColor: Int?, val picture: Bitmap?, val palette: TextPalette) {
-    /** With a picture, the note's color is a frame around it. */
-    val framed: Boolean get() = picture != null && noteColor != null
-}
-
-internal fun cardLook(context: Context, settings: WidgetSettings, account: String?, note: KeepNote?, picture: Bitmap?): CardLook {
-    val look = if (account != null && note != null) NoteLook.of(context, account, note.id) else null
-    // The note can choose the light or dark version; without a choice the phone's mode decides.
-    val night = look?.dark ?: NoteBackgrounds.isNight(context)
-    val noteColor = if (settings.showNoteColors && note != null) NoteColors.argb(note.color, night) else null
-    // Keep's pictures come in a dark version; a photo of one's own never does.
-    val onDarkPicture = night && picture != null && account != null && note != null && CustomBackgrounds.stamp(context, account, note.id) == 0L
-    val palette = textPalette(
-        settings, onNoteColor = noteColor != null || picture != null,
-        onDarkPicture = onDarkPicture || (noteColor != null && night && picture == null), own = look?.textColor?.let { Color(it) },
-    )
-    return CardLook(noteColor, picture, palette)
-}
-
-/**
- * The text color of a card. With different day and night colors the widget itself switches when
- * the system theme changes, without being redrawn.
- */
-internal class TextPalette(private val day: Color, private val night: Color) {
-    fun provider(alpha: Float = 1f): ColorProvider =
-        if (day == night) {
-            ColorProvider(day.copy(alpha = alpha))
-        } else {
-            DayNightColorProvider(day = day.copy(alpha = alpha), night = night.copy(alpha = alpha))
-        }
-}
-
-/** Notes with a color always get dark text, which suits the light note colors. */
-internal fun textPalette(settings: WidgetSettings, onNoteColor: Boolean, onDarkPicture: Boolean = false, own: Color? = null): TextPalette = when {
-    own != null -> TextPalette(own, own)
-    onDarkPicture -> TextPalette(LightNoteText, LightNoteText)
-    onNoteColor -> TextPalette(DarkNoteText, DarkNoteText)
-    settings.textColorAuto -> TextPalette(DarkNoteText, Color.White)
-    else -> Color(settings.textColor).let { TextPalette(it, it) }
-}
-
 private const val KEEP_PACKAGE = "com.google.android.keep"
 private const val KEEP_WEB_URL = "https://keep.google.com"
 
@@ -128,7 +48,7 @@ internal fun keepIntent(context: Context): Intent =
     context.packageManager.getLaunchIntentForPackage(KEEP_PACKAGE)
         ?: Intent(Intent.ACTION_VIEW, KEEP_WEB_URL.toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
-private fun newNoteIntent(context: Context, appWidgetId: Int, account: String?, isList: Boolean) =
+internal fun newNoteIntent(context: Context, appWidgetId: Int, account: String?, isList: Boolean) =
     Intent(context, EditNoteActivity::class.java)
         .putExtra(EditNoteActivity.EXTRA_NEW_LIST, isList)
         .putExtra(EditNoteActivity.EXTRA_ACCOUNT, account.orEmpty())
@@ -289,174 +209,6 @@ internal fun EditedTime(note: KeepNote, settings: WidgetSettings, palette: TextP
         style = TextStyle(color = palette.provider(0.6f), fontSize = (settings.textSizeSp - 2).coerceAtLeast(9).sp),
         modifier = GlanceModifier.padding(top = 4.dp),
     )
-}
-
-/** The name of a button, which a screen reader speaks for its icon. */
-private fun buttonLabelRes(id: String): Int = when (id) {
-    BTN_REFRESH -> R.string.btn_refresh
-    BTN_ADD_ITEM -> R.string.btn_add_item
-    BTN_REMINDER -> R.string.reminders_title
-    BTN_NEW_NOTE -> R.string.btn_new_note
-    BTN_NEW_LIST -> R.string.btn_new_list
-    BTN_SORT -> R.string.btn_sort
-    BTN_SEARCH -> R.string.btn_search
-    BTN_APP -> R.string.btn_app
-    BTN_KEEP -> R.string.btn_keep
-    BTN_FOLD -> R.string.btn_fold
-    else -> R.string.btn_settings
-}
-
-private data class BarButton(val id: String, @DrawableRes val icon: Int, val action: Action)
-
-/** The buttons that are switched on for this widget. */
-internal fun enabledButtons(settings: WidgetSettings, withNewButtons: Boolean, hasAddItem: Boolean = false): List<String> {
-    val on = enabledSet(settings, withNewButtons, hasAddItem)
-    return settings.orderedIds().filter { it in on }
-}
-
-private fun enabledSet(settings: WidgetSettings, withNewButtons: Boolean, hasAddItem: Boolean): Set<String> =
-    settings.buttonSides.keys.filter {
-        when (it) {
-            BTN_ADD_ITEM -> hasAddItem
-            // Only the single-note widget has one note to set a reminder for.
-            BTN_REMINDER -> !withNewButtons
-            BTN_NEW_NOTE, BTN_NEW_LIST, BTN_SEARCH -> withNewButtons
-            // The sort button only appears with a manual order.
-            BTN_SORT -> withNewButtons && settings.sortMode == SORT_MANUAL
-            // Only when folding is switched on for the widget.
-            BTN_FOLD -> withNewButtons && settings.foldable
-            else -> true
-        }
-    }.toSet()
-
-/** All button ids in the order the user chose; buttons never moved keep their default place at the end. */
-internal fun WidgetSettings.orderedIds(): List<String> = (buttonOrder + ALL_BUTTONS).distinct().filter { it in ALL_BUTTONS }
-
-internal fun WidgetSettings.sideOf(button: String): Int = buttonSides[button] ?: POS_TOP
-
-internal fun hasBarAt(settings: WidgetSettings, side: Int, withNewButtons: Boolean, hasAddItem: Boolean = false): Boolean =
-    enabledButtons(settings, withNewButtons, hasAddItem).any { settings.sideOf(it) == side }
-
-/** Width the bars at the left and right edge take away from the content (icon plus its padding). */
-internal fun sideBarWidth(settings: WidgetSettings, withNewButtons: Boolean, hasAddItem: Boolean = false): Dp {
-    val bars = listOf(POS_LEFT, POS_RIGHT).count { hasBarAt(settings, it, withNewButtons, hasAddItem) }
-    return ((settings.headerSizeSp + 16) * bars).dp
-}
-
-/**
- * One bar of the button bar: the buttons assigned to [side] (top, bottom, left or right). Every
- * button picks its own side. A bar is a row or a column, with the buttons sharing its whole length.
- */
-@Composable
-internal fun HeaderBar(
-    side: Int,
-    appWidgetId: Int,
-    account: String?,
-    settings: WidgetSettings,
-    textColor: ColorProvider,
-    withNewButtons: Boolean,
-    reordering: Boolean = false,
-    /** The checklist the single-note widget shows; gives it a button to add an item. */
-    addItemNoteId: String? = null,
-    /** The note the single-note widget shows; the reminder button is for this note. */
-    reminderNoteId: String? = null,
-    /** Every note of the list widget is folded: the fold button then unfolds. */
-    allFolded: Boolean = false,
-) {
-    val context = LocalContext.current
-    val buttons = enabledButtons(settings, withNewButtons, addItemNoteId != null)
-        .filter { settings.sideOf(it) == side }
-        .map { id ->
-            when (id) {
-                BTN_REFRESH -> BarButton(id, R.drawable.ic_refresh, actionRunCallback<RefreshAction>())
-                BTN_ADD_ITEM -> BarButton(
-                    id, R.drawable.ic_add,
-                    actionStartActivity<AddItemActivity>(actionParametersOf(AccountKey to account.orEmpty(), NoteIdKey to addItemNoteId.orEmpty())),
-                )
-                BTN_REMINDER -> BarButton(
-                    id, R.drawable.ic_alarm,
-                    actionStartActivity<RemindersActivity>(actionParametersOf(AccountKey to account.orEmpty(), NoteIdKey to reminderNoteId.orEmpty())),
-                )
-                BTN_NEW_NOTE -> BarButton(id, R.drawable.ic_add, actionStartActivity(newNoteIntent(context, appWidgetId, account, isList = false)))
-                BTN_NEW_LIST -> BarButton(id, R.drawable.ic_checklist, actionStartActivity(newNoteIntent(context, appWidgetId, account, isList = true)))
-                // Shows or hides the up/down arrows on the notes; a check mark means "done".
-                BTN_SORT -> BarButton(
-                    id, if (reordering) R.drawable.ic_done else R.drawable.ic_sort,
-                    actionRunCallback<ToggleReorderAction>(actionParametersOf(WidgetIdKey to appWidgetId)),
-                )
-                // A widget cannot hold a text field, so the button opens the search screen.
-                BTN_SEARCH -> BarButton(
-                    id, R.drawable.ic_search,
-                    actionStartActivity<SearchActivity>(actionParametersOf(AccountKey to account.orEmpty(), WidgetIdKey to appWidgetId)),
-                )
-                BTN_FOLD -> BarButton(
-                    id, if (allFolded) R.drawable.ic_unfold else R.drawable.ic_fold,
-                    actionRunCallback<ToggleFoldAllAction>(actionParametersOf(WidgetIdKey to appWidgetId)),
-                )
-                BTN_APP -> BarButton(id, R.drawable.ic_apps, actionStartActivity<MainActivity>())
-                BTN_KEEP -> BarButton(id, R.drawable.ic_open_new, actionStartActivity(keepIntent(context)))
-                else -> BarButton(
-                    id, R.drawable.ic_settings,
-                    actionStartActivity<SettingsActivity>(actionParametersOf(WidgetIdKey to appWidgetId)),
-                )
-            }
-        }
-    // Without any button there is no bar at all, not even an empty gap.
-    if (buttons.isEmpty()) return
-
-    val size = settings.headerSizeSp
-    val vertical = side == POS_LEFT || side == POS_RIGHT
-    // The buttons sit at the start, in the middle or at the end of the bar.
-    fun group(slot: Int) = buttons.filter { (settings.buttonSlots[it.id] ?: ALIGN_CENTER) == slot }
-
-    if (vertical) {
-        Column(GlanceModifier.fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {
-            run {
-                Column(GlanceModifier.defaultWeight(), verticalAlignment = Alignment.Top) {
-                    group(ALIGN_START).forEach { HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action, context.getString(buttonLabelRes(it.id))) }
-                }
-                Column {
-                    group(ALIGN_CENTER).forEach { HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action, context.getString(buttonLabelRes(it.id))) }
-                }
-                Column(GlanceModifier.defaultWeight(), verticalAlignment = Alignment.Bottom) {
-                    group(ALIGN_END).forEach { HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action, context.getString(buttonLabelRes(it.id))) }
-                }
-            }
-        }
-    } else {
-        Row(GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            run {
-                // Equal weights on both outer groups keep the middle group centered.
-                Row(GlanceModifier.defaultWeight(), horizontalAlignment = Alignment.Start) {
-                    group(ALIGN_START).forEach { HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action, context.getString(buttonLabelRes(it.id))) }
-                }
-                Row {
-                    group(ALIGN_CENTER).forEach { HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action, context.getString(buttonLabelRes(it.id))) }
-                }
-                Row(GlanceModifier.defaultWeight(), horizontalAlignment = Alignment.End) {
-                    group(ALIGN_END).forEach { HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action, context.getString(buttonLabelRes(it.id))) }
-                }
-            }
-        }
-    }
-}
-
-/** Lays out [body] with up to four bars around it; [bar] draws the bar of one side. */
-@Composable
-internal fun WithHeaderBar(
-    modifier: GlanceModifier,
-    bar: @Composable (side: Int) -> Unit,
-    body: @Composable ColumnScope.() -> Unit,
-) {
-    Column(modifier) {
-        bar(POS_TOP)
-        Row(GlanceModifier.fillMaxWidth().defaultWeight()) {
-            bar(POS_LEFT)
-            Column(GlanceModifier.defaultWeight().fillMaxHeight(), content = body)
-            bar(POS_RIGHT)
-        }
-        bar(POS_BOTTOM)
-    }
 }
 
 @Composable
@@ -628,115 +380,5 @@ internal fun AddItemRow(note: KeepNote, account: String, settings: WidgetSetting
             context.getString(R.string.add_item),
             style = TextStyle(color = palette.provider(0.7f), fontSize = settings.textSizeSp.sp),
         )
-    }
-}
-
-/** Redraws every placed widget of both kinds with the current notes cache and settings. */
-object WidgetRefresh {
-    internal val VersionKey = longPreferencesKey("version")
-
-    suspend fun all(context: Context) {
-        val manager = GlanceAppWidgetManager(context)
-        val kinds = listOf(NotesWidget::class.java, SingleNoteWidget::class.java)
-        kinds.forEach { kind ->
-            manager.getGlanceIds(kind).forEach { id ->
-                updateAppWidgetState(context, id) { it[VersionKey] = System.currentTimeMillis() }
-            }
-        }
-        NotesWidget().updateAll(context)
-        SingleNoteWidget().updateAll(context)
-    }
-
-    suspend fun hasWidgets(context: Context): Boolean {
-        val manager = GlanceAppWidgetManager(context)
-        return manager.getGlanceIds(NotesWidget::class.java).isNotEmpty() ||
-            manager.getGlanceIds(SingleNoteWidget::class.java).isNotEmpty()
-    }
-}
-
-/** Ticks or unticks a checklist item: instant local change, Keep is updated in the background. */
-class ToggleItemAction : ActionCallback {
-    override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
-        val account = parameters[AccountKey] ?: return
-        val noteId = parameters[NoteIdKey] ?: return
-        val itemId = parameters[ItemIdKey] ?: return
-        val checked = parameters[CheckedKey] ?: return
-        val delete = parameters[DeleteKey] ?: false
-        applyTick(context, account, noteId, itemId, checked, delete)
-    }
-}
-
-/** Instant local change; Keep is updated a few seconds after the last tick. */
-internal suspend fun applyTick(context: Context, account: String, noteId: String, itemId: String, checked: Boolean, delete: Boolean) {
-    PendingToggles.add(context, PendingToggle(account, noteId, itemId, checked, delete))
-    val changed = if (delete) {
-        NotesCache.removeItem(context, account, noteId, itemId)
-    } else {
-        NotesCache.setChecked(context, account, noteId, itemId, checked)
-    }
-    if (changed) WidgetRefresh.all(context)
-    ToggleItemWorker.schedule(context, account)
-}
-
-/** Folds every note of the list widget, or unfolds them all when they are all folded already. */
-class ToggleFoldAllAction : ActionCallback {
-    override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
-        val widgetId = parameters[WidgetIdKey] ?: return
-        val settings = SettingsStore.loadWidget(context, widgetId)
-        val account = CredentialStore.resolve(context, settings.account) ?: return
-        val keys = NotesCache.read(context, account)
-            .filter { settings.labelFilter.isEmpty() || settings.labelFilter in it.labels }
-            .map { FoldStore.key(account, it.id) }
-        val folded = FoldStore.load(context)
-        FoldStore.setAll(context, keys, !keys.all { it in folded })
-        WidgetRefresh.all(context)
-    }
-}
-
-/** Folds a note to its title or unfolds it. */
-class ToggleFoldAction : ActionCallback {
-    override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
-        val account = parameters[AccountKey] ?: return
-        val noteId = parameters[NoteIdKey] ?: return
-        FoldStore.set(context, account, noteId, parameters[CollapsedKey] ?: return)
-        WidgetRefresh.all(context)
-    }
-}
-
-class ToggleCollapseAction : ActionCallback {
-    override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
-        val account = parameters[AccountKey] ?: return
-        val noteId = parameters[NoteIdKey] ?: return
-        CollapseStore.set(context, account, noteId, parameters[CollapsedKey] ?: return)
-        WidgetRefresh.all(context)
-    }
-}
-
-/** Switches the arrows for re-ordering notes on or off for one widget. */
-class ToggleReorderAction : ActionCallback {
-    override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
-        val widgetId = parameters[WidgetIdKey] ?: return
-        SettingsStore.setReordering(context, widgetId, !SettingsStore.isReordering(context, widgetId))
-        WidgetRefresh.all(context)
-    }
-}
-
-/** Moves a note up or down in the widget's manual order. */
-class MoveNoteAction : ActionCallback {
-    override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
-        val widgetId = parameters[WidgetIdKey] ?: return
-        val noteId = parameters[NoteIdKey] ?: return
-        val delta = parameters[DeltaKey] ?: return
-        val settings = SettingsStore.loadWidget(context, widgetId)
-        val account = CredentialStore.resolve(context, settings.account) ?: return
-        val updated = reorderedSettings(NotesCache.read(context, account), settings, noteId, delta) ?: return
-        SettingsStore.saveWidget(context, widgetId, updated)
-        WidgetRefresh.all(context)
-    }
-}
-
-class RefreshAction : ActionCallback {
-    override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
-        SyncWorker.syncNow(context)
     }
 }

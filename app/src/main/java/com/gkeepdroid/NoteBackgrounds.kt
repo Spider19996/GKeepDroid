@@ -305,10 +305,10 @@ object NoteLook {
 
     fun save(context: Context, account: String, noteId: String, textColor: Int?, dark: Boolean?) {
         val key = key(account, noteId)
-        prefs(context).edit().apply {
+        prefs(context).edit {
             if (textColor == null) remove("$key|text") else putInt("$key|text", textColor)
             if (dark == null) remove("$key|dark") else putBoolean("$key|dark", dark)
-        }.apply()
+        }
         version.intValue++
     }
 }
