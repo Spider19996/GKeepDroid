@@ -420,11 +420,7 @@ _STYLE_KEYS = {1: "ts_bd", 2: "ts_it", 4: "ts_un", 8: "ts_st"}
 
 
 def format_note(email, master_token, state_path, note_id, docs_json):
-    """Sends text formatting for a note: the styles the app wants, compared with the ones Keep has.
-
-    docs_json: {"text" or an item id: {"t": the text, "r": [[start, end, flags], ...]}}. Only the differences are sent, as
-    commands of Keep's text model, together with the note.
-    """
+    """Sends text formatting for a note: the styles the app wants, compared with the ones Keep has."""
     keep = _login(email, master_token, state_path, pull=False)
     note = keep.get(note_id)
     if note is None:
@@ -432,6 +428,15 @@ def format_note(email, master_token, state_path, note_id, docs_json):
         note = keep.get(note_id)
     if note is None:
         raise ValueError("Note not found")
+    _send_format(keep, state_path, note, json.loads(docs_json))
+    return _finish(keep, state_path, images=False)
+
+
+def _send_format(keep, state_path, note, wanted):
+    """Sends the differences between the styles in [wanted] and the ones Keep has, as commands of Keep's text model.
+
+    wanted: {"text" (the body), an item id, or "#n" (the n-th item): {"t": the text, "r": [[start, end, flags], ...]}}.
+    """
     # The model and its revision must be up to date, as an edit of the text may have been sent just before.
     _fetch_rich(keep, state_path)
     base = state_path.rsplit(".json", 1)[0]
@@ -440,9 +445,13 @@ def format_note(email, master_token, state_path, note_id, docs_json):
     if not entry or not entry.get("rev"):
         raise ValueError("The formatting of this note is not known yet")
     docs = _unpack(entry["m"])
+    ids = [item.id for item in note.items] if isinstance(note, KeepList) else []
     commands = []
-    for key, want in json.loads(docs_json).items():
-        if key == "text":
+    for key, want in wanted.items():
+        if key.startswith("#"):
+            index = int(key[1:])
+            key = ids[index] if index < len(ids) else None
+        elif key == "text":
             # The body of a text note is its only document.
             keys = [k for k, d in docs.items() if d.get("p") and len(d["p"]) == 3]
             key = keys[0] if len(keys) == 1 else None
@@ -473,37 +482,37 @@ def format_note(email, master_token, state_path, note_id, docs_json):
                     marks[name + "_i"] = False
             commands.append(["docs-nestedModel", doc["p"], {"ty": "as", "st": "text", "si": i + 1, "ei": j, "sm": marks}])
             i = j
-    if commands:
-        api = keep._keep_api
-        changes = api.changes
-        send = api.send
-        bundle = {
-            "sessionId": str(random.getrandbits(62)), "requestId": "1",
-            "serializedCommands": json.dumps(commands, separators=(",", ":")),
-        }
+    if not commands:
+        return
+    api = keep._keep_api
+    changes = api.changes
+    send = api.send
+    bundle = {
+        "sessionId": str(random.getrandbits(62)), "requestId": "1",
+        "serializedCommands": json.dumps(commands, separators=(",", ":")),
+    }
 
-        def with_changes(target_version=None, nodes=None, labels=None):
-            for node in nodes or []:
-                if node.get("id") == note.id:
-                    node["clientChanges"] = {"clientRevision": str(entry["rev"]), "commandBundles": [bundle]}
-            return changes(target_version=target_version, nodes=nodes, labels=labels)
+    def with_changes(target_version=None, nodes=None, labels=None):
+        for node in nodes or []:
+            if node.get("id") == note.id:
+                node["clientChanges"] = {"clientRevision": str(entry["rev"]), "commandBundles": [bundle]}
+        return changes(target_version=target_version, nodes=nodes, labels=labels)
 
-        def with_capability(**kwargs):
-            body = kwargs.get("json")
-            if body and "requestHeader" in body:
-                body["requestHeader"]["capabilities"].append({"type": "CL"})
-            return send(**kwargs)
+    def with_capability(**kwargs):
+        body = kwargs.get("json")
+        if body and "requestHeader" in body:
+            body["requestHeader"]["capabilities"].append({"type": "CL"})
+        return send(**kwargs)
 
-        api.changes = with_changes
-        api.send = with_capability
-        try:
-            note.touch()
-            keep.sync()
-        finally:
-            api.changes = changes
-            api.send = send
-        _fetch_rich(keep, state_path)
-    return _finish(keep, state_path, images=False)
+    api.changes = with_changes
+    api.send = with_capability
+    try:
+        note.touch()
+        keep.sync()
+    finally:
+        api.changes = changes
+        api.send = send
+    _fetch_rich(keep, state_path)
 
 
 def _find_child(keep, note_id, child_id):
@@ -629,7 +638,7 @@ def trash_note(email, master_token, state_path, note_id):
     return _finish(keep, state_path)
 
 
-def create_note(email, master_token, state_path, title, text, is_list, items_json, color, pinned, labels_json=None, background=""):
+def create_note(email, master_token, state_path, title, text, is_list, items_json, color, pinned, labels_json=None, background="", format_json=""):
     keep = _login(email, master_token, state_path, pull=False)
     if is_list:
         items = [
@@ -645,6 +654,12 @@ def create_note(email, master_token, state_path, title, text, is_list, items_jso
     _set_labels(keep, note, labels_json)
     _send_background(keep, state_path, note, background)
     keep.sync()
+    # A note made from another kind (checklist to text and back) brings its formatting along.
+    if format_json:
+        try:
+            _send_format(keep, state_path, note, json.loads(format_json))
+        except Exception:
+            pass
     return _finish(keep, state_path, images=False)
 
 

@@ -543,11 +543,29 @@ object NoteColors {
         "Gray" to 0xFFE8EAED.toInt(),
     )
 
+    /** Keep's colors for its dark mode: the same names, deeper shades. */
+    private val darkArgb = mapOf(
+        "Red" to 0xFF77172E.toInt(),
+        "Orange" to 0xFF692B17.toInt(),
+        "Yellow" to 0xFF7C4A03.toInt(),
+        "Green" to 0xFF264D3B.toInt(),
+        "Teal" to 0xFF0C625D.toInt(),
+        "Blue" to 0xFF256377.toInt(),
+        "DarkBlue" to 0xFF284255.toInt(),
+        "Purple" to 0xFF472E5B.toInt(),
+        "Pink" to 0xFF6C394F.toInt(),
+        "Brown" to 0xFF4B443A.toInt(),
+        "Gray" to 0xFF232427.toInt(),
+    )
+
     const val DEFAULT = "White"
     val names: List<String> = listOf(DEFAULT) + argb.keys
 
     /** Null for the default (uncolored) note. */
     fun argb(name: String): Int? = argb[name]
+
+    /** The color for a dark or a light look. */
+    fun argb(name: String, dark: Boolean): Int? = if (dark) darkArgb[name] else argb[name]
 }
 
 /** Per-account cache of the last synced notes, so widgets render without network. */

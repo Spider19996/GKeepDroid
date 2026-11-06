@@ -166,6 +166,10 @@
     <string name="pinned_section_switch">将置顶笔记显示在单独的区域</string>
     <string name="pull_to_refresh_switch">下拉列表以刷新</string>
     <string name="color_background_remove">移除</string>
+    <string name="format_bold">粗体</string>
+    <string name="format_italic">斜体</string>
+    <string name="format_underline">下划线</string>
+    <string name="format_strike">删除线</string>
     <string name="note_text_color">文字颜色</string>
     <string name="note_text_color_auto">自动</string>
     <string name="background_dark_version">图片的深色版本</string>

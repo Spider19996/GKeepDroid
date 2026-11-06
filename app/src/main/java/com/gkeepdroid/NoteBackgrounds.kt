@@ -39,13 +39,16 @@ object NoteBackgrounds {
     /** Keep has a light and a dark version of every picture; the files are named after the version. */
     private fun key(name: String, dark: Boolean) = if (dark) "${name}_dark" else name
 
-    /** The pictures live with the app's files, not in the cache, so Android does not clear them when it needs room. */
+    /**
+     * The pictures live in the cache: clearing it removes them and the app fetches them again. They are checked for changes from
+     * time to time (see [refreshIfDue]), as Google may replace them.
+     */
     private fun dir(context: Context): File {
-        val dir = File(context.filesDir, "backgrounds")
+        val dir = File(context.cacheDir, "backgrounds")
         if (!dir.exists()) {
-            // Earlier versions kept them in the cache.
-            val old = File(context.cacheDir, "backgrounds")
-            if (!(old.exists() && old.renameTo(dir))) dir.mkdirs()
+            // A version of the app kept them with its files for a while.
+            val moved = File(context.filesDir, "backgrounds")
+            if (!(moved.exists() && moved.renameTo(dir))) dir.mkdirs()
         }
         return dir
     }
@@ -122,22 +125,43 @@ object NoteBackgrounds {
         return bitmap
     }
 
+    private const val CHECK_INTERVAL_MS = 7L * 24 * 3_600_000
+
     /**
      * Fetches every picture Keep offers, in both versions (and any other a note uses), once, so none has to be waited for later
-     * and the widgets never meet a missing one. True if something new arrived, so the widgets should be redrawn.
+     * and the widgets never meet a missing one. Once a week, on a network that is not metered (Wi-Fi), the pictures are fetched
+     * again and replaced where Google changed them. True if something new arrived, so the widgets should be redrawn.
      */
     fun prefetch(context: Context): Boolean {
         val accounts = CredentialStore.accounts(context).filter { !CredentialStore.isLocal(it) }
         if (accounts.isEmpty()) return false
         val names = (NAMES + accounts.flatMap { RichNotes.backgrounds(context, it) }).distinct()
-        var fetched = false
+        val prefs = context.getSharedPreferences("backgrounds", Context.MODE_PRIVATE)
+        val due = System.currentTimeMillis() - prefs.getLong("checked", 0L) > CHECK_INTERVAL_MS && !isMetered(context)
+        var changed = false
         names.forEach { name ->
             for (dark in listOf(false, true)) {
-                if (!cacheFile(context, name, dark).exists() && load(context, name, dark) != null) fetched = true
+                val file = cacheFile(context, name, dark)
+                if (!file.exists()) {
+                    if (load(context, name, dark) != null) changed = true
+                } else if (due) {
+                    val fresh = runCatching { render(download(name, dark)) }.getOrNull() ?: continue
+                    val old = BitmapFactory.decodeFile(file.path)
+                    if (old == null || !old.sameAs(fresh)) {
+                        runCatching { file.outputStream().use { fresh.compress(Bitmap.CompressFormat.PNG, 100, it) } }
+                        synchronized(memory) { memory.remove(key(name, dark)) }
+                        synchronized(small) { small.keys.removeAll { it.startsWith(key(name, dark) + "|") } }
+                        changed = true
+                    }
+                }
             }
         }
-        return fetched
+        if (due) prefs.edit().putLong("checked", System.currentTimeMillis()).apply()
+        return changed
     }
+
+    private fun isMetered(context: Context): Boolean =
+        context.getSystemService(android.net.ConnectivityManager::class.java).isActiveNetworkMetered
 
     private const val WIDGET_SIZE = 360
 

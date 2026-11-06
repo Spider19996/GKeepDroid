@@ -169,6 +169,10 @@
     <string name="pinned_section_switch">Show pinned notes in their own section</string>
     <string name="pull_to_refresh_switch">Pull down on the list to refresh</string>
     <string name="color_background_remove">Remove</string>
+    <string name="format_bold">Bold</string>
+    <string name="format_italic">Italic</string>
+    <string name="format_underline">Underline</string>
+    <string name="format_strike">Strikethrough</string>
     <string name="note_text_color">Text color</string>
     <string name="note_text_color_auto">Automatic</string>
     <string name="background_dark_version">Dark version of the picture</string>

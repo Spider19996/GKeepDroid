@@ -1104,10 +1104,11 @@ class MainActivity : ComponentActivity() {
             }
         }
         val onDarkPicture = backgroundImage != null && customStamp == 0L && darkVariant
-        val noteColor = if (app.showNoteColors) NoteColors.argb(note.color) else null
+        val darkCard = LocalDarkTheme.current
+        val noteColor = if (app.showNoteColors) NoteColors.argb(note.color, darkCard) else null
         val gray = noteColor == null && app.plainCardStyle == PLAIN_GRAY
         val textColor = look.textColor?.let { Color(it) } ?: when {
-            onDarkPicture -> LightNoteText
+            onDarkPicture || (noteColor != null && darkCard && backgroundImage == null) -> LightNoteText
             noteColor != null || backgroundImage != null -> DarkNoteText
             gray -> Color.White
             else -> MaterialTheme.colorScheme.onSurface
@@ -1122,7 +1123,7 @@ class MainActivity : ComponentActivity() {
         val markColor = Color(0x80FFC107)
         // Web addresses, e-mail addresses and phone numbers open in the app made for them.
         val linkColor = when {
-            onDarkPicture -> Color(0xFF8AB4F8)
+            onDarkPicture || (noteColor != null && darkCard && backgroundImage == null) -> Color(0xFF8AB4F8)
             noteColor != null || backgroundImage != null -> Color(0xFF0B57D0)
             else -> MaterialTheme.colorScheme.primary
         }

@@ -94,7 +94,7 @@ fun ColorChoiceDialog(onPick: (String) -> Unit, onDismiss: () -> Unit) {
             @OptIn(ExperimentalLayoutApi::class)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 NoteColors.names.forEach { name ->
-                    val argb = NoteColors.argb(name)
+                    val argb = NoteColors.argb(name, LocalDarkTheme.current)
                     Box(
                         Modifier.size(44.dp).clip(CircleShape)
                             .background(if (argb != null) Color(argb) else Color.Transparent)

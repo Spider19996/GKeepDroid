@@ -166,6 +166,10 @@
     <string name="pinned_section_switch">Mostra le note fissate in una sezione a parte</string>
     <string name="pull_to_refresh_switch">Trascina la lista verso il basso per aggiornare</string>
     <string name="color_background_remove">Rimuovi</string>
+    <string name="format_bold">Grassetto</string>
+    <string name="format_italic">Corsivo</string>
+    <string name="format_underline">Sottolineato</string>
+    <string name="format_strike">Barrato</string>
     <string name="note_text_color">Colore del testo</string>
     <string name="note_text_color_auto">Automatico</string>
     <string name="background_dark_version">Versione scura dell\'immagine</string>

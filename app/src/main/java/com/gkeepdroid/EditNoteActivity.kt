@@ -223,7 +223,7 @@ class EditNoteActivity : ComponentActivity() {
         }
     }
 
-    @OptIn(ExperimentalLayoutApi::class)
+    @OptIn(ExperimentalLayoutApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
     @Composable
     private fun EditScreen(
         account: String, existing: KeepNote?, startAsList: Boolean, offline: Boolean, pinWidgetId: Int?,
@@ -321,15 +321,17 @@ class EditNoteActivity : ComponentActivity() {
         }
         // The dark version of one of Keep's pictures keeps the editor dark, with light text.
         val darkPicture = darkVersion && background != CUSTOM_BACKGROUND && background.isNotEmpty()
-        val tint = if (showColors) NoteColors.argb(color) else null
+        val tint = if (showColors) NoteColors.argb(color, darkTheme) else null
         val shownPicture = if (showColors) picture else null
         val tinted = tint != null || shownPicture != null
+        // Dark colors and dark pictures keep the editor dark, with light text.
+        val darkLook = (shownPicture != null && darkPicture) || (shownPicture == null && tint != null && darkTheme)
         // The buttons take their colors from the note's color; without one, from the average color of its picture.
         val accent = tint ?: shownPicture?.let { remember(it) { NoteBackgrounds.averageColor(it) } }
-        DisposableEffect(tint, shownPicture, darkPicture) {
+        DisposableEffect(tint, shownPicture, darkLook) {
             screenTint.color = tint
             screenTint.image = shownPicture
-            screenTint.darkImage = darkPicture
+            screenTint.darkImage = darkLook
             onDispose { screenTint.color = null; screenTint.image = null; screenTint.darkImage = false }
         }
         var labels by remember { mutableStateOf(existing?.labels.orEmpty()) }
@@ -444,12 +446,56 @@ class EditNoteActivity : ComponentActivity() {
         fun formatJson(): String? {
             if (!canFormat || formatTouched.isEmpty()) return null
             val json = org.json.JSONObject()
+            // A note made from the other kind is a new note: its items are addressed by their place, as they have no ids in Keep yet.
+            val newNote = convertFrom != null
+            val order = if (newNote && isList) outItems().filter { it.text.isNotBlank() }.map { it.id } else emptyList()
             formatTouched.toList().forEach { key ->
                 val current = formatTextOf(key)
                 val doc = formatDocs[key]
-                if (doc != null && doc.flags.size == current.length) json.put(key, doc.toJson(current))
+                if (doc != null && doc.flags.size == current.length) {
+                    val name = if (newNote && key != "text") order.indexOf(key).takeIf { it >= 0 }?.let { "#$it" } else key
+                    if (name != null) json.put(name, doc.toJson(current))
+                }
             }
             return if (json.length() == 0) null else json.toString()
+        }
+
+        /** Takes the formatting along when the note changes its kind: lines become items and items become lines. */
+        fun carryFormat(toList: Boolean, oldText: String, oldItems: List<KeepItem>, newText: String, newItems: List<KeepItem>) {
+            if (!canFormat) return
+            val carried = mutableMapOf<String, DocFlags>()
+            if (toList) {
+                val body = flagsFor("text", oldText)
+                var start = 0
+                val lines = oldText.split("\n").map { line -> (start to line).also { start += line.length + 1 } }.filter { it.second.isNotBlank() }
+                newItems.forEachIndexed { i, item ->
+                    val (lineStart, line) = lines.getOrNull(i) ?: return@forEachIndexed
+                    val offset = line.indexOf(item.text)
+                    if (item.text.isEmpty() || offset < 0) return@forEachIndexed
+                    carried[item.id] = DocFlags(IntArray(item.text.length) { body.flags.getOrElse(lineStart + offset + it) { 0 } })
+                }
+            } else {
+                val lines = newText.split("\n")
+                val flags = IntArray(newText.length)
+                var start = 0
+                lines.forEachIndexed { i, line ->
+                    val item = oldItems.filter { it.text.isNotBlank() }.getOrNull(i)
+                    if (item != null && line.endsWith(item.text)) {
+                        val source = flagsFor(item.id, item.text)
+                        val offset = line.length - item.text.length
+                        for (k in item.text.indices) flags[start + offset + k] = source.flags.getOrElse(k) { 0 }
+                    }
+                    start += line.length + 1
+                }
+                carried["text"] = DocFlags(flags)
+            }
+            formatDocs.clear()
+            formatTouched.clear()
+            carried.forEach { (key, doc) ->
+                formatDocs[key] = doc
+                if (doc.flags.any { it and TEXT_STYLE_MASK != 0 }) formatTouched.add(key)
+            }
+            formatVersion++
         }
 
         fun save(fromHome: Boolean = false) {
@@ -476,7 +522,7 @@ class EditNoteActivity : ComponentActivity() {
                     if (isLocal || galleryNow == originalGallery) "" else galleryNow.ifEmpty { "default" },
                 )
             } else {
-                KeepRepository.createNoteArgs(title, text, isList, outItems(), color, pinned, withHiddenLabel(labels, hiddenInWidgets), galleryNow)
+                KeepRepository.createNoteArgs(title, text, isList, outItems(), color, pinned, withHiddenLabel(labels, hiddenInWidgets), galleryNow, if (converting) formatJson().orEmpty() else "")
             }
             // The mark in Keep replaces the older one that only this phone knew.
             if (existing != null) PrivateNotes.set(this@EditNoteActivity, account, existing.id, false)
@@ -557,6 +603,7 @@ class EditNoteActivity : ComponentActivity() {
                 askEdit()
             } else if (existing == null) {
                 val (newText, newItems) = convertedContent(!isList)
+                val (oldText, oldItems) = text to items.toList()
                 items.clear()
                 items.addAll(newItems)
                 text = newText
@@ -566,12 +613,16 @@ class EditNoteActivity : ComponentActivity() {
                 Toast.makeText(this@EditNoteActivity, R.string.convert_images_blocked, Toast.LENGTH_LONG).show()
             } else {
                 val (newText, newItems) = convertedContent(!isList)
+                val (oldText, oldItems) = text to items.toList()
+                val toList = !isList
                 items.clear()
                 items.addAll(newItems)
                 text = newText
                 isList = !isList
                 if (isList) adoptNumbering() else numbered = false
                 convertFrom = if (isList != existing.isList) existing else null
+                // The styles travel with the text (a numbered list also keeps them: the numbers are not part of the items).
+                if (convertFrom != null) carryFormat(toList, oldText, oldItems, newText, items.toList())
             }
         }
 
@@ -598,47 +649,23 @@ class EditNoteActivity : ComponentActivity() {
             onDispose { onHome = null }
         }
 
-        // Formatting buttons for the selected text of the note body or of the item being edited; they sit above the keyboard, where
-        // the pop-up of the text selection does not cover them.
-        val formatBar: @Composable (Modifier) -> Unit = { modifier ->
+        // The text styles live in the selection menu of Android (next to Cut, Copy, Paste), for the text field that has the focus.
+        val styleLabels = listOf(R.string.format_bold, R.string.format_italic, R.string.format_underline, R.string.format_strike).map { stringResource(it) }
+        val applyStyle: (Int) -> Unit = { bit ->
             val key = formatFocus
             val selection = key?.let { formatSelection[it] }
-            val doc = key?.let { flagsFor(it, formatTextOf(it)) }
-            formatVersion
-            val selected = doc != null && selection != null && !selection.collapsed
-            androidx.compose.material3.Surface(modifier, color = MaterialTheme.colorScheme.surfaceContainerHigh, shape = MaterialTheme.shapes.extraLarge, tonalElevation = 3.dp) {
-                Row(Modifier.padding(horizontal = 8.dp, vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                    listOf(STYLE_BOLD to "B", STYLE_ITALIC to "I", STYLE_UNDERLINE to "U", STYLE_STRIKE to "S").forEach { (bit, label) ->
-                        androidx.compose.material3.IconToggleButton(
-                            checked = selected && doc!!.has(selection!!.min, selection.max, bit),
-                            onCheckedChange = {
-                                doc!!.toggle(selection!!.min, selection.max, bit)
-                                if (key !in formatTouched) formatTouched.add(key!!)
-                                formatVersion++
-                            },
-                            enabled = selected,
-                        ) {
-                            Text(
-                                label,
-                                fontWeight = if (bit == STYLE_BOLD) FontWeight.Bold else null,
-                                fontStyle = if (bit == STYLE_ITALIC) androidx.compose.ui.text.font.FontStyle.Italic else null,
-                                textDecoration = when (bit) {
-                                    STYLE_UNDERLINE -> androidx.compose.ui.text.style.TextDecoration.Underline
-                                    STYLE_STRIKE -> androidx.compose.ui.text.style.TextDecoration.LineThrough
-                                    else -> null
-                                },
-                            )
-                        }
-                    }
-                }
+            if (key != null && selection != null && !selection.collapsed) {
+                flagsFor(key, formatTextOf(key)).toggle(selection.min, selection.max, bit)
+                if (key !in formatTouched) formatTouched.add(key)
+                formatVersion++
             }
         }
         val scroll = rememberScrollState()
         // The editor opens in its final look; only changes made while it is open fade.
         LaunchedEffect(Unit) { kotlinx.coroutines.delay(500); screenTint.instant = false }
         OnNoteTheme(
-            active = tinted && !(shownPicture != null && darkPicture), accent = accent, transparentRows = tinted,
-            darkOnPicture = shownPicture != null && darkPicture, textColor = ownText,
+            active = tinted && !darkLook, accent = accent, transparentRows = tinted,
+            darkOnPicture = darkLook, textColor = ownText,
         ) {
         Box(Modifier.fillMaxSize()) {
         Column(
@@ -1083,8 +1110,10 @@ class EditNoteActivity : ComponentActivity() {
                                     }
                                 }
                             },
-                            flags = if (canFormat) flagsFor(item.id, item.text).also { formatVersion } else null,
+                            flags = if (canFormat) flagsFor(item.id, item.text) else null,
+                            flagsVersion = formatVersion,
                             onFocus = { formatFocus = item.id },
+                            styleMenu = if (canFormat && canEdit) Modifier.textStyleMenu(styleLabels, applyStyle) else Modifier,
                             onSelection = { formatSelection[item.id] = it },
                             onToggle = { items.indexOfFirst { it.id == item.id }.let { i -> if (i >= 0) items[i] = items[i].copy(checked = !items[i].checked) } },
                             onRemove = {
@@ -1145,8 +1174,9 @@ class EditNoteActivity : ComponentActivity() {
                     },
                     readOnly = !canEdit,
                     label = { Text(stringResource(R.string.note_hint)) },
-                    visualTransformation = if (canFormat) FlagsTransformation(flagsFor("text", text).also { formatVersion }) else VisualTransformation.None,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp).onFocusChanged { if (it.isFocused) formatFocus = "text" },
+                    visualTransformation = if (canFormat) remember(formatVersion, text) { FlagsTransformation(flagsFor("text", text)) } else VisualTransformation.None,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp).onFocusChanged { if (it.isFocused) formatFocus = "text" }
+                        .then(if (canFormat && canEdit) Modifier.textStyleMenu(styleLabels, applyStyle) else Modifier),
                 )
             }
 
@@ -1190,7 +1220,7 @@ class EditNoteActivity : ComponentActivity() {
             }
             Row(Modifier.horizontalScroll(rememberScrollState())) {
                 NoteColors.names.forEach { name ->
-                    val argb = NoteColors.argb(name)
+                    val argb = NoteColors.argb(name, darkTheme)
                     val chosen = name == color
                     // The circle keeps its size; the touch area around it is 48 dp.
                     RoundTouchTarget(onClick = { color = name }, enabled = canEdit) {
@@ -1377,9 +1407,6 @@ class EditNoteActivity : ComponentActivity() {
                 )
             }
         }
-        if (canFormat && canEdit && formatFocus != null && WindowInsets.isImeVisible) {
-            formatBar(Modifier.align(Alignment.BottomCenter).padding(bottom = 8.dp))
-        }
         }
         }
     }
@@ -1403,12 +1430,13 @@ class EditNoteActivity : ComponentActivity() {
      * One item of a checklist while editing: just the text, with a green check at the bottom right when it is
      * done. Swiping right ticks (or unticks) it, swiping left removes it, and the row stops where the symbol is shown.
      */
+    @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
     @Composable
     private fun ChecklistRow(
         item: KeepItem, editable: Boolean, dragged: Boolean, number: Int?,
         onText: (String) -> Unit, onToggle: () -> Unit, onRemove: () -> Unit,
         onBounds: (Rect) -> Unit, onDragStart: () -> Unit, onDragTo: (Float) -> Unit, onDragEnd: () -> Unit,
-        flags: DocFlags? = null, onFocus: () -> Unit = {}, onSelection: (androidx.compose.ui.text.TextRange) -> Unit = {},
+        flags: DocFlags? = null, flagsVersion: Int = 0, styleMenu: Modifier = Modifier, onFocus: () -> Unit = {}, onSelection: (androidx.compose.ui.text.TextRange) -> Unit = {},
     ) {
         // The field keeps its own selection, which the formatting buttons need.
         var field by remember(item.id) { mutableStateOf(androidx.compose.ui.text.input.TextFieldValue(item.text)) }
@@ -1465,7 +1493,7 @@ class EditNoteActivity : ComponentActivity() {
                         onSelection(typed.selection)
                         if (typed.text != item.text) onText(typed.text)
                     },
-                    visualTransformation = if (flags != null) FlagsTransformation(flags) else VisualTransformation.None,
+                    visualTransformation = if (flags != null) remember(flags, flagsVersion, item.text) { FlagsTransformation(flags) } else VisualTransformation.None,
                     placeholder = { Text(stringResource(R.string.item_hint)) },
                     // The text starts 48 dp from the left edge (16 dp content padding plus this room), where the strip with the
                     // capsule ends; the strip is drawn on top. In a numbered list the number stands in front of the text and is
@@ -1484,7 +1512,7 @@ class EditNoteActivity : ComponentActivity() {
                     } else {
                         LocalTextStyle.current
                     },
-                    modifier = Modifier.fillMaxWidth().onFocusChanged { if (it.isFocused) onFocus() },
+                    modifier = Modifier.fillMaxWidth().onFocusChanged { if (it.isFocused) onFocus() }.then(styleMenu),
                 )
                 // One button for both jobs: a tap switches the item between done and open, holding it and dragging moves the row.
                 // The whole strip at the left is the touch area, 48 dp wide as Material asks; the capsule in it is the housing of the

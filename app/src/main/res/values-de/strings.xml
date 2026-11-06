@@ -166,6 +166,10 @@
     <string name="pinned_section_switch">Angeheftete Notizen in eigenem Abschnitt zeigen</string>
     <string name="pull_to_refresh_switch">Zum Aktualisieren die Liste herunterziehen</string>
     <string name="color_background_remove">Entfernen</string>
+    <string name="format_bold">Fett</string>
+    <string name="format_italic">Kursiv</string>
+    <string name="format_underline">Unterstrichen</string>
+    <string name="format_strike">Durchgestrichen</string>
     <string name="note_text_color">Textfarbe</string>
     <string name="note_text_color_auto">Automatisch</string>
     <string name="background_dark_version">Dunkle Version des Bildes</string>

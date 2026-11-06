@@ -166,6 +166,10 @@
     <string name="pinned_section_switch">Показывать закреплённые заметки в отдельном разделе</string>
     <string name="pull_to_refresh_switch">Потянуть список вниз для обновления</string>
     <string name="color_background_remove">Убрать</string>
+    <string name="format_bold">Жирный</string>
+    <string name="format_italic">Курсив</string>
+    <string name="format_underline">Подчёркнутый</string>
+    <string name="format_strike">Зачёркнутый</string>
     <string name="note_text_color">Цвет текста</string>
     <string name="note_text_color_auto">Автоматически</string>
     <string name="background_dark_version">Тёмная версия картинки</string>

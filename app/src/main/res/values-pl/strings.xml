@@ -166,6 +166,10 @@
     <string name="pinned_section_switch">Pokaż przypięte notatki w osobnej sekcji</string>
     <string name="pull_to_refresh_switch">Przeciągnij listę w dół, aby odświeżyć</string>
     <string name="color_background_remove">Usuń</string>
+    <string name="format_bold">Pogrubienie</string>
+    <string name="format_italic">Kursywa</string>
+    <string name="format_underline">Podkreślenie</string>
+    <string name="format_strike">Przekreślenie</string>
     <string name="note_text_color">Kolor tekstu</string>
     <string name="note_text_color_auto">Automatycznie</string>
     <string name="background_dark_version">Ciemna wersja obrazu</string>

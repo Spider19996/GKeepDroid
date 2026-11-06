@@ -166,6 +166,10 @@
     <string name="pinned_section_switch">Afficher les notes épinglées dans leur propre section</string>
     <string name="pull_to_refresh_switch">Tirer la liste vers le bas pour actualiser</string>
     <string name="color_background_remove">Retirer</string>
+    <string name="format_bold">Gras</string>
+    <string name="format_italic">Italique</string>
+    <string name="format_underline">Souligné</string>
+    <string name="format_strike">Barré</string>
     <string name="note_text_color">Couleur du texte</string>
     <string name="note_text_color_auto">Automatique</string>
     <string name="background_dark_version">Version sombre de l\'image</string>

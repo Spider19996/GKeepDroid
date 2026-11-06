@@ -166,6 +166,10 @@
     <string name="pinned_section_switch">पिन किए गए नोट अलग अनुभाग में दिखाएँ</string>
     <string name="pull_to_refresh_switch">रीफ़्रेश करने के लिए सूची को नीचे खींचें</string>
     <string name="color_background_remove">हटाएँ</string>
+    <string name="format_bold">बोल्ड</string>
+    <string name="format_italic">इटैलिक</string>
+    <string name="format_underline">रेखांकित</string>
+    <string name="format_strike">काटा हुआ</string>
     <string name="note_text_color">टेक्स्ट का रंग</string>
     <string name="note_text_color_auto">अपने आप</string>
     <string name="background_dark_version">चित्र का गहरा संस्करण</string>

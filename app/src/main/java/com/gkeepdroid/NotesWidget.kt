@@ -184,12 +184,16 @@ class NotesWidget : GlanceAppWidget() {
         isPrivate: Boolean,
         foldedKeys: Set<String>,
     ) {
-        val noteColor = if (settings.showNoteColors) NoteColors.argb(note.color) else null
+        val night = NoteBackgrounds.isNight(LocalContext.current)
+        val noteColor = if (settings.showNoteColors) NoteColors.argb(note.color, night) else null
         // Keep's pictures come in a dark version for the phone's dark mode; a photo of one's own never does.
         val look = NoteLook.of(LocalContext.current, account, note.id)
         val onDarkPicture = picture != null && (look.dark ?: NoteBackgrounds.isNight(LocalContext.current)) &&
             CustomBackgrounds.stamp(LocalContext.current, account, note.id) == 0L
-        val palette = textPalette(settings, onNoteColor = noteColor != null || picture != null, onDarkPicture = onDarkPicture, own = look.textColor?.let { Color(it) })
+        val palette = textPalette(
+            settings, onNoteColor = noteColor != null || picture != null,
+            onDarkPicture = onDarkPicture || (noteColor != null && night && picture == null), own = look.textColor?.let { Color(it) },
+        )
         val textColor = palette.provider()
 
         val cardModifier = GlanceModifier.fillMaxWidth().cornerRadius(R.dimen.widget_inner_corner).noteBackground(noteColor, settings, picture = picture)

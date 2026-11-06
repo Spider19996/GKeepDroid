@@ -166,6 +166,10 @@
     <string name="pinned_section_switch">고정된 메모를 별도 섹션에 표시</string>
     <string name="pull_to_refresh_switch">목록을 아래로 당겨 새로고침</string>
     <string name="color_background_remove">제거</string>
+    <string name="format_bold">굵게</string>
+    <string name="format_italic">기울임</string>
+    <string name="format_underline">밑줄</string>
+    <string name="format_strike">취소선</string>
     <string name="note_text_color">글자 색</string>
     <string name="note_text_color_auto">자동</string>
     <string name="background_dark_version">이미지의 어두운 버전</string>

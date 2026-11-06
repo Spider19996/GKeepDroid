@@ -118,8 +118,9 @@ class SearchActivity : ComponentActivity() {
 
     @Composable
     private fun ResultCard(note: KeepNote, query: String, untitled: String, hidden: Boolean, onClick: () -> Unit) {
-        val noteColor = NoteColors.argb(note.color)
-        val textColor = if (noteColor != null) DarkNoteText else MaterialTheme.colorScheme.onSurface
+        val dark = LocalDarkTheme.current
+        val noteColor = NoteColors.argb(note.color, dark)
+        val textColor = if (noteColor != null) (if (dark) LightNoteText else DarkNoteText) else MaterialTheme.colorScheme.onSurface
         Column(
             Modifier.fillMaxWidth()
                 .clip(MaterialTheme.shapes.medium)

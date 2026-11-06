@@ -4,6 +4,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.foundation.text.contextmenu.builder.item
+import androidx.compose.foundation.text.contextmenu.modifier.appendTextContextMenuComponents
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -80,3 +82,18 @@ class FlagsTransformation(private val doc: DocFlags) : VisualTransformation {
         return TransformedText(styled, OffsetMapping.Identity)
     }
 }
+
+/**
+ * Adds the four text styles to the selection menu of Android (next to Cut, Copy, Paste and Select all) of the text field this
+ * modifier belongs to. [onStyle] gets the style bit when one is chosen.
+ */
+@androidx.compose.foundation.ExperimentalFoundationApi
+fun androidx.compose.ui.Modifier.textStyleMenu(labels: List<String>, onStyle: (Int) -> Unit): androidx.compose.ui.Modifier =
+    appendTextContextMenuComponents {
+        labels.forEachIndexed { i, label ->
+            item("text_style_$i", label) {
+                onStyle(1 shl i)
+                close()
+            }
+        }
+    }

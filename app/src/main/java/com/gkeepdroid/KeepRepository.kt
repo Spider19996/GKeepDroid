@@ -86,8 +86,8 @@ object KeepRepository {
 
     fun createNoteArgs(
         title: String, text: String, isList: Boolean, items: List<KeepItem>, color: String, pinned: Boolean,
-        labels: List<String>, background: String = "",
-    ): List<Any> = listOf(title, text, isList, itemsToJson(items), color, pinned, JSONArray(labels).toString(), background)
+        labels: List<String>, background: String = "", format: String = "",
+    ): List<Any> = listOf(title, text, isList, itemsToJson(items), color, pinned, JSONArray(labels).toString(), background, format)
 
     // Label changes talk to Keep in the background, so the editor stays quick and closing it does not cancel them.
     private val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)

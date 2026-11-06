@@ -120,7 +120,17 @@ fun OnNoteTheme(
     val darkTheme = LocalDarkTheme.current
     var scheme = when {
         // The dark version of a picture needs light text, also in a light theme.
-        darkOnPicture -> if (darkTheme) outer else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) dynamicDarkColorScheme(context) else darkColorScheme()
+        darkOnPicture -> {
+            val base = if (darkTheme) outer else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) dynamicDarkColorScheme(context) else darkColorScheme()
+            if (accent == null) base else {
+                // The same for a dark picture: menus and dialogs in a dark shade of its color.
+                val surface = androidx.compose.ui.graphics.lerp(Color(accent), Color.Black, 0.75f)
+                base.copy(
+                    surfaceContainerLowest = surface, surfaceContainerLow = surface, surfaceContainer = surface,
+                    surfaceContainerHigh = surface, surfaceContainerHighest = surface, surfaceBright = surface,
+                )
+            }
+        }
         !active -> outer
         else -> {
             val base = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) dynamicLightColorScheme(context) else expressiveLightColorScheme()
@@ -129,12 +139,17 @@ fun OnNoteTheme(
                 val hsv = FloatArray(3).also { android.graphics.Color.colorToHSV(accent, it) }
                 val dark = Color(android.graphics.Color.HSVToColor(floatArrayOf(hsv[0], (hsv[1] + 0.35f).coerceIn(0.45f, 0.9f), 0.34f)))
                 val light = androidx.compose.ui.graphics.lerp(Color(accent), Color.White, 0.55f)
+                // Menus and dialogs take a light shade of the note's color, so everything looks of one piece.
+                val surface = androidx.compose.ui.graphics.lerp(Color(accent), Color.White, 0.8f)
                 base.copy(
                     primary = dark, onPrimary = Color.White,
                     primaryContainer = light, onPrimaryContainer = dark,
                     secondaryContainer = light, onSecondaryContainer = dark,
                     secondary = dark, onSecondary = Color.White,
                     surfaceTint = dark, outline = dark.copy(alpha = 0.6f),
+                    surfaceContainerLowest = surface, surfaceContainerLow = surface, surfaceContainer = surface,
+                    surfaceContainerHigh = surface, surfaceContainerHighest = surface, surfaceBright = surface,
+                    onSurface = DarkNoteText, onSurfaceVariant = DarkNoteText.copy(alpha = 0.75f),
                 )
             }
         }
@@ -184,7 +199,7 @@ fun KeepTheme(themeMode: Int, opaque: Boolean = true, tint: ScreenTint? = null, 
     }
 
     val view = LocalView.current
-    val tinted = tint != null && (if (tint.image != null) !tint.darkImage else tint.color != null)
+    val tinted = tint != null && (tint.image != null || tint.color != null) && !tint.darkImage
     // Demo mode (for screenshots) runs full screen: the status bar and the three buttons are hidden, and a swipe from the edge brings them back.
     val fullScreen = DemoNotes.version.intValue >= 0 && DemoNotes.enabled(context)
     // Switching the demo mode on or off changes how the window is laid out; a fresh activity does that cleanly.
