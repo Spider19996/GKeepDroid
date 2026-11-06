@@ -695,6 +695,16 @@ class EditNoteActivity : ComponentActivity() {
                     }
                 }
                 ReminderButton(shownReminders.isNotEmpty(), notificationsOn) { if (canEdit) remindersOpen = true else askEdit() }
+                // Save, then the overflow menu as the last item at the right edge; a note that is still locked shows a lock instead of the check.
+                FilledIconButton(
+                    onClick = { if (canEdit) save() else askEdit() }, enabled = !saving,
+                    shapes = IconButtonDefaults.shapes(), modifier = Modifier.padding(start = 4.dp).size(40.dp),
+                ) {
+                    Icon(
+                        painterResource(if (canEdit) R.drawable.ic_done else R.drawable.ic_lock),
+                        contentDescription = stringResource(if (canEdit) R.string.save else if (isList) R.string.edit_list else R.string.edit_note),
+                    )
+                }
                 // Less common actions live in an overflow menu; grayed out until the note is open for editing.
                 run {
                     Box {
@@ -809,17 +819,7 @@ class EditNoteActivity : ComponentActivity() {
                         )
                     }
                 }
-                            // Save; a note that is still locked shows a lock instead and asks for the unlock.
-                FilledIconButton(
-                    onClick = { if (canEdit) save() else askEdit() }, enabled = !saving,
-                    shapes = IconButtonDefaults.shapes(), modifier = Modifier.padding(start = 4.dp).size(40.dp),
-                ) {
-                    Icon(
-                        painterResource(if (canEdit) R.drawable.ic_done else R.drawable.ic_lock),
-                        contentDescription = stringResource(if (canEdit) R.string.save else if (isList) R.string.edit_list else R.string.edit_note),
-                    )
-                }
-            }
+                        }
         Column(
             Modifier.weight(1f).verticalScroll(scroll).padding(EDITOR_PADDING),
             verticalArrangement = Arrangement.spacedBy(12.dp),
