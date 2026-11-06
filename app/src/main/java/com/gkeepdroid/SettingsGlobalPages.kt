@@ -272,6 +272,7 @@ internal fun ColumnScope.AppLayoutPage(s: SettingsState) {
         }
         SwitchRow(R.string.pinned_section_switch, appPinnedSection) { appPinnedSection = it }
         SwitchRow(R.string.pull_to_refresh_switch, appPullToRefresh) { appPullToRefresh = it }
+        SwitchRow(R.string.show_count_switch, appShowCount) { appShowCount = it }
 
         Text(stringResource(R.string.plain_style))
         ChoiceGroup(plainStyles(), appPlainStyle) { appPlainStyle = it }

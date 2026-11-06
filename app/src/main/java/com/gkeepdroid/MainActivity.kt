@@ -11,6 +11,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,7 +55,9 @@ import androidx.compose.material3.FloatingActionButtonMenu
 import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.MaterialTheme
@@ -140,6 +143,15 @@ class MainActivity : ComponentActivity() {
         var undoKey by remember { mutableStateOf(0) }
         var syncing by remember { mutableStateOf(false) }
         var pulling by remember { mutableStateOf(false) }
+        // Several notes chosen at once (keys are account|id); while any is chosen, the bar above the list turns into their actions.
+        var selected by remember { mutableStateOf(emptySet<String>()) }
+        var selectionMenu by remember { mutableStateOf(false) }
+        var colorDialog by remember { mutableStateOf(false) }
+        var labelDialog by remember { mutableStateOf(false) }
+        var emptyTrashDialog by remember { mutableStateOf(false) }
+        var deleteSelected by remember { mutableStateOf<List<Pair<KeepNote, String>>?>(null) }
+        var searchFocused by remember { mutableStateOf(false) }
+        var history by remember { mutableStateOf(SearchHistory.load(context)) }
         var menuOpen by remember { mutableStateOf(false) }
         var newMenuOpen by remember { mutableStateOf(false) }
         var deleteTarget by remember { mutableStateOf<Pair<KeepNote, String>?>(null) }
@@ -234,6 +246,58 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        fun keyOf(entry: Pair<KeepNote, String>) = entry.second + "|" + entry.first.id
+        val selectedEntries = shown.filter { keyOf(it) in selected }
+        // Notes that left the list (archived, searched away) are no longer chosen.
+        LaunchedEffect(shown) { val keys = shown.map(::keyOf).toSet(); if (!keys.containsAll(selected)) selected = selected intersect keys }
+        LaunchedEffect(screen) { selected = emptySet() }
+        BackHandler(enabled = selected.isNotEmpty()) { selected = emptySet() }
+
+        /** Changes every chosen note like an edit in the editor would: stored at once, sent in the background. */
+        fun editSelected(change: (KeepNote, String) -> KeepNote) {
+            val targets = selectedEntries
+            selected = emptySet()
+            act {
+                val privateKeys = PrivateNotes.load(context)
+                targets.forEach { (note, account) ->
+                    val n = change(note, account)
+                    val args = KeepRepository.updateNoteArgs(
+                        n.id, n.title, n.text, n.items, n.color, n.pinned, emptyList(),
+                        withHiddenLabel(n.labels, PrivateNotes.isPrivate(note, account, privateKeys)),
+                    )
+                    PrivateNotes.set(context, account, n.id, false)
+                    KeepRepository.queueEdit(context, PendingEdit(account, "update_note", args))
+                }
+            }
+        }
+        fun moveSelected(block: suspend (KeepNote, String) -> Unit) {
+            val targets = selectedEntries
+            selected = emptySet()
+            act { targets.forEach { (note, account) -> block(note, account) } }
+        }
+        fun duplicateSelected() {
+            val targets = selectedEntries
+            selected = emptySet()
+            act {
+                val privateKeys = PrivateNotes.load(context)
+                targets.forEach { (n, account) ->
+                    val args = KeepRepository.createNoteArgs(
+                        n.title, n.text, n.isList, n.items, n.color, n.pinned,
+                        withHiddenLabel(n.labels, PrivateNotes.isPrivate(n, account, privateKeys)),
+                    )
+                    if (CredentialStore.isLocal(account)) KeepRepository.run(context, account, "create_note", args)
+                    else KeepRepository.queueEdit(context, PendingEdit(account, "create_note", args))
+                }
+            }
+        }
+        fun trashSelected() {
+            // Local notes have no trash: those are deleted, after asking.
+            val (local, remote) = selectedEntries.partition { CredentialStore.isLocal(it.second) }
+            selected = emptySet()
+            if (local.isNotEmpty()) deleteSelected = local
+            if (remote.isNotEmpty()) act { remote.forEach { (note, account) -> KeepRepository.trashNote(context, account, note.id) } }
+        }
+
         /** A card was swiped (and let go): the action chosen in the settings, with "Undo" where there is one. */
         fun swiped(note: KeepNote, account: String, action: Int) {
             /** Changes of the note itself (pin, hide) are edits like any other: they ask for the lock when it is on. */
@@ -300,6 +364,65 @@ class MainActivity : ComponentActivity() {
             )
         }
 
+        deleteSelected?.let { targets ->
+            AlertDialog(
+                onDismissRequest = { deleteSelected = null },
+                text = { Text(stringResource(R.string.delete_selected_confirm)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        deleteSelected = null
+                        act { targets.forEach { (note, account) -> KeepRepository.deleteForever(context, account, note.id) } }
+                    }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.delete_forever)) }
+                },
+                dismissButton = {
+                    TextButton(onClick = { deleteSelected = null }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) }
+                },
+            )
+        }
+        if (emptyTrashDialog) {
+            AlertDialog(
+                onDismissRequest = { emptyTrashDialog = false },
+                text = { Text(stringResource(R.string.empty_trash_confirm)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        emptyTrashDialog = false
+                        // Everything in the trash of the accounts on screen, whatever the search says.
+                        val trashed = accounts.filter { filterAccount == null || it == filterAccount }.flatMap { account ->
+                            NotesCache.readOther(context, account).filter { it.state == "trashed" }.map { it to account }
+                        }
+                        act { trashed.forEach { (note, account) -> KeepRepository.deleteForever(context, account, note.id) } }
+                    }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.empty_trash)) }
+                },
+                dismissButton = {
+                    TextButton(onClick = { emptyTrashDialog = false }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) }
+                },
+            )
+        }
+        if (colorDialog) {
+            ColorChoiceDialog(
+                onPick = { name -> colorDialog = false; editSelected { note, _ -> note.copy(color = name) } },
+                onDismiss = { colorDialog = false },
+            )
+        }
+        if (labelDialog) {
+            val accountsOfSelection = selectedEntries.map { it.second }.distinct()
+            val labelOptions = accountsOfSelection.flatMap { NotesCache.labels(context, it) }.distinct().sortedBy { it.lowercase() }
+            val allHave = labelOptions.filter { label -> selectedEntries.all { label in it.first.labels } }.toSet()
+            LabelChoiceDialog(
+                labels = labelOptions,
+                allHave = allHave,
+                onApply = { added, removed ->
+                    labelDialog = false
+                    editSelected { note, account ->
+                        // A label is only added where the account knows it.
+                        val known = NotesCache.labels(context, account)
+                        note.copy(labels = ((note.labels + added.filter { it in known }) - removed).distinct())
+                    }
+                },
+                onDismiss = { labelDialog = false },
+            )
+        }
+
         Scaffold(
             containerColor = Color.Transparent,
             // The default snackbar is light in dark themes; this one follows the app's colors.
@@ -347,7 +470,7 @@ class MainActivity : ComponentActivity() {
             Column(Modifier.fillMaxSize().padding(padding)) {
                 // Search field and the menu. A running sync shows as a thin line on the row's lower edge, which takes no room.
                 Box {
-                Row(
+                if (selected.isEmpty()) Row(
                     Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -357,6 +480,11 @@ class MainActivity : ComponentActivity() {
                     AppSearchField(
                         query = query,
                         onQueryChange = { query = it },
+                        onSearch = { history = SearchHistory.add(context, query) },
+                        onFocusChange = {
+                            searchFocused = it
+                            if (!it) history = SearchHistory.add(context, query)
+                        },
                         placeholder = when (screen) {
                             AppScreen.Notes -> stringResource(R.string.search_notes_hint)
                             AppScreen.Archive -> stringResource(R.string.archive_note)
@@ -373,6 +501,9 @@ class MainActivity : ComponentActivity() {
                             onDismissRequest = { menuOpen = false },
                             groups = listOf(
                                 listOf(MenuEntry(stringResource(R.string.refresh_action), R.drawable.ic_refresh) { menuOpen = false; sync() }),
+                                if (screen == AppScreen.Trash && shown.isNotEmpty()) listOf(
+                                    MenuEntry(stringResource(R.string.empty_trash), R.drawable.ic_delete) { menuOpen = false; emptyTrashDialog = true },
+                                ) else emptyList(),
                                 listOf(
                                     MenuEntry(stringResource(R.string.archive_note), R.drawable.ic_archive) { menuOpen = false; screen = AppScreen.Archive },
                                     MenuEntry(stringResource(R.string.trash_title), R.drawable.ic_delete) { menuOpen = false; screen = AppScreen.Trash },
@@ -404,7 +535,83 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 }
+                else Row(
+                    Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp).height(SearchBarDefaults.InputFieldHeight),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    IconButton(onClick = { selected = emptySet() }, shapes = IconButtonDefaults.shapes()) {
+                        Icon(painterResource(R.drawable.ic_close), contentDescription = stringResource(android.R.string.cancel))
+                    }
+                    Text(
+                        stringResource(R.string.selected_count, selected.size),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.weight(1f),
+                    )
+                    if (screen == AppScreen.Notes) IconButton(onClick = {
+                        val pin = selectedEntries.any { !it.first.pinned }
+                        editSelected { note, _ -> note.copy(pinned = pin) }
+                    }, shapes = IconButtonDefaults.shapes()) {
+                        Icon(painterResource(R.drawable.ic_push_pin), contentDescription = stringResource(R.string.pinned_section))
+                    }
+                    if (screen != AppScreen.Trash) IconButton(onClick = {
+                        if (screen == AppScreen.Archive) moveSelected { note, account -> KeepRepository.unarchiveNote(context, account, note.id) }
+                        else moveSelected { note, account -> if (!CredentialStore.isLocal(account)) KeepRepository.archiveNote(context, account, note.id) }
+                    }, shapes = IconButtonDefaults.shapes()) {
+                        Icon(
+                            painterResource(R.drawable.ic_archive),
+                            contentDescription = stringResource(if (screen == AppScreen.Archive) R.string.unarchive_note else R.string.archive_note),
+                        )
+                    }
+                    IconButton(onClick = {
+                        if (screen == AppScreen.Trash) deleteSelected = selectedEntries else trashSelected()
+                    }, shapes = IconButtonDefaults.shapes()) {
+                        Icon(
+                            painterResource(R.drawable.ic_delete),
+                            contentDescription = stringResource(if (screen == AppScreen.Trash) R.string.delete_forever else R.string.trash_title),
+                        )
+                    }
+                    Box {
+                        IconButton(onClick = { selectionMenu = true }, shapes = IconButtonDefaults.shapes()) {
+                            Icon(painterResource(R.drawable.ic_more_vert), contentDescription = stringResource(R.string.more_actions))
+                        }
+                        GroupedMenu(
+                            expanded = selectionMenu,
+                            onDismissRequest = { selectionMenu = false },
+                            groups = listOf(
+                                if (screen == AppScreen.Trash) listOf(
+                                    MenuEntry(stringResource(R.string.restore_note), R.drawable.ic_refresh) {
+                                        selectionMenu = false
+                                        moveSelected { note, account -> KeepRepository.untrashNote(context, account, note.id) }
+                                    },
+                                ) else listOf(
+                                    MenuEntry(stringResource(R.string.color), R.drawable.ic_color_none) { selectionMenu = false; colorDialog = true },
+                                    MenuEntry(stringResource(R.string.labels_title), R.drawable.ic_checklist) { selectionMenu = false; labelDialog = true },
+                                    MenuEntry(stringResource(R.string.duplicate_note), R.drawable.ic_open_new) { selectionMenu = false; duplicateSelected() },
+                                ),
+                                listOf(MenuEntry(stringResource(R.string.select_all), R.drawable.ic_done) {
+                                    selectionMenu = false
+                                    selected = shown.map(::keyOf).toSet()
+                                }),
+                            ),
+                        )
+                    }
+                }
                 if (syncing) LinearProgressIndicator(Modifier.fillMaxWidth().align(Alignment.BottomCenter).height(2.dp))
+                }
+
+                if (searchFocused && query.isBlank() && history.isNotEmpty() && selected.isEmpty()) {
+                    Row(
+                        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        history.forEach { recent ->
+                            AssistChip(onClick = { query = recent }, label = { Text(recent, maxLines = 1) })
+                        }
+                        IconButton(onClick = { SearchHistory.clear(context); history = emptyList() }, shapes = IconButtonDefaults.shapes()) {
+                            Icon(painterResource(R.drawable.ic_close), contentDescription = stringResource(R.string.search_history_clear))
+                        }
+                    }
                 }
 
                 if (accounts.size > 1) {
@@ -550,8 +757,26 @@ class MainActivity : ComponentActivity() {
                     // Notes can be dragged into a new place in Keep's order, for one account and without a search.
                     val canReorder = app.sortMode == SORT_KEEP && query.isBlank() && (screen != AppScreen.Notes || filterLabel == null) &&
                         shown.map { it.second }.distinct().size == 1
+                    if (app.showCount) Text(
+                        stringResource(
+                            when (screen) {
+                                AppScreen.Notes -> R.string.count_notes
+                                AppScreen.Archive -> R.string.count_archive
+                                AppScreen.Trash -> R.string.count_trash
+                            },
+                            shown.size,
+                        ),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    )
                     val grid = @Composable {
-                        NotesGrid(shown, screen, app, canReorder, ::openEditor, { denied, block -> act(denied, block) }, { deleteTarget = it }, ::swiped)
+                        NotesGrid(
+                            shown, screen, app, canReorder, query, selected,
+                            { key -> selected = if (key in selected) selected - key else selected + key },
+                            { note, account, edit -> if (query.isNotBlank()) history = SearchHistory.add(context, query); openEditor(note, account, edit) },
+                            { denied, block -> act(denied, block) }, { deleteTarget = it }, ::swiped,
+                        )
                     }
                     if (app.pullToRefresh) {
                         PullToRefreshBox(
@@ -571,6 +796,9 @@ class MainActivity : ComponentActivity() {
         screen: AppScreen,
         app: AppSettings,
         canReorder: Boolean,
+        query: String,
+        selected: Set<String>,
+        onToggle: (String) -> Unit,
         open: (KeepNote?, String, Boolean) -> Unit,
         act: (() -> Unit, suspend () -> Unit) -> Unit,
         askDelete: (Pair<KeepNote, String>) -> Unit,
@@ -657,7 +885,12 @@ class MainActivity : ComponentActivity() {
         /** The long-press drag of one card. */
         @Composable
         fun dragModifier(key: String): Modifier {
-            if (!canReorder) return Modifier
+            val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+            val toggle = { haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress); onToggle(key) }
+            // Once notes are chosen, a tap adds or removes one, and the cards no longer move.
+            if (selected.isNotEmpty()) return Modifier
+            // Without a place to drag to, a long press chooses the note.
+            if (!canReorder) return Modifier.pointerInput(key) { detectTapGestures(onLongPress = { toggle() }) }
             val coords = remember { arrayOfNulls<LayoutCoordinates>(1) }
             return Modifier
                 .onGloballyPositioned { coords[0] = it; cardBounds[key] = it.boundsInRoot() }
@@ -673,10 +906,27 @@ class MainActivity : ComponentActivity() {
                             pointer = coords[0]?.localToRoot(change.position) ?: pointer
                             moveUnderFinger()
                         },
-                        onDragEnd = { dropNow() },
+                        // Let go without having moved the card: the long press chooses it.
+                        onDragEnd = { if (dragOrder == null) { dragKey = null; toggle() } else dropNow() },
                         onDragCancel = { dragKey = null; dragOrder = null },
                     )
                 }
+        }
+
+        fun cardClick(note: KeepNote, account: String) {
+            if (selected.isNotEmpty()) onToggle(account + "|" + note.id) else open(note, account, false)
+        }
+
+        /** The long-press behavior of a card, and a frame around it while it is chosen. */
+        @Composable
+        fun cardModifier(note: KeepNote, account: String): Modifier {
+            val key = account + "|" + note.id
+            val frame = if (key in selected) {
+                Modifier.clip(MaterialTheme.shapes.medium).border(3.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.medium)
+            } else {
+                Modifier
+            }
+            return dragModifier(key).then(frame)
         }
 
         LazyVerticalStaggeredGrid(
@@ -698,7 +948,7 @@ class MainActivity : ComponentActivity() {
                 item(span = StaggeredGridItemSpan.FullLine) { SectionLabel(stringResource(R.string.pinned_section)) }
                 items(pinned, key = { it.second + "|" + it.first.id }) { (note, account) ->
                     SwipeCard(app, screen == AppScreen.Notes, { onSwiped(note, account, it) }, Modifier.animateItem()) {
-                        NoteTile(note, account, app, onClick = { open(note, account, false) }, modifier = dragModifier(account + "|" + note.id))
+                        NoteTile(note, account, app, query, onClick = { cardClick(note, account) }, modifier = cardModifier(note, account))
                     }
                 }
                 if (others.isNotEmpty()) {
@@ -707,7 +957,7 @@ class MainActivity : ComponentActivity() {
             }
             items(others, key = { it.second + "|" + it.first.id }) { (note, account) ->
                 SwipeCard(app, screen == AppScreen.Notes, { onSwiped(note, account, it) }, Modifier.animateItem()) {
-                NoteTile(note, account, app, onClick = { open(note, account, false) }, modifier = dragModifier(account + "|" + note.id)) {
+                NoteTile(note, account, app, query, onClick = { cardClick(note, account) }, modifier = cardModifier(note, account)) {
                     // Archive and trash get their own actions below the note.
                     if (screen == AppScreen.Archive) {
                         TextButton(onClick = { act({}) { KeepRepository.unarchiveNote(context, account, note.id) } }, shapes = ButtonDefaults.shapes()) {
@@ -806,6 +1056,7 @@ class MainActivity : ComponentActivity() {
         note: KeepNote,
         account: String,
         app: AppSettings,
+        query: String,
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
         actions: (@Composable () -> Unit)? = null,
@@ -842,6 +1093,7 @@ class MainActivity : ComponentActivity() {
             else -> Color.Transparent
         }
         val shape = MaterialTheme.shapes.medium
+        val markColor = Color(0x80FFC107)
         // Web addresses, e-mail addresses and phone numbers open in the app made for them.
         val linkColor = if (noteColor != null) Color(0xFF0B57D0) else MaterialTheme.colorScheme.primary
         // A private note shows only its title until it is opened with the device lock.
@@ -885,7 +1137,7 @@ class MainActivity : ComponentActivity() {
             if (hasTitleRow) {
                 Row(verticalAlignment = Alignment.Top) {
                     Text(
-                        note.title,
+                        highlightMatches(androidx.compose.ui.text.AnnotatedString(note.title), query, markColor),
                         color = textColor,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleSmall,
@@ -962,7 +1214,7 @@ class MainActivity : ComponentActivity() {
                             CheckboxPreview(app.listCheckboxStyle, item.checked, app.listCheckboxSizeDp, textColor.copy(alpha = if (item.checked) 0.55f else 1f))
                         }
                         Text(
-                            NoteLinks.annotate(item.text, linkColor),
+                            highlightMatches(NoteLinks.annotate(item.text, linkColor), query, markColor),
                             color = if (item.checked) textColor.copy(alpha = 0.55f) else textColor,
                             style = MaterialTheme.typography.bodyMedium,
                             maxLines = 2,
@@ -980,7 +1232,7 @@ class MainActivity : ComponentActivity() {
                 }
             } else if (note.text.isNotBlank()) {
                 Text(
-                    NoteLinks.annotate(note.text, linkColor),
+                    highlightMatches(NoteLinks.annotate(note.text, linkColor), query, markColor),
                     color = textColor,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = lines,
