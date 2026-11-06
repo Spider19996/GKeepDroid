@@ -164,6 +164,7 @@
     <string name="layout_grid">Grille</string>
     <string name="layout_list">Liste</string>
     <string name="pinned_section_switch">Afficher les notes épinglées dans leur propre section</string>
+    <string name="pull_to_refresh_switch">Tirer la liste vers le bas pour actualiser</string>
     <string name="preview_lines">Longueur de l\'aperçu : %1$d lignes</string>
     <string name="labels_title">Libellés</string>
     <string name="new_label_hint">Nouveau libellé</string>

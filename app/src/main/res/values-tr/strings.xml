@@ -164,6 +164,7 @@
     <string name="layout_grid">Izgara</string>
     <string name="layout_list">Liste</string>
     <string name="pinned_section_switch">Sabitlenen notları ayrı bölümde göster</string>
+    <string name="pull_to_refresh_switch">Yenilemek için listeyi aşağı çek</string>
     <string name="preview_lines">Önizleme uzunluğu: %1$d satır</string>
     <string name="labels_title">Etiketler</string>
     <string name="new_label_hint">Yeni etiket</string>

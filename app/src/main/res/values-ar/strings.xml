@@ -164,6 +164,7 @@
     <string name="layout_grid">شبكة</string>
     <string name="layout_list">قائمة</string>
     <string name="pinned_section_switch">عرض الملاحظات المثبتة في قسم مستقل</string>
+    <string name="pull_to_refresh_switch">اسحب القائمة للأسفل للتحديث</string>
     <string name="preview_lines">طول المعاينة: %1$d أسطر</string>
     <string name="labels_title">التصنيفات</string>
     <string name="new_label_hint">تصنيف جديد</string>

@@ -164,6 +164,7 @@
     <string name="layout_grid">Cuadrícula</string>
     <string name="layout_list">Lista</string>
     <string name="pinned_section_switch">Mostrar las notas fijadas en su propia sección</string>
+    <string name="pull_to_refresh_switch">Deslizar la lista hacia abajo para actualizar</string>
     <string name="preview_lines">Longitud de la vista previa: %1$d líneas</string>
     <string name="labels_title">Etiquetas</string>
     <string name="new_label_hint">Nueva etiqueta</string>

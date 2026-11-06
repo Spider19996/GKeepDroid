@@ -164,6 +164,7 @@
     <string name="layout_grid">격자</string>
     <string name="layout_list">목록</string>
     <string name="pinned_section_switch">고정된 메모를 별도 섹션에 표시</string>
+    <string name="pull_to_refresh_switch">목록을 아래로 당겨 새로고침</string>
     <string name="preview_lines">미리보기 길이: %1$d줄</string>
     <string name="labels_title">라벨</string>
     <string name="new_label_hint">새 라벨</string>

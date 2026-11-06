@@ -164,6 +164,7 @@
     <string name="layout_grid">Raster</string>
     <string name="layout_list">Liste</string>
     <string name="pinned_section_switch">Angeheftete Notizen in eigenem Abschnitt zeigen</string>
+    <string name="pull_to_refresh_switch">Zum Aktualisieren die Liste herunterziehen</string>
     <string name="preview_lines">Vorschaulänge: %1$d Zeilen</string>
     <string name="labels_title">Labels</string>
     <string name="new_label_hint">Neues Label</string>

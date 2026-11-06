@@ -861,6 +861,7 @@ data class AppSettings(
     /** The row of filter buttons above the notes, and which of them it shows (bits of FILTER_*). */
     val filterBar: Boolean = true,
     val filterChips: Int = FILTER_NOTES or FILTER_LISTS or FILTER_REMINDER or FILTER_RECENT or FILTER_LABELS,
+    val pullToRefresh: Boolean = true,
 )
 
 const val FILTER_NOTES = 1
@@ -925,6 +926,7 @@ object AppSettingsStore {
             foldNotes = p.getBoolean("fold_notes", d.foldNotes),
             filterBar = p.getBoolean("filter_bar", d.filterBar),
             filterChips = p.getInt("filter_chips", d.filterChips),
+            pullToRefresh = p.getBoolean("pull_to_refresh", d.pullToRefresh),
         )
     }
 
@@ -963,6 +965,7 @@ object AppSettingsStore {
             .putBoolean("fold_notes", s.foldNotes)
             .putBoolean("filter_bar", s.filterBar)
             .putInt("filter_chips", s.filterChips)
+            .putBoolean("pull_to_refresh", s.pullToRefresh)
             .apply()
     }
 }

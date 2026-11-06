@@ -14,6 +14,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.offset
@@ -54,7 +55,8 @@ import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.LinearWavyProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -137,6 +139,7 @@ class MainActivity : ComponentActivity() {
         var filterDialog by remember { mutableStateOf(false) }
         var undoKey by remember { mutableStateOf(0) }
         var syncing by remember { mutableStateOf(false) }
+        var pulling by remember { mutableStateOf(false) }
         var menuOpen by remember { mutableStateOf(false) }
         var newMenuOpen by remember { mutableStateOf(false) }
         var deleteTarget by remember { mutableStateOf<Pair<KeepNote, String>?>(null) }
@@ -151,13 +154,11 @@ class MainActivity : ComponentActivity() {
         // Back folds the open new-note menu before it does anything else.
         BackHandler(enabled = newMenuOpen) { newMenuOpen = false }
 
-        fun sync() {
-            scope.launch {
-                syncing = true
-                runCatching { KeepRepository.syncAll(context) }
-                syncing = false
-                reloadKey++
-            }
+        fun sync() = scope.launch {
+            syncing = true
+            runCatching { KeepRepository.syncAll(context) }
+            syncing = false
+            reloadKey++
         }
         val unlock = AppLock.rememberUnlock(this@MainActivity)
         unlocker = unlock
@@ -344,7 +345,8 @@ class MainActivity : ComponentActivity() {
             },
         ) { padding ->
             Column(Modifier.fillMaxSize().padding(padding)) {
-                // Search field and the menu.
+                // Search field and the menu. A running sync shows as a thin line on the row's lower edge, which takes no room.
+                Box {
                 Row(
                     Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -401,6 +403,8 @@ class MainActivity : ComponentActivity() {
                             ),
                         )
                     }
+                }
+                if (syncing) LinearProgressIndicator(Modifier.fillMaxWidth().align(Alignment.BottomCenter).height(2.dp))
                 }
 
                 if (accounts.size > 1) {
@@ -507,7 +511,6 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(top = 4.dp),
                     )
                 }
-                if (syncing) LinearWavyProgressIndicator(Modifier.fillMaxWidth().padding(top = 4.dp))
                 // A failed sync stays visible until the next one works.
                 val syncError = remember(reloadKey, syncing) { SyncPolicy.lastError(context) }
                 val expired = remember(reloadKey, syncing) { SyncPolicy.expiredAccount(context) }
@@ -547,7 +550,16 @@ class MainActivity : ComponentActivity() {
                     // Notes can be dragged into a new place in Keep's order, for one account and without a search.
                     val canReorder = app.sortMode == SORT_KEEP && query.isBlank() && (screen != AppScreen.Notes || filterLabel == null) &&
                         shown.map { it.second }.distinct().size == 1
-                    NotesGrid(shown, screen, app, canReorder, ::openEditor, { denied, block -> act(denied, block) }, { deleteTarget = it }, ::swiped)
+                    val grid = @Composable {
+                        NotesGrid(shown, screen, app, canReorder, ::openEditor, { denied, block -> act(denied, block) }, { deleteTarget = it }, ::swiped)
+                    }
+                    if (app.pullToRefresh) {
+                        PullToRefreshBox(
+                            isRefreshing = pulling,
+                            onRefresh = { pulling = true; scope.launch { sync().join(); pulling = false } },
+                            modifier = Modifier.fillMaxSize(),
+                        ) { grid() }
+                    } else grid()
                 }
             }
         }

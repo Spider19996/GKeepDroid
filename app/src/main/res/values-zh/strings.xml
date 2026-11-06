@@ -164,6 +164,7 @@
     <string name="layout_grid">网格</string>
     <string name="layout_list">列表</string>
     <string name="pinned_section_switch">将置顶笔记显示在单独的区域</string>
+    <string name="pull_to_refresh_switch">下拉列表以刷新</string>
     <string name="preview_lines">预览长度：%1$d 行</string>
     <string name="labels_title">标签</string>
     <string name="new_label_hint">新标签</string>

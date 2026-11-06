@@ -167,6 +167,7 @@
     <string name="layout_grid">Grid</string>
     <string name="layout_list">List</string>
     <string name="pinned_section_switch">Show pinned notes in their own section</string>
+    <string name="pull_to_refresh_switch">Pull down on the list to refresh</string>
     <string name="preview_lines">Preview length: %1$d lines</string>
     <string name="labels_title">Labels</string>
     <string name="new_label_hint">New label</string>

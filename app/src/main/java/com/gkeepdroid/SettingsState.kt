@@ -75,6 +75,7 @@ internal class SettingsState(val context: SettingsActivity) {
     var appFoldNotes by mutableStateOf(initialApp.foldNotes)
     var appFilterBar by mutableStateOf(initialApp.filterBar)
     var appFilterChips by mutableIntStateOf(initialApp.filterChips)
+    var appPullToRefresh by mutableStateOf(initialApp.pullToRefresh)
     /** Asks for the lock (set by the screen); the security settings open only after it. */
     var unlock: ((Int, (Boolean) -> Unit) -> Unit)? = null
     val initialGlobal = SettingsStore.loadGlobal(context)
@@ -220,7 +221,7 @@ internal class SettingsState(val context: SettingsActivity) {
     fun currentApp() = AppSettings(
         appLayout, appSort, appPinnedSection, appShowImages, appShowColors, appPlainStyle, appPreviewLines, appShowEdited, appEditedAsDate, appShowLabels, appShowProgress, appLockPrivate, appLockApp, appLockEdit, appLockGrace,
         appShowReminders, appListCheckedToEnd, appListCollapseChecked, appListCheckboxStyle, appListCheckboxSize, appListSpacing,
-        appListCheckInApp, appListDeleteChecked, appConvertPrefix, appRenumberDisplay, appWidgetGrace, appWidgetTitlesOnly, appLockWidgetTick, appSwipeRight, appSwipeLeft, appFoldNotes, appFilterBar, appFilterChips,
+        appListCheckInApp, appListDeleteChecked, appConvertPrefix, appRenumberDisplay, appWidgetGrace, appWidgetTitlesOnly, appLockWidgetTick, appSwipeRight, appSwipeLeft, appFoldNotes, appFilterBar, appFilterChips, appPullToRefresh,
     )
 
     /** Opens a page; the security page asks for the lock first (whenever the phone has one). */

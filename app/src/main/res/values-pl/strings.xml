@@ -164,6 +164,7 @@
     <string name="layout_grid">Siatka</string>
     <string name="layout_list">Lista</string>
     <string name="pinned_section_switch">Pokaż przypięte notatki w osobnej sekcji</string>
+    <string name="pull_to_refresh_switch">Przeciągnij listę w dół, aby odświeżyć</string>
     <string name="preview_lines">Długość podglądu: %1$d wierszy</string>
     <string name="labels_title">Etykiety</string>
     <string name="new_label_hint">Nowa etykieta</string>

@@ -164,6 +164,7 @@
     <string name="layout_grid">ग्रिड</string>
     <string name="layout_list">सूची</string>
     <string name="pinned_section_switch">पिन किए गए नोट अलग अनुभाग में दिखाएँ</string>
+    <string name="pull_to_refresh_switch">रीफ़्रेश करने के लिए सूची को नीचे खींचें</string>
     <string name="preview_lines">पूर्वावलोकन की लंबाई: %1$d पंक्तियाँ</string>
     <string name="labels_title">लेबल</string>
     <string name="new_label_hint">नया लेबल</string>

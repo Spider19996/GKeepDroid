@@ -164,6 +164,7 @@
     <string name="layout_grid">Сетка</string>
     <string name="layout_list">Список</string>
     <string name="pinned_section_switch">Показывать закреплённые заметки в отдельном разделе</string>
+    <string name="pull_to_refresh_switch">Потянуть список вниз для обновления</string>
     <string name="preview_lines">Длина предпросмотра: %1$d строк</string>
     <string name="labels_title">Ярлыки</string>
     <string name="new_label_hint">Новый ярлык</string>

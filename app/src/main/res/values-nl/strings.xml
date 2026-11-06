@@ -164,6 +164,7 @@
     <string name="layout_grid">Raster</string>
     <string name="layout_list">Lijst</string>
     <string name="pinned_section_switch">Vastgezette notities in een eigen sectie tonen</string>
+    <string name="pull_to_refresh_switch">Lijst omlaag trekken om te vernieuwen</string>
     <string name="preview_lines">Lengte van het voorbeeld: %1$d regels</string>
     <string name="labels_title">Labels</string>
     <string name="new_label_hint">Nieuw label</string>

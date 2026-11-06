@@ -164,6 +164,7 @@
     <string name="layout_grid">グリッド</string>
     <string name="layout_list">リスト</string>
     <string name="pinned_section_switch">ピン留めしたメモを別セクションに表示</string>
+    <string name="pull_to_refresh_switch">リストを下に引いて更新</string>
     <string name="preview_lines">プレビューの長さ：%1$d 行</string>
     <string name="labels_title">ラベル</string>
     <string name="new_label_hint">新しいラベル</string>
