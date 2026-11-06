@@ -411,4 +411,6 @@
     <string name="credits_not_affiliated">GKeepDroid is niet gemaakt door Google en is niet verbonden met Google. Google Keep is een handelsmerk van Google LLC.</string>
     <string name="credits_license">GKeepDroid zelf is vrije software onder de GNU General Public License, versie 3.</string>
     <string name="reset_hints_done">Alle tips worden weer getoond.</string>
+    <string name="undo">Ongedaan maken</string>
+    <string name="redo">Opnieuw</string>
 </resources>

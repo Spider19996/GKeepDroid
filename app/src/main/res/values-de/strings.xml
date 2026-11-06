@@ -411,4 +411,6 @@
     <string name="credits_not_affiliated">GKeepDroid stammt nicht von Google und steht in keiner Verbindung zu Google. Google Keep ist eine Marke von Google LLC.</string>
     <string name="credits_license">GKeepDroid selbst ist freie Software unter der GNU General Public License, Version 3.</string>
     <string name="reset_hints_done">Alle Hinweise werden wieder angezeigt.</string>
+    <string name="undo">Rückgängig</string>
+    <string name="redo">Wiederholen</string>
 </resources>

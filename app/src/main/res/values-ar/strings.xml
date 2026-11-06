@@ -447,4 +447,6 @@
     <string name="credits_not_affiliated">GKeepDroid ليس من تطوير Google ولا يرتبط بها. Google Keep علامة تجارية لشركة Google LLC.</string>
     <string name="credits_license">GKeepDroid نفسه برنامج حر بموجب رخصة GNU العامة، الإصدار 3.</string>
     <string name="reset_hints_done">ستظهر كل التلميحات مجددًا.</string>
+    <string name="undo">تراجع</string>
+    <string name="redo">إعادة</string>
 </resources>

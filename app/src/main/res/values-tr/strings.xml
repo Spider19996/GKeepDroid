@@ -411,4 +411,6 @@
     <string name="credits_not_affiliated">GKeepDroid Google tarafından yapılmamıştır ve Google ile bağlantılı değildir. Google Keep, Google LLC\'nin ticari markasıdır.</string>
     <string name="credits_license">GKeepDroid\'in kendisi, GNU Genel Kamu Lisansı sürüm 3 altında özgür yazılımdır.</string>
     <string name="reset_hints_done">Tüm ipuçları yeniden gösterilecek.</string>
+    <string name="undo">Geri al</string>
+    <string name="redo">Yinele</string>
 </resources>

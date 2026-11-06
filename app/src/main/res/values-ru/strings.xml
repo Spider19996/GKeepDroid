@@ -429,4 +429,6 @@
     <string name="credits_not_affiliated">GKeepDroid создан не Google и не связан с Google. Google Keep — товарный знак Google LLC.</string>
     <string name="credits_license">Сам GKeepDroid — свободное программное обеспечение по лицензии GNU General Public License, версия 3.</string>
     <string name="reset_hints_done">Все подсказки снова будут показываться.</string>
+    <string name="undo">Отменить</string>
+    <string name="redo">Повторить</string>
 </resources>

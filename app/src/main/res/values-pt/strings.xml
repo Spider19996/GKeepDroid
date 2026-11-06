@@ -420,4 +420,6 @@
     <string name="credits_not_affiliated">O GKeepDroid não é feito pelo Google nem é afiliado ao Google. Google Keep é uma marca da Google LLC.</string>
     <string name="credits_license">O próprio GKeepDroid é software livre sob a Licença Pública Geral GNU, versão 3.</string>
     <string name="reset_hints_done">Todas as dicas voltarão a ser mostradas.</string>
+    <string name="undo">Desfazer</string>
+    <string name="redo">Refazer</string>
 </resources>

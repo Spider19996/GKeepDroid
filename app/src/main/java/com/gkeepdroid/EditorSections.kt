@@ -31,7 +31,9 @@ import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalIconToggleButton
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -218,8 +220,7 @@ internal fun ColumnScope.AppearanceSection(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun EditorButtonBar(
-    canEdit: Boolean, saving: Boolean, isList: Boolean, reminderSet: Boolean, notificationsOn: Boolean,
-    onCancel: () -> Unit, onReminders: () -> Unit, onSave: () -> Unit,
+    canEdit: Boolean, saving: Boolean, isList: Boolean, onCancel: () -> Unit, onSave: () -> Unit,
 ) {
     val barHeight = ButtonDefaults.MediumContainerHeight
     val barPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
@@ -228,41 +229,6 @@ internal fun EditorButtonBar(
         modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        customItem(
-            buttonGroupContent = {
-                val pressed = remember { MutableInteractionSource() }
-                androidx.compose.material3.FilledTonalButton(
-                    onClick = onCancel, enabled = !saving,
-                    shapes = ButtonDefaults.shapesFor(barHeight), contentPadding = barPadding, interactionSource = pressed,
-                    modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = barHeight).animateWidth(pressed),
-                ) { Text(stringResource(R.string.cancel), style = ButtonDefaults.textStyleFor(barHeight), textAlign = TextAlign.Center) }
-            },
-            menuContent = {},
-        )
-        customItem(
-            buttonGroupContent = {
-                val pressed = remember { MutableInteractionSource() }
-                // Set: the accent color with a matching icon. None set: a quiet button.
-                FilledTonalIconToggleButton(
-                    checked = reminderSet,
-                    onCheckedChange = { onReminders() },
-                    colors = IconButtonDefaults.filledTonalIconToggleButtonColors(
-                        checkedContainerColor = MaterialTheme.colorScheme.primary,
-                        checkedContentColor = MaterialTheme.colorScheme.onPrimary,
-                    ),
-                    shapes = IconButtonDefaults.toggleableShapes(),
-                    interactionSource = pressed,
-                    modifier = Modifier.size(IconButtonDefaults.mediumContainerSize()).animateWidth(pressed),
-                ) {
-                    Icon(
-                        painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminders_title),
-                        tint = if (notificationsOn) LocalContentColor.current else MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(IconButtonDefaults.mediumIconSize),
-                    )
-                }
-            },
-            menuContent = {},
-        )
         customItem(
             buttonGroupContent = {
                 val pressed = remember { MutableInteractionSource() }
@@ -401,6 +367,45 @@ internal fun ColumnScope.LabelsSection(account: String, labels: List<String>, on
             dismissButton = {
                 TextButton(onClick = { labelToDelete = null }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) }
             },
+        )
+    }
+}
+
+/** Undo and Redo, small icon buttons for the title row of the editor. */
+@Composable
+internal fun UndoRedoButtons(canUndo: Boolean, canRedo: Boolean, onUndo: () -> Unit, onRedo: () -> Unit) {
+    for ((icon, label, enabled, action) in listOf(
+        UndoStep(R.drawable.ic_undo, R.string.undo, canUndo, onUndo), UndoStep(R.drawable.ic_redo, R.string.redo, canRedo, onRedo),
+    )) {
+        IconButton(onClick = action, enabled = enabled, shapes = IconButtonDefaults.shapes(), modifier = Modifier.size(40.dp)) {
+            Icon(painterResource(icon), contentDescription = stringResource(label))
+        }
+    }
+}
+
+private class UndoStep(val icon: Int, val label: Int, val enabled: Boolean, val action: () -> Unit) {
+    operator fun component1() = icon
+    operator fun component2() = label
+    operator fun component3() = enabled
+    operator fun component4() = action
+}
+
+/** The reminder button of the title row: set, it shows the accent color; with notifications off, its icon warns. */
+@Composable
+internal fun ReminderButton(reminderSet: Boolean, notificationsOn: Boolean, onReminders: () -> Unit) {
+    FilledTonalIconToggleButton(
+        checked = reminderSet,
+        onCheckedChange = { onReminders() },
+        colors = IconButtonDefaults.filledTonalIconToggleButtonColors(
+            checkedContainerColor = MaterialTheme.colorScheme.primary,
+            checkedContentColor = MaterialTheme.colorScheme.onPrimary,
+        ),
+        shapes = IconButtonDefaults.toggleableShapes(),
+        modifier = Modifier.size(40.dp),
+    ) {
+        Icon(
+            painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminders_title),
+            tint = if (notificationsOn) LocalContentColor.current else MaterialTheme.colorScheme.error,
         )
     }
 }

@@ -402,4 +402,6 @@
     <string name="credits_not_affiliated">GKeepDroid는 Google에서 만든 것이 아니며 Google과 제휴하지 않았습니다. Google Keep은 Google LLC의 상표입니다.</string>
     <string name="credits_license">GKeepDroid 자체는 GNU 일반 공중 사용 허가서 3판에 따른 자유 소프트웨어입니다.</string>
     <string name="reset_hints_done">모든 힌트가 다시 표시됩니다.</string>
+    <string name="undo">실행 취소</string>
+    <string name="redo">다시 실행</string>
 </resources>

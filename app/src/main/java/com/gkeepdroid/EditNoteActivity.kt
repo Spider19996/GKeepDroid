@@ -86,6 +86,13 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.focus.onFocusChanged
@@ -563,6 +570,51 @@ class EditNoteActivity : ComponentActivity() {
             title.isNotBlank() || text.isNotBlank() || items.any { it.text.isNotBlank() }
         }
 
+        // Undo and Redo: a step for each change, and for a burst of typing once it pauses. A few minutes after closing, the steps are still there.
+        fun capture(): EditSnapshot {
+            val (styles, touched) = format.snapshot()
+            return EditSnapshot(title, text, textSel, isList, color, background, labels, numbered, items.toList(), ownText, variantDark, styles, touched)
+        }
+        val historyKey = existing?.let { account + "|" + it.id }
+        val history = remember { capture().let { first -> historyKey?.let { EditHistoryKeep.take(it, first) } ?: EditHistory() } }
+        LaunchedEffect(title, text, isList, color, background, labels, numbered, items.toList(), ownText, variantDark, format.version) {
+            if (history.isTyping(capture())) kotlinx.coroutines.delay(700)
+            history.record(capture())
+        }
+        val latestCapture by rememberUpdatedState { capture() }
+        DisposableEffect(Unit) {
+            onDispose {
+                if (historyKey != null) {
+                    history.record(latestCapture())
+                    EditHistoryKeep.put(historyKey, history)
+                }
+            }
+        }
+        fun restore(step: EditSnapshot) {
+            title = step.title
+            text = step.text
+            textSel = androidx.compose.ui.text.TextRange(step.selection.start.coerceAtMost(step.text.length), step.selection.end.coerceAtMost(step.text.length))
+            textComp = null
+            isList = step.isList
+            color = step.color
+            background = step.background
+            labels = step.labels
+            numbered = step.numbered
+            items.clear()
+            items.addAll(step.items)
+            ownText = step.ownText
+            variantDark = step.variantDark
+            format.restore(step.styles, step.touched)
+            format.selection["text"] = textSel
+            convertFrom = if (existing != null && isList != existing.isList) existing else null
+        }
+        val undo = {
+            history.record(capture())
+            history.undo()?.let { restore(it) }
+            Unit
+        }
+        val redo = { history.redo()?.let { restore(it) }; Unit }
+
         /** Closes the editor without saving; a note that was changed is reported as discarded. */
         fun discard() {
             if (hasChanges()) Toast.makeText(this@EditNoteActivity, R.string.note_discarded, Toast.LENGTH_SHORT).show()
@@ -587,7 +639,15 @@ class EditNoteActivity : ComponentActivity() {
             active = tinted && !darkLook, accent = accent, transparentRows = tinted,
             darkOnPicture = darkLook, textColor = ownText,
         ) {
-        Box(Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize().onPreviewKeyEvent { event ->
+            // Ctrl+Z, Ctrl+Shift+Z and Ctrl+Y of a hardware keyboard.
+            if (!canEdit || event.type != KeyEventType.KeyDown || !event.isCtrlPressed) return@onPreviewKeyEvent false
+            when {
+                event.key == Key.Z && event.isShiftPressed || event.key == Key.Y -> { redo(); true }
+                event.key == Key.Z -> { undo(); true }
+                else -> false
+            }
+        }) {
         Column(
             Modifier.verticalScroll(scroll).padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -638,6 +698,8 @@ class EditNoteActivity : ComponentActivity() {
                         Icon(painterResource(R.drawable.ic_pin_bottom), contentDescription = stringResource(R.string.pin_to_bottom))
                     }
                 }
+                if (canEdit) UndoRedoButtons(history.canUndo, history.canRedo, undo, redo)
+                ReminderButton(shownReminders.isNotEmpty(), notificationsOn) { if (canEdit) remindersOpen = true else askEdit() }
                 // Less common actions live in an overflow menu; grayed out until the note is open for editing.
                 run {
                     Box {
@@ -1048,9 +1110,7 @@ class EditNoteActivity : ComponentActivity() {
                 )
             }
             EditorButtonBar(
-                canEdit = canEdit, saving = saving, isList = isList,
-                reminderSet = shownReminders.isNotEmpty(), notificationsOn = notificationsOn,
-                onCancel = { discard() }, onReminders = { if (canEdit) remindersOpen = true else askEdit() },
+                canEdit = canEdit, saving = saving, isList = isList, onCancel = { discard() },
                 onSave = { if (canEdit) save() else askEdit() },
             )
         }

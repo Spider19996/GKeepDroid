@@ -402,4 +402,6 @@
     <string name="credits_not_affiliated">GKeepDroid 并非 Google 制作，也与 Google 无关联。Google Keep 是 Google LLC 的商标。</string>
     <string name="credits_license">GKeepDroid 本身是遵循 GNU 通用公共许可证第 3 版的自由软件。</string>
     <string name="reset_hints_done">所有提示将再次显示。</string>
+    <string name="undo">撤销</string>
+    <string name="redo">重做</string>
 </resources>

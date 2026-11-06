@@ -122,6 +122,17 @@ class FormatState(private val enabled: Boolean, private val rich: RichNote?) {
         return DocFlags(current, doc).also { docs[key] = it }
     }
 
+    /** The styles of every text and which ones were changed, for Undo. */
+    fun snapshot(): Pair<Map<String, IntArray>, List<String>> = docs.mapValues { it.value.flags.copyOf() } to touched.toList()
+
+    fun restore(styles: Map<String, IntArray>, touchedKeys: List<String>) {
+        docs.clear()
+        styles.forEach { (key, flags) -> docs[key] = DocFlags(flags.copyOf()) }
+        touched.clear()
+        touched.addAll(touchedKeys)
+        version++
+    }
+
     /** The text of [key] changed; the styles stay with their characters. */
     fun edited(key: String, old: String, new: String) {
         if (enabled) docs[key]?.edit(old, new)

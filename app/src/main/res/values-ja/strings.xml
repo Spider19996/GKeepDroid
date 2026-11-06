@@ -402,4 +402,6 @@
     <string name="credits_not_affiliated">GKeepDroid は Google によって作られたものでも、Google と提携しているものでもありません。Google Keep は Google LLC の商標です。</string>
     <string name="credits_license">GKeepDroid 自体は GNU General Public License バージョン 3 の自由ソフトウェアです。</string>
     <string name="reset_hints_done">すべてのヒントが再び表示されます。</string>
+    <string name="undo">元に戻す</string>
+    <string name="redo">やり直す</string>
 </resources>
