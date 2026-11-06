@@ -171,10 +171,19 @@
     <string name="empty_trash">Svuota il cestino</string>
     <string name="empty_trash_confirm">Eliminare definitivamente tutte le note nel cestino? Non si può annullare.</string>
     <string name="delete_selected_confirm">Eliminare definitivamente le note selezionate? Non si può annullare.</string>
-    <string name="count_notes">Note: %d</string>
-    <string name="count_archive">Archiviate: %d</string>
-    <string name="count_trash">Nel cestino: %d</string>
-    <string name="show_count_switch">Mostra il numero di note sopra l\'elenco</string>
+    <string name="show_count_switch">Mostra il numero di note nel campo di ricerca</string>
+    <plurals name="search_count_notes">
+        <item quantity="one">Cerca in 1 nota</item>
+        <item quantity="other">Cerca in %d note</item>
+    </plurals>
+    <plurals name="search_count_archive">
+        <item quantity="one">Cerca in 1 nota archiviata</item>
+        <item quantity="other">Cerca in %d note archiviate</item>
+    </plurals>
+    <plurals name="search_count_trash">
+        <item quantity="one">Cerca in 1 nota nel cestino</item>
+        <item quantity="other">Cerca in %d note nel cestino</item>
+    </plurals>
     <string name="search_history_clear">Cancella cronologia ricerche</string>
     <string name="no_labels_yet">Ancora nessuna etichetta.</string>
     <string name="preview_lines">Lunghezza dell\'anteprima: %1$d righe</string>

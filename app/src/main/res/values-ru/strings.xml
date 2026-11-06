@@ -171,10 +171,16 @@
     <string name="empty_trash">Очистить корзину</string>
     <string name="empty_trash_confirm">Удалить все заметки из корзины навсегда? Это нельзя отменить.</string>
     <string name="delete_selected_confirm">Удалить выбранные заметки навсегда? Это нельзя отменить.</string>
-    <string name="count_notes">Заметки: %d</string>
-    <string name="count_archive">В архиве: %d</string>
-    <string name="count_trash">В корзине: %d</string>
-    <string name="show_count_switch">Показывать число заметок над списком</string>
+    <string name="show_count_switch">Показывать число заметок в поле поиска</string>
+    <plurals name="search_count_notes">
+        <item quantity="other">Поиск по заметкам (%d)</item>
+    </plurals>
+    <plurals name="search_count_archive">
+        <item quantity="other">Поиск в архиве (%d)</item>
+    </plurals>
+    <plurals name="search_count_trash">
+        <item quantity="other">Поиск в корзине (%d)</item>
+    </plurals>
     <string name="search_history_clear">Очистить историю поиска</string>
     <string name="no_labels_yet">Ярлыков пока нет.</string>
     <string name="preview_lines">Длина предпросмотра: %1$d строк</string>

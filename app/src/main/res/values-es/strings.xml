@@ -171,10 +171,19 @@
     <string name="empty_trash">Vaciar la papelera</string>
     <string name="empty_trash_confirm">¿Eliminar definitivamente todas las notas de la papelera? No se puede deshacer.</string>
     <string name="delete_selected_confirm">¿Eliminar definitivamente las notas seleccionadas? No se puede deshacer.</string>
-    <string name="count_notes">Notas: %d</string>
-    <string name="count_archive">Archivadas: %d</string>
-    <string name="count_trash">En la papelera: %d</string>
-    <string name="show_count_switch">Mostrar el número de notas sobre la lista</string>
+    <string name="show_count_switch">Mostrar el número de notas en el campo de búsqueda</string>
+    <plurals name="search_count_notes">
+        <item quantity="one">Buscar en 1 nota</item>
+        <item quantity="other">Buscar en %d notas</item>
+    </plurals>
+    <plurals name="search_count_archive">
+        <item quantity="one">Buscar en 1 nota archivada</item>
+        <item quantity="other">Buscar en %d notas archivadas</item>
+    </plurals>
+    <plurals name="search_count_trash">
+        <item quantity="one">Buscar en 1 nota de la papelera</item>
+        <item quantity="other">Buscar en %d notas de la papelera</item>
+    </plurals>
     <string name="search_history_clear">Borrar historial de búsqueda</string>
     <string name="no_labels_yet">Aún no hay etiquetas.</string>
     <string name="preview_lines">Longitud de la vista previa: %1$d líneas</string>

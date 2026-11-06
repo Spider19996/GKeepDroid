@@ -174,10 +174,19 @@
     <string name="empty_trash">Empty trash</string>
     <string name="empty_trash_confirm">Delete all notes in the trash permanently? This cannot be undone.</string>
     <string name="delete_selected_confirm">Delete the selected notes permanently? This cannot be undone.</string>
-    <string name="count_notes">Notes: %d</string>
-    <string name="count_archive">Archived: %d</string>
-    <string name="count_trash">In trash: %d</string>
-    <string name="show_count_switch">Show the number of notes above the list</string>
+    <string name="show_count_switch">Show the number of notes in the search field</string>
+    <plurals name="search_count_notes">
+        <item quantity="one">Search 1 note</item>
+        <item quantity="other">Search %d notes</item>
+    </plurals>
+    <plurals name="search_count_archive">
+        <item quantity="one">Search 1 archived note</item>
+        <item quantity="other">Search %d archived notes</item>
+    </plurals>
+    <plurals name="search_count_trash">
+        <item quantity="one">Search 1 note in trash</item>
+        <item quantity="other">Search %d notes in trash</item>
+    </plurals>
     <string name="search_history_clear">Clear search history</string>
     <string name="no_labels_yet">No labels yet.</string>
     <string name="preview_lines">Preview length: %1$d lines</string>

@@ -485,10 +485,19 @@ class MainActivity : ComponentActivity() {
                             searchFocused = it
                             if (!it) history = SearchHistory.add(context, query)
                         },
-                        placeholder = when (screen) {
-                            AppScreen.Notes -> stringResource(R.string.search_notes_hint)
-                            AppScreen.Archive -> stringResource(R.string.archive_note)
-                            AppScreen.Trash -> stringResource(R.string.trash_title)
+                        // With the setting on, the field names how many notes it searches (the ones the filters leave).
+                        placeholder = when {
+                            app.showCount -> androidx.compose.ui.res.pluralStringResource(
+                                when (screen) {
+                                    AppScreen.Notes -> R.plurals.search_count_notes
+                                    AppScreen.Archive -> R.plurals.search_count_archive
+                                    AppScreen.Trash -> R.plurals.search_count_trash
+                                },
+                                shown.size, shown.size,
+                            )
+                            screen == AppScreen.Notes -> stringResource(R.string.search_notes_hint)
+                            screen == AppScreen.Archive -> stringResource(R.string.archive_note)
+                            else -> stringResource(R.string.trash_title)
                         },
                         modifier = Modifier.weight(1f),
                     )
@@ -757,19 +766,6 @@ class MainActivity : ComponentActivity() {
                     // Notes can be dragged into a new place in Keep's order, for one account and without a search.
                     val canReorder = app.sortMode == SORT_KEEP && query.isBlank() && (screen != AppScreen.Notes || filterLabel == null) &&
                         shown.map { it.second }.distinct().size == 1
-                    if (app.showCount) Text(
-                        stringResource(
-                            when (screen) {
-                                AppScreen.Notes -> R.string.count_notes
-                                AppScreen.Archive -> R.string.count_archive
-                                AppScreen.Trash -> R.string.count_trash
-                            },
-                            shown.size,
-                        ),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                    )
                     val grid = @Composable {
                         NotesGrid(
                             shown, screen, app, canReorder, query, selected,

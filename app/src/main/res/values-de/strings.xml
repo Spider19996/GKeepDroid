@@ -171,10 +171,19 @@
     <string name="empty_trash">Papierkorb leeren</string>
     <string name="empty_trash_confirm">Alle Notizen im Papierkorb endgültig löschen? Das kann nicht rückgängig gemacht werden.</string>
     <string name="delete_selected_confirm">Die ausgewählten Notizen endgültig löschen? Das kann nicht rückgängig gemacht werden.</string>
-    <string name="count_notes">Notizen: %d</string>
-    <string name="count_archive">Archiviert: %d</string>
-    <string name="count_trash">Im Papierkorb: %d</string>
-    <string name="show_count_switch">Anzahl der Notizen über der Liste zeigen</string>
+    <string name="show_count_switch">Anzahl der Notizen im Suchfeld zeigen</string>
+    <plurals name="search_count_notes">
+        <item quantity="one">1 Notiz durchsuchen</item>
+        <item quantity="other">%d Notizen durchsuchen</item>
+    </plurals>
+    <plurals name="search_count_archive">
+        <item quantity="one">1 Notiz im Archiv durchsuchen</item>
+        <item quantity="other">%d Notizen im Archiv durchsuchen</item>
+    </plurals>
+    <plurals name="search_count_trash">
+        <item quantity="one">1 Notiz im Papierkorb durchsuchen</item>
+        <item quantity="other">%d Notizen im Papierkorb durchsuchen</item>
+    </plurals>
     <string name="search_history_clear">Suchverlauf löschen</string>
     <string name="no_labels_yet">Noch keine Labels.</string>
     <string name="preview_lines">Vorschaulänge: %1$d Zeilen</string>

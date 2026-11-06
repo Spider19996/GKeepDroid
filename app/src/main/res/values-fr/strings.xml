@@ -171,10 +171,19 @@
     <string name="empty_trash">Vider la corbeille</string>
     <string name="empty_trash_confirm">Supprimer définitivement toutes les notes de la corbeille ? Cette action est irréversible.</string>
     <string name="delete_selected_confirm">Supprimer définitivement les notes sélectionnées ? Cette action est irréversible.</string>
-    <string name="count_notes">Notes : %d</string>
-    <string name="count_archive">Archivées : %d</string>
-    <string name="count_trash">Dans la corbeille : %d</string>
-    <string name="show_count_switch">Afficher le nombre de notes au-dessus de la liste</string>
+    <string name="show_count_switch">Afficher le nombre de notes dans le champ de recherche</string>
+    <plurals name="search_count_notes">
+        <item quantity="one">Rechercher dans 1 note</item>
+        <item quantity="other">Rechercher dans %d notes</item>
+    </plurals>
+    <plurals name="search_count_archive">
+        <item quantity="one">Rechercher dans 1 note archivée</item>
+        <item quantity="other">Rechercher dans %d notes archivées</item>
+    </plurals>
+    <plurals name="search_count_trash">
+        <item quantity="one">Rechercher dans 1 note de la corbeille</item>
+        <item quantity="other">Rechercher dans %d notes de la corbeille</item>
+    </plurals>
     <string name="search_history_clear">Effacer l\'historique de recherche</string>
     <string name="no_labels_yet">Aucun libellé pour le moment.</string>
     <string name="preview_lines">Longueur de l\'aperçu : %1$d lignes</string>

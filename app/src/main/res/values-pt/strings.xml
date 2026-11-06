@@ -171,10 +171,19 @@
     <string name="empty_trash">Esvaziar a lixeira</string>
     <string name="empty_trash_confirm">Excluir permanentemente todas as notas da lixeira? Não pode ser desfeito.</string>
     <string name="delete_selected_confirm">Excluir permanentemente as notas selecionadas? Não pode ser desfeito.</string>
-    <string name="count_notes">Notas: %d</string>
-    <string name="count_archive">Arquivadas: %d</string>
-    <string name="count_trash">Na lixeira: %d</string>
-    <string name="show_count_switch">Mostrar o número de notas acima da lista</string>
+    <string name="show_count_switch">Mostrar o número de notas no campo de pesquisa</string>
+    <plurals name="search_count_notes">
+        <item quantity="one">Pesquisar 1 nota</item>
+        <item quantity="other">Pesquisar %d notas</item>
+    </plurals>
+    <plurals name="search_count_archive">
+        <item quantity="one">Pesquisar 1 nota arquivada</item>
+        <item quantity="other">Pesquisar %d notas arquivadas</item>
+    </plurals>
+    <plurals name="search_count_trash">
+        <item quantity="one">Pesquisar 1 nota na lixeira</item>
+        <item quantity="other">Pesquisar %d notas na lixeira</item>
+    </plurals>
     <string name="search_history_clear">Limpar histórico de pesquisa</string>
     <string name="no_labels_yet">Ainda não há marcadores.</string>
     <string name="preview_lines">Tamanho da prévia: %1$d linhas</string>

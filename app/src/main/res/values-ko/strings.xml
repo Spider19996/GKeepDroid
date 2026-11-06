@@ -171,10 +171,16 @@
     <string name="empty_trash">휴지통 비우기</string>
     <string name="empty_trash_confirm">휴지통의 모든 메모를 영구 삭제할까요? 되돌릴 수 없습니다.</string>
     <string name="delete_selected_confirm">선택한 메모를 영구 삭제할까요? 되돌릴 수 없습니다.</string>
-    <string name="count_notes">메모: %d</string>
-    <string name="count_archive">보관: %d</string>
-    <string name="count_trash">휴지통: %d</string>
-    <string name="show_count_switch">목록 위에 메모 수 표시</string>
+    <string name="show_count_switch">검색창에 메모 수 표시</string>
+    <plurals name="search_count_notes">
+        <item quantity="other">메모 %d개 검색</item>
+    </plurals>
+    <plurals name="search_count_archive">
+        <item quantity="other">보관된 메모 %d개 검색</item>
+    </plurals>
+    <plurals name="search_count_trash">
+        <item quantity="other">휴지통의 메모 %d개 검색</item>
+    </plurals>
     <string name="search_history_clear">검색 기록 지우기</string>
     <string name="no_labels_yet">아직 라벨이 없습니다.</string>
     <string name="preview_lines">미리보기 길이: %1$d줄</string>

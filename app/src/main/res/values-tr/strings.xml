@@ -171,10 +171,16 @@
     <string name="empty_trash">Çöp kutusunu boşalt</string>
     <string name="empty_trash_confirm">Çöp kutusundaki tüm notlar kalıcı olarak silinsin mi? Bu geri alınamaz.</string>
     <string name="delete_selected_confirm">Seçilen notlar kalıcı olarak silinsin mi? Bu geri alınamaz.</string>
-    <string name="count_notes">Notlar: %d</string>
-    <string name="count_archive">Arşivlenen: %d</string>
-    <string name="count_trash">Çöp kutusunda: %d</string>
-    <string name="show_count_switch">Listenin üstünde not sayısını göster</string>
+    <string name="show_count_switch">Arama alanında not sayısını göster</string>
+    <plurals name="search_count_notes">
+        <item quantity="other">%d notta ara</item>
+    </plurals>
+    <plurals name="search_count_archive">
+        <item quantity="other">%d arşivlenmiş notta ara</item>
+    </plurals>
+    <plurals name="search_count_trash">
+        <item quantity="other">Çöp kutusundaki %d notta ara</item>
+    </plurals>
     <string name="search_history_clear">Arama geçmişini temizle</string>
     <string name="no_labels_yet">Henüz etiket yok.</string>
     <string name="preview_lines">Önizleme uzunluğu: %1$d satır</string>
