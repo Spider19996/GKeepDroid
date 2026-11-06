@@ -56,7 +56,10 @@
     <string name="checked_to_end">चेक किए गए आइटम को अंत में ले जाएँ</string>
     <string name="collapse_checked">चेक किए गए आइटम को डिफ़ॉल्ट रूप से समेटें</string>
     <string name="list_spacing">आइटम के बीच की दूरी</string>
-    <string name="checked_count">%1$d चेक किए गए</string>
+    <plurals name="checked_count">
+        <item quantity="one">%1$d चेक किए गए</item>
+        <item quantity="other">%1$d चेक किए गए</item>
+    </plurals>
     <string name="note_gone">यह नोट अब मौजूद नहीं है।</string>
     <string name="offline_note">ऑफ़लाइन: आखिरी ज्ञात संस्करण दिखाया जा रहा है।</string>
     <string name="token_help">मास्टर टोकन कैसे पाएँ?</string>
@@ -116,7 +119,10 @@
     <string name="edited_time">%1$s संपादित</string>
     <string name="max_lines">प्रति नोट अधिकतम पंक्तियाँ: %1$d</string>
     <string name="max_lines_unlimited">प्रति नोट अधिकतम पंक्तियाँ: असीमित</string>
-    <string name="items_more">+%1$d और</string>
+    <plurals name="items_more">
+        <item quantity="one">+%1$d और</item>
+        <item quantity="other">+%1$d और</item>
+    </plurals>
     <string name="hide_content">सामग्री छिपाएँ</string>
     <string name="show_content">सामग्री दिखाएँ</string>
     <string name="note_private_hint">सामग्री छिपी है</string>
@@ -202,7 +208,11 @@
     </plurals>
     <string name="search_history_clear">खोज इतिहास साफ़ करें</string>
     <string name="no_labels_yet">अभी कोई लेबल नहीं।</string>
-    <string name="preview_lines">पूर्वावलोकन की लंबाई: %1$d पंक्तियाँ</string>
+    <plurals name="preview_lines">
+        <item quantity="one">पूर्वावलोकन की लंबाई: %1$d पंक्ति</item>
+        <item quantity="other">पूर्वावलोकन की लंबाई: %1$d पंक्तियाँ</item>
+    </plurals>
+    <string name="preview_length">पूर्वावलोकन की लंबाई</string>
     <string name="labels_title">लेबल</string>
     <string name="new_label_hint">नया लेबल</string>
     <string name="add_label">जोड़ें</string>

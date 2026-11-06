@@ -56,7 +56,11 @@
     <string name="checked_to_end">Mover los elementos marcados al final</string>
     <string name="collapse_checked">Contraer los elementos marcados por defecto</string>
     <string name="list_spacing">Espaciado de elementos</string>
-    <string name="checked_count">%1$d marcados</string>
+    <plurals name="checked_count">
+        <item quantity="one">%1$d marcado</item>
+        <item quantity="many">%1$d marcados</item>
+        <item quantity="other">%1$d marcados</item>
+    </plurals>
     <string name="note_gone">Esta nota ya no existe.</string>
     <string name="offline_note">Sin conexión: se muestra la última versión conocida.</string>
     <string name="token_help">¿Cómo obtengo un token maestro?</string>
@@ -116,7 +120,11 @@
     <string name="edited_time">Editada %1$s</string>
     <string name="max_lines">Máximo de líneas por nota: %1$d</string>
     <string name="max_lines_unlimited">Máximo de líneas por nota: sin límite</string>
-    <string name="items_more">+%1$d más</string>
+    <plurals name="items_more">
+        <item quantity="one">+%1$d más</item>
+        <item quantity="many">+%1$d más</item>
+        <item quantity="other">+%1$d más</item>
+    </plurals>
     <string name="hide_content">Ocultar contenido</string>
     <string name="show_content">Mostrar contenido</string>
     <string name="note_private_hint">Contenido oculto</string>
@@ -207,7 +215,12 @@
     </plurals>
     <string name="search_history_clear">Borrar historial de búsqueda</string>
     <string name="no_labels_yet">Aún no hay etiquetas.</string>
-    <string name="preview_lines">Longitud de la vista previa: %1$d líneas</string>
+    <plurals name="preview_lines">
+        <item quantity="one">Longitud de la vista previa: %1$d línea</item>
+        <item quantity="many">Longitud de la vista previa: %1$d líneas</item>
+        <item quantity="other">Longitud de la vista previa: %1$d líneas</item>
+    </plurals>
+    <string name="preview_length">Longitud de la vista previa</string>
     <string name="labels_title">Etiquetas</string>
     <string name="new_label_hint">Nueva etiqueta</string>
     <string name="add_label">Añadir</string>

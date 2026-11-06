@@ -57,7 +57,10 @@
     <string name="checked_to_end">Move checked items to the end</string>
     <string name="collapse_checked">Collapse checked items by default</string>
     <string name="list_spacing">Item spacing</string>
-    <string name="checked_count">%1$d checked</string>
+    <plurals name="checked_count">
+        <item quantity="one">%1$d checked</item>
+        <item quantity="other">%1$d checked</item>
+    </plurals>
     <string name="note_gone">This note no longer exists.</string>
     <string name="offline_note">Offline: showing the last known version.</string>
     <string name="token_help">How do I get a master token?</string>
@@ -117,7 +120,10 @@
     <string name="edited_time">Edited %1$s</string>
     <string name="max_lines">Maximum lines per note: %1$d</string>
     <string name="max_lines_unlimited">Maximum lines per note: unlimited</string>
-    <string name="items_more">+%1$d more</string>
+    <plurals name="items_more">
+        <item quantity="one">+%1$d more</item>
+        <item quantity="other">+%1$d more</item>
+    </plurals>
     <string name="hide_content">Hide content</string>
     <string name="show_content">Show content</string>
     <string name="note_private_hint">Content hidden</string>
@@ -203,7 +209,11 @@
     </plurals>
     <string name="search_history_clear">Clear search history</string>
     <string name="no_labels_yet">No labels yet.</string>
-    <string name="preview_lines">Preview length: %1$d lines</string>
+    <plurals name="preview_lines">
+        <item quantity="one">Preview length: %1$d line</item>
+        <item quantity="other">Preview length: %1$d lines</item>
+    </plurals>
+    <string name="preview_length">Preview length</string>
     <string name="labels_title">Labels</string>
     <string name="new_label_hint">New label</string>
     <string name="add_label">Add</string>

@@ -236,7 +236,7 @@ internal fun CheckedHeader(
 ) {
     val context = LocalContext.current
     Text(
-        (if (collapsed) "▸ " else "▾ ") + context.getString(R.string.checked_count, count),
+        (if (collapsed) "▸ " else "▾ ") + context.resources.getQuantityString(R.plurals.checked_count, count, count),
         style = TextStyle(color = palette.provider(0.7f), fontSize = settings.textSizeSp.sp),
         modifier = GlanceModifier.fillMaxWidth().padding(vertical = settings.listSpacingDp.dp).clickable(
             actionRunCallback<ToggleCollapseAction>(
@@ -348,7 +348,7 @@ internal fun ChecklistBody(
     ListNumbering.display(note.items, shown, renumber).forEach { ItemRow(note, it, account, settings, palette) }
     if (shown.size < unchecked.size) {
         Text(
-            context.getString(R.string.items_more, unchecked.size - shown.size),
+            context.resources.getQuantityString(R.plurals.items_more, unchecked.size - shown.size, unchecked.size - shown.size),
             style = TextStyle(color = palette.provider(0.65f), fontSize = settings.textSizeSp.sp),
             modifier = GlanceModifier.padding(vertical = settings.listSpacingDp.dp),
         )

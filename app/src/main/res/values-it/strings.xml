@@ -56,7 +56,11 @@
     <string name="checked_to_end">Sposta gli elementi spuntati in fondo</string>
     <string name="collapse_checked">Comprimi gli elementi spuntati per impostazione predefinita</string>
     <string name="list_spacing">Spaziatura degli elementi</string>
-    <string name="checked_count">%1$d spuntati</string>
+    <plurals name="checked_count">
+        <item quantity="one">%1$d spuntato</item>
+        <item quantity="many">%1$d spuntati</item>
+        <item quantity="other">%1$d spuntati</item>
+    </plurals>
     <string name="note_gone">Questa nota non esiste più.</string>
     <string name="offline_note">Offline: viene mostrata l\'ultima versione nota.</string>
     <string name="token_help">Come ottengo un token principale?</string>
@@ -116,7 +120,11 @@
     <string name="edited_time">Modificata %1$s</string>
     <string name="max_lines">Righe massime per nota: %1$d</string>
     <string name="max_lines_unlimited">Righe massime per nota: illimitate</string>
-    <string name="items_more">+%1$d altri</string>
+    <plurals name="items_more">
+        <item quantity="one">+%1$d altro</item>
+        <item quantity="many">+%1$d altri</item>
+        <item quantity="other">+%1$d altri</item>
+    </plurals>
     <string name="hide_content">Nascondi contenuti</string>
     <string name="show_content">Mostra contenuti</string>
     <string name="note_private_hint">Contenuto nascosto</string>
@@ -207,7 +215,12 @@
     </plurals>
     <string name="search_history_clear">Cancella cronologia ricerche</string>
     <string name="no_labels_yet">Ancora nessuna etichetta.</string>
-    <string name="preview_lines">Lunghezza dell\'anteprima: %1$d righe</string>
+    <plurals name="preview_lines">
+        <item quantity="one">Lunghezza dell\'anteprima: %1$d riga</item>
+        <item quantity="many">Lunghezza dell\'anteprima: %1$d righe</item>
+        <item quantity="other">Lunghezza dell\'anteprima: %1$d righe</item>
+    </plurals>
+    <string name="preview_length">Lunghezza dell\'anteprima</string>
     <string name="labels_title">Etichette</string>
     <string name="new_label_hint">Nuova etichetta</string>
     <string name="add_label">Aggiungi</string>

@@ -56,7 +56,14 @@
     <string name="checked_to_end">نقل العناصر المحددة إلى النهاية</string>
     <string name="collapse_checked">طيّ العناصر المحددة افتراضيًا</string>
     <string name="list_spacing">المسافة بين العناصر</string>
-    <string name="checked_count">%1$d محدد</string>
+    <plurals name="checked_count">
+        <item quantity="zero">%1$d محدد</item>
+        <item quantity="one">%1$d محدد</item>
+        <item quantity="two">%1$d محدد</item>
+        <item quantity="few">%1$d محدد</item>
+        <item quantity="many">%1$d محدد</item>
+        <item quantity="other">%1$d محدد</item>
+    </plurals>
     <string name="note_gone">لم تعد هذه الملاحظة موجودة.</string>
     <string name="offline_note">بلا اتصال: يتم عرض آخر نسخة معروفة.</string>
     <string name="token_help">كيف أحصل على الرمز الرئيسي؟</string>
@@ -116,7 +123,14 @@
     <string name="edited_time">عُدّلت %1$s</string>
     <string name="max_lines">أقصى عدد أسطر لكل ملاحظة: %1$d</string>
     <string name="max_lines_unlimited">أقصى عدد أسطر لكل ملاحظة: غير محدود</string>
-    <string name="items_more">+%1$d أخرى</string>
+    <plurals name="items_more">
+        <item quantity="zero">+%1$d أخرى</item>
+        <item quantity="one">+%1$d أخرى</item>
+        <item quantity="two">+%1$d أخرى</item>
+        <item quantity="few">+%1$d أخرى</item>
+        <item quantity="many">+%1$d أخرى</item>
+        <item quantity="other">+%1$d أخرى</item>
+    </plurals>
     <string name="hide_content">إخفاء المحتوى</string>
     <string name="show_content">إظهار المحتوى</string>
     <string name="note_private_hint">المحتوى مخفي</string>
@@ -222,7 +236,15 @@
     </plurals>
     <string name="search_history_clear">مسح سجل البحث</string>
     <string name="no_labels_yet">لا توجد تسميات بعد.</string>
-    <string name="preview_lines">طول المعاينة: %1$d أسطر</string>
+    <plurals name="preview_lines">
+        <item quantity="zero">طول المعاينة: %1$d سطر</item>
+        <item quantity="one">طول المعاينة: سطر واحد</item>
+        <item quantity="two">طول المعاينة: سطران</item>
+        <item quantity="few">طول المعاينة: %1$d أسطر</item>
+        <item quantity="many">طول المعاينة: %1$d سطرًا</item>
+        <item quantity="other">طول المعاينة: %1$d سطر</item>
+    </plurals>
+    <string name="preview_length">طول المعاينة</string>
     <string name="labels_title">التصنيفات</string>
     <string name="new_label_hint">تصنيف جديد</string>
     <string name="add_label">إضافة</string>

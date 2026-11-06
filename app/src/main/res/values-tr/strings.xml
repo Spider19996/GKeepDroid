@@ -56,7 +56,10 @@
     <string name="checked_to_end">İşaretli öğeleri sona taşı</string>
     <string name="collapse_checked">İşaretli öğeleri varsayılan olarak daralt</string>
     <string name="list_spacing">Öğe aralığı</string>
-    <string name="checked_count">%1$d işaretli</string>
+    <plurals name="checked_count">
+        <item quantity="one">%1$d işaretli</item>
+        <item quantity="other">%1$d işaretli</item>
+    </plurals>
     <string name="note_gone">Bu not artık yok.</string>
     <string name="offline_note">Çevrimdışı: bilinen son sürüm gösteriliyor.</string>
     <string name="token_help">Ana jetonu nasıl alırım?</string>
@@ -116,7 +119,10 @@
     <string name="edited_time">Düzenlendi: %1$s</string>
     <string name="max_lines">Not başına en fazla satır: %1$d</string>
     <string name="max_lines_unlimited">Not başına en fazla satır: sınırsız</string>
-    <string name="items_more">+%1$d daha</string>
+    <plurals name="items_more">
+        <item quantity="one">+%1$d daha</item>
+        <item quantity="other">+%1$d daha</item>
+    </plurals>
     <string name="hide_content">İçeriği gizle</string>
     <string name="show_content">İçeriği göster</string>
     <string name="note_private_hint">İçerik gizli</string>
@@ -202,7 +208,11 @@
     </plurals>
     <string name="search_history_clear">Arama geçmişini temizle</string>
     <string name="no_labels_yet">Henüz etiket yok.</string>
-    <string name="preview_lines">Önizleme uzunluğu: %1$d satır</string>
+    <plurals name="preview_lines">
+        <item quantity="one">Önizleme uzunluğu: %1$d satır</item>
+        <item quantity="other">Önizleme uzunluğu: %1$d satır</item>
+    </plurals>
+    <string name="preview_length">Önizleme uzunluğu</string>
     <string name="labels_title">Etiketler</string>
     <string name="new_label_hint">Yeni etiket</string>
     <string name="add_label">Ekle</string>

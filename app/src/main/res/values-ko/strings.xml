@@ -56,7 +56,9 @@
     <string name="checked_to_end">체크한 항목을 맨 뒤로 이동</string>
     <string name="collapse_checked">체크한 항목을 기본적으로 접기</string>
     <string name="list_spacing">항목 간격</string>
-    <string name="checked_count">%1$d개 체크됨</string>
+    <plurals name="checked_count">
+        <item quantity="other">%1$d개 체크됨</item>
+    </plurals>
     <string name="note_gone">이 메모는 더 이상 존재하지 않습니다.</string>
     <string name="offline_note">오프라인: 마지막으로 확인된 버전을 표시합니다.</string>
     <string name="token_help">마스터 토큰은 어떻게 얻나요?</string>
@@ -116,7 +118,9 @@
     <string name="edited_time">%1$s 수정됨</string>
     <string name="max_lines">메모당 최대 줄 수: %1$d</string>
     <string name="max_lines_unlimited">메모당 최대 줄 수: 제한 없음</string>
-    <string name="items_more">+%1$d개 더</string>
+    <plurals name="items_more">
+        <item quantity="other">+%1$d개 더</item>
+    </plurals>
     <string name="hide_content">내용 숨기기</string>
     <string name="show_content">내용 표시</string>
     <string name="note_private_hint">내용 숨김</string>
@@ -197,7 +201,10 @@
     </plurals>
     <string name="search_history_clear">검색 기록 지우기</string>
     <string name="no_labels_yet">아직 라벨이 없습니다.</string>
-    <string name="preview_lines">미리보기 길이: %1$d줄</string>
+    <plurals name="preview_lines">
+        <item quantity="other">미리보기 길이: %1$d줄</item>
+    </plurals>
+    <string name="preview_length">미리보기 길이</string>
     <string name="labels_title">라벨</string>
     <string name="new_label_hint">새 라벨</string>
     <string name="add_label">추가</string>

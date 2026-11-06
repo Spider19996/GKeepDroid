@@ -56,7 +56,10 @@
     <string name="checked_to_end">Abgehakte Einträge ans Ende verschieben</string>
     <string name="collapse_checked">Abgehakte Einträge standardmäßig einklappen</string>
     <string name="list_spacing">Abstand der Einträge</string>
-    <string name="checked_count">%1$d abgehakt</string>
+    <plurals name="checked_count">
+        <item quantity="one">%1$d abgehakt</item>
+        <item quantity="other">%1$d abgehakt</item>
+    </plurals>
     <string name="note_gone">Diese Notiz existiert nicht mehr.</string>
     <string name="offline_note">Offline: Es wird die zuletzt bekannte Version angezeigt.</string>
     <string name="token_help">Wie bekomme ich einen Master-Token?</string>
@@ -116,7 +119,10 @@
     <string name="edited_time">Bearbeitet %1$s</string>
     <string name="max_lines">Maximale Zeilen pro Notiz: %1$d</string>
     <string name="max_lines_unlimited">Maximale Zeilen pro Notiz: unbegrenzt</string>
-    <string name="items_more">+%1$d weitere</string>
+    <plurals name="items_more">
+        <item quantity="one">+%1$d weitere</item>
+        <item quantity="other">+%1$d weitere</item>
+    </plurals>
     <string name="hide_content">Inhalte ausblenden</string>
     <string name="show_content">Inhalte anzeigen</string>
     <string name="note_private_hint">Inhalt ausgeblendet</string>
@@ -202,7 +208,11 @@
     </plurals>
     <string name="search_history_clear">Suchverlauf löschen</string>
     <string name="no_labels_yet">Noch keine Labels.</string>
-    <string name="preview_lines">Vorschaulänge: %1$d Zeilen</string>
+    <plurals name="preview_lines">
+        <item quantity="one">Vorschaulänge: %1$d Zeile</item>
+        <item quantity="other">Vorschaulänge: %1$d Zeilen</item>
+    </plurals>
+    <string name="preview_length">Vorschaulänge</string>
     <string name="labels_title">Labels</string>
     <string name="new_label_hint">Neues Label</string>
     <string name="add_label">Hinzufügen</string>

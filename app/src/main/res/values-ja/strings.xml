@@ -56,7 +56,9 @@
     <string name="checked_to_end">チェック済みの項目を末尾に移動</string>
     <string name="collapse_checked">チェック済みの項目をデフォルトで折りたたむ</string>
     <string name="list_spacing">項目の間隔</string>
-    <string name="checked_count">チェック済み %1$d 件</string>
+    <plurals name="checked_count">
+        <item quantity="other">チェック済み %1$d 件</item>
+    </plurals>
     <string name="note_gone">このメモは存在しなくなりました。</string>
     <string name="offline_note">オフライン：最後に確認できたバージョンを表示しています。</string>
     <string name="token_help">マスタートークンの入手方法は？</string>
@@ -116,7 +118,9 @@
     <string name="edited_time">%1$s に編集</string>
     <string name="max_lines">メモごとの最大行数：%1$d</string>
     <string name="max_lines_unlimited">メモごとの最大行数：無制限</string>
-    <string name="items_more">ほか %1$d 件</string>
+    <plurals name="items_more">
+        <item quantity="other">ほか %1$d 件</item>
+    </plurals>
     <string name="hide_content">内容を隠す</string>
     <string name="show_content">内容を表示</string>
     <string name="note_private_hint">内容は非表示です</string>
@@ -197,7 +201,10 @@
     </plurals>
     <string name="search_history_clear">検索履歴を消去</string>
     <string name="no_labels_yet">ラベルはまだありません。</string>
-    <string name="preview_lines">プレビューの長さ：%1$d 行</string>
+    <plurals name="preview_lines">
+        <item quantity="other">プレビューの長さ：%1$d 行</item>
+    </plurals>
+    <string name="preview_length">プレビューの長さ</string>
     <string name="labels_title">ラベル</string>
     <string name="new_label_hint">新しいラベル</string>
     <string name="add_label">追加</string>

@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -329,7 +330,7 @@ internal fun NoteTile(
             }
             if (visible.size > lines) {
                 Text(
-                    stringResource(R.string.items_more, visible.size - lines),
+                    pluralStringResource(R.plurals.items_more, visible.size - lines, visible.size - lines),
                     color = textColor.copy(alpha = 0.65f),
                     style = MaterialTheme.typography.bodySmall,
                 )

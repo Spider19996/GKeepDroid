@@ -56,7 +56,11 @@
     <string name="checked_to_end">Déplacer les éléments cochés à la fin</string>
     <string name="collapse_checked">Replier les éléments cochés par défaut</string>
     <string name="list_spacing">Espacement des éléments</string>
-    <string name="checked_count">%1$d cochés</string>
+    <plurals name="checked_count">
+        <item quantity="one">%1$d coché</item>
+        <item quantity="many">%1$d cochés</item>
+        <item quantity="other">%1$d cochés</item>
+    </plurals>
     <string name="note_gone">Cette note n\'existe plus.</string>
     <string name="offline_note">Hors ligne : dernière version connue affichée.</string>
     <string name="token_help">Comment obtenir un jeton maître ?</string>
@@ -116,7 +120,11 @@
     <string name="edited_time">Modifiée %1$s</string>
     <string name="max_lines">Nombre maximal de lignes par note : %1$d</string>
     <string name="max_lines_unlimited">Nombre maximal de lignes par note : illimité</string>
-    <string name="items_more">+%1$d de plus</string>
+    <plurals name="items_more">
+        <item quantity="one">+%1$d de plus</item>
+        <item quantity="many">+%1$d de plus</item>
+        <item quantity="other">+%1$d de plus</item>
+    </plurals>
     <string name="hide_content">Masquer les contenus</string>
     <string name="show_content">Afficher les contenus</string>
     <string name="note_private_hint">Contenu masqué</string>
@@ -207,7 +215,12 @@
     </plurals>
     <string name="search_history_clear">Effacer l\'historique de recherche</string>
     <string name="no_labels_yet">Aucun libellé pour le moment.</string>
-    <string name="preview_lines">Longueur de l\'aperçu : %1$d lignes</string>
+    <plurals name="preview_lines">
+        <item quantity="one">Longueur de l\'aperçu : %1$d ligne</item>
+        <item quantity="many">Longueur de l\'aperçu : %1$d lignes</item>
+        <item quantity="other">Longueur de l\'aperçu : %1$d lignes</item>
+    </plurals>
+    <string name="preview_length">Longueur de l\'aperçu</string>
     <string name="labels_title">Libellés</string>
     <string name="new_label_hint">Nouveau libellé</string>
     <string name="add_label">Ajouter</string>

@@ -56,7 +56,12 @@
     <string name="checked_to_end">Przenoś zaznaczone elementy na koniec</string>
     <string name="collapse_checked">Domyślnie zwijaj zaznaczone elementy</string>
     <string name="list_spacing">Odstęp między elementami</string>
-    <string name="checked_count">Zaznaczone: %1$d</string>
+    <plurals name="checked_count">
+        <item quantity="one">Zaznaczone: %1$d</item>
+        <item quantity="few">Zaznaczone: %1$d</item>
+        <item quantity="many">Zaznaczone: %1$d</item>
+        <item quantity="other">Zaznaczone: %1$d</item>
+    </plurals>
     <string name="note_gone">Ta notatka już nie istnieje.</string>
     <string name="offline_note">Offline: wyświetlana jest ostatnia znana wersja.</string>
     <string name="token_help">Jak uzyskać token główny?</string>
@@ -116,7 +121,12 @@
     <string name="edited_time">Edytowano %1$s</string>
     <string name="max_lines">Maksymalna liczba wierszy na notatkę: %1$d</string>
     <string name="max_lines_unlimited">Maksymalna liczba wierszy na notatkę: bez limitu</string>
-    <string name="items_more">+%1$d więcej</string>
+    <plurals name="items_more">
+        <item quantity="one">+%1$d więcej</item>
+        <item quantity="few">+%1$d więcej</item>
+        <item quantity="many">+%1$d więcej</item>
+        <item quantity="other">+%1$d więcej</item>
+    </plurals>
     <string name="hide_content">Ukryj treść</string>
     <string name="show_content">Pokaż treść</string>
     <string name="note_private_hint">Zawartość ukryta</string>
@@ -212,7 +222,13 @@
     </plurals>
     <string name="search_history_clear">Wyczyść historię wyszukiwania</string>
     <string name="no_labels_yet">Brak etykiet.</string>
-    <string name="preview_lines">Długość podglądu: %1$d wierszy</string>
+    <plurals name="preview_lines">
+        <item quantity="one">Długość podglądu: %1$d wiersz</item>
+        <item quantity="few">Długość podglądu: %1$d wiersze</item>
+        <item quantity="many">Długość podglądu: %1$d wierszy</item>
+        <item quantity="other">Długość podglądu: %1$d wiersza</item>
+    </plurals>
+    <string name="preview_length">Długość podglądu</string>
     <string name="labels_title">Etykiety</string>
     <string name="new_label_hint">Nowa etykieta</string>
     <string name="add_label">Dodaj</string>

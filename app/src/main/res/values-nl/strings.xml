@@ -56,7 +56,10 @@
     <string name="checked_to_end">Afgevinkte items naar het einde verplaatsen</string>
     <string name="collapse_checked">Afgevinkte items standaard inklappen</string>
     <string name="list_spacing">Itemafstand</string>
-    <string name="checked_count">%1$d afgevinkt</string>
+    <plurals name="checked_count">
+        <item quantity="one">%1$d afgevinkt</item>
+        <item quantity="other">%1$d afgevinkt</item>
+    </plurals>
     <string name="note_gone">Deze notitie bestaat niet meer.</string>
     <string name="offline_note">Offline: de laatst bekende versie wordt getoond.</string>
     <string name="token_help">Hoe krijg ik een hoofdtoken?</string>
@@ -116,7 +119,10 @@
     <string name="edited_time">Bewerkt %1$s</string>
     <string name="max_lines">Maximaal aantal regels per notitie: %1$d</string>
     <string name="max_lines_unlimited">Maximaal aantal regels per notitie: onbeperkt</string>
-    <string name="items_more">+%1$d meer</string>
+    <plurals name="items_more">
+        <item quantity="one">+%1$d meer</item>
+        <item quantity="other">+%1$d meer</item>
+    </plurals>
     <string name="hide_content">Inhoud verbergen</string>
     <string name="show_content">Inhoud tonen</string>
     <string name="note_private_hint">Inhoud verborgen</string>
@@ -202,7 +208,11 @@
     </plurals>
     <string name="search_history_clear">Zoekgeschiedenis wissen</string>
     <string name="no_labels_yet">Nog geen labels.</string>
-    <string name="preview_lines">Lengte van het voorbeeld: %1$d regels</string>
+    <plurals name="preview_lines">
+        <item quantity="one">Lengte van het voorbeeld: %1$d regel</item>
+        <item quantity="other">Lengte van het voorbeeld: %1$d regels</item>
+    </plurals>
+    <string name="preview_length">Lengte van het voorbeeld</string>
     <string name="labels_title">Labels</string>
     <string name="new_label_hint">Nieuw label</string>
     <string name="add_label">Toevoegen</string>

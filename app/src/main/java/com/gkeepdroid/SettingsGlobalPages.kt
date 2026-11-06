@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -279,7 +280,7 @@ internal fun ColumnScope.AppLayoutPage(s: SettingsState) {
         // 0 shows every line of a note and every item of a checklist.
         Text(
             if (appPreviewLines == 0) stringResource(R.string.max_lines_unlimited)
-            else stringResource(R.string.preview_lines, appPreviewLines),
+            else pluralStringResource(R.plurals.preview_lines, appPreviewLines, appPreviewLines),
         )
         ValueSlider(
             value = appPreviewLines.toFloat(), onValueChange = { appPreviewLines = it.toInt() },

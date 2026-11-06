@@ -56,7 +56,12 @@
     <string name="checked_to_end">Переносить отмеченные пункты в конец</string>
     <string name="collapse_checked">Сворачивать отмеченные пункты по умолчанию</string>
     <string name="list_spacing">Интервал между пунктами</string>
-    <string name="checked_count">Отмечено: %1$d</string>
+    <plurals name="checked_count">
+        <item quantity="one">Отмечено: %1$d</item>
+        <item quantity="few">Отмечено: %1$d</item>
+        <item quantity="many">Отмечено: %1$d</item>
+        <item quantity="other">Отмечено: %1$d</item>
+    </plurals>
     <string name="note_gone">Эта заметка больше не существует.</string>
     <string name="offline_note">Офлайн: показана последняя известная версия.</string>
     <string name="token_help">Как получить мастер-токен?</string>
@@ -116,7 +121,12 @@
     <string name="edited_time">Изменено %1$s</string>
     <string name="max_lines">Максимум строк в заметке: %1$d</string>
     <string name="max_lines_unlimited">Максимум строк в заметке: без ограничений</string>
-    <string name="items_more">+ ещё %1$d</string>
+    <plurals name="items_more">
+        <item quantity="one">+ ещё %1$d</item>
+        <item quantity="few">+ ещё %1$d</item>
+        <item quantity="many">+ ещё %1$d</item>
+        <item quantity="other">+ ещё %1$d</item>
+    </plurals>
     <string name="hide_content">Скрыть содержимое</string>
     <string name="show_content">Показать содержимое</string>
     <string name="note_private_hint">Содержимое скрыто</string>
@@ -212,7 +222,13 @@
     </plurals>
     <string name="search_history_clear">Очистить историю поиска</string>
     <string name="no_labels_yet">Ярлыков пока нет.</string>
-    <string name="preview_lines">Длина предпросмотра: %1$d строк</string>
+    <plurals name="preview_lines">
+        <item quantity="one">Длина предпросмотра: %1$d строка</item>
+        <item quantity="few">Длина предпросмотра: %1$d строки</item>
+        <item quantity="many">Длина предпросмотра: %1$d строк</item>
+        <item quantity="other">Длина предпросмотра: %1$d строки</item>
+    </plurals>
+    <string name="preview_length">Длина предпросмотра</string>
     <string name="labels_title">Ярлыки</string>
     <string name="new_label_hint">Новый ярлык</string>
     <string name="add_label">Добавить</string>

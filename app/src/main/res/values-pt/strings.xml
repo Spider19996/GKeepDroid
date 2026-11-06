@@ -56,7 +56,11 @@
     <string name="checked_to_end">Mover itens marcados para o fim</string>
     <string name="collapse_checked">Recolher itens marcados por padrão</string>
     <string name="list_spacing">Espaçamento dos itens</string>
-    <string name="checked_count">%1$d marcados</string>
+    <plurals name="checked_count">
+        <item quantity="one">%1$d marcado</item>
+        <item quantity="many">%1$d marcados</item>
+        <item quantity="other">%1$d marcados</item>
+    </plurals>
     <string name="note_gone">Esta nota não existe mais.</string>
     <string name="offline_note">Offline: mostrando a última versão conhecida.</string>
     <string name="token_help">Como obtenho um token mestre?</string>
@@ -116,7 +120,11 @@
     <string name="edited_time">Editada %1$s</string>
     <string name="max_lines">Máximo de linhas por nota: %1$d</string>
     <string name="max_lines_unlimited">Máximo de linhas por nota: ilimitado</string>
-    <string name="items_more">+%1$d mais</string>
+    <plurals name="items_more">
+        <item quantity="one">+%1$d mais</item>
+        <item quantity="many">+%1$d mais</item>
+        <item quantity="other">+%1$d mais</item>
+    </plurals>
     <string name="hide_content">Ocultar conteúdo</string>
     <string name="show_content">Mostrar conteúdo</string>
     <string name="note_private_hint">Conteúdo oculto</string>
@@ -207,7 +215,12 @@
     </plurals>
     <string name="search_history_clear">Limpar histórico de pesquisa</string>
     <string name="no_labels_yet">Ainda não há marcadores.</string>
-    <string name="preview_lines">Tamanho da prévia: %1$d linhas</string>
+    <plurals name="preview_lines">
+        <item quantity="one">Tamanho da prévia: %1$d linha</item>
+        <item quantity="many">Tamanho da prévia: %1$d linhas</item>
+        <item quantity="other">Tamanho da prévia: %1$d linhas</item>
+    </plurals>
+    <string name="preview_length">Tamanho da prévia</string>
     <string name="labels_title">Marcadores</string>
     <string name="new_label_hint">Novo marcador</string>
     <string name="add_label">Adicionar</string>
