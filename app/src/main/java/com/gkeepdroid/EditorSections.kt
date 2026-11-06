@@ -214,8 +214,8 @@ internal fun ColumnScope.AppearanceSection(
 
 
 /**
- * Cancel, reminders and save. A button group: the pressed button grows a little and its neighbors make room. The three always
- * fit, so nothing ever moves into the overflow menu.
+ * Cancel and save. A button group: the pressed button grows a little and its neighbor makes room. Both always fit, so
+ * nothing ever moves into the overflow menu.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -229,6 +229,17 @@ internal fun EditorButtonBar(
         modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        customItem(
+            buttonGroupContent = {
+                val pressed = remember { MutableInteractionSource() }
+                androidx.compose.material3.FilledTonalButton(
+                    onClick = onCancel, enabled = !saving,
+                    shapes = ButtonDefaults.shapesFor(barHeight), contentPadding = barPadding, interactionSource = pressed,
+                    modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = barHeight).animateWidth(pressed),
+                ) { Text(stringResource(R.string.cancel), style = ButtonDefaults.textStyleFor(barHeight), textAlign = TextAlign.Center) }
+            },
+            menuContent = {},
+        )
         customItem(
             buttonGroupContent = {
                 val pressed = remember { MutableInteractionSource() }

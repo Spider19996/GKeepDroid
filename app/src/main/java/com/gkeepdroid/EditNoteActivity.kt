@@ -662,6 +662,7 @@ class EditNoteActivity : ComponentActivity() {
             }
             // Title with its actions on the right: pin, show at the widget's bottom, open in Keep.
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                if (canEdit) UndoRedoButtons(history.canUndo, history.canRedo, undo, redo)
                 Text(
                     stringResource(
                         when {
@@ -670,8 +671,8 @@ class EditNoteActivity : ComponentActivity() {
                             else -> R.string.new_note
                         }
                     ),
-                    style = MaterialTheme.typography.headlineSmallEmphasized,
-                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.titleLargeEmphasized,
+                    modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
                 )
                 Box(Modifier.clickable(enabled = !canEdit) { toastUnlockFirst() }) {
                 FilledTonalIconToggleButton(checked = pinned, onCheckedChange = { pinned = it }, enabled = canEdit, shapes = IconButtonDefaults.toggleableShapes()) {
@@ -698,7 +699,6 @@ class EditNoteActivity : ComponentActivity() {
                         Icon(painterResource(R.drawable.ic_pin_bottom), contentDescription = stringResource(R.string.pin_to_bottom))
                     }
                 }
-                if (canEdit) UndoRedoButtons(history.canUndo, history.canRedo, undo, redo)
                 ReminderButton(shownReminders.isNotEmpty(), notificationsOn) { if (canEdit) remindersOpen = true else askEdit() }
                 // Less common actions live in an overflow menu; grayed out until the note is open for editing.
                 run {
