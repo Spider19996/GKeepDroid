@@ -214,13 +214,13 @@ fun ButtonEditor(
 
 /**
  * The buttons under a layout editor: save the layout to a file, load one, and reset it. Every page built on [ButtonEditor] gets
- * them by saying what its file is called, how its layout turns into text and back ([export], [import], which throws if the text
+ * them by saying how its file name starts (the date and time are added, so every saved file has its own name), how its layout turns into text and back ([export], [import], which throws if the text
  * is not a layout), and what resetting does. [onStatus] gets the message to show (saved, loaded, could not read).
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun LayoutFileButtons(
-    fileName: String,
+    filePrefix: String,
     export: () -> String,
     import: (String) -> Unit,
     resetLabel: String,
@@ -261,7 +261,7 @@ fun LayoutFileButtons(
         )
     }
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        androidx.compose.material3.OutlinedButton(onClick = { save.launch(fileName) }, shapes = androidx.compose.material3.ButtonDefaults.shapes()) {
+        androidx.compose.material3.OutlinedButton(onClick = { save.launch("$filePrefix-${java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US).format(java.util.Date())}.json") }, shapes = androidx.compose.material3.ButtonDefaults.shapes()) {
             Text(stringResource(R.string.layout_save))
         }
         androidx.compose.material3.OutlinedButton(onClick = { load.launch(arrayOf("*/*")) }, shapes = androidx.compose.material3.ButtonDefaults.shapes()) {

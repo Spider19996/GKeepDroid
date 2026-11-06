@@ -342,7 +342,7 @@ internal fun ColumnScope.ButtonBarPage(s: SettingsState) {
             }
         }
         LayoutFileButtons(
-            fileName = "gkeepdroid-layout.json",
+            filePrefix = "gkeepdroid-layout",
             export = { Backup.exportLayout(currentWidget()) },
             import = { applyLayout(Backup.parseLayout(it, currentWidget())) },
             resetLabel = stringResource(if (layoutResetShown) R.string.layout_reset_done else R.string.layout_reset),

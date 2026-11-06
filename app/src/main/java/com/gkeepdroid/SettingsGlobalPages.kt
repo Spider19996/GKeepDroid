@@ -435,7 +435,7 @@ internal fun ColumnScope.EditorButtonsPage(s: SettingsState) {
         Hint(R.string.editor_buttons_hint)
         EditorLayoutEditor(appEditorLayout) { appEditorLayout = it }
         LayoutFileButtons(
-            fileName = "gkeepdroid-editor-layout.json",
+            filePrefix = "gkeepdroid-editor-layout",
             export = { appEditorLayout.toFileJson() },
             import = { appEditorLayout = EditorLayout.fromFileJson(it) },
             resetLabel = stringResource(R.string.editor_buttons_reset),
