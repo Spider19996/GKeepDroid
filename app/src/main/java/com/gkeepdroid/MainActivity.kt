@@ -1127,6 +1127,8 @@ class MainActivity : ComponentActivity() {
                 .clip(shape)
                 .background(background)
                 .then(backgroundImage?.let { Modifier.noteBackground(it) } ?: Modifier)
+                // With a picture the note's color shows as a frame around it.
+                .then(if (backgroundImage != null && noteColor != null) Modifier.border(3.dp, Color(noteColor), shape) else Modifier)
                 .then(
                     if (noteColor == null && app.plainCardStyle == PLAIN_BORDER) {
                         Modifier.border(1.dp, MaterialTheme.colorScheme.outlineVariant, shape)

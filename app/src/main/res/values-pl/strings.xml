@@ -166,6 +166,7 @@
     <string name="pinned_section_switch">Pokaż przypięte notatki w osobnej sekcji</string>
     <string name="pull_to_refresh_switch">Przeciągnij listę w dół, aby odświeżyć</string>
     <string name="color_background_remove">Usuń</string>
+    <string name="color_and_background">Kolor / tło</string>
     <string name="note_background">Tło</string>
     <string name="own_photo_hint">To zdjęcie zostaje tylko na tym telefonie. Nie jest zapisywane w Google Keep, więc nie pojawi się na innych urządzeniach ani w samym Keep.</string>
     <string name="dont_show_again">Nie pokazuj więcej</string>

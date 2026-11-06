@@ -166,6 +166,7 @@
     <string name="pinned_section_switch">将置顶笔记显示在单独的区域</string>
     <string name="pull_to_refresh_switch">下拉列表以刷新</string>
     <string name="color_background_remove">移除</string>
+    <string name="color_and_background">颜色 / 背景</string>
     <string name="note_background">背景</string>
     <string name="own_photo_hint">此照片仅保存在这部手机上。它不会保存到 Google Keep，因此不会出现在其他设备或 Keep 本身中。</string>
     <string name="dont_show_again">不再显示</string>

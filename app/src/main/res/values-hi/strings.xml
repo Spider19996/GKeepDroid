@@ -166,6 +166,7 @@
     <string name="pinned_section_switch">पिन किए गए नोट अलग अनुभाग में दिखाएँ</string>
     <string name="pull_to_refresh_switch">रीफ़्रेश करने के लिए सूची को नीचे खींचें</string>
     <string name="color_background_remove">हटाएँ</string>
+    <string name="color_and_background">रंग / पृष्ठभूमि</string>
     <string name="note_background">पृष्ठभूमि</string>
     <string name="own_photo_hint">यह फ़ोटो केवल इसी फ़ोन पर रहती है। यह Google Keep में सहेजी नहीं जाती, इसलिए अन्य डिवाइस या Keep में दिखाई नहीं देगी।</string>
     <string name="dont_show_again">फिर न दिखाएँ</string>

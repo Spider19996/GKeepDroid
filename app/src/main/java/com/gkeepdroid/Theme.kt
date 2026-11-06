@@ -53,6 +53,47 @@ class ScreenTint {
 /** True where content sits on a note's own color or picture. */
 val LocalOnNote = androidx.compose.runtime.compositionLocalOf { false }
 
+private fun lerpScheme(a: ColorScheme, b: ColorScheme, f: Float): ColorScheme {
+    fun mix(x: Color, y: Color) = androidx.compose.ui.graphics.lerp(x, y, f)
+    return b.copy(
+        primary = mix(a.primary, b.primary), onPrimary = mix(a.onPrimary, b.onPrimary),
+        primaryContainer = mix(a.primaryContainer, b.primaryContainer), onPrimaryContainer = mix(a.onPrimaryContainer, b.onPrimaryContainer),
+        inversePrimary = mix(a.inversePrimary, b.inversePrimary),
+        secondary = mix(a.secondary, b.secondary), onSecondary = mix(a.onSecondary, b.onSecondary),
+        secondaryContainer = mix(a.secondaryContainer, b.secondaryContainer), onSecondaryContainer = mix(a.onSecondaryContainer, b.onSecondaryContainer),
+        tertiary = mix(a.tertiary, b.tertiary), onTertiary = mix(a.onTertiary, b.onTertiary),
+        tertiaryContainer = mix(a.tertiaryContainer, b.tertiaryContainer), onTertiaryContainer = mix(a.onTertiaryContainer, b.onTertiaryContainer),
+        background = mix(a.background, b.background), onBackground = mix(a.onBackground, b.onBackground),
+        surface = mix(a.surface, b.surface), onSurface = mix(a.onSurface, b.onSurface),
+        surfaceVariant = mix(a.surfaceVariant, b.surfaceVariant), onSurfaceVariant = mix(a.onSurfaceVariant, b.onSurfaceVariant),
+        surfaceTint = mix(a.surfaceTint, b.surfaceTint),
+        inverseSurface = mix(a.inverseSurface, b.inverseSurface), inverseOnSurface = mix(a.inverseOnSurface, b.inverseOnSurface),
+        error = mix(a.error, b.error), onError = mix(a.onError, b.onError),
+        errorContainer = mix(a.errorContainer, b.errorContainer), onErrorContainer = mix(a.onErrorContainer, b.onErrorContainer),
+        outline = mix(a.outline, b.outline), outlineVariant = mix(a.outlineVariant, b.outlineVariant), scrim = mix(a.scrim, b.scrim),
+        surfaceBright = mix(a.surfaceBright, b.surfaceBright), surfaceDim = mix(a.surfaceDim, b.surfaceDim),
+        surfaceContainer = mix(a.surfaceContainer, b.surfaceContainer), surfaceContainerHigh = mix(a.surfaceContainerHigh, b.surfaceContainerHigh),
+        surfaceContainerHighest = mix(a.surfaceContainerHighest, b.surfaceContainerHighest),
+        surfaceContainerLow = mix(a.surfaceContainerLow, b.surfaceContainerLow), surfaceContainerLowest = mix(a.surfaceContainerLowest, b.surfaceContainerLowest),
+    )
+}
+
+/** The scheme to show: when [target] changes (the key tells when), the colors fade over to it instead of jumping. */
+@Composable
+private fun fadingScheme(target: ColorScheme, key: Any?): ColorScheme {
+    var from by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(target) }
+    var to by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(target) }
+    val progress = androidx.compose.runtime.remember { androidx.compose.animation.core.Animatable(1f) }
+    val latest by androidx.compose.runtime.rememberUpdatedState(target)
+    androidx.compose.runtime.LaunchedEffect(key) {
+        from = lerpScheme(from, to, progress.value)
+        to = latest
+        progress.snapTo(0f)
+        progress.animateTo(1f, androidx.compose.animation.core.tween(450))
+    }
+    return if (progress.value >= 1f) to else lerpScheme(from, to, progress.value)
+}
+
 /**
  * Light colors and dark text for content that sits on a note's own color or picture. The wrapper is always there (only the
  * colors change), so switching a color or picture on or off does not rebuild the content and lose its state, such as the scroll position.
@@ -78,9 +119,12 @@ fun OnNoteTheme(active: Boolean, accent: Int? = null, content: @Composable () ->
             )
         }
     }
-    MaterialExpressiveTheme(colorScheme = scheme, motionScheme = MotionScheme.expressive()) {
+    val shown = fadingScheme(scheme, active to accent)
+    // The text color follows the fade as well (dark on a note, the usual one otherwise).
+    val contentColor by androidx.compose.animation.animateColorAsState(if (active) DarkNoteText else outerContent, androidx.compose.animation.core.tween(450), label = "content")
+    MaterialExpressiveTheme(colorScheme = shown, motionScheme = MotionScheme.expressive()) {
         androidx.compose.runtime.CompositionLocalProvider(
-            androidx.compose.material3.LocalContentColor provides (if (active) DarkNoteText else outerContent),
+            androidx.compose.material3.LocalContentColor provides contentColor,
             LocalOnNote provides active,
         ) { content() }
     }
@@ -153,11 +197,14 @@ fun KeepTheme(themeMode: Int, opaque: Boolean = true, tint: ScreenTint? = null, 
             color = if (opaque) colors.background else Color.Transparent,
             contentColor = colors.onBackground,
         ) {
-            Box(
-                Modifier.fillMaxSize()
-                    .then(tint?.color?.let { Modifier.background(Color(it)) } ?: Modifier)
-                    .then(tint?.image?.let { Modifier.noteBackground(it) } ?: Modifier),
-            ) {
+            // A color or picture behind the screen fades in and out.
+            val tintColor by androidx.compose.animation.animateColorAsState(
+                tint?.color?.let { Color(it) } ?: Color.Transparent, androidx.compose.animation.core.tween(450), label = "tint",
+            )
+            Box(Modifier.fillMaxSize().background(tintColor)) {
+                androidx.compose.animation.Crossfade(targetState = tint?.image, animationSpec = androidx.compose.animation.core.tween(450), label = "tintImage") { image ->
+                    if (image != null) Box(Modifier.fillMaxSize().noteBackground(image))
+                }
                 // The content keeps clear of the bars, the keyboard and, in landscape, a camera hole at the side. The top
                 // cutout is left out: the status bar covers it, and the full-screen demo draws into that strip on purpose.
                 val clear = WindowInsets.systemBars.union(WindowInsets.ime).union(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))

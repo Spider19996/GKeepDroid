@@ -169,6 +169,7 @@
     <string name="pinned_section_switch">Show pinned notes in their own section</string>
     <string name="pull_to_refresh_switch">Pull down on the list to refresh</string>
     <string name="color_background_remove">Remove</string>
+    <string name="color_and_background">Color / background</string>
     <string name="note_background">Background</string>
     <string name="own_photo_hint">This photo stays on this phone only. It is not saved to Google Keep, so it will not appear on other devices or in Keep itself.</string>
     <string name="dont_show_again">Don\'t show again</string>

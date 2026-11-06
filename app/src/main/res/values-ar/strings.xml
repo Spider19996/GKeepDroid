@@ -166,6 +166,7 @@
     <string name="pinned_section_switch">عرض الملاحظات المثبتة في قسم مستقل</string>
     <string name="pull_to_refresh_switch">اسحب القائمة للأسفل للتحديث</string>
     <string name="color_background_remove">إزالة</string>
+    <string name="color_and_background">اللون / الخلفية</string>
     <string name="note_background">الخلفية</string>
     <string name="own_photo_hint">تبقى هذه الصورة على هذا الهاتف فقط. لا تُحفظ في Google Keep، لذا لن تظهر على الأجهزة الأخرى أو في Keep نفسه.</string>
     <string name="dont_show_again">عدم الإظهار مجددًا</string>
