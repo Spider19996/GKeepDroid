@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
 package com.gkeepdroid
 
 import android.appwidget.AppWidgetManager
@@ -59,6 +61,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Checkbox
@@ -563,6 +567,8 @@ class EditNoteActivity : ComponentActivity() {
         }
 
         var confirmDiscard by remember { mutableStateOf(false) }
+        var paletteOpen by remember { mutableStateOf(false) }
+        var labelsOpen by remember { mutableStateOf(false) }
 
         fun hasChanges() = if (existing != null) {
             title != existing.title || text != existing.text || outItems() != existing.items || color != existing.color ||
@@ -756,13 +762,6 @@ class EditNoteActivity : ComponentActivity() {
                                             openInKeep(account, existing)
                                         },
                                     )
-                                    // Keep's API has no way to upload pictures, so adding one is left to the Keep app.
-                                    if (!isLocal && images.isEmpty()) add(
-                                        MenuEntry(stringResource(R.string.image_add_keep), R.drawable.ic_add) {
-                                            menuOpen = false
-                                            startActivity(keepIntent(this@EditNoteActivity))
-                                        },
-                                    )
                                     add(
                                         MenuEntry(stringResource(R.string.share_note), R.drawable.ic_share) {
                                             menuOpen = false
@@ -864,7 +863,10 @@ class EditNoteActivity : ComponentActivity() {
                 }
             }
 
-            LabelsSection(account = targetAccount, labels = labels, onLabels = { labels = it }, canEdit = canEdit)
+            // The labels of the note as chips; they are chosen in the sheet of the bottom bar.
+            if (labels.isNotEmpty()) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                labels.forEach { name -> AssistChip(onClick = { labelsOpen = true }, label = { Text(name) }) }
+            }
 
             if (remote != null) {
                 // The note changed in Keep while it was open here.
@@ -1085,15 +1087,6 @@ class EditNoteActivity : ComponentActivity() {
                 }
             }
 
-            AppearanceSection(
-                color = color, onColor = { color = it },
-                background = background, onBackground = { background = it; pickedBackground = null },
-                darkVersion = darkVersion, onDarkVersion = { variantDark = it },
-                canEdit = canEdit, isExisting = existing != null, isLocal = isLocal,
-                ownText = ownText, onOwnText = { ownText = it },
-                picture = picture,
-                onPickPhoto = { if (hintPrefs.getBoolean("own_photo_local_dismissed", false)) pickBackground.launch("image/*") else localHint = true },
-            )
 
             if (error.isNotEmpty()) Text(error, color = MaterialTheme.colorScheme.error)
 
@@ -1124,8 +1117,46 @@ class EditNoteActivity : ComponentActivity() {
         }
         // Undo and Redo sit above the keyboard, where the thumb is while typing, and stay when the note scrolls.
         if (canEdit) Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            // The tools of the note's content on the left, Undo and Redo on the right.
+            IconButton(onClick = { paletteOpen = true }, shapes = IconButtonDefaults.shapes(), modifier = Modifier.size(40.dp)) {
+                Icon(painterResource(R.drawable.ic_palette), contentDescription = stringResource(R.string.color_and_background))
+            }
+            IconButton(onClick = { labelsOpen = true }, shapes = IconButtonDefaults.shapes(), modifier = Modifier.size(40.dp)) {
+                Icon(painterResource(R.drawable.ic_label), contentDescription = stringResource(R.string.labels_title))
+            }
+            // Keep's API has no way to upload pictures, so adding one is left to the Keep app.
+            if (existing != null && !isLocal && images.isEmpty()) IconButton(
+                onClick = { startActivity(keepIntent(this@EditNoteActivity)) }, shapes = IconButtonDefaults.shapes(), modifier = Modifier.size(40.dp),
+            ) {
+                Icon(painterResource(R.drawable.ic_image), contentDescription = stringResource(R.string.image_add_keep))
+            }
+            Spacer(Modifier.weight(1f))
             UndoRedoButtons(history.canUndo, history.canRedo, undo, redo)
         }
+        }
+        if (paletteOpen) ModalBottomSheet(onDismissRequest = { paletteOpen = false }) {
+            Column(
+                Modifier.verticalScroll(rememberScrollState()).padding(horizontal = EDITOR_PADDING).padding(bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                AppearanceSection(
+                color = color, onColor = { color = it },
+                background = background, onBackground = { background = it; pickedBackground = null },
+                darkVersion = darkVersion, onDarkVersion = { variantDark = it },
+                canEdit = canEdit, isExisting = existing != null, isLocal = isLocal,
+                ownText = ownText, onOwnText = { ownText = it },
+                picture = picture,
+                onPickPhoto = { if (hintPrefs.getBoolean("own_photo_local_dismissed", false)) pickBackground.launch("image/*") else localHint = true },
+            )
+            }
+        }
+        if (labelsOpen) ModalBottomSheet(onDismissRequest = { labelsOpen = false }) {
+            Column(
+                Modifier.verticalScroll(rememberScrollState()).padding(horizontal = EDITOR_PADDING).padding(bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                LabelsSection(account = targetAccount, labels = labels, onLabels = { labels = it }, canEdit = canEdit)
+            }
         }
         if (confirmDiscard) AlertDialog(
             onDismissRequest = { confirmDiscard = false },
