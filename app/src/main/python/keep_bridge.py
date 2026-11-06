@@ -207,7 +207,129 @@ def exchange_master_token(email, oauth_token, android_id):
 
 def fetch_notes(email, master_token, state_path):
     keep = _login(email, master_token, state_path)
-    return _finish(keep, state_path)
+    result = _finish(keep, state_path)
+    # Formatting and backgrounds come on top of the notes; a failure here must not spoil the sync.
+    try:
+        _fetch_rich(keep, state_path)
+    except Exception:
+        pass
+    return result
+
+
+# Text styles of Keep's rich text, as bits of the flags that go to the app.
+_STYLE_BITS = {"ts_bd": 1, "ts_it": 2, "ts_un": 4, "ts_st": 8}
+_HEADING_BIT = 16
+
+
+def _utf16(text):
+    raw = text.encode("utf-16-le", "surrogatepass")
+    return [raw[i] | (raw[i + 1] << 8) for i in range(0, len(raw), 2)]
+
+
+def _parse_docs(ops):
+    """Rebuild the texts of a note from Keep's change log and collect their styles.
+
+    Positions in the log are 1-based UTF-16 positions, like the strings of the app. Returns
+    {document id: {"t": text, "r": [[start, end, flags], ...]}} for the documents that have any style.
+    """
+    docs = {}
+    for op in ops:
+        if op[0] != "docs-nestedModel":
+            continue
+        body = op[2]
+        doc = docs.setdefault(op[1][-1], {"u": [], "f": []})
+        kind = body.get("ty")
+        units, flags = doc["u"], doc["f"]
+        if kind == "is":
+            new = _utf16(body["s"])
+            at = body["ibi"] - 1
+            units[at:at] = new
+            flags[at:at] = [0] * len(new)
+        elif kind == "ds":
+            del units[body["si"] - 1:body["ei"]]
+            del flags[body["si"] - 1:body["ei"]]
+        elif kind == "as":
+            marks = body.get("sm") or {}
+            if body.get("st") == "paragraph":
+                if "ps_hd" not in marks:
+                    continue
+                # The position is that of the paragraph's line break; the heading covers the line before it.
+                end = min(body["si"] - 1, len(units))
+                start = end
+                while start > 0 and units[start - 1] != 10:
+                    start -= 1
+                for i in range(start, end):
+                    flags[i] = flags[i] | _HEADING_BIT if marks["ps_hd"] else flags[i] & ~_HEADING_BIT
+            else:
+                for i in range(body["si"] - 1, min(body["ei"], len(units))):
+                    for key, bit in _STYLE_BITS.items():
+                        if key in marks:
+                            flags[i] = flags[i] | bit if marks[key] else flags[i] & ~bit
+    result = {}
+    for key, doc in docs.items():
+        runs, start = [], 0
+        flags = doc["f"]
+        for i in range(1, len(flags) + 1):
+            if i == len(flags) or flags[i] != flags[start]:
+                if flags[start]:
+                    runs.append([start, i, flags[start]])
+                start = i
+        if runs:
+            text = b"".join(u.to_bytes(2, "little") for u in doc["u"]).decode("utf-16-le", "surrogatepass")
+            result[key] = {"t": text, "r": runs}
+    return result
+
+
+def _fetch_rich(keep, state_path):
+    """Formatting and background of the notes, which gkeepapi does not know, into a file of their own.
+
+    Keep only sends them to clients that call themselves collaborative ("CL"), and then it sends the whole
+    text as a change log. So this is a second, separate request, and its own version makes it incremental.
+    """
+    path = state_path.rsplit(".json", 1)[0] + "_rich.json"
+    store = {"v": None, "n": {}}
+    if os.path.exists(path):
+        try:
+            with open(path) as f:
+                store = json.load(f)
+        except (OSError, ValueError):
+            pass
+    api = keep._keep_api
+    send = api.send
+
+    def with_capability(**kwargs):
+        body = kwargs.get("json")
+        if body and "requestHeader" in body:
+            body["requestHeader"]["capabilities"].append({"type": "CL"})
+        return send(**kwargs)
+
+    api.send = with_capability
+    try:
+        version = store["v"]
+        while True:
+            changes = api.changes(target_version=version)
+            if changes.get("forceFullResync"):
+                store = {"v": None, "n": {}}
+            for node in changes.get("nodes", []):
+                if node.get("parentId") != "root":
+                    continue
+                ops = []
+                for chunk in node.get("serverChanges", {}).get("snapshot", {}).get("serializedChunks", []):
+                    ops += json.loads(chunk)
+                background = (node.get("background") or {}).get("name") or ""
+                docs = _parse_docs(ops)
+                if background and background != "default" or docs:
+                    store["n"][node["id"]] = {"bg": background, "d": docs}
+                else:
+                    store["n"].pop(node["id"], None)
+            version = changes["toVersion"]
+            if not changes.get("truncated"):
+                break
+        store["v"] = version
+    finally:
+        api.send = send
+    with open(path, "w") as f:
+        json.dump(store, f)
 
 
 def _find_child(keep, note_id, child_id):

@@ -1078,10 +1078,16 @@ class MainActivity : ComponentActivity() {
             }
             if (AppLock.editAllowed(this@MainActivity)) apply() else unlocker?.invoke(R.string.lock_prompt_edit) { if (it) apply() }
         }
+        // Formatting and the background picture that Keep's own editor gave the note.
+        val rich = remember(resumeKey, NotesCache.version.intValue, note.id) { RichNotes.of(context, account, note.id) }
+        val backgroundName = rich?.background?.takeIf { app.showNoteColors && it.isNotEmpty() && it != "default" }
+        val backgroundImage by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, backgroundName) {
+            value = if (backgroundName == null) null else kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { NoteBackgrounds.load(context, backgroundName) }
+        }
         val noteColor = if (app.showNoteColors) NoteColors.argb(note.color) else null
         val gray = noteColor == null && app.plainCardStyle == PLAIN_GRAY
         val textColor = when {
-            noteColor != null -> DarkNoteText
+            noteColor != null || backgroundImage != null -> DarkNoteText
             gray -> Color.White
             else -> MaterialTheme.colorScheme.onSurface
         }
@@ -1111,6 +1117,7 @@ class MainActivity : ComponentActivity() {
             Modifier.fillMaxWidth()
                 .clip(shape)
                 .background(background)
+                .then(backgroundImage?.let { Modifier.noteBackground(it) } ?: Modifier)
                 .then(
                     if (noteColor == null && app.plainCardStyle == PLAIN_BORDER) {
                         Modifier.border(1.dp, MaterialTheme.colorScheme.outlineVariant, shape)
@@ -1213,7 +1220,7 @@ class MainActivity : ComponentActivity() {
                             CheckboxPreview(app.listCheckboxStyle, item.checked, app.listCheckboxSizeDp, textColor.copy(alpha = if (item.checked) 0.55f else 1f))
                         }
                         Text(
-                            highlightMatches(NoteLinks.annotate(item.text, linkColor), query, markColor),
+                            highlightMatches(RichNotes.style(NoteLinks.annotate(item.text, linkColor), rich?.docs?.get(item.id)), query, markColor),
                             color = if (item.checked) textColor.copy(alpha = 0.55f) else textColor,
                             style = MaterialTheme.typography.bodyMedium,
                             maxLines = 2,
@@ -1231,7 +1238,7 @@ class MainActivity : ComponentActivity() {
                 }
             } else if (note.text.isNotBlank()) {
                 Text(
-                    highlightMatches(NoteLinks.annotate(note.text, linkColor), query, markColor),
+                    highlightMatches(RichNotes.style(NoteLinks.annotate(note.text, linkColor), rich?.docs?.values?.firstOrNull()), query, markColor),
                     color = textColor,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = lines,

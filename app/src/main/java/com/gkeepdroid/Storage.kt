@@ -684,6 +684,9 @@ object NotesCache {
         }
     }
 
+    /** Formatting and backgrounds of the notes, which the Python bridge writes next to the sync state. */
+    fun richFile(context: Context, email: String) = File(context.filesDir, "keep_state_${key(email)}_rich.json")
+
     fun labelsFile(context: Context, email: String) = File(context.filesDir, "keep_state_${key(email)}_labels.json")
 
     /** The label names stored for an account, also unused ones. */
@@ -710,6 +713,7 @@ object NotesCache {
         otherFile(context, email).delete()
         file(context, email).delete()
         stateFile(context, email).delete()
+        richFile(context, email).delete()
         imageDir(context, email).deleteRecursively()
     }
 
