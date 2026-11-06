@@ -404,4 +404,7 @@
     <string name="reset_hints_done">すべてのヒントが再び表示されます。</string>
     <string name="undo">元に戻す</string>
     <string name="redo">やり直す</string>
+    <string name="discard_title">変更を破棄しますか？</string>
+    <string name="discard_action">破棄</string>
+    <string name="keep_editing">編集を続ける</string>
 </resources>

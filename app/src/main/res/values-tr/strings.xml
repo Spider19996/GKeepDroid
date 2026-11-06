@@ -413,4 +413,7 @@
     <string name="reset_hints_done">Tüm ipuçları yeniden gösterilecek.</string>
     <string name="undo">Geri al</string>
     <string name="redo">Yinele</string>
+    <string name="discard_title">Değişiklikler silinsin mi?</string>
+    <string name="discard_action">Sil</string>
+    <string name="keep_editing">Düzenlemeye devam et</string>
 </resources>

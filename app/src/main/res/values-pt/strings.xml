@@ -422,4 +422,7 @@
     <string name="reset_hints_done">Todas as dicas voltarão a ser mostradas.</string>
     <string name="undo">Desfazer</string>
     <string name="redo">Refazer</string>
+    <string name="discard_title">Descartar as alterações?</string>
+    <string name="discard_action">Descartar</string>
+    <string name="keep_editing">Continuar editando</string>
 </resources>

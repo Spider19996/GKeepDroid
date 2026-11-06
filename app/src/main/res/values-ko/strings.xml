@@ -404,4 +404,7 @@
     <string name="reset_hints_done">모든 힌트가 다시 표시됩니다.</string>
     <string name="undo">실행 취소</string>
     <string name="redo">다시 실행</string>
+    <string name="discard_title">변경사항을 취소할까요?</string>
+    <string name="discard_action">취소</string>
+    <string name="keep_editing">계속 편집</string>
 </resources>

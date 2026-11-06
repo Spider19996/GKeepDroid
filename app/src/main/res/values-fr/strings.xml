@@ -422,4 +422,7 @@
     <string name="reset_hints_done">Toutes les astuces s’afficheront de nouveau.</string>
     <string name="undo">Annuler</string>
     <string name="redo">Rétablir</string>
+    <string name="discard_title">Abandonner les modifications ?</string>
+    <string name="discard_action">Abandonner</string>
+    <string name="keep_editing">Continuer</string>
 </resources>

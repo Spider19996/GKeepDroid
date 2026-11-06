@@ -66,6 +66,7 @@ import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.FilledTonalIconToggleButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -561,6 +562,8 @@ class EditNoteActivity : ComponentActivity() {
             }
         }
 
+        var confirmDiscard by remember { mutableStateOf(false) }
+
         fun hasChanges() = if (existing != null) {
             title != existing.title || text != existing.text || outItems() != existing.items || color != existing.color ||
                 pinned != existing.pinned || labels != existing.labels || removedImages.isNotEmpty() || convertFrom != null || hiddenInWidgets != wasHidden ||
@@ -648,34 +651,15 @@ class EditNoteActivity : ComponentActivity() {
                 else -> false
             }
         }) {
-        Column(
-            Modifier.verticalScroll(scroll).padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            if (unsent != null) {
-                Text(
-                    if (unsent.error.isBlank()) stringResource(R.string.note_unsent)
-                    else stringResource(R.string.note_unsent_failed, unsent.error),
-                    color = if (unsent.error.isBlank()) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                )
-            }
-            // Title with its actions on the right: pin, show at the widget's bottom, open in Keep.
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    stringResource(
-                        when {
-                            existing != null -> R.string.edit_note
-                            isList -> R.string.new_list
-                            else -> R.string.new_note
-                        }
-                    ),
-                    style = MaterialTheme.typography.titleLargeEmphasized,
-                    maxLines = 2,
-                    modifier = Modifier.weight(1f),
-                )
-                // Left of the other buttons, right of the title.
+        Column(Modifier.fillMaxSize()) {
+        // The bar stays on screen while the note scrolls: discard, undo and redo, the note's switches, save.
+            Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                // Discard on the left, save on the right; Undo and Redo next to Discard.
+                IconButton(onClick = { if (hasChanges()) confirmDiscard = true else discard() }, enabled = !saving, shapes = IconButtonDefaults.shapes(), modifier = Modifier.size(40.dp)) {
+                    Icon(painterResource(R.drawable.ic_close), contentDescription = stringResource(R.string.cancel))
+                }
                 if (canEdit) UndoRedoButtons(history.canUndo, history.canRedo, undo, redo)
+                Spacer(Modifier.weight(1f))
                 Box(Modifier.clickable(enabled = !canEdit) { toastUnlockFirst() }) {
                 FilledTonalIconToggleButton(
                     checked = pinned, onCheckedChange = { pinned = it }, enabled = canEdit, shapes = IconButtonDefaults.toggleableShapes(),
@@ -827,7 +811,30 @@ class EditNoteActivity : ComponentActivity() {
                         )
                     }
                 }
+                            // Save; a note that is still locked shows a lock instead and asks for the unlock.
+                FilledIconButton(
+                    onClick = { if (canEdit) save() else askEdit() }, enabled = !saving,
+                    shapes = IconButtonDefaults.shapes(), modifier = Modifier.padding(start = 4.dp).size(40.dp),
+                ) {
+                    Icon(
+                        painterResource(if (canEdit) R.drawable.ic_done else R.drawable.ic_lock),
+                        contentDescription = stringResource(if (canEdit) R.string.save else if (isList) R.string.edit_list else R.string.edit_note),
+                    )
+                }
             }
+        Column(
+            Modifier.weight(1f).verticalScroll(scroll).padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            if (unsent != null) {
+                Text(
+                    if (unsent.error.isBlank()) stringResource(R.string.note_unsent)
+                    else stringResource(R.string.note_unsent_failed, unsent.error),
+                    color = if (unsent.error.isBlank()) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+
 
             if (confirmDelete && existing != null) {
                 AlertDialog(
@@ -1115,11 +1122,14 @@ class EditNoteActivity : ComponentActivity() {
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 )
             }
-            EditorButtonBar(
-                canEdit = canEdit, saving = saving, isList = isList, onCancel = { discard() },
-                onSave = { if (canEdit) save() else askEdit() },
-            )
         }
+        }
+        if (confirmDiscard) AlertDialog(
+            onDismissRequest = { confirmDiscard = false },
+            title = { Text(stringResource(R.string.discard_title)) },
+            confirmButton = { TextButton(onClick = { confirmDiscard = false; discard() }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.discard_action)) } },
+            dismissButton = { TextButton(onClick = { confirmDiscard = false }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.keep_editing)) } },
+        )
         }
         }
     }

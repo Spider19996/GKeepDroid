@@ -214,52 +214,6 @@ internal fun ColumnScope.AppearanceSection(
 
 
 /**
- * Cancel and save. A button group: the pressed button grows a little and its neighbor makes room. Both always fit, so
- * nothing ever moves into the overflow menu.
- */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-internal fun EditorButtonBar(
-    canEdit: Boolean, saving: Boolean, isList: Boolean, onCancel: () -> Unit, onSave: () -> Unit,
-) {
-    val barHeight = ButtonDefaults.MediumContainerHeight
-    val barPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-    ButtonGroup(
-        overflowIndicator = {},
-        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        customItem(
-            buttonGroupContent = {
-                val pressed = remember { MutableInteractionSource() }
-                androidx.compose.material3.FilledTonalButton(
-                    onClick = onCancel, enabled = !saving,
-                    shapes = ButtonDefaults.shapesFor(barHeight), contentPadding = barPadding, interactionSource = pressed,
-                    modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = barHeight).animateWidth(pressed),
-                ) { Text(stringResource(R.string.cancel), style = ButtonDefaults.textStyleFor(barHeight), textAlign = TextAlign.Center) }
-            },
-            menuContent = {},
-        )
-        customItem(
-            buttonGroupContent = {
-                val pressed = remember { MutableInteractionSource() }
-                Button(
-                    onClick = onSave,
-                    shapes = ButtonDefaults.shapesFor(barHeight), contentPadding = barPadding, interactionSource = pressed,
-                    modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = barHeight).animateWidth(pressed),
-                ) {
-                    Text(
-                        stringResource(if (canEdit) R.string.save else if (isList) R.string.edit_list else R.string.edit_note),
-                        style = ButtonDefaults.textStyleFor(barHeight), textAlign = TextAlign.Center,
-                    )
-                }
-            },
-            menuContent = {},
-        )
-    }
-}
-
-/**
  * Labels: tap a known label to add or remove it; a new name creates the label on save. Creating and deleting labels in the
  * dialog shows at once, Keep follows in the background.
  */

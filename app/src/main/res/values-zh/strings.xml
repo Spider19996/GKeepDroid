@@ -404,4 +404,7 @@
     <string name="reset_hints_done">所有提示将再次显示。</string>
     <string name="undo">撤销</string>
     <string name="redo">重做</string>
+    <string name="discard_title">放弃更改？</string>
+    <string name="discard_action">放弃</string>
+    <string name="keep_editing">继续编辑</string>
 </resources>

@@ -422,4 +422,7 @@
     <string name="reset_hints_done">Todos los avisos volverán a mostrarse.</string>
     <string name="undo">Deshacer</string>
     <string name="redo">Rehacer</string>
+    <string name="discard_title">¿Descartar los cambios?</string>
+    <string name="discard_action">Descartar</string>
+    <string name="keep_editing">Seguir editando</string>
 </resources>

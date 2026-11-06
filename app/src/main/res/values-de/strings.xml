@@ -413,4 +413,7 @@
     <string name="reset_hints_done">Alle Hinweise werden wieder angezeigt.</string>
     <string name="undo">Rückgängig</string>
     <string name="redo">Wiederholen</string>
+    <string name="discard_title">Änderungen verwerfen?</string>
+    <string name="discard_action">Verwerfen</string>
+    <string name="keep_editing">Weiter bearbeiten</string>
 </resources>

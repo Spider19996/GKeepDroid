@@ -413,4 +413,7 @@
     <string name="reset_hints_done">सभी संकेत फिर दिखाई देंगे।</string>
     <string name="undo">पूर्ववत करें</string>
     <string name="redo">फिर से करें</string>
+    <string name="discard_title">बदलाव छोड़ें?</string>
+    <string name="discard_action">छोड़ें</string>
+    <string name="keep_editing">संपादन जारी रखें</string>
 </resources>

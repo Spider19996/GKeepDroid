@@ -413,4 +413,7 @@
     <string name="reset_hints_done">Alle tips worden weer getoond.</string>
     <string name="undo">Ongedaan maken</string>
     <string name="redo">Opnieuw</string>
+    <string name="discard_title">Wijzigingen weggooien?</string>
+    <string name="discard_action">Weggooien</string>
+    <string name="keep_editing">Verder bewerken</string>
 </resources>

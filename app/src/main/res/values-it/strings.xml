@@ -422,4 +422,7 @@
     <string name="reset_hints_done">Tutti i suggerimenti verranno mostrati di nuovo.</string>
     <string name="undo">Annulla</string>
     <string name="redo">Ripeti</string>
+    <string name="discard_title">Scartare le modifiche?</string>
+    <string name="discard_action">Scarta</string>
+    <string name="keep_editing">Continua a modificare</string>
 </resources>
