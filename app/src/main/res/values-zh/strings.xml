@@ -171,7 +171,6 @@
     <string name="empty_trash">清空回收站</string>
     <string name="empty_trash_confirm">永久删除回收站中的所有笔记？此操作无法撤销。</string>
     <string name="delete_selected_confirm">永久删除所选笔记？此操作无法撤销。</string>
-    <string name="show_count_switch">在搜索框中显示笔记数量</string>
     <plurals name="search_count_notes">
         <item quantity="other">搜索 %d 条笔记</item>
     </plurals>

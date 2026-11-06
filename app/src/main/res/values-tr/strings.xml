@@ -171,7 +171,6 @@
     <string name="empty_trash">Çöp kutusunu boşalt</string>
     <string name="empty_trash_confirm">Çöp kutusundaki tüm notlar kalıcı olarak silinsin mi? Bu geri alınamaz.</string>
     <string name="delete_selected_confirm">Seçilen notlar kalıcı olarak silinsin mi? Bu geri alınamaz.</string>
-    <string name="show_count_switch">Arama alanında not sayısını göster</string>
     <plurals name="search_count_notes">
         <item quantity="other">%d notta ara</item>
     </plurals>

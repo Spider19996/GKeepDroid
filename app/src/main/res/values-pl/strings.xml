@@ -171,7 +171,6 @@
     <string name="empty_trash">Opróżnij kosz</string>
     <string name="empty_trash_confirm">Trwale usunąć wszystkie notatki z kosza? Tego nie można cofnąć.</string>
     <string name="delete_selected_confirm">Trwale usunąć zaznaczone notatki? Tego nie można cofnąć.</string>
-    <string name="show_count_switch">Pokaż liczbę notatek w polu wyszukiwania</string>
     <plurals name="search_count_notes">
         <item quantity="other">Szukaj w notatkach (%d)</item>
     </plurals>

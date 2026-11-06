@@ -171,7 +171,6 @@
     <string name="empty_trash">ट्रैश खाली करें</string>
     <string name="empty_trash_confirm">ट्रैश के सभी नोट हमेशा के लिए हटाएँ? इसे पूर्ववत नहीं किया जा सकता।</string>
     <string name="delete_selected_confirm">चुने गए नोट हमेशा के लिए हटाएँ? इसे पूर्ववत नहीं किया जा सकता।</string>
-    <string name="show_count_switch">खोज बॉक्स में नोट की संख्या दिखाएँ</string>
     <plurals name="search_count_notes">
         <item quantity="other">%d नोट्स खोजें</item>
     </plurals>

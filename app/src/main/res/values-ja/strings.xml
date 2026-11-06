@@ -171,7 +171,6 @@
     <string name="empty_trash">ゴミ箱を空にする</string>
     <string name="empty_trash_confirm">ゴミ箱のメモをすべて完全に削除しますか？この操作は元に戻せません。</string>
     <string name="delete_selected_confirm">選択したメモを完全に削除しますか？この操作は元に戻せません。</string>
-    <string name="show_count_switch">検索欄にメモの数を表示</string>
     <plurals name="search_count_notes">
         <item quantity="other">%d件のメモを検索</item>
     </plurals>

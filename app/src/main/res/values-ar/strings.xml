@@ -171,7 +171,6 @@
     <string name="empty_trash">إفراغ سلة المهملات</string>
     <string name="empty_trash_confirm">حذف كل الملاحظات في سلة المهملات نهائيًا؟ لا يمكن التراجع عن ذلك.</string>
     <string name="delete_selected_confirm">حذف الملاحظات المحددة نهائيًا؟ لا يمكن التراجع عن ذلك.</string>
-    <string name="show_count_switch">عرض عدد الملاحظات في حقل البحث</string>
     <plurals name="search_count_notes">
         <item quantity="other">البحث في الملاحظات (%d)</item>
     </plurals>

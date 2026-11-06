@@ -171,7 +171,6 @@
     <string name="empty_trash">Vaciar la papelera</string>
     <string name="empty_trash_confirm">¿Eliminar definitivamente todas las notas de la papelera? No se puede deshacer.</string>
     <string name="delete_selected_confirm">¿Eliminar definitivamente las notas seleccionadas? No se puede deshacer.</string>
-    <string name="show_count_switch">Mostrar el número de notas en el campo de búsqueda</string>
     <plurals name="search_count_notes">
         <item quantity="one">Buscar en 1 nota</item>
         <item quantity="other">Buscar en %d notas</item>

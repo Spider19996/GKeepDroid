@@ -174,7 +174,6 @@
     <string name="empty_trash">Empty trash</string>
     <string name="empty_trash_confirm">Delete all notes in the trash permanently? This cannot be undone.</string>
     <string name="delete_selected_confirm">Delete the selected notes permanently? This cannot be undone.</string>
-    <string name="show_count_switch">Show the number of notes in the search field</string>
     <plurals name="search_count_notes">
         <item quantity="one">Search 1 note</item>
         <item quantity="other">Search %d notes</item>

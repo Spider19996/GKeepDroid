@@ -171,7 +171,6 @@
     <string name="empty_trash">Papierkorb leeren</string>
     <string name="empty_trash_confirm">Alle Notizen im Papierkorb endgültig löschen? Das kann nicht rückgängig gemacht werden.</string>
     <string name="delete_selected_confirm">Die ausgewählten Notizen endgültig löschen? Das kann nicht rückgängig gemacht werden.</string>
-    <string name="show_count_switch">Anzahl der Notizen im Suchfeld zeigen</string>
     <plurals name="search_count_notes">
         <item quantity="one">1 Notiz durchsuchen</item>
         <item quantity="other">%d Notizen durchsuchen</item>

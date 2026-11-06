@@ -171,7 +171,6 @@
     <string name="empty_trash">Очистить корзину</string>
     <string name="empty_trash_confirm">Удалить все заметки из корзины навсегда? Это нельзя отменить.</string>
     <string name="delete_selected_confirm">Удалить выбранные заметки навсегда? Это нельзя отменить.</string>
-    <string name="show_count_switch">Показывать число заметок в поле поиска</string>
     <plurals name="search_count_notes">
         <item quantity="other">Поиск по заметкам (%d)</item>
     </plurals>

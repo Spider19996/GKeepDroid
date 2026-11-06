@@ -485,9 +485,9 @@ class MainActivity : ComponentActivity() {
                             searchFocused = it
                             if (!it) history = SearchHistory.add(context, query)
                         },
-                        // With the setting on, the field names how many notes it searches (the ones the filters leave).
+                        // The field names how many notes it searches (the ones the filters leave).
                         placeholder = when {
-                            app.showCount -> androidx.compose.ui.res.pluralStringResource(
+                            else -> androidx.compose.ui.res.pluralStringResource(
                                 when (screen) {
                                     AppScreen.Notes -> R.plurals.search_count_notes
                                     AppScreen.Archive -> R.plurals.search_count_archive
@@ -495,9 +495,6 @@ class MainActivity : ComponentActivity() {
                                 },
                                 shown.size, shown.size,
                             )
-                            screen == AppScreen.Notes -> stringResource(R.string.search_notes_hint)
-                            screen == AppScreen.Archive -> stringResource(R.string.archive_note)
-                            else -> stringResource(R.string.trash_title)
                         },
                         modifier = Modifier.weight(1f),
                     )
@@ -883,17 +880,20 @@ class MainActivity : ComponentActivity() {
         fun dragModifier(key: String): Modifier {
             val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
             val toggle = { haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress); onToggle(key) }
-            // Once notes are chosen, a tap adds or removes one, and the cards no longer move.
-            if (selected.isNotEmpty()) return Modifier
+            // Once notes are chosen, a tap adds or removes one, and the cards no longer move (the card being pressed keeps its gesture).
+            if (selected.isNotEmpty() && dragKey != key) return Modifier
             // Without a place to drag to, a long press chooses the note.
             if (!canReorder) return Modifier.pointerInput(key) { detectTapGestures(onLongPress = { toggle() }) }
             val coords = remember { arrayOfNulls<LayoutCoordinates>(1) }
+            // The long press chooses the card at once, so it shows what is happening; dragging it on turns that back into a move.
+            var chosenByPress by remember { mutableStateOf(false) }
             return Modifier
                 .onGloballyPositioned { coords[0] = it; cardBounds[key] = it.boundsInRoot() }
                 .alpha(if (dragKey == key) 0.4f else 1f)
                 .pointerInput(key) {
                     detectDragGesturesAfterLongPress(
                         onDragStart = { start ->
+                            if (selected.isEmpty()) { toggle(); chosenByPress = true }
                             dragKey = key
                             pointer = coords[0]?.localToRoot(start) ?: Offset.Zero
                         },
@@ -902,9 +902,12 @@ class MainActivity : ComponentActivity() {
                             pointer = coords[0]?.localToRoot(change.position) ?: pointer
                             moveUnderFinger()
                         },
-                        // Let go without having moved the card: the long press chooses it.
-                        onDragEnd = { if (dragOrder == null) { dragKey = null; toggle() } else dropNow() },
-                        onDragCancel = { dragKey = null; dragOrder = null },
+                        onDragEnd = {
+                            // Let go without having moved the card: it stays chosen.
+                            if (dragOrder == null) dragKey = null else { dropNow(); if (chosenByPress) onToggle(key) }
+                            chosenByPress = false
+                        },
+                        onDragCancel = { dragKey = null; dragOrder = null; if (chosenByPress) onToggle(key); chosenByPress = false },
                     )
                 }
         }

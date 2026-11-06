@@ -171,7 +171,6 @@
     <string name="empty_trash">Svuota il cestino</string>
     <string name="empty_trash_confirm">Eliminare definitivamente tutte le note nel cestino? Non si può annullare.</string>
     <string name="delete_selected_confirm">Eliminare definitivamente le note selezionate? Non si può annullare.</string>
-    <string name="show_count_switch">Mostra il numero di note nel campo di ricerca</string>
     <plurals name="search_count_notes">
         <item quantity="one">Cerca in 1 nota</item>
         <item quantity="other">Cerca in %d note</item>

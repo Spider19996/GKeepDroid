@@ -862,7 +862,6 @@ data class AppSettings(
     val filterBar: Boolean = true,
     val filterChips: Int = FILTER_NOTES or FILTER_LISTS or FILTER_REMINDER or FILTER_RECENT or FILTER_LABELS,
     val pullToRefresh: Boolean = true,
-    val showCount: Boolean = true,
 )
 
 const val FILTER_NOTES = 1
@@ -928,7 +927,6 @@ object AppSettingsStore {
             filterBar = p.getBoolean("filter_bar", d.filterBar),
             filterChips = p.getInt("filter_chips", d.filterChips),
             pullToRefresh = p.getBoolean("pull_to_refresh", d.pullToRefresh),
-            showCount = p.getBoolean("show_count", d.showCount),
         )
     }
 
@@ -968,7 +966,6 @@ object AppSettingsStore {
             .putBoolean("filter_bar", s.filterBar)
             .putInt("filter_chips", s.filterChips)
             .putBoolean("pull_to_refresh", s.pullToRefresh)
-            .putBoolean("show_count", s.showCount)
             .apply()
     }
 }

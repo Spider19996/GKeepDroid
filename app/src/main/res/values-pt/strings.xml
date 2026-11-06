@@ -171,7 +171,6 @@
     <string name="empty_trash">Esvaziar a lixeira</string>
     <string name="empty_trash_confirm">Excluir permanentemente todas as notas da lixeira? Não pode ser desfeito.</string>
     <string name="delete_selected_confirm">Excluir permanentemente as notas selecionadas? Não pode ser desfeito.</string>
-    <string name="show_count_switch">Mostrar o número de notas no campo de pesquisa</string>
     <plurals name="search_count_notes">
         <item quantity="one">Pesquisar 1 nota</item>
         <item quantity="other">Pesquisar %d notas</item>

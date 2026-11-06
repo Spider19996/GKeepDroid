@@ -171,7 +171,6 @@
     <string name="empty_trash">Vider la corbeille</string>
     <string name="empty_trash_confirm">Supprimer définitivement toutes les notes de la corbeille ? Cette action est irréversible.</string>
     <string name="delete_selected_confirm">Supprimer définitivement les notes sélectionnées ? Cette action est irréversible.</string>
-    <string name="show_count_switch">Afficher le nombre de notes dans le champ de recherche</string>
     <plurals name="search_count_notes">
         <item quantity="one">Rechercher dans 1 note</item>
         <item quantity="other">Rechercher dans %d notes</item>

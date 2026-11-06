@@ -171,7 +171,6 @@
     <string name="empty_trash">Prullenbak legen</string>
     <string name="empty_trash_confirm">Alle notities in de prullenbak definitief verwijderen? Dit kan niet ongedaan worden gemaakt.</string>
     <string name="delete_selected_confirm">De geselecteerde notities definitief verwijderen? Dit kan niet ongedaan worden gemaakt.</string>
-    <string name="show_count_switch">Aantal notities in het zoekveld tonen</string>
     <plurals name="search_count_notes">
         <item quantity="one">1 notitie doorzoeken</item>
         <item quantity="other">%d notities doorzoeken</item>
