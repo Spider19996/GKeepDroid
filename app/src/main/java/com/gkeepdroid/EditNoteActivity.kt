@@ -568,6 +568,13 @@ class EditNoteActivity : ComponentActivity() {
                                             openInKeep(account, existing)
                                         },
                                     )
+                                    // Keep's API has no way to upload pictures, so adding one is left to the Keep app.
+                                    if (!isLocal && images.isEmpty()) add(
+                                        MenuEntry(stringResource(R.string.image_add_keep), R.drawable.ic_add) {
+                                            menuOpen = false
+                                            startActivity(keepIntent(this@EditNoteActivity))
+                                        },
+                                    )
                                     add(
                                         MenuEntry(stringResource(R.string.share_note), R.drawable.ic_share) {
                                             menuOpen = false
@@ -814,14 +821,6 @@ class EditNoteActivity : ComponentActivity() {
                         }
                     }
                 }
-            }
-            // Keep's API has no way to upload pictures, so adding one is left to the Keep app.
-            if (existing != null && !isLocal) {
-                OutlinedButton(
-                    onClick = { startActivity(keepIntent(this@EditNoteActivity)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shapes = ButtonDefaults.shapes(),
-                ) { Text(stringResource(R.string.image_add_keep)) }
             }
             viewerImage?.let { imageId ->
                 val full = remember(imageId) { NoteImages.full(this@EditNoteActivity, account, imageId) }
