@@ -162,7 +162,7 @@ class SettingsActivity : ComponentActivity() {
             ) { uri ->
                 if (uri == null) return@rememberLauncherForActivityResult
                 try {
-                    val json = Backup.export(currentGlobal(), currentWidget(), Reminders.exportAll(context))
+                    val json = Backup.export(currentGlobal(), currentWidget(), Reminders.exportAll(context), AppSettingsStore.export(context))
                     context.contentResolver.openOutputStream(uri)?.use { it.write(json.toByteArray()) }
                     status = exportDone
                 } catch (e: Exception) {
@@ -178,6 +178,7 @@ class SettingsActivity : ComponentActivity() {
                         ?: error("Cannot read file")
                     val imported = Backup.parse(text)
                     Reminders.importAll(context, imported.reminders)
+                    imported.app?.let { applyApp(AppSettingsStore.import(context, it)) }
                     themeMode = imported.global.themeMode
                     interval = imported.global.syncIntervalMin
                     syncOnUnlock = imported.global.syncOnUnlock

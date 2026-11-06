@@ -28,13 +28,14 @@ object Backup {
         )
     }
 
-    data class Imported(val global: GlobalSettings, val widget: WidgetSettings, val reminders: JSONObject = JSONObject())
+    data class Imported(val global: GlobalSettings, val widget: WidgetSettings, val reminders: JSONObject = JSONObject(), val app: JSONObject? = null)
 
     /** The widget's account (an e-mail address) is left out on purpose, like the token. */
-    fun export(global: GlobalSettings, widget: WidgetSettings, reminders: JSONObject = JSONObject()): String =
+    fun export(global: GlobalSettings, widget: WidgetSettings, reminders: JSONObject = JSONObject(), app: JSONObject = JSONObject()): String =
         JSONObject()
             .put("version", FORMAT_VERSION)
             .put("reminders", reminders)
+            .put("app", app)
             .put(
                 "global",
                 JSONObject()
@@ -95,6 +96,7 @@ object Backup {
         val dw = WidgetSettings()
         return Imported(
             reminders = root.optJSONObject("reminders") ?: JSONObject(),
+            app = root.optJSONObject("app"),
             global = GlobalSettings(
                 themeMode = g.optInt("themeMode", dg.themeMode).coerceIn(THEME_SYSTEM, THEME_OLED),
                 syncIntervalMin = g.optInt("syncIntervalMin", dg.syncIntervalMin).coerceAtLeast(0),

@@ -129,6 +129,31 @@ object AppSettingsStore {
         )
     }
 
+    /** All app settings as they are stored, for the backup file (the editor layout is among them). */
+    fun export(context: Context): org.json.JSONObject {
+        save(context, load(context))
+        val out = org.json.JSONObject()
+        prefs(context).all.forEach { (key, value) -> if (value is Boolean || value is Int || value is String) out.put(key, value) }
+        return out
+    }
+
+    /** Takes the settings of a backup file over: only keys this app knows, and only values of the right kind. */
+    fun import(context: Context, json: org.json.JSONObject): AppSettings {
+        save(context, load(context))
+        val known = prefs(context).all
+        prefs(context).edit {
+            json.keys().forEach { key ->
+                val value = json.opt(key)
+                when (known[key]) {
+                    is Boolean -> if (value is Boolean) putBoolean(key, value)
+                    is Int -> if (value is Int) putInt(key, value)
+                    is String -> if (value is String) putString(key, value)
+                }
+            }
+        }
+        return load(context)
+    }
+
     fun save(context: Context, s: AppSettings) {
         prefs(context).edit {
             putInt("layout", s.layout)

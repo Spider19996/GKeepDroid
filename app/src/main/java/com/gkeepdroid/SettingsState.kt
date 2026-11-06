@@ -217,6 +217,20 @@ internal class SettingsState(val context: SettingsActivity) {
         context.recreate()
     }
 
+    /** Takes over settings that were set from outside (the import of a backup file). */
+    fun applyApp(a: AppSettings) {
+        appLayout = a.layout; appSort = a.sortMode; appPinnedSection = a.pinnedSection; appShowImages = a.showImages
+        appShowColors = a.showNoteColors; appPlainStyle = a.plainCardStyle; appPreviewLines = a.previewLines
+        appShowEdited = a.showEditedTime; appEditedAsDate = a.editedAsDate; appShowLabels = a.showLabels; appShowProgress = a.showProgress
+        appLockPrivate = a.lockPrivateNotes; appLockApp = a.lockApp; appLockEdit = a.lockEdit; appLockGrace = a.lockGraceSec
+        appShowReminders = a.showReminders; appListCheckedToEnd = a.listCheckedToEnd; appListCollapseChecked = a.listCollapseChecked
+        appListCheckboxStyle = a.listCheckboxStyle; appListCheckboxSize = a.listCheckboxSizeDp; appListSpacing = a.listSpacingDp
+        appListCheckInApp = a.listCheckInApp; appListDeleteChecked = a.listDeleteChecked; appConvertPrefix = a.convertPrefix
+        appRenumberDisplay = a.renumberDisplay; appWidgetGrace = a.lockWidgetGraceSec; appWidgetTitlesOnly = a.widgetTitlesOnly
+        appLockWidgetTick = a.lockWidgetTick; appSwipeRight = a.swipeRight; appSwipeLeft = a.swipeLeft; appFoldNotes = a.foldNotes
+        appFilterBar = a.filterBar; appFilterChips = a.filterChips; appPullToRefresh = a.pullToRefresh; appEditorLayout = a.editorLayout
+    }
+
     fun currentApp() = AppSettings(
         appLayout, appSort, appPinnedSection, appShowImages, appShowColors, appPlainStyle, appPreviewLines, appShowEdited, appEditedAsDate, appShowLabels, appShowProgress, appLockPrivate, appLockApp, appLockEdit, appLockGrace,
         appShowReminders, appListCheckedToEnd, appListCollapseChecked, appListCheckboxStyle, appListCheckboxSize, appListSpacing,
