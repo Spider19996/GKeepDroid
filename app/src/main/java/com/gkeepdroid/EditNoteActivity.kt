@@ -104,7 +104,7 @@ import androidx.core.content.FileProvider
 import kotlinx.coroutines.launch
 
 /** What the background choice holds while the note's background is a photo of the user's own. */
-private const val CUSTOM_BACKGROUND = "custom"
+internal const val CUSTOM_BACKGROUND = "custom"
 
 /** Edits an existing note (EXTRA_NOTE_ID) or creates a new note or checklist. */
 class EditNoteActivity : ComponentActivity() {
@@ -298,7 +298,6 @@ class EditNoteActivity : ComponentActivity() {
         val originalLook = remember { existing?.let { NoteLook.of(this@EditNoteActivity, account, it.id) } ?: NoteLook.Look(null, null) }
         var variantDark by remember { mutableStateOf(originalLook.dark) }
         var ownText by remember { mutableStateOf(originalLook.textColor) }
-        var textPicker by remember { mutableStateOf(false) }
         val darkVersion = variantDark ?: darkTheme
         // What is on the device already is there in the first frame, so the picture does not pop in.
         val firstPicture = remember {
@@ -336,13 +335,6 @@ class EditNoteActivity : ComponentActivity() {
             onDispose { screenTint.color = null; screenTint.image = null; screenTint.darkImage = false }
         }
         var labels by remember { mutableStateOf(existing?.labels.orEmpty()) }
-        var newLabel by remember { mutableStateOf("") }
-        var manageLabels by remember { mutableStateOf(false) }
-        var labelsVersion by remember { mutableStateOf(0) }
-        // Label changes show at once; Keep follows in the background.
-        var addedLabels by remember { mutableStateOf(setOf<String>()) }
-        var removedLabels by remember { mutableStateOf(setOf<String>()) }
-        var labelToDelete by remember { mutableStateOf<String?>(null) }
         // A numbered checklist keeps "1. ", "2. " in the text of its items (so Keep shows them too); in the editor
         // the number is a label in front of the field and the field holds only the text.
         val startNumbered = existing != null && existing.isList && ListNumbering.isNumbered(existing.items)
@@ -798,113 +790,7 @@ class EditNoteActivity : ComponentActivity() {
                 }
             }
 
-            // Labels: tap a known label to add or remove it; a new name creates the label on save.
-            val knownLabels = remember(targetAccount, labelsVersion) {
-                (NotesCache.labels(this@EditNoteActivity, targetAccount) + addedLabels).filter { it !in removedLabels }
-                    .distinct().sortedBy { it.lowercase() }
-            }
-            val allLabels = (knownLabels + labels).distinct().sortedBy { it.lowercase() }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    stringResource(if (allLabels.isEmpty()) R.string.no_labels else R.string.labels_title), style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier.weight(1f),
-                )
-                TextButton(onClick = { manageLabels = true }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.manage_labels)) }
-            }
-            if (allLabels.isNotEmpty()) FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                allLabels.forEach { name ->
-                    FilterChip(
-                        selected = name in labels,
-                        enabled = canEdit,
-                        onClick = { labels = if (name in labels) labels - name else labels + name },
-                        label = { Text(name) },
-                    )
-                }
-            }
-            if (allLabels.isNotEmpty()) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = newLabel,
-                    onValueChange = { newLabel = it },
-                    label = { Text(stringResource(R.string.new_label_hint)) },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f),
-                )
-                TextButton(
-                    enabled = newLabel.isNotBlank(),
-                    onClick = {
-                        val name = newLabel.trim()
-                        if (name !in labels) labels = labels + name
-                        newLabel = ""
-                    },
-                    shapes = ButtonDefaults.shapes(),
-                ) { Text(stringResource(R.string.add_label)) }
-            }
-
-            if (manageLabels) {
-                var creating by remember { mutableStateOf("") }
-                AlertDialog(
-                    onDismissRequest = { manageLabels = false },
-                    title = { Text(stringResource(R.string.manage_labels)) },
-                    text = {
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                OutlinedTextField(
-                                    value = creating,
-                                    onValueChange = { creating = it },
-                                    label = { Text(stringResource(R.string.new_label_hint)) },
-                                    singleLine = true,
-                                    modifier = Modifier.weight(1f),
-                                )
-                                TextButton(
-                                    enabled = creating.isNotBlank(),
-                                    onClick = {
-                                        val name = creating.trim()
-                                        creating = ""
-                                        addedLabels = addedLabels + name
-                                        removedLabels = removedLabels - name
-                                        labelsVersion++
-                                        KeepRepository.createLabel(this@EditNoteActivity, targetAccount, name)
-                                    },
-                                    shapes = ButtonDefaults.shapes(),
-                                ) { Text(stringResource(R.string.add_label)) }
-                            }
-                            Column(Modifier.heightIn(max = 280.dp).verticalScroll(rememberScrollState())) {
-                                knownLabels.forEach { name ->
-                                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                                        Text(name, Modifier.weight(1f))
-                                        TextButton(onClick = { labelToDelete = name }, shapes = ButtonDefaults.shapes()) {
-                                            Text(stringResource(R.string.delete_label))
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    confirmButton = {
-                        TextButton(onClick = { manageLabels = false }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.done)) }
-                    },
-                )
-            }
-
-            labelToDelete?.let { name ->
-                AlertDialog(
-                    onDismissRequest = { labelToDelete = null },
-                    text = { Text(stringResource(R.string.delete_label_confirm, name)) },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            labelToDelete = null
-                            labels = labels - name
-                            removedLabels = removedLabels + name
-                            addedLabels = addedLabels - name
-                            labelsVersion++
-                            KeepRepository.deleteLabel(this@EditNoteActivity, targetAccount, name)
-                        }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.delete_label)) }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { labelToDelete = null }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) }
-                    },
-                )
-            }
+            LabelsSection(account = targetAccount, labels = labels, onLabels = { labels = it }, canEdit = canEdit)
 
             if (remote != null) {
                 // The note changed in Keep while it was open here.
@@ -1125,127 +1011,15 @@ class EditNoteActivity : ComponentActivity() {
                 }
             }
 
-            // The color and the picture (Keep's or the user's own photo) are set separately; the first item of each row takes it away.
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.color_and_background), modifier = Modifier.weight(1f))
-                // Light or dark version of the color and of Keep's picture; on the phone only, and the theme decides until it is chosen here.
-                // The row keeps its height whether the button shows or not.
-                Box(Modifier.size(48.dp), contentAlignment = Alignment.Center) {
-                    if (existing != null && (color != NoteColors.DEFAULT || (background.isNotEmpty() && background != CUSTOM_BACKGROUND))) {
-                        androidx.compose.material3.IconToggleButton(
-                            checked = darkVersion, onCheckedChange = { variantDark = it }, enabled = canEdit,
-                            colors = IconButtonDefaults.iconToggleButtonColors(
-                                contentColor = LocalContentColor.current, checkedContentColor = LocalContentColor.current,
-                            ),
-                        ) {
-                            Icon(
-                                painterResource(R.drawable.ic_contrast), contentDescription = stringResource(R.string.background_dark_version),
-                                modifier = Modifier.rotate(if (darkVersion) 180f else 0f),
-                            )
-                        }
-                    }
-                }
-            }
-            Row(Modifier.horizontalScroll(rememberScrollState())) {
-                NoteColors.names.forEach { name ->
-                    val argb = NoteColors.argb(name, darkVersion)
-                    val chosen = name == color
-                    // The circle keeps its size; the touch area around it is 48 dp.
-                    RoundTouchTarget(onClick = { color = name }, enabled = canEdit) {
-                        Box(
-                            Modifier.size(if (chosen) 44.dp else 36.dp)
-                                .clip(CircleShape)
-                                .background(if (argb != null) Color(argb) else Color.Transparent)
-                                .border(
-                                    if (chosen) 3.dp else 1.dp,
-                                    if (chosen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                                    CircleShape,
-                                ),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            // The default (uncolored) swatch is transparent, so mark it.
-                            if (argb == null) Icon(painterResource(R.drawable.ic_color_none), contentDescription = stringResource(R.string.color_background_remove), modifier = Modifier.size(20.dp))
-                        }
-                    }
-                }
-            }
-            // Keep's pictures exist in Keep only, so local notes have none; the photo of one's own works for every note that exists.
-            Row(Modifier.horizontalScroll(rememberScrollState())) {
-                RoundTouchTarget(onClick = { background = ""; pickedBackground = null }, enabled = canEdit, shape = MaterialTheme.shapes.small) {
-                    BackgroundTile(background.isEmpty()) {
-                        Icon(painterResource(R.drawable.ic_color_none), contentDescription = stringResource(R.string.color_background_remove), modifier = Modifier.size(20.dp))
-                    }
-                }
-                if (!isLocal) NoteBackgrounds.NAMES.forEach { name ->
-                    val thumb by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, name) {
-                        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { NoteBackgrounds.load(this@EditNoteActivity, name) }
-                    }
-                    RoundTouchTarget(onClick = { background = name; pickedBackground = null }, enabled = canEdit, shape = MaterialTheme.shapes.small) {
-                        BackgroundTile(name == background) {
-                            thumb?.let { Image(it.asImageBitmap(), contentDescription = name, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()) }
-                        }
-                    }
-                }
-                if (existing != null) RoundTouchTarget(
-                    onClick = { if (hintPrefs.getBoolean("own_photo_local_dismissed", false)) pickBackground.launch("image/*") else localHint = true },
-                    enabled = canEdit, shape = MaterialTheme.shapes.small,
-                ) {
-                    BackgroundTile(background == CUSTOM_BACKGROUND) {
-                        val own = picture
-                        if (background == CUSTOM_BACKGROUND && own != null) {
-                            Image(own.asImageBitmap(), contentDescription = stringResource(R.string.background_own), contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
-                        } else {
-                            Icon(painterResource(R.drawable.ic_add), contentDescription = stringResource(R.string.background_own), modifier = Modifier.size(20.dp))
-                        }
-                    }
-                }
-            }
-
-            // The note's own text color (only on this phone), for a note of an own photo above all.
-            if (existing != null) {
-                Text(stringResource(R.string.note_text_color))
-                Row(Modifier.horizontalScroll(rememberScrollState())) {
-                    val textChoices = listOf(
-                        null, 0xFF202124.toInt(), 0xFFFFFFFF.toInt(), 0xFFD93025.toInt(), 0xFFE8710A.toInt(), 0xFFF9AB00.toInt(),
-                        0xFF188038.toInt(), 0xFF1A73E8.toInt(), 0xFF9334E6.toInt(),
-                    )
-                    textChoices.forEach { choice ->
-                        val chosen = ownText == choice
-                        RoundTouchTarget(onClick = { ownText = choice }, enabled = canEdit) {
-                            Box(
-                                Modifier.size(if (chosen) 44.dp else 36.dp)
-                                    .clip(CircleShape)
-                                    .background(if (choice != null) Color(choice) else Color.Transparent)
-                                    .border(
-                                        if (chosen) 3.dp else 1.dp,
-                                        if (chosen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                                        CircleShape,
-                                    ),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                if (choice == null) Icon(painterResource(R.drawable.ic_color_none), contentDescription = stringResource(R.string.note_text_color_auto), modifier = Modifier.size(20.dp))
-                            }
-                        }
-                    }
-                    // Any other color.
-                    RoundTouchTarget(onClick = { textPicker = true }, enabled = canEdit) {
-                        val custom = ownText != null && ownText !in textChoices
-                        Box(
-                            Modifier.size(if (custom) 44.dp else 36.dp)
-                                .clip(CircleShape)
-                                .background(androidx.compose.ui.graphics.Brush.sweepGradient(listOf(Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red)))
-                                .border(
-                                    if (custom) 3.dp else 1.dp,
-                                    if (custom) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                                    CircleShape,
-                                ),
-                        )
-                    }
-                }
-                if (textPicker) {
-                    ColorPickerDialog(initial = ownText ?: 0xFF202124.toInt(), onDismiss = { textPicker = false }, onPick = { ownText = it; textPicker = false })
-                }
-            }
+            AppearanceSection(
+                color = color, onColor = { color = it },
+                background = background, onBackground = { background = it; pickedBackground = null },
+                darkVersion = darkVersion, onDarkVersion = { variantDark = it },
+                canEdit = canEdit, isExisting = existing != null, isLocal = isLocal,
+                ownText = ownText, onOwnText = { ownText = it },
+                picture = picture,
+                onPickPhoto = { if (hintPrefs.getBoolean("own_photo_local_dismissed", false)) pickBackground.launch("image/*") else localHint = true },
+            )
 
             if (error.isNotEmpty()) Text(error, color = MaterialTheme.colorScheme.error)
 
@@ -1273,85 +1047,15 @@ class EditNoteActivity : ComponentActivity() {
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 )
             }
-            // A button group: the pressed button grows a little and its neighbors make room. The three always fit,
-            // so nothing ever moves into the overflow menu.
-            val barHeight = ButtonDefaults.MediumContainerHeight
-            val barPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-            ButtonGroup(
-                overflowIndicator = {},
-                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                customItem(
-                    buttonGroupContent = {
-                        val pressed = remember { MutableInteractionSource() }
-                        androidx.compose.material3.FilledTonalButton(
-                            onClick = { discard() }, enabled = !saving,
-                            shapes = ButtonDefaults.shapesFor(barHeight), contentPadding = barPadding, interactionSource = pressed,
-                            modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = barHeight).animateWidth(pressed),
-                        ) { Text(stringResource(R.string.cancel), style = ButtonDefaults.textStyleFor(barHeight), textAlign = TextAlign.Center) }
-                    },
-                    menuContent = {},
-                )
-                customItem(
-                    buttonGroupContent = {
-                        val pressed = remember { MutableInteractionSource() }
-                        // Set: the accent color with a matching icon. None set: a quiet button.
-                        FilledTonalIconToggleButton(
-                            checked = shownReminders.isNotEmpty(),
-                            onCheckedChange = { if (canEdit) remindersOpen = true else askEdit() },
-                            colors = IconButtonDefaults.filledTonalIconToggleButtonColors(
-                                checkedContainerColor = MaterialTheme.colorScheme.primary,
-                                checkedContentColor = MaterialTheme.colorScheme.onPrimary,
-                            ),
-                            shapes = IconButtonDefaults.toggleableShapes(),
-                            interactionSource = pressed,
-                            modifier = Modifier.size(IconButtonDefaults.mediumContainerSize()).animateWidth(pressed),
-                        ) {
-                            Icon(
-                                painterResource(R.drawable.ic_alarm), contentDescription = stringResource(R.string.reminders_title),
-                                tint = if (notificationsOn) LocalContentColor.current else MaterialTheme.colorScheme.error,
-                                modifier = Modifier.size(IconButtonDefaults.mediumIconSize),
-                            )
-                        }
-                    },
-                    menuContent = {},
-                )
-                customItem(
-                    buttonGroupContent = {
-                        val pressed = remember { MutableInteractionSource() }
-                        Button(
-                            onClick = { if (canEdit) save() else askEdit() },
-                            shapes = ButtonDefaults.shapesFor(barHeight), contentPadding = barPadding, interactionSource = pressed,
-                            modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = barHeight).animateWidth(pressed),
-                        ) {
-                            Text(
-                                stringResource(if (canEdit) R.string.save else if (isList) R.string.edit_list else R.string.edit_note),
-                                style = ButtonDefaults.textStyleFor(barHeight), textAlign = TextAlign.Center,
-                            )
-                        }
-                    },
-                    menuContent = {},
-                )
-            }
+            EditorButtonBar(
+                canEdit = canEdit, saving = saving, isList = isList,
+                reminderSet = shownReminders.isNotEmpty(), notificationsOn = notificationsOn,
+                onCancel = { discard() }, onReminders = { if (canEdit) remindersOpen = true else askEdit() },
+                onSave = { if (canEdit) save() else askEdit() },
+            )
         }
         }
         }
-    }
-
-    /** A square preview in the background row; the chosen one is larger and has a thick frame. */
-    @Composable
-    private fun BackgroundTile(chosen: Boolean, content: @Composable () -> Unit) {
-        Box(
-            Modifier.size(if (chosen) 44.dp else 36.dp)
-                .clip(MaterialTheme.shapes.small)
-                .border(
-                    if (chosen) 3.dp else 1.dp,
-                    if (chosen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                    MaterialTheme.shapes.small,
-                ),
-            contentAlignment = Alignment.Center,
-        ) { content() }
     }
 
     /**
