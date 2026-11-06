@@ -30,8 +30,8 @@ object NoteBackgrounds {
         return android.graphics.Color.rgb((r / n).toInt(), (g / n).toInt(), (b / n).toInt())
     }
 
-    /** The pictures Keep offers (the names are those of its own files). */
-    val NAMES = listOf("celebration", "food", "grocery", "music", "notes", "places", "recipe", "travel", "video")
+    /** The pictures Keep offers; these are the names its server accepts (checked by setting each on a test note). */
+    val NAMES = listOf("celebration", "food", "groceries", "music", "notes", "places", "recipes", "travel", "video")
 
     private const val SIZE = 768
     private val memory = HashMap<String, Bitmap>()
@@ -104,7 +104,9 @@ object NoteBackgrounds {
     private const val WIDGET_SIZE = 360
 
     private fun download(name: String): ByteArray {
-        val connection = URL("https://www.gstatic.com/keep/backgrounds/${name}_light_0609.svg").openConnection() as HttpURLConnection
+        // Two pictures are named differently in their files than in the notes.
+        val file = when (name) { "groceries" -> "grocery"; "recipes" -> "recipe"; else -> name }
+        val connection = URL("https://www.gstatic.com/keep/backgrounds/${file}_light_0609.svg").openConnection() as HttpURLConnection
         connection.connectTimeout = 10_000
         connection.readTimeout = 15_000
         return try {
