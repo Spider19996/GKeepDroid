@@ -339,7 +339,7 @@ def _send_background(keep, state_path, note, name):
         pass
 
 
-def _fetch_rich(keep, state_path):
+def _fetch_rich(keep, state_path, full=False):
     """Formatting and background of the notes, which gkeepapi does not know, into files of their own.
 
     Keep only sends them to clients that call themselves collaborative ("CL"), and then it sends the text of
@@ -365,7 +365,8 @@ def _fetch_rich(keep, state_path):
 
     api.send = with_capability
     try:
-        version = model["v"]
+        # A full pull brings the whole model of every note again (a new note may not have had its model yet).
+        version = None if full else model["v"]
         while True:
             changes = api.changes(target_version=version)
             if changes.get("forceFullResync"):
@@ -438,10 +439,17 @@ def _send_format(keep, state_path, note, wanted):
     wanted: {"text" (the body), an item id, or "#n" (the n-th item): {"t": the text, "r": [[start, end, flags], ...]}}.
     """
     # The model and its revision must be up to date, as an edit of the text may have been sent just before.
-    _fetch_rich(keep, state_path)
     base = state_path.rsplit(".json", 1)[0]
-    with open(base + "_richmodel.json") as f:
-        entry = json.load(f)["n"].get(note.id)
+
+    def model_entry():
+        with open(base + "_richmodel.json") as f:
+            return json.load(f)["n"].get(note.id)
+
+    _fetch_rich(keep, state_path)
+    entry = model_entry()
+    if (not entry or not entry.get("m")) and any(want.get("r") for want in wanted.values()):
+        _fetch_rich(keep, state_path, full=True)
+        entry = model_entry()
     if not entry or not entry.get("rev"):
         raise ValueError("The formatting of this note is not known yet")
     docs = _unpack(entry["m"])
