@@ -125,7 +125,16 @@ fun OnNoteTheme(
             if (accent == null) base else {
                 // The same for a dark picture: menus and dialogs in a dark shade of its color.
                 val surface = androidx.compose.ui.graphics.lerp(Color(accent), Color.Black, 0.75f)
+                // Buttons and outlines in a light shade of the color, on the dark note.
+                val bright = androidx.compose.ui.graphics.lerp(Color(accent), Color.White, 0.7f)
+                val container = androidx.compose.ui.graphics.lerp(Color(accent), Color.White, 0.22f)
                 base.copy(
+                    primary = bright, onPrimary = DarkNoteText,
+                    primaryContainer = container, onPrimaryContainer = Color.White,
+                    secondaryContainer = container, onSecondaryContainer = Color.White,
+                    secondary = bright, onSecondary = DarkNoteText,
+                    surfaceTint = bright, outline = bright.copy(alpha = 0.75f), outlineVariant = bright.copy(alpha = 0.4f),
+                    tertiary = bright,
                     surfaceContainerLowest = surface, surfaceContainerLow = surface, surfaceContainer = surface,
                     surfaceContainerHigh = surface, surfaceContainerHighest = surface, surfaceBright = surface,
                 )
@@ -146,7 +155,8 @@ fun OnNoteTheme(
                     primaryContainer = light, onPrimaryContainer = dark,
                     secondaryContainer = light, onSecondaryContainer = dark,
                     secondary = dark, onSecondary = Color.White,
-                    surfaceTint = dark, outline = dark.copy(alpha = 0.6f),
+                    // The outlines of fields and of the checklist checkboxes take the color too.
+                    surfaceTint = dark, outline = dark.copy(alpha = 0.85f), outlineVariant = dark.copy(alpha = 0.45f),
                     surfaceContainerLowest = surface, surfaceContainerLow = surface, surfaceContainer = surface,
                     surfaceContainerHigh = surface, surfaceContainerHighest = surface, surfaceBright = surface,
                     onSurface = DarkNoteText, onSurfaceVariant = DarkNoteText.copy(alpha = 0.75f),
