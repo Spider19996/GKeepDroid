@@ -165,8 +165,10 @@
     <string name="layout_list">목록</string>
     <string name="pinned_section_switch">고정된 메모를 별도 섹션에 표시</string>
     <string name="pull_to_refresh_switch">목록을 아래로 당겨 새로고침</string>
-    <string name="color_and_background">색상 / 배경</string>
     <string name="color_background_remove">제거</string>
+    <string name="note_background">배경</string>
+    <string name="own_photo_hint">이 사진은 이 휴대전화에만 저장됩니다. Google Keep에는 저장되지 않으므로 다른 기기나 Keep 자체에는 표시되지 않습니다.</string>
+    <string name="dont_show_again">다시 표시 안 함</string>
     <string name="background_own">내 사진</string>
     <string name="selected_count">%d개 선택됨</string>
     <string name="select_all">모두 선택</string>

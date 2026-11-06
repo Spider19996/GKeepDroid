@@ -250,8 +250,38 @@ class EditNoteActivity : ComponentActivity() {
         val originalCustom = remember { existing != null && CustomBackgrounds.stamp(this@EditNoteActivity, account, existing.id) != 0L }
         var background by remember { mutableStateOf(if (originalCustom) CUSTOM_BACKGROUND else originalGallery) }
         val picked = pickedBackground
+        // A photo of one's own stays on this phone; that is said every time until it is marked as understood.
+        val hintPrefs = remember { getSharedPreferences("hints", MODE_PRIVATE) }
+        var localHint by remember { mutableStateOf(false) }
         LaunchedEffect(picked) {
-            if (picked != null) background = CUSTOM_BACKGROUND
+            if (picked != null) {
+                background = CUSTOM_BACKGROUND
+                if (!hintPrefs.getBoolean("own_photo_local_dismissed", false)) localHint = true
+            }
+        }
+        if (localHint) {
+            var never by remember { mutableStateOf(false) }
+            AlertDialog(
+                onDismissRequest = { localHint = false },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Text(stringResource(R.string.own_photo_hint))
+                        Row(
+                            Modifier.fillMaxWidth().clickable { never = !never },
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            androidx.compose.material3.Checkbox(checked = never, onCheckedChange = null, modifier = Modifier.padding(end = 8.dp))
+                            Text(stringResource(R.string.dont_show_again))
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        if (never) hintPrefs.edit().putBoolean("own_photo_local_dismissed", true).apply()
+                        localHint = false
+                    }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.ok)) }
+                },
+            )
         }
         val showColors = remember { AppSettingsStore.load(this@EditNoteActivity).showNoteColors }
         val picture by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, background, picked) {
@@ -505,9 +535,10 @@ class EditNoteActivity : ComponentActivity() {
             onDispose { onHome = null }
         }
 
+        val scroll = rememberScrollState()
         OnNoteTheme(tinted, accent = accent) {
         Column(
-            Modifier.verticalScroll(rememberScrollState()).padding(20.dp),
+            Modifier.verticalScroll(scroll).padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             if (unsent != null) {
@@ -1019,14 +1050,14 @@ class EditNoteActivity : ComponentActivity() {
                 }
             }
 
-            // The color and the picture (Keep's or the user's own photo) are set separately; picking the chosen one again takes it away.
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.color_and_background), modifier = Modifier.weight(1f))
-                if (color != NoteColors.DEFAULT || background.isNotEmpty()) {
-                    TextButton(
-                        onClick = { color = NoteColors.DEFAULT; background = ""; pickedBackground = null },
-                        enabled = canEdit, shapes = ButtonDefaults.shapes(),
-                    ) { Text(stringResource(R.string.color_background_remove)) }
+            // The color and the picture (Keep's or the user's own photo) are set separately, each with its own "Remove".
+            // The row is as tall as the button, also without it, so showing the button moves nothing.
+            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.color), modifier = Modifier.weight(1f))
+                if (color != NoteColors.DEFAULT) {
+                    TextButton(onClick = { color = NoteColors.DEFAULT }, enabled = canEdit, shapes = ButtonDefaults.shapes()) {
+                        Text(stringResource(R.string.color_background_remove))
+                    }
                 }
             }
             Row(Modifier.horizontalScroll(rememberScrollState())) {
@@ -1034,7 +1065,7 @@ class EditNoteActivity : ComponentActivity() {
                     val argb = NoteColors.argb(name)
                     val chosen = name == color
                     // The circle keeps its size; the touch area around it is 48 dp.
-                    RoundTouchTarget(onClick = { color = if (chosen) NoteColors.DEFAULT else name }, enabled = canEdit) {
+                    RoundTouchTarget(onClick = { color = name }, enabled = canEdit) {
                         Box(
                             Modifier.size(if (chosen) 44.dp else 36.dp)
                                 .clip(CircleShape)
@@ -1048,13 +1079,21 @@ class EditNoteActivity : ComponentActivity() {
                     }
                 }
             }
+            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.note_background), modifier = Modifier.weight(1f))
+                if (background.isNotEmpty()) {
+                    TextButton(onClick = { background = ""; pickedBackground = null }, enabled = canEdit, shapes = ButtonDefaults.shapes()) {
+                        Text(stringResource(R.string.color_background_remove))
+                    }
+                }
+            }
             // Keep's pictures exist in Keep only, so local notes have none; the photo of one's own works for every note that exists.
             Row(Modifier.horizontalScroll(rememberScrollState())) {
                 if (!isLocal) NoteBackgrounds.NAMES.forEach { name ->
                     val thumb by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, name) {
                         value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { NoteBackgrounds.load(this@EditNoteActivity, name) }
                     }
-                    RoundTouchTarget(onClick = { background = if (name == background) "" else name; pickedBackground = null }, enabled = canEdit, shape = MaterialTheme.shapes.small) {
+                    RoundTouchTarget(onClick = { background = name; pickedBackground = null }, enabled = canEdit, shape = MaterialTheme.shapes.small) {
                         BackgroundTile(name == background) {
                             thumb?.let { Image(it.asImageBitmap(), contentDescription = name, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()) }
                         }

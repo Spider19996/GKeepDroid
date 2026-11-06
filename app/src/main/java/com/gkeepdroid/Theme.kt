@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialExpressiveTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MotionScheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
@@ -52,29 +53,35 @@ class ScreenTint {
 /** True where content sits on a note's own color or picture. */
 val LocalOnNote = androidx.compose.runtime.compositionLocalOf { false }
 
-/** Light colors and dark text for content that sits on a note's own color or picture. */
+/**
+ * Light colors and dark text for content that sits on a note's own color or picture. The wrapper is always there (only the
+ * colors change), so switching a color or picture on or off does not rebuild the content and lose its state, such as the scroll position.
+ */
 @Composable
 fun OnNoteTheme(active: Boolean, accent: Int? = null, content: @Composable () -> Unit) {
-    if (!active) return content()
     val context = LocalContext.current
-    val base = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) dynamicLightColorScheme(context) else expressiveLightColorScheme()
-    val scheme = if (accent == null) base else {
-        // Buttons in a dark shade of the note's hue, their containers in a light one, so they sit well on the note.
-        val hsv = FloatArray(3).also { android.graphics.Color.colorToHSV(accent, it) }
-        val dark = Color(android.graphics.Color.HSVToColor(floatArrayOf(hsv[0], (hsv[1] + 0.35f).coerceIn(0.45f, 0.9f), 0.34f)))
-        val light = androidx.compose.ui.graphics.lerp(Color(accent), Color.White, 0.55f)
-        base.copy(
-            primary = dark, onPrimary = Color.White,
-            primaryContainer = light, onPrimaryContainer = dark,
-            secondaryContainer = light, onSecondaryContainer = dark,
-            secondary = dark, onSecondary = Color.White,
-            surfaceTint = dark, outline = dark.copy(alpha = 0.6f),
-        )
+    val outer = MaterialTheme.colorScheme
+    val outerContent = androidx.compose.material3.LocalContentColor.current
+    val scheme = if (!active) outer else {
+        val base = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) dynamicLightColorScheme(context) else expressiveLightColorScheme()
+        if (accent == null) base else {
+            // Buttons in a dark shade of the note's hue, their containers in a light one, so they sit well on the note.
+            val hsv = FloatArray(3).also { android.graphics.Color.colorToHSV(accent, it) }
+            val dark = Color(android.graphics.Color.HSVToColor(floatArrayOf(hsv[0], (hsv[1] + 0.35f).coerceIn(0.45f, 0.9f), 0.34f)))
+            val light = androidx.compose.ui.graphics.lerp(Color(accent), Color.White, 0.55f)
+            base.copy(
+                primary = dark, onPrimary = Color.White,
+                primaryContainer = light, onPrimaryContainer = dark,
+                secondaryContainer = light, onSecondaryContainer = dark,
+                secondary = dark, onSecondary = Color.White,
+                surfaceTint = dark, outline = dark.copy(alpha = 0.6f),
+            )
+        }
     }
     MaterialExpressiveTheme(colorScheme = scheme, motionScheme = MotionScheme.expressive()) {
         androidx.compose.runtime.CompositionLocalProvider(
-            androidx.compose.material3.LocalContentColor provides DarkNoteText,
-            LocalOnNote provides true,
+            androidx.compose.material3.LocalContentColor provides (if (active) DarkNoteText else outerContent),
+            LocalOnNote provides active,
         ) { content() }
     }
 }

@@ -165,8 +165,10 @@
     <string name="layout_list">Liste</string>
     <string name="pinned_section_switch">Afficher les notes épinglées dans leur propre section</string>
     <string name="pull_to_refresh_switch">Tirer la liste vers le bas pour actualiser</string>
-    <string name="color_and_background">Couleur / arrière-plan</string>
     <string name="color_background_remove">Retirer</string>
+    <string name="note_background">Arrière-plan</string>
+    <string name="own_photo_hint">Cette photo reste uniquement sur ce téléphone. Elle n\'est pas enregistrée dans Google Keep et n\'apparaîtra donc ni sur d\'autres appareils ni dans Keep.</string>
+    <string name="dont_show_again">Ne plus afficher</string>
     <string name="background_own">Photo personnelle</string>
     <string name="selected_count">%d sélectionnées</string>
     <string name="select_all">Tout sélectionner</string>
