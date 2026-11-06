@@ -211,3 +211,64 @@ fun ButtonEditor(
         }
     }
 }
+
+/**
+ * The buttons under a layout editor: save the layout to a file, load one, and reset it. Every page built on [ButtonEditor] gets
+ * them by saying what its file is called, how its layout turns into text and back ([export], [import], which throws if the text
+ * is not a layout), and what resetting does. [onStatus] gets the message to show (saved, loaded, could not read).
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun LayoutFileButtons(
+    fileName: String,
+    export: () -> String,
+    import: (String) -> Unit,
+    resetLabel: String,
+    onReset: () -> Unit,
+    onStatus: (String) -> Unit,
+    resetEnabled: Boolean = true,
+) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val export by rememberUpdatedState(export)
+    val import by rememberUpdatedState(import)
+    val saved = stringResource(R.string.layout_saved)
+    val loaded = stringResource(R.string.layout_loaded)
+    val failed = stringResource(R.string.layout_failed)
+    val save = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/json"),
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        onStatus(
+            try {
+                context.contentResolver.openOutputStream(uri)?.use { it.write(export().toByteArray()) }
+                saved
+            } catch (e: Exception) {
+                failed
+            },
+        )
+    }
+    val load = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.OpenDocument(),
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        onStatus(
+            try {
+                import(context.contentResolver.openInputStream(uri)?.use { it.readBytes().decodeToString() } ?: error("Cannot read file"))
+                loaded
+            } catch (e: Exception) {
+                failed
+            },
+        )
+    }
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        androidx.compose.material3.OutlinedButton(onClick = { save.launch(fileName) }, shapes = androidx.compose.material3.ButtonDefaults.shapes()) {
+            Text(stringResource(R.string.layout_save))
+        }
+        androidx.compose.material3.OutlinedButton(onClick = { load.launch(arrayOf("*/*")) }, shapes = androidx.compose.material3.ButtonDefaults.shapes()) {
+            Text(stringResource(R.string.layout_load))
+        }
+        androidx.compose.material3.OutlinedButton(enabled = resetEnabled, onClick = onReset, shapes = androidx.compose.material3.ButtonDefaults.shapes()) {
+            Text(resetLabel)
+        }
+    }
+}

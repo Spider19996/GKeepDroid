@@ -341,16 +341,14 @@ internal fun ColumnScope.ButtonBarPage(s: SettingsState) {
                 }
             }
         }
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = { layoutSaveLauncher.launch("gkeepdroid-layout.json") }, shapes = ButtonDefaults.shapes()) {
-                Text(stringResource(R.string.layout_save))
-            }
-            OutlinedButton(onClick = { layoutLoadLauncher.launch(arrayOf("*/*")) }, shapes = ButtonDefaults.shapes()) {
-                Text(stringResource(R.string.layout_load))
-            }
-            OutlinedButton(enabled = !layoutResetShown, onClick = { confirmLayoutReset = true }, shapes = ButtonDefaults.shapes()) {
-                Text(stringResource(if (layoutResetShown) R.string.layout_reset_done else R.string.layout_reset))
-            }
-        }
+        LayoutFileButtons(
+            fileName = "gkeepdroid-layout.json",
+            export = { Backup.exportLayout(currentWidget()) },
+            import = { applyLayout(Backup.parseLayout(it, currentWidget())) },
+            resetLabel = stringResource(if (layoutResetShown) R.string.layout_reset_done else R.string.layout_reset),
+            onReset = { confirmLayoutReset = true },
+            onStatus = { status = it },
+            resetEnabled = !layoutResetShown,
+        )
     }
 }

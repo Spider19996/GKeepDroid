@@ -434,14 +434,13 @@ internal fun ColumnScope.EditorButtonsPage(s: SettingsState) {
     with(s) {
         Hint(R.string.editor_buttons_hint)
         EditorLayoutEditor(appEditorLayout) { appEditorLayout = it }
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = { editorLayoutSaveLauncher.launch("gkeepdroid-editor-layout.json") }, shapes = ButtonDefaults.shapes()) {
-                Text(stringResource(R.string.layout_save))
-            }
-            OutlinedButton(onClick = { editorLayoutLoadLauncher.launch(arrayOf("*/*")) }, shapes = ButtonDefaults.shapes()) {
-                Text(stringResource(R.string.layout_load))
-            }
-            OutlinedButton(onClick = { appEditorLayout = EditorLayout() }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.editor_buttons_reset)) }
-        }
+        LayoutFileButtons(
+            fileName = "gkeepdroid-editor-layout.json",
+            export = { appEditorLayout.toFileJson() },
+            import = { appEditorLayout = EditorLayout.fromFileJson(it) },
+            resetLabel = stringResource(R.string.editor_buttons_reset),
+            onReset = { appEditorLayout = EditorLayout() },
+            onStatus = { status = it },
+        )
     }
 }

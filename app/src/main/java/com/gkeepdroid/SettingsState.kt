@@ -27,10 +27,6 @@ internal class SettingsState(val context: SettingsActivity) {
     lateinit var folderLauncher: ActivityResultLauncher<Uri?>
     lateinit var exportLauncher: ActivityResultLauncher<String>
     lateinit var importLauncher: ActivityResultLauncher<Array<String>>
-    lateinit var layoutSaveLauncher: ActivityResultLauncher<String>
-    lateinit var layoutLoadLauncher: ActivityResultLauncher<Array<String>>
-    lateinit var editorLayoutSaveLauncher: ActivityResultLauncher<String>
-    lateinit var editorLayoutLoadLauncher: ActivityResultLauncher<Array<String>>
     var credentialsRequired = ""
 
     var themeMode: Int

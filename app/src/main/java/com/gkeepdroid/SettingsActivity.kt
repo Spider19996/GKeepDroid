@@ -110,9 +110,6 @@ class SettingsActivity : ComponentActivity() {
             credentialsRequired = stringResource(R.string.credentials_required)
             val exportDone = stringResource(R.string.export_done)
             val importDone = stringResource(R.string.import_done)
-            val layoutSaved = stringResource(R.string.layout_saved)
-            val layoutLoaded = stringResource(R.string.layout_loaded)
-            val layoutFailed = stringResource(R.string.layout_failed)
             val importFailed = stringResource(R.string.import_failed, "%s")
 
             BackHandler(enabled = page != Page.Main || settingsQuery.isNotEmpty()) {
@@ -170,52 +167,6 @@ class SettingsActivity : ComponentActivity() {
                     status = exportDone
                 } catch (e: Exception) {
                     status = importFailed.format(e.message ?: e.javaClass.simpleName)
-                }
-            }
-            layoutSaveLauncher = rememberLauncherForActivityResult(
-                ActivityResultContracts.CreateDocument("application/json"),
-            ) { uri ->
-                if (uri == null) return@rememberLauncherForActivityResult
-                status = try {
-                    context.contentResolver.openOutputStream(uri)?.use { it.write(Backup.exportLayout(currentWidget()).toByteArray()) }
-                    layoutSaved
-                } catch (e: Exception) {
-                    layoutFailed
-                }
-            }
-            layoutLoadLauncher = rememberLauncherForActivityResult(
-                ActivityResultContracts.OpenDocument(),
-            ) { uri ->
-                if (uri == null) return@rememberLauncherForActivityResult
-                status = try {
-                    val text = context.contentResolver.openInputStream(uri)?.use { it.readBytes().decodeToString() } ?: error("Cannot read file")
-                    applyLayout(Backup.parseLayout(text, currentWidget()))
-                    layoutLoaded
-                } catch (e: Exception) {
-                    layoutFailed
-                }
-            }
-            editorLayoutSaveLauncher = rememberLauncherForActivityResult(
-                ActivityResultContracts.CreateDocument("application/json"),
-            ) { uri ->
-                if (uri == null) return@rememberLauncherForActivityResult
-                status = try {
-                    context.contentResolver.openOutputStream(uri)?.use { it.write(appEditorLayout.toFileJson().toByteArray()) }
-                    layoutSaved
-                } catch (e: Exception) {
-                    layoutFailed
-                }
-            }
-            editorLayoutLoadLauncher = rememberLauncherForActivityResult(
-                ActivityResultContracts.OpenDocument(),
-            ) { uri ->
-                if (uri == null) return@rememberLauncherForActivityResult
-                status = try {
-                    val text = context.contentResolver.openInputStream(uri)?.use { it.readBytes().decodeToString() } ?: error("Cannot read file")
-                    appEditorLayout = EditorLayout.fromFileJson(text)
-                    layoutLoaded
-                } catch (e: Exception) {
-                    layoutFailed
                 }
             }
             importLauncher = rememberLauncherForActivityResult(
