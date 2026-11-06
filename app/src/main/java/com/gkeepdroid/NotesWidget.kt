@@ -94,7 +94,23 @@ class NotesWidget : GlanceAppWidget() {
             }
             result
         }
-        Content(appWidgetId, account, notes, settings, collapsed, thumbs, reordering, privateKeys, hideAll, foldedKeys)
+        // Keep's background pictures, as far as they are on the device; they share a smaller budget with each other.
+        val pictures = remember(version) {
+            val result = HashMap<String, Bitmap?>()
+            if (settings.showNoteColors && account != null) {
+                var budget = PICTURE_BUDGET_BYTES
+                notes.forEach { note ->
+                    val name = RichNotes.of(context, account, note.id)?.background.orEmpty()
+                    val bitmap = if (name.isEmpty()) null else NoteBackgrounds.forWidget(context, name, settings.noteAlpha)
+                    if (bitmap != null && budget >= bitmap.byteCount) {
+                        budget -= bitmap.byteCount
+                        result[note.id] = bitmap
+                    }
+                }
+            }
+            result
+        }
+        Content(appWidgetId, account, notes, settings, collapsed, thumbs, pictures, reordering, privateKeys, hideAll, foldedKeys)
     }
 
     @Composable
@@ -105,6 +121,7 @@ class NotesWidget : GlanceAppWidget() {
         settings: WidgetSettings,
         collapsed: Map<String, Boolean>,
         thumbs: Map<String, Bitmap?>,
+        pictures: Map<String, Bitmap?>,
         reordering: Boolean,
         privateKeys: Set<String>,
         hideAll: Boolean,
@@ -138,7 +155,7 @@ class NotesWidget : GlanceAppWidget() {
                     items(notes, itemId = { stableId("n", it.id) }) { note ->
                         val index = notes.indexOf(note)
                         NoteCard(
-                            appWidgetId, note, account.orEmpty(), settings, collapsed, thumbs[note.id], contentWidth,
+                            appWidgetId, note, account.orEmpty(), settings, collapsed, thumbs[note.id], pictures[note.id], contentWidth,
                             reordering = reordering, canMoveUp = index > 0, canMoveDown = index < notes.lastIndex,
                             isPrivate = hideAll || PrivateNotes.isPrivate(note, account.orEmpty(), privateKeys),
                             foldedKeys = foldedKeys,
@@ -157,6 +174,7 @@ class NotesWidget : GlanceAppWidget() {
         settings: WidgetSettings,
         collapsedByNote: Map<String, Boolean>,
         thumb: Bitmap?,
+        picture: Bitmap?,
         contentWidth: Dp,
         reordering: Boolean,
         canMoveUp: Boolean,
@@ -165,10 +183,10 @@ class NotesWidget : GlanceAppWidget() {
         foldedKeys: Set<String>,
     ) {
         val noteColor = if (settings.showNoteColors) NoteColors.argb(note.color) else null
-        val palette = textPalette(settings, onNoteColor = noteColor != null)
+        val palette = textPalette(settings, onNoteColor = noteColor != null || picture != null)
         val textColor = palette.provider()
 
-        val cardModifier = GlanceModifier.fillMaxWidth().cornerRadius(R.dimen.widget_inner_corner).noteBackground(noteColor, settings)
+        val cardModifier = GlanceModifier.fillMaxWidth().cornerRadius(R.dimen.widget_inner_corner).noteBackground(noteColor, settings, picture = picture)
         val folded = settings.foldable && FoldStore.key(account, note.id) in foldedKeys
 
         // A small pin shows that the note is pinned in Keep or shown at the widget's bottom.
@@ -290,6 +308,7 @@ class NotesWidget : GlanceAppWidget() {
 }
 
 private const val IMAGE_BUDGET_BYTES = 9 * 1024 * 1024
+private const val PICTURE_BUDGET_BYTES = 4 * 1024 * 1024
 
 class NotesWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = NotesWidget()

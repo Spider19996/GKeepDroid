@@ -110,7 +110,9 @@ internal fun GlanceModifier.noteBackground(
     noteColor: Int?,
     settings: WidgetSettings,
     transparentFallback: Color = Color.Transparent,
+    picture: android.graphics.Bitmap? = null,
 ): GlanceModifier = when {
+    picture != null -> background(ImageProvider(picture), androidx.glance.layout.ContentScale.Crop)
     noteColor != null -> background(ColorProvider(Color(noteColor).copy(alpha = settings.noteAlpha)))
     settings.plainCardStyle == PLAIN_GRAY -> background(ColorProvider(Color(0xFF424242).copy(alpha = settings.noteAlpha)))
     settings.plainCardStyle == PLAIN_BORDER -> background(ImageProvider(R.drawable.card_border))

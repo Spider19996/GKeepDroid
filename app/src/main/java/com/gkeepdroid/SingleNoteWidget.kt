@@ -78,14 +78,18 @@ class SingleNoteWidget : GlanceAppWidget() {
         }
 
         val noteColor = if (settings.showNoteColors && note != null) NoteColors.argb(note.color) else null
-        val palette = textPalette(settings, onNoteColor = noteColor != null)
+        val picture = remember(version) {
+            val name = if (settings.showNoteColors && note != null && account != null) RichNotes.of(context, account, note.id)?.background.orEmpty() else ""
+            if (name.isEmpty()) null else NoteBackgrounds.forWidget(context, name, settings.noteAlpha)
+        }
+        val palette = textPalette(settings, onNoteColor = noteColor != null || picture != null)
         val textColor = palette.provider()
         val settingsAction = actionStartActivity<SettingsActivity>(actionParametersOf(WidgetIdKey to appWidgetId))
 
         // The whole widget is the note's card: its color, or the widget background if it has none.
         WithHeaderBar(
             modifier = GlanceModifier.fillMaxSize()
-                .noteBackground(noteColor, settings, Color.Black.copy(alpha = settings.backgroundAlpha))
+                .noteBackground(noteColor, settings, Color.Black.copy(alpha = settings.backgroundAlpha), picture)
                 .cornerRadius(R.dimen.widget_corner)
                 .padding(8.dp),
             bar = { side ->

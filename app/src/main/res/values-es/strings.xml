@@ -165,6 +165,8 @@
     <string name="layout_list">Lista</string>
     <string name="pinned_section_switch">Mostrar las notas fijadas en su propia sección</string>
     <string name="pull_to_refresh_switch">Deslizar la lista hacia abajo para actualizar</string>
+    <string name="note_background">Fondo</string>
+    <string name="note_background_none">Sin fondo</string>
     <string name="selected_count">%d seleccionadas</string>
     <string name="select_all">Seleccionar todo</string>
     <string name="duplicate_note">Duplicar</string>

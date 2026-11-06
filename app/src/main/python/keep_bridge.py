@@ -304,6 +304,38 @@ def _unpack(packed):
     return docs
 
 
+def _send_background(keep, state_path, note, name):
+    """Have the next sync carry the note's background picture ("" leaves it alone, "default" removes it).
+
+    gkeepapi does not know backgrounds, so the node that it sends is completed on its way out.
+    """
+    if not name:
+        return
+    api = keep._keep_api
+    changes = api.changes
+
+    def with_background(target_version=None, nodes=None, labels=None):
+        for node in nodes or []:
+            if node.get("id") == note.id:
+                node["background"] = {"name": name, "origin": "none" if name == "default" else "gallery"}
+        return changes(target_version=target_version, nodes=nodes, labels=labels)
+
+    api.changes = with_background
+    # A note that is otherwise unchanged is not sent at all.
+    note.touch()
+    # The app shows the new picture at once; the next sync confirms it.
+    path = state_path.rsplit(".json", 1)[0] + "_rich.json"
+    try:
+        with open(path) as f:
+            rich = json.load(f)
+        entry = rich["n"].setdefault(note.id, {"bg": "", "d": {}})
+        entry["bg"] = "" if name == "default" else name
+        with open(path, "w") as f:
+            json.dump(rich, f)
+    except (OSError, ValueError, KeyError):
+        pass
+
+
 def _fetch_rich(keep, state_path):
     """Formatting and background of the notes, which gkeepapi does not know, into files of their own.
 
@@ -402,7 +434,7 @@ def set_items_checked(email, master_token, state_path, ops_json):
     return _finish(keep, state_path)
 
 
-def update_note(email, master_token, state_path, note_id, title, text, items_json, color, pinned, remove_images_json="[]", labels_json=None):
+def update_note(email, master_token, state_path, note_id, title, text, items_json, color, pinned, remove_images_json="[]", labels_json=None, background=""):
     keep = _login(email, master_token, state_path, pull=False)
     note = keep.get(note_id)
     if note is None:
@@ -426,6 +458,7 @@ def update_note(email, master_token, state_path, note_id, title, text, items_jso
         _apply_items(note, json.loads(items_json))
     else:
         note.text = text
+    _send_background(keep, state_path, note, background)
     keep.sync()
     # Saving never adds images, so only the deletions matter; the next sync cleans up the files.
     return _finish(keep, state_path, images=bool(removed))
@@ -497,7 +530,7 @@ def trash_note(email, master_token, state_path, note_id):
     return _finish(keep, state_path)
 
 
-def create_note(email, master_token, state_path, title, text, is_list, items_json, color, pinned, labels_json=None):
+def create_note(email, master_token, state_path, title, text, is_list, items_json, color, pinned, labels_json=None, background=""):
     keep = _login(email, master_token, state_path, pull=False)
     if is_list:
         items = [
@@ -511,6 +544,7 @@ def create_note(email, master_token, state_path, title, text, is_list, items_jso
     note.color = ColorValue[color]
     note.pinned = pinned
     _set_labels(keep, note, labels_json)
+    _send_background(keep, state_path, note, background)
     keep.sync()
     return _finish(keep, state_path, images=False)
 

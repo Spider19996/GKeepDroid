@@ -168,6 +168,8 @@
     <string name="layout_list">List</string>
     <string name="pinned_section_switch">Show pinned notes in their own section</string>
     <string name="pull_to_refresh_switch">Pull down on the list to refresh</string>
+    <string name="note_background">Background</string>
+    <string name="note_background_none">No background</string>
     <string name="selected_count">%d selected</string>
     <string name="select_all">Select all</string>
     <string name="duplicate_note">Duplicate</string>

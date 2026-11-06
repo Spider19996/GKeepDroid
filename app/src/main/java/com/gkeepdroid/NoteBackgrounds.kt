@@ -20,6 +20,9 @@ import java.net.URL
  * drawn to a bitmap and kept on the device.
  */
 object NoteBackgrounds {
+    /** The pictures Keep offers (the names are those of its own files). */
+    val NAMES = listOf("celebration", "food", "grocery", "music", "notes", "places", "recipe", "travel", "video")
+
     private const val SIZE = 768
     private val memory = HashMap<String, Bitmap>()
 
@@ -37,6 +40,41 @@ object NoteBackgrounds {
         synchronized(memory) { memory[name] = bitmap }
         return bitmap
     }
+
+    private val small = HashMap<String, Bitmap>()
+
+    /**
+     * The picture for a widget: small, with the card's transparency applied, and only from what is on the device
+     * already (a widget is drawn without waiting for the network; the sync fetches the pictures).
+     */
+    fun forWidget(context: Context, name: String, alpha: Float): Bitmap? {
+        if (!name.matches(Regex("[a-z0-9_]{1,40}"))) return null
+        val key = "$name|${(alpha * 100).toInt()}"
+        synchronized(small) { small[key]?.let { return it } }
+        val file = File(File(context.cacheDir, "backgrounds"), "$name.png")
+        val full = if (file.exists()) BitmapFactory.decodeFile(file.path) else null
+        if (full == null) return null
+        val bitmap = Bitmap.createBitmap(WIDGET_SIZE, WIDGET_SIZE, Bitmap.Config.ARGB_8888)
+        Canvas(bitmap).drawBitmap(
+            full, null, android.graphics.Rect(0, 0, WIDGET_SIZE, WIDGET_SIZE),
+            android.graphics.Paint(android.graphics.Paint.FILTER_BITMAP_FLAG).apply { this.alpha = (alpha * 255).toInt().coerceIn(0, 255) },
+        )
+        synchronized(small) { small[key] = bitmap }
+        return bitmap
+    }
+
+    /** Fetches the pictures that notes of any account use; true if one was new, so the widgets should be redrawn. */
+    fun prefetch(context: Context): Boolean {
+        var fetched = false
+        CredentialStore.accounts(context).forEach { account ->
+            RichNotes.backgrounds(context, account).forEach { name ->
+                if (!File(File(context.cacheDir, "backgrounds"), "$name.png").exists() && load(context, name) != null) fetched = true
+            }
+        }
+        return fetched
+    }
+
+    private const val WIDGET_SIZE = 360
 
     private fun download(name: String): ByteArray {
         val connection = URL("https://www.gstatic.com/keep/backgrounds/${name}_light_0609.svg").openConnection() as HttpURLConnection

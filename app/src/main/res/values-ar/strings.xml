@@ -165,6 +165,8 @@
     <string name="layout_list">قائمة</string>
     <string name="pinned_section_switch">عرض الملاحظات المثبتة في قسم مستقل</string>
     <string name="pull_to_refresh_switch">اسحب القائمة للأسفل للتحديث</string>
+    <string name="note_background">الخلفية</string>
+    <string name="note_background_none">بدون خلفية</string>
     <string name="selected_count">تم تحديد %d</string>
     <string name="select_all">تحديد الكل</string>
     <string name="duplicate_note">تكرار</string>

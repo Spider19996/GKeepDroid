@@ -165,6 +165,8 @@
     <string name="layout_list">列表</string>
     <string name="pinned_section_switch">将置顶笔记显示在单独的区域</string>
     <string name="pull_to_refresh_switch">下拉列表以刷新</string>
+    <string name="note_background">背景</string>
+    <string name="note_background_none">无背景</string>
     <string name="selected_count">已选择 %d 项</string>
     <string name="select_all">全选</string>
     <string name="duplicate_note">复制</string>

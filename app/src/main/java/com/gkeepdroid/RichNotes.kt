@@ -55,6 +55,10 @@ object RichNotes {
         }
     }
 
+    /** The names of all background pictures the notes of an account use. */
+    fun backgrounds(context: Context, account: String): Set<String> =
+        load(context, account).values.map { it.background }.filter { it.isNotEmpty() }.toSet()
+
     fun of(context: Context, account: String, noteId: String): RichNote? = load(context, account)[noteId]
 
     /**

@@ -37,6 +37,8 @@ object KeepRepository {
         }
         SyncPolicy.recordSync(context, error, expired)
         Reminders.cleanup(context)
+        // Background pictures of notes are fetched once; the widgets pick them up when they are new.
+        if (withContext(Dispatchers.IO) { runCatching { NoteBackgrounds.prefetch(context) }.getOrDefault(false) }) WidgetRefresh.all(context)
         return allOk
     }
 
@@ -77,15 +79,15 @@ object KeepRepository {
     /** The arguments of the Python calls, also stored when a change has to wait for the network. */
     fun updateNoteArgs(
         id: String, title: String, text: String, items: List<KeepItem>, color: String, pinned: Boolean,
-        removeImages: List<String>, labels: List<String>,
+        removeImages: List<String>, labels: List<String>, background: String = "",
     ): List<Any> = listOf(
-        id, title, text, itemsToJson(items), color, pinned, JSONArray(removeImages).toString(), JSONArray(labels).toString(),
+        id, title, text, itemsToJson(items), color, pinned, JSONArray(removeImages).toString(), JSONArray(labels).toString(), background,
     )
 
     fun createNoteArgs(
         title: String, text: String, isList: Boolean, items: List<KeepItem>, color: String, pinned: Boolean,
-        labels: List<String>,
-    ): List<Any> = listOf(title, text, isList, itemsToJson(items), color, pinned, JSONArray(labels).toString())
+        labels: List<String>, background: String = "",
+    ): List<Any> = listOf(title, text, isList, itemsToJson(items), color, pinned, JSONArray(labels).toString(), background)
 
     // Label changes talk to Keep in the background, so the editor stays quick and closing it does not cancel them.
     private val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)

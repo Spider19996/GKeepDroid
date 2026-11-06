@@ -234,6 +234,21 @@ class EditNoteActivity : ComponentActivity() {
         // The keyboard's composing region; dropping it on every keystroke makes the word suggestions flicker.
         var textComp by remember { mutableStateOf<androidx.compose.ui.text.TextRange?>(null) }
         var color by remember { mutableStateOf(existing?.color ?: NoteColors.DEFAULT) }
+        // The note's own look fills the screen behind the editor, as long as it has a color or a picture.
+        val originalBackground = remember { existing?.let { RichNotes.of(this@EditNoteActivity, account, it.id)?.background }.orEmpty() }
+        var background by remember { mutableStateOf(originalBackground) }
+        val showColors = remember { AppSettingsStore.load(this@EditNoteActivity).showNoteColors }
+        val picture by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, background) {
+            value = if (background.isEmpty()) null else kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { NoteBackgrounds.load(this@EditNoteActivity, background) }
+        }
+        val tint = if (showColors) NoteColors.argb(color) else null
+        val shownPicture = if (showColors) picture else null
+        val tinted = tint != null || shownPicture != null
+        DisposableEffect(tint, shownPicture) {
+            ScreenTint.color = tint
+            ScreenTint.image = shownPicture
+            onDispose { ScreenTint.color = null; ScreenTint.image = null }
+        }
         var labels by remember { mutableStateOf(existing?.labels.orEmpty()) }
         var newLabel by remember { mutableStateOf("") }
         var manageLabels by remember { mutableStateOf(false) }
@@ -331,9 +346,13 @@ class EditNoteActivity : ComponentActivity() {
             val converting = convertFrom != null
             val function = if (existing != null && !converting) "update_note" else "create_note"
             val args = if (existing != null && !converting) {
-                KeepRepository.updateNoteArgs(existing.id, title, text, outItems(), color, pinned, removedImages.toList(), withHiddenLabel(labels, hiddenInWidgets))
+                KeepRepository.updateNoteArgs(
+                    existing.id, title, text, outItems(), color, pinned, removedImages.toList(), withHiddenLabel(labels, hiddenInWidgets),
+                    // Only a changed picture is sent; "default" takes it away.
+                    if (background != originalBackground) background.ifEmpty { "default" } else "",
+                )
             } else {
-                KeepRepository.createNoteArgs(title, text, isList, outItems(), color, pinned, withHiddenLabel(labels, hiddenInWidgets))
+                KeepRepository.createNoteArgs(title, text, isList, outItems(), color, pinned, withHiddenLabel(labels, hiddenInWidgets), background)
             }
             // The mark in Keep replaces the older one that only this phone knew.
             if (existing != null) PrivateNotes.set(this@EditNoteActivity, account, existing.id, false)
@@ -451,6 +470,7 @@ class EditNoteActivity : ComponentActivity() {
             onDispose { onHome = null }
         }
 
+        OnNoteTheme(tinted) {
         Column(
             Modifier.verticalScroll(rememberScrollState()).padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -988,6 +1008,33 @@ class EditNoteActivity : ComponentActivity() {
                 }
             }
 
+            // Keep's pictures behind a note: they exist in Keep only, so local notes have none.
+            if (!isLocal) {
+                Text(stringResource(R.string.note_background))
+                Row(Modifier.horizontalScroll(rememberScrollState())) {
+                    listOf("") .plus(NoteBackgrounds.NAMES).forEach { name ->
+                        val thumb by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, name) {
+                            value = if (name.isEmpty()) null else kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { NoteBackgrounds.load(this@EditNoteActivity, name) }
+                        }
+                        RoundTouchTarget(onClick = { background = name }, enabled = canEdit) {
+                            Box(
+                                Modifier.size(if (name == background) 44.dp else 36.dp)
+                                    .clip(MaterialTheme.shapes.small)
+                                    .border(
+                                        if (name == background) 3.dp else 1.dp,
+                                        if (name == background) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                                        MaterialTheme.shapes.small,
+                                    ),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                if (name.isEmpty()) Icon(painterResource(R.drawable.ic_color_none), contentDescription = stringResource(R.string.note_background_none), modifier = Modifier.size(20.dp))
+                                else thumb?.let { Image(it.asImageBitmap(), contentDescription = name, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()) }
+                            }
+                        }
+                    }
+                }
+            }
+
             if (error.isNotEmpty()) Text(error, color = MaterialTheme.colorScheme.error)
 
             if (remindersOpen) {
@@ -1075,6 +1122,7 @@ class EditNoteActivity : ComponentActivity() {
                     menuContent = {},
                 )
             }
+        }
         }
     }
 
