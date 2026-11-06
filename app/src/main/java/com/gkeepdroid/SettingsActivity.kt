@@ -195,6 +195,29 @@ class SettingsActivity : ComponentActivity() {
                     layoutFailed
                 }
             }
+            editorLayoutSaveLauncher = rememberLauncherForActivityResult(
+                ActivityResultContracts.CreateDocument("application/json"),
+            ) { uri ->
+                if (uri == null) return@rememberLauncherForActivityResult
+                status = try {
+                    context.contentResolver.openOutputStream(uri)?.use { it.write(appEditorLayout.toFileJson().toByteArray()) }
+                    layoutSaved
+                } catch (e: Exception) {
+                    layoutFailed
+                }
+            }
+            editorLayoutLoadLauncher = rememberLauncherForActivityResult(
+                ActivityResultContracts.OpenDocument(),
+            ) { uri ->
+                if (uri == null) return@rememberLauncherForActivityResult
+                status = try {
+                    val text = context.contentResolver.openInputStream(uri)?.use { it.readBytes().decodeToString() } ?: error("Cannot read file")
+                    appEditorLayout = EditorLayout.fromFileJson(text)
+                    layoutLoaded
+                } catch (e: Exception) {
+                    layoutFailed
+                }
+            }
             importLauncher = rememberLauncherForActivityResult(
                 ActivityResultContracts.OpenDocument(),
             ) { uri ->

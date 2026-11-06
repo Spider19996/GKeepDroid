@@ -4,6 +4,10 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -96,7 +100,16 @@ data class EditorLayout(val zones: Map<String, Int> = emptyMap(), val order: Lis
         .put("zones", JSONObject().also { o -> zones.forEach { (k, v) -> o.put(k, v) } })
         .toString()
 
+    /** The layout as a file of its own for saving it; the marker tells it from other files. */
+    fun toFileJson(): String = JSONObject(toJson()).put("editorLayout", 1).toString(2)
+
     companion object {
+        /** A layout read from a file; throws if the text is not one. */
+        fun fromFileJson(text: String): EditorLayout {
+            require(JSONObject(text).has("editorLayout")) { "Not an editor layout file" }
+            return fromJson(text)
+        }
+
         fun fromJson(json: String?): EditorLayout = runCatching {
             val o = JSONObject(json ?: return EditorLayout())
             val order = o.getJSONArray("order").let { a -> (0 until a.length()).map { a.getString(it) } }
@@ -121,17 +134,31 @@ class EditorActionState(
     val popup: (@Composable () -> Unit)? = null,
 )
 
-/** One bar of the editor: the actions of its left zone at the left edge, those of its right zone at the right edge. */
+/**
+ * One bar of the editor: the actions of its left zone at the left edge, those of its right zone at the right edge. When they
+ * do not fit in one line, the bar grows: the left ones stay in the first line, the right ones follow below at the right edge.
+ */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun EditorBar(left: List<EditorActionSpec>, right: List<EditorActionSpec>, states: Map<String, EditorActionState>) {
-    Row(
-        Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(2.dp),
-    ) {
-        left.forEach { EditorActionButton(it, states[it.id]) }
-        Spacer(Modifier.weight(1f))
-        right.forEach { EditorActionButton(it, states[it.id]) }
+    val shown = (left + right).count { states[it.id]?.visible == true }
+    if (shown == 0) return
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        // A button is 40 dp wide with 2 dp between (the save button a little more).
+        val fits = (maxWidth - 24.dp) / 44.dp >= shown
+        val padding = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)
+        if (fits) Row(padding, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+            left.forEach { EditorActionButton(it, states[it.id]) }
+            Spacer(Modifier.weight(1f))
+            right.forEach { EditorActionButton(it, states[it.id]) }
+        } else Column(padding) {
+            FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                left.forEach { EditorActionButton(it, states[it.id]) }
+            }
+            FlowRow(
+                Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.End), verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) { right.forEach { EditorActionButton(it, states[it.id]) } }
+        }
     }
 }
 

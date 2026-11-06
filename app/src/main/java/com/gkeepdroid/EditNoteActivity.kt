@@ -1,4 +1,4 @@
-@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 
 package com.gkeepdroid
 
@@ -32,6 +32,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -799,10 +800,12 @@ class EditNoteActivity : ComponentActivity() {
         Column(Modifier.fillMaxSize()) {
         // The bar stays on screen while the note scrolls: discard, the note's switches, save.
             EditorBar(editorLayout.inZone(ZONE_TOP_LEFT), editorLayout.inZone(ZONE_TOP_RIGHT), states)
-        Column(
-            Modifier.weight(1f).verticalScroll(scroll).padding(EDITOR_PADDING),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
+        // A short note sits in the middle of the screen between the bars; with the keyboard open, at the top, where one types.
+        val imeVisible = WindowInsets.isImeVisible
+        BoxWithConstraints(Modifier.weight(1f)) {
+        val viewport = maxHeight
+        Column(Modifier.fillMaxSize().verticalScroll(scroll).padding(EDITOR_PADDING)) {
+        Column(Modifier.fillMaxWidth().heightIn(min = viewport - EDITOR_PADDING * 2), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (unsent != null) {
                 Text(
                     if (unsent.error.isBlank()) stringResource(R.string.note_unsent)
@@ -920,6 +923,7 @@ class EditNoteActivity : ComponentActivity() {
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
+            if (!imeVisible) Spacer(Modifier.weight(1f))
             OutlinedTextField(
                 value = title, onValueChange = { title = it }, readOnly = !canEdit,
                 label = { Text(stringResource(R.string.title_hint)) },
@@ -1049,6 +1053,8 @@ class EditNoteActivity : ComponentActivity() {
                 )
             }
 
+            Spacer(Modifier.weight(1f))
+
             // Web addresses, e-mail addresses and phone numbers in the note can be opened with one tap.
             val links = NoteLinks.find(listOf(title, text) + items.map { it.text })
             if (links.isNotEmpty()) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1093,6 +1099,8 @@ class EditNoteActivity : ComponentActivity() {
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 )
             }
+        }
+        }
         }
         // The bottom bar sits above the keyboard, where the thumb is while typing, and stays when the note scrolls.
         EditorBar(editorLayout.inZone(ZONE_BOTTOM_LEFT), editorLayout.inZone(ZONE_BOTTOM_RIGHT), states)
