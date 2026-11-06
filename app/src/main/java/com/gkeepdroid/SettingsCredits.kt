@@ -23,6 +23,7 @@ private class Credit(val name: String, val author: String, val license: String, 
  */
 private val credits = listOf(
     Credit("Jetpack Compose, Material 3, Glance, WorkManager, Activity, Core, Core SplashScreen", "Google / Android Open Source Project", "Apache License 2.0", "https://developer.android.com/jetpack"),
+    Credit("App icon", "Claude (Anthropic), made for this project", "Part of GKeepDroid (GNU General Public License 3)", "https://claude.ai"),
     Credit("Material icons", "Google", "Apache License 2.0", "https://fonts.google.com/icons"),
     Credit("AndroidSVG", "Paul LeBeau", "Apache License 2.0", "https://bigbadaboom.github.io/androidsvg/"),
     Credit("Chaquopy (Python for Android)", "Chaquopy Ltd", "MIT License", "https://chaquo.com/chaquopy/"),
