@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Material icon, tinted at runtime so that all buttons share one style. -->
+<!-- Material Symbols (Outlined, weight 400) by Google, Apache License 2.0: "unfold_more". Tinted at runtime. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
-    <path
-        android:fillColor="#FF000000"
-        android:pathData="M12,5.83L15.17,9l1.41,-1.41L12,3 7.41,7.59 8.83,9 12,5.83zM12,18.17L8.83,15l-1.41,1.41L12,21l4.59,-4.59L15.17,15 12,18.17z" />
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+  <path
+      android:fillColor="#FF000000"
+      android:pathData="M480,840L300,660L358,602L480,724L602,602L660,660L480,840ZM358,362L300,304L480,124L660,304L602,362L480,240L358,362Z"/>
 </vector>

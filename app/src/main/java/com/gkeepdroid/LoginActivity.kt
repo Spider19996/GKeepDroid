@@ -63,6 +63,16 @@ class LoginActivity : ComponentActivity() {
         setContent { KeepTheme(themeMode) { LoginScreen() } }
     }
 
+    override fun onDestroy() {
+        // What the Google page left behind (its session cookies and stored data) is of no use to the app once the sign-in is over.
+        if (isFinishing) {
+            CookieManager.getInstance().removeAllCookies(null)
+            CookieManager.getInstance().flush()
+            android.webkit.WebStorage.getInstance().deleteAllData()
+        }
+        super.onDestroy()
+    }
+
     @OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
     @Composable
     private fun LoginScreen() {
