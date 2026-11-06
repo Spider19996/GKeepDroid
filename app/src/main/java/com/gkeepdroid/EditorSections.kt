@@ -407,9 +407,8 @@ internal fun ReminderButton(reminderSet: Boolean, notificationsOn: Boolean, onRe
     FilledTonalIconToggleButton(
         checked = reminderSet,
         onCheckedChange = { onReminders() },
-        colors = IconButtonDefaults.filledTonalIconToggleButtonColors(
-            checkedContainerColor = MaterialTheme.colorScheme.primary,
-            checkedContentColor = MaterialTheme.colorScheme.onPrimary,
+        colors = quietToggleColors(
+            checkedContainer = MaterialTheme.colorScheme.primary, checkedContent = MaterialTheme.colorScheme.onPrimary,
         ),
         shapes = IconButtonDefaults.toggleableShapes(),
         modifier = Modifier.size(40.dp),
@@ -420,3 +419,15 @@ internal fun ReminderButton(reminderSet: Boolean, notificationsOn: Boolean, onRe
         )
     }
 }
+
+/** Toggle buttons of the title row: no container until they are on, so the row stays calm. */
+@Composable
+internal fun quietToggleColors(
+    checkedContainer: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.secondaryContainer,
+    checkedContent: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSecondaryContainer,
+) = IconButtonDefaults.filledTonalIconToggleButtonColors(
+    containerColor = androidx.compose.ui.graphics.Color.Transparent,
+    contentColor = LocalContentColor.current,
+    checkedContainerColor = checkedContainer,
+    checkedContentColor = checkedContent,
+)

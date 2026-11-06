@@ -662,7 +662,6 @@ class EditNoteActivity : ComponentActivity() {
             }
             // Title with its actions on the right: pin, show at the widget's bottom, open in Keep.
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                if (canEdit) UndoRedoButtons(history.canUndo, history.canRedo, undo, redo)
                 Text(
                     stringResource(
                         when {
@@ -672,10 +671,16 @@ class EditNoteActivity : ComponentActivity() {
                         }
                     ),
                     style = MaterialTheme.typography.titleLargeEmphasized,
-                    modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
+                    maxLines = 2,
+                    modifier = Modifier.weight(1f),
                 )
+                // Left of the other buttons, right of the title.
+                if (canEdit) UndoRedoButtons(history.canUndo, history.canRedo, undo, redo)
                 Box(Modifier.clickable(enabled = !canEdit) { toastUnlockFirst() }) {
-                FilledTonalIconToggleButton(checked = pinned, onCheckedChange = { pinned = it }, enabled = canEdit, shapes = IconButtonDefaults.toggleableShapes()) {
+                FilledTonalIconToggleButton(
+                    checked = pinned, onCheckedChange = { pinned = it }, enabled = canEdit, shapes = IconButtonDefaults.toggleableShapes(),
+                    colors = quietToggleColors(), modifier = Modifier.size(40.dp),
+                ) {
                     Icon(
                         painterResource(if (pinned) R.drawable.ic_push_pin else R.drawable.ic_push_pin_outline),
                         contentDescription = stringResource(R.string.pin_note),
@@ -695,6 +700,7 @@ class EditNoteActivity : ComponentActivity() {
                             scope.launch { WidgetRefresh.all(this@EditNoteActivity) }
                         },
                         shapes = IconButtonDefaults.toggleableShapes(),
+                        colors = quietToggleColors(), modifier = Modifier.size(40.dp),
                     ) {
                         Icon(painterResource(R.drawable.ic_pin_bottom), contentDescription = stringResource(R.string.pin_to_bottom))
                     }
@@ -703,7 +709,7 @@ class EditNoteActivity : ComponentActivity() {
                 // Less common actions live in an overflow menu; grayed out until the note is open for editing.
                 run {
                     Box {
-                        IconButton(onClick = { if (canEdit) menuOpen = true else toastUnlockFirst() }, shapes = IconButtonDefaults.shapes()) {
+                        IconButton(onClick = { if (canEdit) menuOpen = true else toastUnlockFirst() }, shapes = IconButtonDefaults.shapes(), modifier = Modifier.size(40.dp)) {
                             Icon(
                                 painterResource(R.drawable.ic_more_vert), contentDescription = stringResource(R.string.more_actions),
                                 tint = if (canEdit) LocalContentColor.current else LocalContentColor.current.copy(alpha = 0.38f),
