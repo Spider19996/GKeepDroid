@@ -81,7 +81,8 @@ internal class TextPalette(private val day: Color, private val night: Color) {
 }
 
 /** Notes with a color always get dark text, which suits the light note colors. */
-internal fun textPalette(settings: WidgetSettings, onNoteColor: Boolean, onDarkPicture: Boolean = false): TextPalette = when {
+internal fun textPalette(settings: WidgetSettings, onNoteColor: Boolean, onDarkPicture: Boolean = false, own: Color? = null): TextPalette = when {
+    own != null -> TextPalette(own, own)
     onDarkPicture -> TextPalette(LightNoteText, LightNoteText)
     onNoteColor -> TextPalette(DarkNoteText, DarkNoteText)
     settings.textColorAuto -> TextPalette(DarkNoteText, Color.White)

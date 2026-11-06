@@ -166,6 +166,9 @@
     <string name="pinned_section_switch">Vastgezette notities in een eigen sectie tonen</string>
     <string name="pull_to_refresh_switch">Lijst omlaag trekken om te vernieuwen</string>
     <string name="color_background_remove">Verwijderen</string>
+    <string name="note_text_color">Tekstkleur</string>
+    <string name="note_text_color_auto">Automatisch</string>
+    <string name="background_dark_version">Donkere versie van de afbeelding</string>
     <string name="color_and_background">Kleur / achtergrond</string>
     <string name="note_background">Achtergrond</string>
     <string name="own_photo_hint">Deze foto blijft alleen op deze telefoon. Hij wordt niet opgeslagen in Google Keep en verschijnt dus niet op andere apparaten of in Keep zelf.</string>

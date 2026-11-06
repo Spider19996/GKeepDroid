@@ -166,6 +166,9 @@
     <string name="pinned_section_switch">Mostrar notas fixadas em uma seção própria</string>
     <string name="pull_to_refresh_switch">Puxar a lista para baixo para atualizar</string>
     <string name="color_background_remove">Remover</string>
+    <string name="note_text_color">Cor do texto</string>
+    <string name="note_text_color_auto">Automática</string>
+    <string name="background_dark_version">Versão escura da imagem</string>
     <string name="color_and_background">Cor / plano de fundo</string>
     <string name="note_background">Plano de fundo</string>
     <string name="own_photo_hint">Esta foto fica apenas neste telefone. Ela não é salva no Google Keep e, por isso, não aparece em outros dispositivos nem no próprio Keep.</string>

@@ -166,6 +166,9 @@
     <string name="pinned_section_switch">Показывать закреплённые заметки в отдельном разделе</string>
     <string name="pull_to_refresh_switch">Потянуть список вниз для обновления</string>
     <string name="color_background_remove">Убрать</string>
+    <string name="note_text_color">Цвет текста</string>
+    <string name="note_text_color_auto">Автоматически</string>
+    <string name="background_dark_version">Тёмная версия картинки</string>
     <string name="color_and_background">Цвет / фон</string>
     <string name="note_background">Фон</string>
     <string name="own_photo_hint">Это фото остаётся только на этом телефоне. Оно не сохраняется в Google Keep и поэтому не появится на других устройствах и в самом Keep.</string>

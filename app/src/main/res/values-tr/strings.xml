@@ -166,6 +166,9 @@
     <string name="pinned_section_switch">Sabitlenen notları ayrı bölümde göster</string>
     <string name="pull_to_refresh_switch">Yenilemek için listeyi aşağı çek</string>
     <string name="color_background_remove">Kaldır</string>
+    <string name="note_text_color">Metin rengi</string>
+    <string name="note_text_color_auto">Otomatik</string>
+    <string name="background_dark_version">Resmin koyu sürümü</string>
     <string name="color_and_background">Renk / arka plan</string>
     <string name="note_background">Arka plan</string>
     <string name="own_photo_hint">Bu fotoğraf yalnızca bu telefonda kalır. Google Keep\'e kaydedilmez; bu yüzden diğer cihazlarda veya Keep\'in kendisinde görünmez.</string>

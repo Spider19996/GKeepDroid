@@ -250,6 +250,8 @@ class EditNoteActivity : ComponentActivity() {
         val originalCustom = remember { existing != null && CustomBackgrounds.stamp(this@EditNoteActivity, account, existing.id) != 0L }
         var background by remember { mutableStateOf(if (originalCustom) CUSTOM_BACKGROUND else originalGallery) }
         val picked = pickedBackground
+        val showColors0 = remember { AppSettingsStore.load(this@EditNoteActivity).showNoteColors }
+        val showColors = showColors0
         LaunchedEffect(picked) {
             if (picked != null) background = CUSTOM_BACKGROUND
         }
@@ -284,21 +286,35 @@ class EditNoteActivity : ComponentActivity() {
                 },
             )
         }
-        val showColors = remember { AppSettingsStore.load(this@EditNoteActivity).showNoteColors }
         val darkTheme = LocalDarkTheme.current
-        val picture by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, background, picked, darkTheme) {
+        // This phone's own look of the note: a text color, and which version (light or dark) of Keep's picture it shows.
+        val originalLook = remember { existing?.let { NoteLook.of(this@EditNoteActivity, account, it.id) } ?: NoteLook.Look(null, null) }
+        var variantDark by remember { mutableStateOf(originalLook.dark) }
+        var ownText by remember { mutableStateOf(originalLook.textColor) }
+        var textPicker by remember { mutableStateOf(false) }
+        val darkVersion = variantDark ?: darkTheme
+        // What is on the device already is there in the first frame, so the picture does not pop in.
+        val firstPicture = remember {
+            when {
+                !showColors0 -> null
+                background == CUSTOM_BACKGROUND -> existing?.let { CustomBackgrounds.peek(this@EditNoteActivity, account, it.id) }
+                background.isEmpty() -> null
+                else -> NoteBackgrounds.peek(this@EditNoteActivity, background, darkVersion)
+            }
+        }
+        val picture by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(firstPicture, background, picked, darkVersion) {
             value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
                 when {
                     background == CUSTOM_BACKGROUND ->
                         if (picked != null) CustomBackgrounds.preview(this@EditNoteActivity, picked)
                         else existing?.let { CustomBackgrounds.load(this@EditNoteActivity, account, it.id) }
                     background.isEmpty() -> null
-                    else -> NoteBackgrounds.load(this@EditNoteActivity, background, darkTheme)
+                    else -> NoteBackgrounds.load(this@EditNoteActivity, background, darkVersion)
                 }
             }
         }
         // The dark version of one of Keep's pictures keeps the editor dark, with light text.
-        val darkPicture = darkTheme && background != CUSTOM_BACKGROUND && background.isNotEmpty()
+        val darkPicture = darkVersion && background != CUSTOM_BACKGROUND && background.isNotEmpty()
         val tint = if (showColors) NoteColors.argb(color) else null
         val shownPicture = if (showColors) picture else null
         val tinted = tint != null || shownPicture != null
@@ -405,6 +421,8 @@ class EditNoteActivity : ComponentActivity() {
             error = ""
             val target = if (existing != null) account else targetAccount
             val galleryNow = if (background == CUSTOM_BACKGROUND) "" else background
+            if (existing != null) NoteLook.save(this@EditNoteActivity, account, existing.id, ownText, variantDark)
+            if (existing != null) scope.launch { WidgetRefresh.all(this@EditNoteActivity) }
             // The photo of one's own stays on this phone; the widgets learn of a change right away.
             if (existing != null && (background == CUSTOM_BACKGROUND && picked != null || background != CUSTOM_BACKGROUND && originalCustom)) {
                 if (background == CUSTOM_BACKGROUND) CustomBackgrounds.save(this@EditNoteActivity, account, existing.id, picked!!)
@@ -521,7 +539,8 @@ class EditNoteActivity : ComponentActivity() {
         fun hasChanges() = if (existing != null) {
             title != existing.title || text != existing.text || outItems() != existing.items || color != existing.color ||
                 pinned != existing.pinned || labels != existing.labels || removedImages.isNotEmpty() || convertFrom != null || hiddenInWidgets != wasHidden ||
-                background != (if (originalCustom) CUSTOM_BACKGROUND else originalGallery) || picked != null
+                background != (if (originalCustom) CUSTOM_BACKGROUND else originalGallery) || picked != null ||
+                variantDark != originalLook.dark || ownText != originalLook.textColor
         } else {
             title.isNotBlank() || text.isNotBlank() || items.any { it.text.isNotBlank() }
         }
@@ -541,7 +560,10 @@ class EditNoteActivity : ComponentActivity() {
         }
 
         val scroll = rememberScrollState()
-        OnNoteTheme(tinted && !(shownPicture != null && darkPicture), accent = accent, transparentRows = tinted) {
+        OnNoteTheme(
+            active = tinted && !(shownPicture != null && darkPicture), accent = accent, transparentRows = tinted,
+            darkOnPicture = shownPicture != null && darkPicture, textColor = ownText,
+        ) {
         Column(
             Modifier.verticalScroll(scroll).padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -1056,7 +1078,18 @@ class EditNoteActivity : ComponentActivity() {
             }
 
             // The color and the picture (Keep's or the user's own photo) are set separately; the first item of each row takes it away.
-            Text(stringResource(R.string.color_and_background))
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.color_and_background), modifier = Modifier.weight(1f))
+                // Light or dark version of Keep's picture; on the phone only, and the theme decides until it is chosen here.
+                if (existing != null && background.isNotEmpty() && background != CUSTOM_BACKGROUND) {
+                    FilledTonalIconToggleButton(
+                        checked = darkVersion, onCheckedChange = { variantDark = it }, enabled = canEdit,
+                        shapes = IconButtonDefaults.toggleableShapes(),
+                    ) {
+                        Icon(painterResource(R.drawable.ic_contrast), contentDescription = stringResource(R.string.background_dark_version))
+                    }
+                }
+            }
             Row(Modifier.horizontalScroll(rememberScrollState())) {
                 NoteColors.names.forEach { name ->
                     val argb = NoteColors.argb(name)
@@ -1109,6 +1142,52 @@ class EditNoteActivity : ComponentActivity() {
                             Icon(painterResource(R.drawable.ic_add), contentDescription = stringResource(R.string.background_own), modifier = Modifier.size(20.dp))
                         }
                     }
+                }
+            }
+
+            // The note's own text color (only on this phone), for a note of an own photo above all.
+            if (existing != null) {
+                Text(stringResource(R.string.note_text_color))
+                Row(Modifier.horizontalScroll(rememberScrollState())) {
+                    val textChoices = listOf(
+                        null, 0xFF202124.toInt(), 0xFFFFFFFF.toInt(), 0xFFD93025.toInt(), 0xFFE8710A.toInt(), 0xFFF9AB00.toInt(),
+                        0xFF188038.toInt(), 0xFF1A73E8.toInt(), 0xFF9334E6.toInt(),
+                    )
+                    textChoices.forEach { choice ->
+                        val chosen = ownText == choice
+                        RoundTouchTarget(onClick = { ownText = choice }, enabled = canEdit) {
+                            Box(
+                                Modifier.size(if (chosen) 44.dp else 36.dp)
+                                    .clip(CircleShape)
+                                    .background(if (choice != null) Color(choice) else Color.Transparent)
+                                    .border(
+                                        if (chosen) 3.dp else 1.dp,
+                                        if (chosen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                                        CircleShape,
+                                    ),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                if (choice == null) Icon(painterResource(R.drawable.ic_color_none), contentDescription = stringResource(R.string.note_text_color_auto), modifier = Modifier.size(20.dp))
+                            }
+                        }
+                    }
+                    // Any other color.
+                    RoundTouchTarget(onClick = { textPicker = true }, enabled = canEdit) {
+                        val custom = ownText != null && ownText !in textChoices
+                        Box(
+                            Modifier.size(if (custom) 44.dp else 36.dp)
+                                .clip(CircleShape)
+                                .background(androidx.compose.ui.graphics.Brush.sweepGradient(listOf(Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red)))
+                                .border(
+                                    if (custom) 3.dp else 1.dp,
+                                    if (custom) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                                    CircleShape,
+                                ),
+                        )
+                    }
+                }
+                if (textPicker) {
+                    ColorPickerDialog(initial = ownText ?: 0xFF202124.toInt(), onDismiss = { textPicker = false }, onPick = { ownText = it; textPicker = false })
                 }
             }
 

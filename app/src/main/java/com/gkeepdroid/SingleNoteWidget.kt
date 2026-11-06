@@ -85,12 +85,13 @@ class SingleNoteWidget : GlanceAppWidget() {
             } else {
                 val name = RichNotes.of(context, account, note.id)?.background.orEmpty()
                 CustomBackgrounds.forWidget(context, account, note.id, settings.noteAlpha, 0.8f)
-                    ?: if (name.isEmpty()) null else NoteBackgrounds.forWidget(context, name, settings.noteAlpha, 0.8f, NoteBackgrounds.isNight(context))
+                    ?: if (name.isEmpty()) null else NoteBackgrounds.forWidget(context, name, settings.noteAlpha, 0.8f, NoteLook.of(context, account, note.id).dark ?: NoteBackgrounds.isNight(context))
             }
         }
-        val onDarkPicture = picture != null && note != null && account != null && NoteBackgrounds.isNight(context) &&
+        val look = if (note != null && account != null) NoteLook.of(context, account, note.id) else null
+        val onDarkPicture = picture != null && note != null && account != null && (look?.dark ?: NoteBackgrounds.isNight(context)) &&
             CustomBackgrounds.stamp(context, account, note.id) == 0L
-        val palette = textPalette(settings, onNoteColor = noteColor != null || picture != null, onDarkPicture = onDarkPicture)
+        val palette = textPalette(settings, onNoteColor = noteColor != null || picture != null, onDarkPicture = onDarkPicture, own = look?.textColor?.let { Color(it) })
         val textColor = palette.provider()
         val settingsAction = actionStartActivity<SettingsActivity>(actionParametersOf(WidgetIdKey to appWidgetId))
 

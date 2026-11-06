@@ -46,6 +46,17 @@ object NoteBackgrounds {
     fun isNight(context: Context): Boolean =
         context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES
 
+    /** The picture if it is in memory or on the device already, without waiting for anything: for the first frame of a screen. */
+    fun peek(context: Context, name: String, dark: Boolean): Bitmap? {
+        if (!name.matches(Regex("[a-z0-9_]{1,40}"))) return null
+        val key = key(name, dark)
+        synchronized(memory) { memory[key]?.let { return it } }
+        val file = cacheFile(context, name, dark)
+        val bitmap = if (file.exists()) BitmapFactory.decodeFile(file.path) else null
+        if (bitmap != null) synchronized(memory) { memory[key] = bitmap }
+        return bitmap
+    }
+
     /** Null when the picture is not on the device yet and cannot be fetched now. Call off the main thread. */
     fun load(context: Context, name: String, dark: Boolean = false): Bitmap? {
         // The name comes from Keep's answer and ends up in a file name and an address.
@@ -200,6 +211,14 @@ object CustomBackgrounds {
         return copy
     }
 
+    /** The saved photo if it is in memory already (a card showed it), for the first frame of a screen. */
+    fun peek(context: Context, account: String, noteId: String): Bitmap? {
+        val file = file(context, account, noteId)
+        if (!file.exists()) return null
+        synchronized(memory) { memory[file.path]?.let { if (it.first == file.lastModified()) return it.second } }
+        return null
+    }
+
     /** The saved photo with the veil; call off the main thread. */
     fun load(context: Context, account: String, noteId: String): Bitmap? {
         val file = file(context, account, noteId)
@@ -218,5 +237,39 @@ object CustomBackgrounds {
     fun forWidget(context: Context, account: String, noteId: String, alpha: Float, fraction: Float): Bitmap? {
         val photo = BitmapFactory.decodeFile(file(context, account, noteId).takeIf { it.exists() }?.path ?: return null) ?: return null
         return NoteBackgrounds.widgetCrop(veil(photo), alpha, fraction, fromBottom = false)
+    }
+}
+
+
+/**
+ * How a note looks on this phone beyond what Keep stores: its own text color, and which version (light or dark) of Keep's
+ * picture it shows. Both stay on the phone.
+ */
+object NoteLook {
+    class Look(val textColor: Int?, val dark: Boolean?)
+
+    /** Changes whenever a look is saved, so open screens redraw their cards. */
+    val version = androidx.compose.runtime.mutableIntStateOf(0)
+
+    private fun prefs(context: Context) = context.getSharedPreferences("note_look", Context.MODE_PRIVATE)
+
+    private fun key(account: String, noteId: String) = "$account|$noteId"
+
+    fun of(context: Context, account: String, noteId: String): Look {
+        val prefs = prefs(context)
+        val key = key(account, noteId)
+        return Look(
+            textColor = if (prefs.contains("$key|text")) prefs.getInt("$key|text", 0) else null,
+            dark = if (prefs.contains("$key|dark")) prefs.getBoolean("$key|dark", false) else null,
+        )
+    }
+
+    fun save(context: Context, account: String, noteId: String, textColor: Int?, dark: Boolean?) {
+        val key = key(account, noteId)
+        prefs(context).edit().apply {
+            if (textColor == null) remove("$key|text") else putInt("$key|text", textColor)
+            if (dark == null) remove("$key|dark") else putBoolean("$key|dark", dark)
+        }.apply()
+        version.intValue++
     }
 }

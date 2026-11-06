@@ -1083,22 +1083,30 @@ class MainActivity : ComponentActivity() {
         val backgroundName = rich?.background?.takeIf { app.showNoteColors && it.isNotEmpty() && it != "default" }
         // A photo of the user's own wins over Keep's pictures (choosing it takes Keep's picture away).
         val customStamp = remember(resumeKey, NotesCache.version.intValue, note.id) { CustomBackgrounds.stamp(context, account, note.id) }
-        // In a dark theme Keep's pictures come in their dark version, with light text on them.
-        val darkTheme = LocalDarkTheme.current
-        val backgroundImage by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, backgroundName, customStamp, app.showNoteColors, darkTheme) {
+        // In a dark theme Keep's pictures come in their dark version, with light text on them (a note can choose its version).
+        val look = remember(resumeKey, NoteLook.version.intValue, note.id) { NoteLook.of(context, account, note.id) }
+        val darkVariant = look.dark ?: LocalDarkTheme.current
+        // What is on the device already is there in the first frame, so the picture does not pop in.
+        val firstPicture = when {
+            !app.showNoteColors -> null
+            customStamp != 0L -> CustomBackgrounds.peek(context, account, note.id)
+            backgroundName != null -> NoteBackgrounds.peek(context, backgroundName, darkVariant)
+            else -> null
+        }
+        val backgroundImage by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(firstPicture, backgroundName, customStamp, app.showNoteColors, darkVariant) {
             value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
                 when {
                     !app.showNoteColors -> null
                     customStamp != 0L -> CustomBackgrounds.load(context, account, note.id)
-                    backgroundName != null -> NoteBackgrounds.load(context, backgroundName, darkTheme)
+                    backgroundName != null -> NoteBackgrounds.load(context, backgroundName, darkVariant)
                     else -> null
                 }
             }
         }
-        val onDarkPicture = backgroundImage != null && customStamp == 0L && darkTheme
+        val onDarkPicture = backgroundImage != null && customStamp == 0L && darkVariant
         val noteColor = if (app.showNoteColors) NoteColors.argb(note.color) else null
         val gray = noteColor == null && app.plainCardStyle == PLAIN_GRAY
-        val textColor = when {
+        val textColor = look.textColor?.let { Color(it) } ?: when {
             onDarkPicture -> LightNoteText
             noteColor != null || backgroundImage != null -> DarkNoteText
             gray -> Color.White

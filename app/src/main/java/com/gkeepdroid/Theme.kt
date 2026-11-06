@@ -90,7 +90,11 @@ private fun fadingScheme(target: ColorScheme, key: Any?): ColorScheme {
     var to by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(target) }
     val progress = androidx.compose.runtime.remember { androidx.compose.animation.core.Animatable(1f) }
     val latest by androidx.compose.runtime.rememberUpdatedState(target)
+    var shownKey by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(key) }
     androidx.compose.runtime.LaunchedEffect(key) {
+        // Nothing changed (the first run, or the same look again): no fade, which would redraw the whole screen every frame for nothing.
+        if (key == shownKey) return@LaunchedEffect
+        shownKey = key
         from = lerpScheme(from, to, progress.value)
         to = latest
         progress.snapTo(0f)
@@ -104,29 +108,44 @@ private fun fadingScheme(target: ColorScheme, key: Any?): ColorScheme {
  * colors change), so switching a color or picture on or off does not rebuild the content and lose its state, such as the scroll position.
  */
 @Composable
-fun OnNoteTheme(active: Boolean, accent: Int? = null, transparentRows: Boolean = active, content: @Composable () -> Unit) {
+fun OnNoteTheme(
+    active: Boolean, accent: Int? = null, transparentRows: Boolean = active,
+    darkOnPicture: Boolean = false, textColor: Int? = null, content: @Composable () -> Unit,
+) {
     val context = LocalContext.current
     val outer = MaterialTheme.colorScheme
     val outerContent = androidx.compose.material3.LocalContentColor.current
-    val scheme = if (!active) outer else {
-        val base = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) dynamicLightColorScheme(context) else expressiveLightColorScheme()
-        if (accent == null) base else {
-            // Buttons in a dark shade of the note's hue, their containers in a light one, so they sit well on the note.
-            val hsv = FloatArray(3).also { android.graphics.Color.colorToHSV(accent, it) }
-            val dark = Color(android.graphics.Color.HSVToColor(floatArrayOf(hsv[0], (hsv[1] + 0.35f).coerceIn(0.45f, 0.9f), 0.34f)))
-            val light = androidx.compose.ui.graphics.lerp(Color(accent), Color.White, 0.55f)
-            base.copy(
-                primary = dark, onPrimary = Color.White,
-                primaryContainer = light, onPrimaryContainer = dark,
-                secondaryContainer = light, onSecondaryContainer = dark,
-                secondary = dark, onSecondary = Color.White,
-                surfaceTint = dark, outline = dark.copy(alpha = 0.6f),
-            )
+    val darkTheme = LocalDarkTheme.current
+    var scheme = when {
+        // The dark version of a picture needs light text, also in a light theme.
+        darkOnPicture -> if (darkTheme) outer else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) dynamicDarkColorScheme(context) else darkColorScheme()
+        !active -> outer
+        else -> {
+            val base = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) dynamicLightColorScheme(context) else expressiveLightColorScheme()
+            if (accent == null) base else {
+                // Buttons in a dark shade of the note's hue, their containers in a light one, so they sit well on the note.
+                val hsv = FloatArray(3).also { android.graphics.Color.colorToHSV(accent, it) }
+                val dark = Color(android.graphics.Color.HSVToColor(floatArrayOf(hsv[0], (hsv[1] + 0.35f).coerceIn(0.45f, 0.9f), 0.34f)))
+                val light = androidx.compose.ui.graphics.lerp(Color(accent), Color.White, 0.55f)
+                base.copy(
+                    primary = dark, onPrimary = Color.White,
+                    primaryContainer = light, onPrimaryContainer = dark,
+                    secondaryContainer = light, onSecondaryContainer = dark,
+                    secondary = dark, onSecondary = Color.White,
+                    surfaceTint = dark, outline = dark.copy(alpha = 0.6f),
+                )
+            }
         }
     }
-    val shown = fadingScheme(scheme, active to accent)
-    // The text color follows the fade as well (dark on a note, the usual one otherwise).
-    val contentColor by androidx.compose.animation.animateColorAsState(if (active) DarkNoteText else outerContent, androidx.compose.animation.core.tween(450), label = "content")
+    // A text color of the note's own wins over the theme's.
+    textColor?.let {
+        val own = Color(it)
+        scheme = scheme.copy(onSurface = own, onBackground = own, onSurfaceVariant = own.copy(alpha = 0.75f))
+    }
+    val shown = fadingScheme(scheme, listOf(active, accent, darkOnPicture, textColor))
+    val target = textColor?.let { Color(it) } ?: if (darkOnPicture) scheme.onSurface else if (active) DarkNoteText else outerContent
+    // The text color follows the fade as well.
+    val contentColor by androidx.compose.animation.animateColorAsState(target, androidx.compose.animation.core.tween(450), label = "content")
     MaterialExpressiveTheme(colorScheme = shown, motionScheme = MotionScheme.expressive()) {
         androidx.compose.runtime.CompositionLocalProvider(
             androidx.compose.material3.LocalContentColor provides contentColor,
