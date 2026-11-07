@@ -40,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -245,7 +246,7 @@ internal fun NoteTile(
                     highlightMatches(androidx.compose.ui.text.AnnotatedString(note.title), query, markColor),
                     color = textColor,
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.titleSmall.copy(hyphens = Hyphens.Auto),
                     modifier = Modifier.weight(1f),
                 )
                 if (progress != null) {
@@ -321,7 +322,7 @@ internal fun NoteTile(
                     Text(
                         highlightMatches(RichNotes.style(NoteLinks.annotate(item.text, linkColor), rich?.docs?.get(item.id)), query, markColor),
                         color = if (item.checked) textColor.copy(alpha = 0.55f) else textColor,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyMedium.copy(hyphens = Hyphens.Auto),
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.padding(vertical = rowGap),
@@ -339,7 +340,7 @@ internal fun NoteTile(
             Text(
                 highlightMatches(RichNotes.style(NoteLinks.annotate(note.text, linkColor), rich?.docs?.values?.firstOrNull()), query, markColor),
                 color = textColor,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMedium.copy(hyphens = Hyphens.Auto),
                 maxLines = lines,
                 overflow = TextOverflow.Ellipsis,
             )
