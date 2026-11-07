@@ -429,6 +429,7 @@
     <string name="editor_buttons_hint">Mantenha um botão pressionado e arraste-o para outro lugar: as barras acima e abaixo da nota, o menu ou oculto.</string>
     <string name="editor_zone_menu">Menu</string>
     <string name="editor_zone_hidden">Oculto</string>
+    <string name="button_preview">Pré-visualização: toque num botão para destacá-lo, arraste para ver como ficaria</string>
     <string name="button_bar_top">Barra superior</string>
     <string name="button_bar_bottom">Barra inferior</string>
     <string name="button_bar_left">Barra esquerda</string>

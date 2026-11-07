@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +17,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -34,6 +37,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.input.pointer.pointerInput
@@ -86,6 +91,12 @@ interface ButtonEditorScope {
 }
 
 /**
+ * What the preview of a page gets: the buttons as they would stand if a dragged one were dropped now, and the button that is
+ * tapped or dragged, to be drawn highlighted.
+ */
+class ButtonPreviewState(val items: List<ButtonItem>, val highlightId: String?)
+
+/**
  * The template of the layout settings: a miniature made of places ([ButtonEditorScope.Zone]) where long-pressing a button and
  * dragging it to another place (or in front of another button) moves it. The widget's button bar and the editor's buttons are both
  * built on it; each page only says which places exist and how they are arranged. [onMove] gets the button, the place it was
@@ -96,11 +107,14 @@ interface ButtonEditorScope {
 fun ButtonEditor(
     items: List<ButtonItem>,
     onMove: (id: String, zone: Int, beforeId: String?) -> Unit,
+    /** A mirror of the layout as the real thing looks, shown below the places; it follows a drag, and a tap on a button highlights it. */
+    preview: (@Composable (ButtonPreviewState) -> Unit)? = null,
     content: @Composable ButtonEditorScope.() -> Unit,
 ) {
     val move by rememberUpdatedState(onMove)
     val current by rememberUpdatedState(items)
     var dragId by remember { mutableStateOf<String?>(null) }
+    var selectedId by remember { mutableStateOf<String?>(null) }
     var pointer by remember { mutableStateOf(Offset.Zero) }
     var origin by remember { mutableStateOf(Offset.Zero) }
     val zones = remember { mutableStateMapOf<Int, Rect>() }
@@ -124,6 +138,16 @@ fun ButtonEditor(
     val landing = target()
     val dragged = current.firstOrNull { it.id == dragId }
 
+    /** The layout as it would be after dropping the dragged button where it is now. */
+    fun withDrop(): List<ButtonItem> {
+        val d = dragged ?: return items
+        val drop = landing ?: return items
+        val rest = items.filter { it.id != d.id }
+        val at = drop.second?.let { b -> rest.indexOfFirst { it.id == b } }?.takeIf { it >= 0 }
+            ?: rest.indexOfLast { it.zone == drop.first }.let { if (it >= 0) it + 1 else rest.size }
+        return rest.take(at) + ButtonItem(d.id, d.icon, d.label, drop.first, d.allowed) + rest.drop(at)
+    }
+
     @Composable
     fun Chip(item: ButtonItem, labeled: Boolean, size: Dp) {
         var coords by remember { mutableStateOf<LayoutCoordinates?>(null) }
@@ -131,13 +155,16 @@ fun ButtonEditor(
             Modifier
                 .onGloballyPositioned { coords = it; chips[item.id] = it.boundsInRoot() }
                 .alpha(if (dragId == item.id) 0.25f else 1f)
+                .then(if (selectedId == item.id) Modifier.border(BorderStroke(4.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.45f)), MaterialTheme.shapes.medium) else Modifier)
                 .border(BorderStroke(if (item.kind == ButtonKind.FREE) 1.dp else 2.dp, chipEdge(item.kind)), MaterialTheme.shapes.medium)
                 .background(chipFill(item.kind), MaterialTheme.shapes.medium)
+                .clickable { selectedId = item.id }
                 .pointerInput(item.id, item.fixed) {
                     if (item.fixed) return@pointerInput
                     detectDragGesturesAfterLongPress(
                         onDragStart = { start ->
                             dragId = item.id
+                            selectedId = item.id
                             pointer = coords?.localToRoot(start) ?: Offset.Zero
                         },
                         onDrag = { change, _ ->
@@ -229,6 +256,11 @@ fun ButtonEditor(
     }
     Box(Modifier.fillMaxWidth().onGloballyPositioned { origin = it.positionInRoot() }) {
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            // On top, so it is on the screen together with the places while one drags; made small like a phone seen from afar.
+            if (preview != null) {
+                Text(stringResource(R.string.button_preview), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                ScaledPreview { preview(ButtonPreviewState(withDrop(), dragId ?: selectedId)) }
+            }
             scope.content()
             Legend(items)
         }
@@ -357,6 +389,28 @@ private fun Legend(items: List<ButtonItem>) {
                 Box(Modifier.padding(top = 2.dp).size(16.dp).border(BorderStroke(if (kind == ButtonKind.FREE) 1.dp else 2.dp, chipEdge(kind)), MaterialTheme.shapes.small).background(chipFill(kind), MaterialTheme.shapes.small))
                 Text(stringResource(label), style = MaterialTheme.typography.bodySmall)
             }
+        }
+    }
+}
+
+private val PREVIEW_WIDTH = 360.dp
+private val PREVIEW_HEIGHT = 460.dp
+private const val PREVIEW_SCALE = 0.55f
+
+/**
+ * Draws [content] in the size of a phone screen (so the real buttons take the room they really take) and shrinks it, so that the
+ * preview and the places fit on the screen together.
+ */
+@Composable
+private fun ScaledPreview(content: @Composable () -> Unit) {
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Box(Modifier.size(PREVIEW_WIDTH * PREVIEW_SCALE, PREVIEW_HEIGHT * PREVIEW_SCALE)) {
+            Box(
+                Modifier
+                    .wrapContentSize(Alignment.TopStart, unbounded = true)
+                    .requiredSize(PREVIEW_WIDTH, PREVIEW_HEIGHT)
+                    .graphicsLayer(scaleX = PREVIEW_SCALE, scaleY = PREVIEW_SCALE, transformOrigin = TransformOrigin(0f, 0f)),
+            ) { content() }
         }
     }
 }

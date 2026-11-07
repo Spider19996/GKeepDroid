@@ -304,7 +304,7 @@ internal fun ColumnScope.ButtonBarPage(s: SettingsState) {
         }
         val order = (buttonOrder + ALL_BUTTONS).distinct()
         val layout = unordered.sortedBy { order.indexOf(it.id) }
-        ButtonLayoutEditor(layout) { id, side, slot, beforeId ->
+        ButtonLayoutEditor(layout, headerSize) { id, side, slot, beforeId ->
             if (side != null) {
                 buttonSides = buttonSides + (id to side)
                 buttonSlots = buttonSlots + (id to slot)

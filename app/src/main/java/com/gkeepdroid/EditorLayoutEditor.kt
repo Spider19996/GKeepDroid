@@ -16,7 +16,10 @@ import androidx.compose.ui.unit.dp
 @Composable
 internal fun EditorLayoutEditor(layout: EditorLayout, onChange: (EditorLayout) -> Unit) {
     val items = (ZONE_TOP_LEFT..ZONE_NOTE).flatMap { zone -> layout.inZone(zone).map { ButtonItem(it.id, it.icon, it.label, zone, layout.allowedZones(it.id)) } }
-    ButtonEditor(items, { id, zone, before -> onChange(layout.moved(id, zone, before)) }) {
+    ButtonEditor(
+        items, { id, zone, before -> onChange(layout.moved(id, zone, before)) },
+        preview = { EditorPreview(it, layout.align) },
+    ) {
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 Zone(ZONE_TOP_LEFT, Modifier.weight(1f), caption = R.string.editor_zone_top_left)

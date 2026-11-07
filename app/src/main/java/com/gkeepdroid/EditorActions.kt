@@ -2,6 +2,7 @@ package com.gkeepdroid
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.FlowRow
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
@@ -186,6 +188,7 @@ class EditorActionState(
 @Composable
 internal fun EditorBar(
     left: List<EditorActionSpec>, right: List<EditorActionSpec>, states: Map<String, EditorActionState>, sidePadding: Dp = 12.dp,
+    highlightId: String? = null,
 ) {
     val shown = (left + right).count { states[it.id]?.visible == true }
     if (shown == 0) return
@@ -194,22 +197,22 @@ internal fun EditorBar(
         val fits = (maxWidth - sidePadding * 2) / 44.dp >= shown
         val padding = Modifier.fillMaxWidth().padding(horizontal = sidePadding, vertical = 4.dp)
         if (fits) Row(padding, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-            left.forEach { EditorActionButton(it, states[it.id]) }
+            left.forEach { EditorActionButton(it, states[it.id], it.id == highlightId) }
             Spacer(Modifier.weight(1f))
-            right.forEach { EditorActionButton(it, states[it.id]) }
+            right.forEach { EditorActionButton(it, states[it.id], it.id == highlightId) }
         } else Column(padding) {
             FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                left.forEach { EditorActionButton(it, states[it.id]) }
+                left.forEach { EditorActionButton(it, states[it.id], it.id == highlightId) }
             }
             FlowRow(
                 Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.End), verticalArrangement = Arrangement.spacedBy(2.dp),
-            ) { right.forEach { EditorActionButton(it, states[it.id]) } }
+            ) { right.forEach { EditorActionButton(it, states[it.id], it.id == highlightId) } }
         }
     }
 }
 
 @Composable
-private fun EditorActionButton(spec: EditorActionSpec, state: EditorActionState?) {
+private fun EditorActionButton(spec: EditorActionSpec, state: EditorActionState?, highlighted: Boolean = false) {
     if (state == null || !state.visible) return
     val modifier = Modifier.size(40.dp)
     val icon: @Composable () -> Unit = {
@@ -220,7 +223,7 @@ private fun EditorActionButton(spec: EditorActionSpec, state: EditorActionState?
             tint = if (state.dimmed) tint.copy(alpha = 0.38f) else tint,
         )
     }
-    Box {
+    Box(if (highlighted) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(14.dp)) else Modifier) {
         when {
             spec.id == "save" -> FilledIconButton(
                 onClick = state.onClick, enabled = state.enabled, shapes = IconButtonDefaults.shapes(), modifier = Modifier.padding(horizontal = 4.dp).size(40.dp),
@@ -269,13 +272,16 @@ internal fun menuGroups(
 /** The actions of the note's place as buttons with a name, side by side as far as they fit. */
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-internal fun NoteActionButtons(specs: List<EditorActionSpec>, states: Map<String, EditorActionState>) {
+internal fun NoteActionButtons(specs: List<EditorActionSpec>, states: Map<String, EditorActionState>, highlightId: String? = null) {
     val shown = specs.filter { states[it.id]?.visible == true }
     if (shown.isEmpty()) return
     FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         shown.forEach { spec ->
             val state = states.getValue(spec.id)
-            TextButton(onClick = state.onClick, enabled = state.enabled, shapes = ButtonDefaults.shapes()) {
+            TextButton(
+                onClick = state.onClick, enabled = state.enabled, shapes = ButtonDefaults.shapes(),
+                modifier = if (spec.id == highlightId) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp)) else Modifier,
+            ) {
                 Icon(painterResource(state.icon), contentDescription = null, Modifier.size(18.dp))
                 Spacer(Modifier.size(8.dp))
                 Text(state.label)

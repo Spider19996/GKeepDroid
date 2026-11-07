@@ -411,6 +411,7 @@
     <string name="editor_buttons_hint">ボタンを長押しして別の場所にドラッグします：メモの上下のバー、メニュー、または非表示。</string>
     <string name="editor_zone_menu">メニュー</string>
     <string name="editor_zone_hidden">非表示</string>
+    <string name="button_preview">プレビュー：ボタンをタップで強調、ドラッグで配置後の見た目を確認</string>
     <string name="button_bar_top">上のバー</string>
     <string name="button_bar_bottom">下のバー</string>
     <string name="button_bar_left">左のバー</string>

@@ -456,6 +456,7 @@
     <string name="editor_buttons_hint">اضغط مطولًا على زر واسحبه إلى مكان آخر: الشريطان فوق الملاحظة وتحتها، أو القائمة، أو مخفي.</string>
     <string name="editor_zone_menu">القائمة</string>
     <string name="editor_zone_hidden">مخفي</string>
+    <string name="button_preview">معاينة: اضغط زرًا لإبرازه، واسحب لترى الشكل</string>
     <string name="button_bar_top">الشريط العلوي</string>
     <string name="button_bar_bottom">الشريط السفلي</string>
     <string name="button_bar_left">الشريط الأيسر</string>

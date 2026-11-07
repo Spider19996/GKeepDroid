@@ -411,6 +411,7 @@
     <string name="editor_buttons_hint">버튼을 길게 눌러 다른 위치로 끌어 놓으세요: 메모 위아래의 막대, 메뉴 또는 숨김.</string>
     <string name="editor_zone_menu">메뉴</string>
     <string name="editor_zone_hidden">숨김</string>
+    <string name="button_preview">미리보기: 버튼을 누르면 강조되고, 끌면 배치 후 모습이 보입니다</string>
     <string name="button_bar_top">상단 바</string>
     <string name="button_bar_bottom">하단 바</string>
     <string name="button_bar_left">왼쪽 바</string>

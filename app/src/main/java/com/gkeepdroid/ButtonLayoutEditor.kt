@@ -13,6 +13,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +43,8 @@ private const val OFF_ZONE = -1
 @Composable
 fun ButtonLayoutEditor(
     buttons: List<LayoutButton>,
+    /** The size of the icons in the widget, for the preview. */
+    iconSizeDp: Int,
     /** A button was dropped on [side] at [slot] (side null: hidden), in front of [beforeId] or at the end if that is null. */
     onMove: (id: String, side: Int?, slot: Int, beforeId: String?) -> Unit,
 ) {
@@ -39,7 +52,7 @@ fun ButtonLayoutEditor(
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         ButtonEditor(items, { id, zone, before ->
             if (zone == OFF_ZONE) onMove(id, null, ALIGN_CENTER, before) else onMove(id, zone / 10, zone % 10, before)
-        }) {
+        }, preview = { WidgetPreview(it, iconSizeDp) }) {
             // The editor has a fixed height. Icons shrink with the number of buttons on a side, so none is ever cut off.
             val middleHeight = 170.dp
             fun count(side: Int) = buttons.count { it.side == side }
@@ -97,4 +110,62 @@ private fun ButtonEditorScope.Bar(buttons: List<LayoutButton>, side: Int, chipSi
 @Composable
 private fun Caption(@StringRes text: Int) {
     Text(stringResource(text), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+}
+
+/**
+ * The widget in small: the four bars with their buttons in their places and a few notes between them. The buttons have the real
+ * icons in the size of the setting, so one sees how much room a bar takes; the notes are sketches.
+ */
+@Composable
+private fun WidgetPreview(state: ButtonPreviewState, iconSizeDp: Int) {
+    fun inPlace(side: Int, slot: Int) = state.items.filter { it.zone == side * 10 + slot }
+
+    @Composable
+    fun Icons(list: List<ButtonItem>) {
+        list.forEach { item ->
+            Box(
+                Modifier.padding(4.dp).then(
+                    if (item.id == state.highlightId) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp)) else Modifier,
+                ).padding(4.dp),
+            ) { Icon(painterResource(item.icon), stringResource(item.label), Modifier.size(iconSizeDp.dp)) }
+        }
+    }
+
+    @Composable
+    fun HorizontalBar(side: Int) = Box(Modifier.fillMaxWidth()) {
+        Row(Modifier.align(Alignment.CenterStart), verticalAlignment = Alignment.CenterVertically) { Icons(inPlace(side, ALIGN_START)) }
+        Row(Modifier.align(Alignment.Center), verticalAlignment = Alignment.CenterVertically) { Icons(inPlace(side, ALIGN_CENTER)) }
+        Row(Modifier.align(Alignment.CenterEnd), verticalAlignment = Alignment.CenterVertically) { Icons(inPlace(side, ALIGN_END)) }
+    }
+
+    @Composable
+    fun VerticalBar(side: Int) = Box(Modifier.fillMaxHeight()) {
+        Column(Modifier.align(Alignment.TopCenter), horizontalAlignment = Alignment.CenterHorizontally) { Icons(inPlace(side, ALIGN_START)) }
+        Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) { Icons(inPlace(side, ALIGN_CENTER)) }
+        Column(Modifier.align(Alignment.BottomCenter), horizontalAlignment = Alignment.CenterHorizontally) { Icons(inPlace(side, ALIGN_END)) }
+    }
+
+    val shape = RoundedCornerShape(16.dp)
+    val hidden = state.items.firstOrNull { it.id == state.highlightId }?.zone == OFF_ZONE
+    Box(Modifier.fillMaxSize().clip(shape).border(BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant), shape).background(MaterialTheme.colorScheme.background)) {
+        Column(Modifier.fillMaxSize().padding(4.dp)) {
+            HorizontalBar(POS_TOP)
+            Row(Modifier.weight(1f).fillMaxWidth()) {
+                VerticalBar(POS_LEFT)
+                Column(Modifier.weight(1f).fillMaxHeight().padding(4.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(0.9f, 0.7f, 0.8f).forEach { w ->
+                        Box(
+                            Modifier.fillMaxWidth().height(56.dp).border(BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant), RoundedCornerShape(12.dp)).padding(14.dp),
+                        ) { Box(Modifier.fillMaxWidth(w).height(10.dp).background(MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(5.dp))) }
+                    }
+                }
+                VerticalBar(POS_RIGHT)
+            }
+            HorizontalBar(POS_BOTTOM)
+        }
+        if (hidden) Text(
+            stringResource(R.string.editor_zone_hidden), Modifier.align(Alignment.Center), style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.outline,
+        )
+    }
 }
