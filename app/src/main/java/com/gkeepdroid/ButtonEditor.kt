@@ -34,6 +34,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
@@ -308,21 +310,32 @@ fun LayoutFileButtons(
     }
 }
 
-/** Fill and edge of a button by what it may do: anywhere (plain), some places, its own place only, nowhere. */
+/**
+ * Fill and edge of a button by what it may do: anywhere (plain), some places (orange), its own place only (violet), nowhere (red).
+ * Fixed hues, as the colors of the theme are too close to each other; a tint of the hue over the surface keeps them readable in
+ * the light and the dark theme.
+ */
+private val LIMITED_COLOR = Color(0xFFF29900)
+private val STAYS_COLOR = Color(0xFF9C5BD8)
+private val FIXED_COLOR = Color(0xFFE5484D)
+
 @Composable
-private fun chipFill(kind: ButtonKind) = when (kind) {
-    ButtonKind.FREE -> MaterialTheme.colorScheme.surface
-    ButtonKind.LIMITED -> MaterialTheme.colorScheme.secondaryContainer
-    ButtonKind.STAYS -> MaterialTheme.colorScheme.tertiaryContainer
-    ButtonKind.FIXED -> MaterialTheme.colorScheme.surfaceContainerHighest
+private fun chipFill(kind: ButtonKind): Color {
+    val surface = MaterialTheme.colorScheme.surface
+    return when (kind) {
+        ButtonKind.FREE -> surface
+        ButtonKind.LIMITED -> LIMITED_COLOR.copy(alpha = 0.28f).compositeOver(surface)
+        ButtonKind.STAYS -> STAYS_COLOR.copy(alpha = 0.28f).compositeOver(surface)
+        ButtonKind.FIXED -> FIXED_COLOR.copy(alpha = 0.28f).compositeOver(surface)
+    }
 }
 
 @Composable
 private fun chipEdge(kind: ButtonKind) = when (kind) {
     ButtonKind.FREE -> MaterialTheme.colorScheme.outline
-    ButtonKind.LIMITED -> MaterialTheme.colorScheme.secondary
-    ButtonKind.STAYS -> MaterialTheme.colorScheme.tertiary
-    ButtonKind.FIXED -> MaterialTheme.colorScheme.onSurfaceVariant
+    ButtonKind.LIMITED -> LIMITED_COLOR
+    ButtonKind.STAYS -> STAYS_COLOR
+    ButtonKind.FIXED -> FIXED_COLOR
 }
 
 /**
