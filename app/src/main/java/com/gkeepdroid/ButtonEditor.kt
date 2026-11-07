@@ -47,16 +47,24 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
+/** What a button may do, as the template shows it: each kind has its colors and its line in the legend. */
+enum class ButtonKind { FREE, LIMITED, STAYS, FIXED }
+
 /**
  * A button of a layout: where it stands is its [zone], null while it is off. The order of the list is the order inside a zone.
  * [allowed] says where it may be dragged: null anywhere, a set only to those places (and in front of or behind others in its
- * own), an empty set nowhere. The template marks the three kinds with colors.
+ * own), only its own place: it stays where it is and can be put in another order there, an empty set nowhere.
  */
 class ButtonItem(
     val id: String, @DrawableRes val icon: Int, @StringRes val label: Int, val zone: Int?, val allowed: Set<Int>? = null,
 ) {
-    val fixed get() = allowed != null && allowed.isEmpty()
-    val limited get() = allowed != null && allowed.isNotEmpty()
+    val kind = when {
+        allowed == null -> ButtonKind.FREE
+        allowed.isEmpty() -> ButtonKind.FIXED
+        zone != null && allowed.all { it == zone } -> ButtonKind.STAYS
+        else -> ButtonKind.LIMITED
+    }
+    val fixed get() = kind == ButtonKind.FIXED
     fun canGoTo(place: Int) = !fixed && (allowed == null || place in allowed || place == zone)
 }
 
@@ -65,12 +73,13 @@ interface ButtonEditorScope {
     /**
      * A place for buttons. Its buttons are drawn inside, aligned by [contentAlignment]; while one is dragged, the place lights up and
      * shows where the button would land. [vertical] places the buttons in a column, [labeled] draws them with their names (the
-     * names are for places that have room), otherwise they are squares of [chipSize].
+     * names are for places that have room), otherwise they are squares of [chipSize]. A [caption] names the place above it; it is
+     * for places that grow with their buttons (a place of a fixed height has no room for one).
      */
     @Composable
     fun Zone(
         key: Int, modifier: Modifier = Modifier, vertical: Boolean = false, labeled: Boolean = false, chipSize: Dp = 34.dp,
-        contentAlignment: Alignment = Alignment.CenterStart, scrollable: Boolean = false,
+        contentAlignment: Alignment = Alignment.CenterStart, scrollable: Boolean = false, @StringRes caption: Int? = null,
     )
 }
 
@@ -120,8 +129,8 @@ fun ButtonEditor(
             Modifier
                 .onGloballyPositioned { coords = it; chips[item.id] = it.boundsInRoot() }
                 .alpha(if (dragId == item.id) 0.25f else 1f)
-                .border(BorderStroke(if (item.fixed || item.limited) 2.dp else 1.dp, chipEdge(item)), MaterialTheme.shapes.medium)
-                .background(chipFill(item), MaterialTheme.shapes.medium)
+                .border(BorderStroke(if (item.kind == ButtonKind.FREE) 1.dp else 2.dp, chipEdge(item.kind)), MaterialTheme.shapes.medium)
+                .background(chipFill(item.kind), MaterialTheme.shapes.medium)
                 .pointerInput(item.id, item.fixed) {
                     if (item.fixed) return@pointerInput
                     detectDragGesturesAfterLongPress(
@@ -173,6 +182,7 @@ fun ButtonEditor(
         @Composable
         override fun Zone(
             key: Int, modifier: Modifier, vertical: Boolean, labeled: Boolean, chipSize: Dp, contentAlignment: Alignment, scrollable: Boolean,
+            caption: Int?,
         ) {
             val here = landing?.takeIf { dragId != null && it.first == key }
             val inZone = items.filter { it.zone == key }
@@ -184,25 +194,33 @@ fun ButtonEditor(
                 }
                 if (here != null && here.second == null) Placeholder(labeled, chipSize)
             }
-            Box(
-                modifier
-                    .onGloballyPositioned { zones[key] = it.boundsInRoot() }
-                    .alpha(if (dragged != null && !dragged.canGoTo(key)) 0.4f else 1f)
-                    .background(
-                        if (here != null) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-                        MaterialTheme.shapes.medium,
-                    )
-                    .heightIn(min = if (labeled || !vertical) 40.dp else 0.dp)
-                    .padding(2.dp),
-                contentAlignment = contentAlignment,
-            ) {
-                if (vertical) Column(
-                    Modifier.then(if (scrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier),
-                    horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp),
-                ) { Buttons() }
-                else if (scrollable) Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
-                    FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { Buttons() }
-                } else FlowRow(horizontalArrangement = Arrangement.spacedBy(3.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) { Buttons() }
+            @Composable
+            fun Place(placeModifier: Modifier) {
+                Box(
+                    placeModifier
+                        .onGloballyPositioned { zones[key] = it.boundsInRoot() }
+                        .alpha(if (dragged != null && !dragged.canGoTo(key)) 0.4f else 1f)
+                        .background(
+                            if (here != null) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                            MaterialTheme.shapes.medium,
+                        )
+                        .heightIn(min = if (labeled || !vertical) 40.dp else 0.dp)
+                        .padding(2.dp),
+                    contentAlignment = contentAlignment,
+                ) {
+                    if (vertical) Column(
+                        Modifier.then(if (scrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier),
+                        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp),
+                    ) { Buttons() }
+                    else if (scrollable) Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { Buttons() }
+                    } else FlowRow(horizontalArrangement = Arrangement.spacedBy(3.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) { Buttons() }
+                }
+            }
+            // The name stands above the place, outside of what lights up.
+            if (caption == null) Place(modifier) else Column(modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(stringResource(caption), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Place(Modifier.fillMaxWidth())
             }
             androidx.compose.runtime.SideEffect { columns[key] = vertical }
         }
@@ -290,35 +308,40 @@ fun LayoutFileButtons(
     }
 }
 
-/** Fill and edge of a button by what it may do: anywhere (plain), only to some places, nowhere. */
+/** Fill and edge of a button by what it may do: anywhere (plain), some places, its own place only, nowhere. */
 @Composable
-private fun chipFill(item: ButtonItem) = when {
-    item.fixed -> MaterialTheme.colorScheme.tertiaryContainer
-    item.limited -> MaterialTheme.colorScheme.secondaryContainer
-    else -> MaterialTheme.colorScheme.surface
+private fun chipFill(kind: ButtonKind) = when (kind) {
+    ButtonKind.FREE -> MaterialTheme.colorScheme.surface
+    ButtonKind.LIMITED -> MaterialTheme.colorScheme.secondaryContainer
+    ButtonKind.STAYS -> MaterialTheme.colorScheme.tertiaryContainer
+    ButtonKind.FIXED -> MaterialTheme.colorScheme.surfaceContainerHighest
 }
 
 @Composable
-private fun chipEdge(item: ButtonItem) = when {
-    item.fixed -> MaterialTheme.colorScheme.tertiary
-    item.limited -> MaterialTheme.colorScheme.secondary
-    else -> MaterialTheme.colorScheme.outline
+private fun chipEdge(kind: ButtonKind) = when (kind) {
+    ButtonKind.FREE -> MaterialTheme.colorScheme.outline
+    ButtonKind.LIMITED -> MaterialTheme.colorScheme.secondary
+    ButtonKind.STAYS -> MaterialTheme.colorScheme.tertiary
+    ButtonKind.FIXED -> MaterialTheme.colorScheme.onSurfaceVariant
 }
 
-/** Explains the colors, for the kinds that exist in this layout only; nothing when all buttons may go anywhere. */
-@OptIn(ExperimentalLayoutApi::class)
+/**
+ * Explains the colors: one line per kind that exists in this layout, plain buttons included, so the colors are not a riddle.
+ * Nothing when all buttons may go anywhere, as then there is nothing to tell apart.
+ */
 @Composable
 private fun Legend(items: List<ButtonItem>) {
-    val kinds = listOf(
-        Triple(items.any { it.fixed }, ButtonItem("", 0, 0, null, emptySet()), R.string.button_legend_fixed),
-        Triple(items.any { it.limited }, ButtonItem("", 0, 0, null, setOf(-1)), R.string.button_legend_limited),
-    ).filter { it.first }
-    // Without a button that is held back there is nothing to explain.
-    if (kinds.isEmpty()) return
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        kinds.forEach { (_, sample, label) ->
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                Box(Modifier.size(16.dp).border(BorderStroke(2.dp, chipEdge(sample)), MaterialTheme.shapes.small).background(chipFill(sample), MaterialTheme.shapes.small))
+    val present = items.map { it.kind }.toSet()
+    if (present.all { it == ButtonKind.FREE }) return
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        listOf(
+            ButtonKind.FREE to R.string.button_legend_free,
+            ButtonKind.LIMITED to R.string.button_legend_limited,
+            ButtonKind.STAYS to R.string.button_legend_stays,
+            ButtonKind.FIXED to R.string.button_legend_fixed,
+        ).filter { it.first in present }.forEach { (kind, label) ->
+            Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Box(Modifier.padding(top = 2.dp).size(16.dp).border(BorderStroke(if (kind == ButtonKind.FREE) 1.dp else 2.dp, chipEdge(kind)), MaterialTheme.shapes.small).background(chipFill(kind), MaterialTheme.shapes.small))
                 Text(stringResource(label), style = MaterialTheme.typography.bodySmall)
             }
         }

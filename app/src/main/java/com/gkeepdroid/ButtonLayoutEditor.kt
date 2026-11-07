@@ -6,13 +6,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -46,12 +50,22 @@ fun ButtonLayoutEditor(
                 fit(middleHeight, maxOf(count(POS_LEFT), count(POS_RIGHT))),
             ).coerceAtLeast(16.dp)
             Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Caption(R.string.button_bar_top)
                 Bar(buttons, POS_TOP, chipSize, Modifier.fillMaxWidth().height(40.dp))
+                // The names of the three places in the middle row, in the order they stand there.
+                Row(Modifier.fillMaxWidth()) {
+                    Caption(R.string.button_bar_left)
+                    Spacer(Modifier.weight(1f))
+                    Caption(R.string.editor_zone_hidden)
+                    Spacer(Modifier.weight(1f))
+                    Caption(R.string.button_bar_right)
+                }
                 Row(Modifier.fillMaxWidth().height(middleHeight), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Bar(buttons, POS_LEFT, chipSize, Modifier.width(40.dp).fillMaxHeight())
                     Zone(OFF_ZONE, Modifier.weight(1f).fillMaxHeight(), chipSize = chipSize, contentAlignment = Alignment.Center, scrollable = true)
                     Bar(buttons, POS_RIGHT, chipSize, Modifier.width(40.dp).fillMaxHeight())
                 }
+                Caption(R.string.button_bar_bottom)
                 Bar(buttons, POS_BOTTOM, chipSize, Modifier.fillMaxWidth().height(40.dp))
             }
         }
@@ -77,4 +91,10 @@ private fun ButtonEditorScope.Bar(buttons: List<LayoutButton>, side: Int, chipSi
         Zone(side * 10 + ALIGN_CENTER, Modifier.weight(middle).fillMaxHeight(), chipSize = chipSize, contentAlignment = Alignment.Center)
         Zone(side * 10 + ALIGN_END, Modifier.weight(outer).fillMaxHeight(), chipSize = chipSize, contentAlignment = Alignment.CenterEnd)
     }
+}
+
+/** The name of a place, as in the editor's miniature (the places of a fixed height have no room for one of their own). */
+@Composable
+private fun Caption(@StringRes text: Int) {
+    Text(stringResource(text), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
 }
