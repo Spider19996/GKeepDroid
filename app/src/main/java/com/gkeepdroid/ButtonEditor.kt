@@ -81,12 +81,14 @@ interface ButtonEditorScope {
      * A place for buttons. Its buttons are drawn inside, aligned by [contentAlignment]; while one is dragged, the place lights up and
      * shows where the button would land. [vertical] places the buttons in a column, [labeled] draws them with their names (the
      * names are for places that have room), otherwise they are squares of [chipSize]. A [caption] names the place above it; it is
-     * for places that grow with their buttons (a place of a fixed height has no room for one).
+     * for places that grow with their buttons (a place of a fixed height has no room for one). The buttons lie in the place as they
+     * will lie in the real thing: [align] says on which side of it they are put (a place at the right edge has them at its right).
      */
     @Composable
     fun Zone(
         key: Int, modifier: Modifier = Modifier, vertical: Boolean = false, labeled: Boolean = false, chipSize: Dp = 34.dp,
         contentAlignment: Alignment = Alignment.CenterStart, scrollable: Boolean = false, @StringRes caption: Int? = null,
+        align: Alignment.Horizontal = Alignment.Start,
     )
 }
 
@@ -211,7 +213,7 @@ fun ButtonEditor(
         @Composable
         override fun Zone(
             key: Int, modifier: Modifier, vertical: Boolean, labeled: Boolean, chipSize: Dp, contentAlignment: Alignment, scrollable: Boolean,
-            caption: Int?,
+            caption: Int?, align: Alignment.Horizontal,
         ) {
             val here = landing?.takeIf { dragId != null && it.first == key }
             val inZone = items.filter { it.zone == key }
@@ -239,12 +241,11 @@ fun ButtonEditor(
                 ) {
                     if (vertical) Column(
                         Modifier.then(if (scrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier),
-                        // Named buttons in a column start at the left, as the buttons under the note do; icons are centered.
-                        horizontalAlignment = if (labeled) Alignment.Start else Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp),
+                        horizontalAlignment = align, verticalArrangement = Arrangement.spacedBy(3.dp),
                     ) { Buttons() }
                     else if (scrollable) Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
-                        FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { Buttons() }
-                    } else FlowRow(horizontalArrangement = Arrangement.spacedBy(3.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) { Buttons() }
+                        FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp, align), verticalArrangement = Arrangement.spacedBy(4.dp)) { Buttons() }
+                    } else FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(3.dp, align), verticalArrangement = Arrangement.spacedBy(3.dp)) { Buttons() }
                 }
             }
             // The name stands above the place, outside of what lights up.

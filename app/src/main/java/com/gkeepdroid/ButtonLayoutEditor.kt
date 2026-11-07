@@ -75,7 +75,7 @@ fun ButtonLayoutEditor(
                 }
                 Row(Modifier.fillMaxWidth().height(middleHeight), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Bar(buttons, POS_LEFT, chipSize, Modifier.width(40.dp).fillMaxHeight())
-                    Zone(OFF_ZONE, Modifier.weight(1f).fillMaxHeight(), chipSize = chipSize, contentAlignment = Alignment.Center, scrollable = true)
+                    Zone(OFF_ZONE, Modifier.weight(1f).fillMaxHeight(), chipSize = chipSize, contentAlignment = Alignment.Center, scrollable = true, align = Alignment.CenterHorizontally)
                     Bar(buttons, POS_RIGHT, chipSize, Modifier.width(40.dp).fillMaxHeight())
                 }
                 Caption(R.string.button_bar_bottom)
@@ -96,13 +96,13 @@ private fun ButtonEditorScope.Bar(buttons: List<LayoutButton>, side: Int, chipSi
     val outer = maxOf(regionWeight(ALIGN_START), regionWeight(ALIGN_END))
     val middle = regionWeight(ALIGN_CENTER)
     if (vertical) Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Zone(side * 10 + ALIGN_START, Modifier.weight(outer).fillMaxWidth(), vertical = true, chipSize = chipSize, contentAlignment = Alignment.TopCenter)
-        Zone(side * 10 + ALIGN_CENTER, Modifier.weight(middle).fillMaxWidth(), vertical = true, chipSize = chipSize, contentAlignment = Alignment.Center)
-        Zone(side * 10 + ALIGN_END, Modifier.weight(outer).fillMaxWidth(), vertical = true, chipSize = chipSize, contentAlignment = Alignment.BottomCenter)
+        Zone(side * 10 + ALIGN_START, Modifier.weight(outer).fillMaxWidth(), vertical = true, chipSize = chipSize, contentAlignment = Alignment.TopCenter, align = Alignment.CenterHorizontally)
+        Zone(side * 10 + ALIGN_CENTER, Modifier.weight(middle).fillMaxWidth(), vertical = true, chipSize = chipSize, contentAlignment = Alignment.Center, align = Alignment.CenterHorizontally)
+        Zone(side * 10 + ALIGN_END, Modifier.weight(outer).fillMaxWidth(), vertical = true, chipSize = chipSize, contentAlignment = Alignment.BottomCenter, align = Alignment.CenterHorizontally)
     } else Row(modifier, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        Zone(side * 10 + ALIGN_START, Modifier.weight(outer).fillMaxHeight(), chipSize = chipSize, contentAlignment = Alignment.CenterStart)
-        Zone(side * 10 + ALIGN_CENTER, Modifier.weight(middle).fillMaxHeight(), chipSize = chipSize, contentAlignment = Alignment.Center)
-        Zone(side * 10 + ALIGN_END, Modifier.weight(outer).fillMaxHeight(), chipSize = chipSize, contentAlignment = Alignment.CenterEnd)
+        Zone(side * 10 + ALIGN_START, Modifier.weight(outer).fillMaxHeight(), chipSize = chipSize, contentAlignment = Alignment.CenterStart, align = Alignment.Start)
+        Zone(side * 10 + ALIGN_CENTER, Modifier.weight(middle).fillMaxHeight(), chipSize = chipSize, contentAlignment = Alignment.Center, align = Alignment.CenterHorizontally)
+        Zone(side * 10 + ALIGN_END, Modifier.weight(outer).fillMaxHeight(), chipSize = chipSize, contentAlignment = Alignment.CenterEnd, align = Alignment.End)
     }
 }
 
