@@ -34,6 +34,8 @@ internal fun EditorPreview(state: ButtonPreviewState, align: Int) {
     val states = EDITOR_ACTIONS.associate { spec -> spec.id to EditorActionState(spec.icon, stringResource(spec.label), {}) }
     fun inZone(zone: Int) = state.items.filter { it.zone == zone }.mapNotNull { byId[it.id] }
     val noteZone = inZone(ZONE_NOTE)
+    // The color and the label section are shown as a block with their name, as the sketch of what they would show.
+    val inline: Map<String, @Composable (Boolean) -> Unit> = NOTE_INLINE.associateWith { id -> { hl -> InlinePlaceholder(byId.getValue(id), hl) } }
     val noteAt = noteZone.indexOfFirst { it.id == NOTE_ID }.coerceAtLeast(0)
     val highlighted = state.items.firstOrNull { it.id == state.highlightId }
     val shape = RoundedCornerShape(16.dp)
@@ -48,9 +50,9 @@ internal fun EditorPreview(state: ButtonPreviewState, align: Int) {
                     else -> Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
                 },
             ) {
-                NoteActionButtons(noteZone.take(noteAt), states, state.highlightId)
+                NoteActionButtons(noteZone.take(noteAt), states, state.highlightId, inline)
                 ExampleNote(state.highlightId == NOTE_ID)
-                NoteActionButtons(noteZone.drop(noteAt + 1), states, state.highlightId)
+                NoteActionButtons(noteZone.drop(noteAt + 1), states, state.highlightId, inline)
             }
             EditorBar(inZone(ZONE_BOTTOM_LEFT), inZone(ZONE_BOTTOM_RIGHT), states, highlightId = state.highlightId)
         }
@@ -94,5 +96,21 @@ private fun ExampleNote(highlighted: Boolean) {
                 Box(Modifier.fillMaxWidth(w).padding(10.dp).height(10.dp).background(MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(5.dp)))
             }
         }
+    }
+}
+
+/** A section that shows itself beside the note, as a block with its icon and name. */
+@Composable
+private fun InlinePlaceholder(spec: EditorActionSpec, highlighted: Boolean) {
+    Row(
+        Modifier.fillMaxWidth().height(48.dp)
+            .border(
+                if (highlighted) BorderStroke(3.dp, MaterialTheme.colorScheme.primary) else BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                RoundedCornerShape(12.dp),
+            ).padding(horizontal = 14.dp),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Icon(painterResource(spec.icon), null, Modifier.size(20.dp))
+        Text(stringResource(spec.label), style = MaterialTheme.typography.bodyMedium)
     }
 }

@@ -689,6 +689,27 @@ class EditNoteActivity : ComponentActivity() {
             R.drawable.ic_image, stringResource(R.string.image_add_keep), { startActivity(keepIntent(this@EditNoteActivity)) },
             visible = canEdit && existing != null && !isLocal && images.isEmpty(),
         )
+        // What the sheets of the bottom bar hold, to show where the layout sets them beside the note (the highlight is for the preview).
+        val inlineBlocks: Map<String, @Composable (Boolean) -> Unit> = mapOf(
+            "palette" to { _ ->
+                if (canEdit) Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    AppearanceSection(
+                        color = color, onColor = { color = it },
+                        background = background, onBackground = { background = it; pickedBackground = null },
+                        darkVersion = darkVersion, onDarkVersion = { variantDark = it },
+                        canEdit = canEdit, isExisting = existing != null, isLocal = isLocal,
+                        ownText = ownText, onOwnText = { ownText = it },
+                        picture = picture,
+                        onPickPhoto = { if (hintPrefs.getBoolean("own_photo_local_dismissed", false)) pickBackground.launch("image/*") else localHint = true },
+                    )
+                }
+            },
+            "labels" to { _ ->
+                if (canEdit) Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    LabelsSection(account = targetAccount, labels = labels, onLabels = { labels = it }, canEdit = canEdit)
+                }
+            },
+        )
         states["undo"] = EditorActionState(R.drawable.ic_undo, stringResource(R.string.undo), undo, visible = canEdit, enabled = history.canUndo)
         states["redo"] = EditorActionState(R.drawable.ic_redo, stringResource(R.string.redo), redo, visible = canEdit, enabled = history.canRedo)
         states["convert"] = EditorActionState(
@@ -940,7 +961,7 @@ class EditNoteActivity : ComponentActivity() {
             // The buttons the layout sets before the note show above its fields, those after it below them.
             val noteZone = editorLayout.inZone(ZONE_NOTE)
             val noteAt = noteZone.indexOfFirst { it.id == NOTE_ID }.coerceAtLeast(0)
-            NoteActionButtons(noteZone.take(noteAt), states)
+            NoteActionButtons(noteZone.take(noteAt), states, inline = inlineBlocks)
             OutlinedTextField(
                 value = title, onValueChange = { title = it }, readOnly = !canEdit,
                 label = { Text(stringResource(R.string.title_hint)) },
@@ -1070,7 +1091,7 @@ class EditNoteActivity : ComponentActivity() {
                 )
             }
 
-            NoteActionButtons(editorLayout.inZone(ZONE_NOTE).dropWhile { it.id != NOTE_ID }.drop(1), states)
+            NoteActionButtons(editorLayout.inZone(ZONE_NOTE).dropWhile { it.id != NOTE_ID }.drop(1), states, inline = inlineBlocks)
             if (imeVisible || editorLayout.align != EDITOR_ALIGN_BOTTOM) Spacer(Modifier.weight(1f))
 
             // Web addresses, e-mail addresses and phone numbers in the note can be opened with one tap.

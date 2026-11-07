@@ -239,7 +239,8 @@ fun ButtonEditor(
                 ) {
                     if (vertical) Column(
                         Modifier.then(if (scrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier),
-                        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp),
+                        // Named buttons in a column start at the left, as the buttons under the note do; icons are centered.
+                        horizontalAlignment = if (labeled) Alignment.Start else Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp),
                     ) { Buttons() }
                     else if (scrollable) Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { Buttons() }

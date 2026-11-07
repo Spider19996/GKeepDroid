@@ -92,8 +92,15 @@ fun isListTool(id: String) = id in LIST_TOOLS
 
 const val NOTE_ID = "note"
 
-/** The actions that have a name to show can be set beside the note (those of the menu); the symbols of the bars cannot. */
-fun canSitInNote(id: String): Boolean = id == NOTE_ID || EDITOR_ACTIONS.firstOrNull { it.id == id }?.defaultZone == ZONE_MENU
+/** What the sheets of the bottom bar hold; set in the note's place, each shows itself there instead of opening a sheet. */
+val NOTE_INLINE = setOf("palette", "labels")
+
+/**
+ * What can be set beside the note: the actions of the menu, which show as buttons with a name, the picture button, and the
+ * color and label sections, which show themselves. The symbols of the bars that only do something (save, close, pin...) cannot.
+ */
+fun canSitInNote(id: String): Boolean =
+    id == NOTE_ID || id == "image" || id in NOTE_INLINE || EDITOR_ACTIONS.firstOrNull { it.id == id }?.defaultZone == ZONE_MENU
 
 /** Where each action stands: its zone, and the order of all actions (the order inside a zone is the order here). */
 data class EditorLayout(
@@ -269,22 +276,41 @@ internal fun menuGroups(
     return groups
 }
 
-/** The actions of the note's place as buttons with a name, side by side as far as they fit. */
+/**
+ * The actions of the note's place: buttons with a name side by side as far as they fit, and what is in [inline] (the color and the
+ * label section) as a block of its own, in the order of the layout.
+ */
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-internal fun NoteActionButtons(specs: List<EditorActionSpec>, states: Map<String, EditorActionState>, highlightId: String? = null) {
+internal fun NoteActionButtons(
+    specs: List<EditorActionSpec>, states: Map<String, EditorActionState>, highlightId: String? = null,
+    inline: Map<String, @Composable (Boolean) -> Unit> = emptyMap(),
+) {
     val shown = specs.filter { states[it.id]?.visible == true }
     if (shown.isEmpty()) return
-    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        shown.forEach { spec ->
-            val state = states.getValue(spec.id)
-            TextButton(
-                onClick = state.onClick, enabled = state.enabled, shapes = ButtonDefaults.shapes(),
-                modifier = if (spec.id == highlightId) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp)) else Modifier,
-            ) {
-                Icon(painterResource(state.icon), contentDescription = null, Modifier.size(18.dp))
-                Spacer(Modifier.size(8.dp))
-                Text(state.label)
+    // Runs of buttons share a row; a block that shows itself breaks the run.
+    val runs = mutableListOf<List<EditorActionSpec>>()
+    shown.forEach { spec ->
+        if (spec.id in inline) runs.add(listOf(spec))
+        else if (runs.isNotEmpty() && runs.last().first().id !in inline) runs[runs.lastIndex] = runs.last() + spec
+        else runs.add(listOf(spec))
+    }
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        runs.forEach { run ->
+            val block = inline[run.first().id]
+            if (block != null) block(run.first().id == highlightId)
+            else FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                run.forEach { spec ->
+                    val state = states.getValue(spec.id)
+                    TextButton(
+                        onClick = state.onClick, enabled = state.enabled, shapes = ButtonDefaults.shapes(),
+                        modifier = if (spec.id == highlightId) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp)) else Modifier,
+                    ) {
+                        Icon(painterResource(state.icon), contentDescription = null, Modifier.size(18.dp))
+                        Spacer(Modifier.size(8.dp))
+                        Text(state.label)
+                    }
+                }
             }
         }
     }
