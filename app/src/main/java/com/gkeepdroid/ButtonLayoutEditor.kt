@@ -1,6 +1,5 @@
 package com.gkeepdroid
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -31,31 +30,29 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-/** One button of the bar as the layout editor shows it; [side] is null while the button is off. */
-data class LayoutButton(val id: String, @DrawableRes val icon: Int, @StringRes val label: Int, val side: Int?, val slot: Int = ALIGN_CENTER)
-
-private const val OFF_ZONE = -1
-
 /**
  * A miniature of the widget: the four edges are the bars, each with a start, a middle and an end place, and the middle lists
- * the buttons that are off. Built on [ButtonEditor]; a place is [side] * 10 + slot.
+ * the buttons that are off. Built on [ButtonEditor]; a place is [barZone] of the edge and the place along it. Only the
+ * [available] buttons are shown (which ones a widget has depends on its kind).
  */
 @Composable
 fun ButtonLayoutEditor(
-    buttons: List<LayoutButton>,
+    layout: ButtonLayout,
+    available: Set<String>,
     /** The size of the icons in the widget, for the preview. */
     iconSizeDp: Int,
-    /** A button was dropped on [side] at [slot] (side null: hidden), in front of [beforeId] or at the end if that is null. */
-    onMove: (id: String, side: Int?, slot: Int, beforeId: String?) -> Unit,
+    /** A button was dropped on a [zone] (BAR_HIDDEN: off), in front of [beforeId] or at the end if that is null. */
+    onMove: (id: String, zone: Int, beforeId: String?) -> Unit,
 ) {
-    val items = buttons.map { b -> ButtonItem(b.id, b.icon, b.label, b.side?.let { it * 10 + b.slot } ?: OFF_ZONE) }
+    val buttons = layout.ids().filter { it in available }.map { id ->
+        val spec = layout.catalog.byId.getValue(id)
+        ButtonItem(id, spec.icon, spec.label, layout.zoneOf(id), layout.catalog.allowed(id))
+    }
     BoxWithConstraints(Modifier.fillMaxWidth()) {
-        ButtonEditor(items, { id, zone, before ->
-            if (zone == OFF_ZONE) onMove(id, null, ALIGN_CENTER, before) else onMove(id, zone / 10, zone % 10, before)
-        }, preview = { WidgetPreview(it, iconSizeDp) }) {
+        ButtonEditor(buttons, onMove, preview = { WidgetPreview(it, iconSizeDp) }) {
             // The editor has a fixed height. Icons shrink with the number of buttons on a side, so none is ever cut off.
             val middleHeight = 170.dp
-            fun count(side: Int) = buttons.count { it.side == side }
+            fun count(side: Int) = buttons.count { val z = it.zone ?: BAR_HIDDEN; z != BAR_HIDDEN && barSide(z) == side }
             fun fit(length: Dp, n: Int): Dp = ((length - 8.dp - 3.dp * (n - 1).coerceAtLeast(0)) / n.coerceAtLeast(1))
             val chipSize = minOf(
                 34.dp,
@@ -75,7 +72,7 @@ fun ButtonLayoutEditor(
                 }
                 Row(Modifier.fillMaxWidth().height(middleHeight), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Bar(buttons, POS_LEFT, chipSize, Modifier.width(40.dp).fillMaxHeight())
-                    Zone(OFF_ZONE, Modifier.weight(1f).fillMaxHeight(), chipSize = chipSize, contentAlignment = Alignment.Center, scrollable = true, align = Alignment.CenterHorizontally)
+                    Zone(BAR_HIDDEN, Modifier.weight(1f).fillMaxHeight(), chipSize = chipSize, contentAlignment = Alignment.Center, scrollable = true, align = Alignment.CenterHorizontally)
                     Bar(buttons, POS_RIGHT, chipSize, Modifier.width(40.dp).fillMaxHeight())
                 }
                 Caption(R.string.button_bar_bottom)
@@ -90,19 +87,19 @@ fun ButtonLayoutEditor(
  * one centered, as in the widget.
  */
 @Composable
-private fun ButtonEditorScope.Bar(buttons: List<LayoutButton>, side: Int, chipSize: Dp, modifier: Modifier) {
+private fun ButtonEditorScope.Bar(buttons: List<ButtonItem>, side: Int, chipSize: Dp, modifier: Modifier) {
     val vertical = side == POS_LEFT || side == POS_RIGHT
-    fun regionWeight(slot: Int) = maxOf(1f, 0.5f * buttons.count { it.side == side && it.slot == slot } + 0.5f)
+    fun regionWeight(slot: Int) = maxOf(1f, 0.5f * buttons.count { it.zone == barZone(side, slot) } + 0.5f)
     val outer = maxOf(regionWeight(ALIGN_START), regionWeight(ALIGN_END))
     val middle = regionWeight(ALIGN_CENTER)
     if (vertical) Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Zone(side * 10 + ALIGN_START, Modifier.weight(outer).fillMaxWidth(), vertical = true, chipSize = chipSize, contentAlignment = Alignment.TopCenter, align = Alignment.CenterHorizontally)
-        Zone(side * 10 + ALIGN_CENTER, Modifier.weight(middle).fillMaxWidth(), vertical = true, chipSize = chipSize, contentAlignment = Alignment.Center, align = Alignment.CenterHorizontally)
-        Zone(side * 10 + ALIGN_END, Modifier.weight(outer).fillMaxWidth(), vertical = true, chipSize = chipSize, contentAlignment = Alignment.BottomCenter, align = Alignment.CenterHorizontally)
+        Zone(barZone(side, ALIGN_START), Modifier.weight(outer).fillMaxWidth(), vertical = true, chipSize = chipSize, contentAlignment = Alignment.TopCenter, align = Alignment.CenterHorizontally)
+        Zone(barZone(side, ALIGN_CENTER), Modifier.weight(middle).fillMaxWidth(), vertical = true, chipSize = chipSize, contentAlignment = Alignment.Center, align = Alignment.CenterHorizontally)
+        Zone(barZone(side, ALIGN_END), Modifier.weight(outer).fillMaxWidth(), vertical = true, chipSize = chipSize, contentAlignment = Alignment.BottomCenter, align = Alignment.CenterHorizontally)
     } else Row(modifier, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        Zone(side * 10 + ALIGN_START, Modifier.weight(outer).fillMaxHeight(), chipSize = chipSize, contentAlignment = Alignment.CenterStart, align = Alignment.Start)
-        Zone(side * 10 + ALIGN_CENTER, Modifier.weight(middle).fillMaxHeight(), chipSize = chipSize, contentAlignment = Alignment.Center, align = Alignment.CenterHorizontally)
-        Zone(side * 10 + ALIGN_END, Modifier.weight(outer).fillMaxHeight(), chipSize = chipSize, contentAlignment = Alignment.CenterEnd, align = Alignment.End)
+        Zone(barZone(side, ALIGN_START), Modifier.weight(outer).fillMaxHeight(), chipSize = chipSize, contentAlignment = Alignment.CenterStart, align = Alignment.Start)
+        Zone(barZone(side, ALIGN_CENTER), Modifier.weight(middle).fillMaxHeight(), chipSize = chipSize, contentAlignment = Alignment.Center, align = Alignment.CenterHorizontally)
+        Zone(barZone(side, ALIGN_END), Modifier.weight(outer).fillMaxHeight(), chipSize = chipSize, contentAlignment = Alignment.CenterEnd, align = Alignment.End)
     }
 }
 
@@ -118,7 +115,7 @@ private fun Caption(@StringRes text: Int) {
  */
 @Composable
 private fun WidgetPreview(state: ButtonPreviewState, iconSizeDp: Int) {
-    fun inPlace(side: Int, slot: Int) = state.items.filter { it.zone == side * 10 + slot }
+    fun inPlace(side: Int, slot: Int) = state.items.filter { it.zone == barZone(side, slot) }
 
     @Composable
     fun Icons(list: List<ButtonItem>) {
@@ -146,7 +143,7 @@ private fun WidgetPreview(state: ButtonPreviewState, iconSizeDp: Int) {
     }
 
     val shape = RoundedCornerShape(16.dp)
-    val hidden = state.items.firstOrNull { it.id == state.highlightId }?.zone == OFF_ZONE
+    val hidden = state.items.firstOrNull { it.id == state.highlightId }?.zone == BAR_HIDDEN
     Box(Modifier.fillMaxSize().clip(shape).border(BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant), shape).background(MaterialTheme.colorScheme.background)) {
         Column(Modifier.fillMaxSize().padding(4.dp)) {
             HorizontalBar(POS_TOP)

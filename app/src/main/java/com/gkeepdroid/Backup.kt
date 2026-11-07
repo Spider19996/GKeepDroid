@@ -7,24 +7,17 @@ import org.json.JSONObject
 object Backup {
     private const val FORMAT_VERSION = 1
 
+    /** Tells a saved layout file of the widget's bar from other files. */
+    private const val LAYOUT_MARKER = "layout"
+
     /** Only the button bar: which buttons are shown, where, in which order, and their size. */
-    fun exportLayout(w: WidgetSettings): String = JSONObject()
-        .put("layout", 1)
-        .put("headerSizeSp", w.headerSizeSp)
-        .put("buttonSides", sidesToJson(w.buttonSides))
-        .put("buttonOrder", JSONArray(w.buttonOrder))
-        .put("buttonSlots", sidesToJson(w.buttonSlots))
-        .toString(2)
+    fun exportLayout(w: WidgetSettings): String = w.buttons.toFileJson(LAYOUT_MARKER, JSONObject().put("headerSizeSp", w.headerSizeSp))
 
     /** Applies a saved layout on top of [base]; throws if the text is not a layout. */
     fun parseLayout(text: String, base: WidgetSettings): WidgetSettings {
-        val o = JSONObject(text)
-        require(o.has("layout")) { "Not a layout file" }
         return base.copy(
-            headerSizeSp = o.optInt("headerSizeSp", base.headerSizeSp),
-            buttonSides = sidesFromJson(o.optString("buttonSides", "{}")),
-            buttonOrder = idsFromJson(o.optJSONArray("buttonOrder")?.toString()),
-            buttonSlots = sidesFromJson(o.optString("buttonSlots", "{}")),
+            headerSizeSp = JSONObject(text).optInt("headerSizeSp", base.headerSizeSp),
+            buttons = ButtonLayout.fromFileJson(WIDGET_CATALOG, text, LAYOUT_MARKER),
         )
     }
 
@@ -70,9 +63,7 @@ object Backup {
                     .put("listSpacingDp", widget.listSpacingDp)
                     .put("sortMode", widget.sortMode)
                     .put("showImages", widget.showImages)
-                    .put("buttonSides", sidesToJson(widget.buttonSides))
-                    .put("buttonOrder", JSONArray(widget.buttonOrder))
-                    .put("buttonSlots", sidesToJson(widget.buttonSlots))
+                    .put("buttonLayout", widget.buttons.toJsonObject())
                     .put("checkboxStyle", widget.checkboxStyle)
                     .put("checkboxSizeDp", widget.checkboxSizeDp)
                     .put("tapWholeRow", widget.tapWholeRow)
@@ -127,9 +118,7 @@ object Backup {
                 listSpacingDp = w.optInt("listSpacingDp", dw.listSpacingDp).coerceIn(0, 24),
                 sortMode = w.optInt("sortMode", dw.sortMode).coerceIn(SORT_KEEP, SORT_MANUAL),
                 showImages = w.optBoolean("showImages", dw.showImages),
-                buttonSides = if (w.has("buttonSides")) sidesFromJson(w.optString("buttonSides", "{}")) else dw.buttonSides,
-                buttonOrder = if (w.has("buttonOrder")) idsFromJson(w.optJSONArray("buttonOrder")?.toString()) else dw.buttonOrder,
-                buttonSlots = if (w.has("buttonSlots")) sidesFromJson(w.optString("buttonSlots", "{}")) else dw.buttonSlots,
+                buttons = if (w.has("buttonLayout")) ButtonLayout.fromJson(WIDGET_CATALOG, w.getJSONObject("buttonLayout").toString()) else dw.buttons,
                 checkboxStyle = w.optInt("checkboxStyle", dw.checkboxStyle).coerceIn(CB_SQUARE, CB_CLASSIC),
                 checkboxSizeDp = w.optInt("checkboxSizeDp", dw.checkboxSizeDp).coerceIn(14, 56),
                 tapWholeRow = w.optBoolean("tapWholeRow", dw.tapWholeRow),

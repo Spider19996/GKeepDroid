@@ -101,7 +101,7 @@ private fun ExampleNote(highlighted: Boolean) {
 
 /** A section that shows itself beside the note, as a block with its icon and name. */
 @Composable
-private fun InlinePlaceholder(spec: EditorActionSpec, highlighted: Boolean) {
+private fun InlinePlaceholder(spec: ButtonSpec, highlighted: Boolean) {
     Row(
         Modifier.fillMaxWidth().height(48.dp)
             .border(

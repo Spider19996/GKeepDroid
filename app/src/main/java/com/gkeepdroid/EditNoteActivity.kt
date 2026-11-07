@@ -957,7 +957,7 @@ class EditNoteActivity : ComponentActivity() {
                 )
             }
             // Where a short note sits is a setting; with the keyboard open it is at the top, where one types.
-            if (!imeVisible && editorLayout.align != EDITOR_ALIGN_TOP) Spacer(Modifier.weight(1f))
+            if (!imeVisible && editorLayout.option != EDITOR_ALIGN_TOP) Spacer(Modifier.weight(1f))
             // The buttons the layout sets before the note show above its fields, those after it below them.
             val noteZone = editorLayout.inZone(ZONE_NOTE)
             val noteAt = noteZone.indexOfFirst { it.id == NOTE_ID }.coerceAtLeast(0)
@@ -1092,7 +1092,7 @@ class EditNoteActivity : ComponentActivity() {
             }
 
             NoteActionButtons(editorLayout.inZone(ZONE_NOTE).dropWhile { it.id != NOTE_ID }.drop(1), states, inline = inlineBlocks)
-            if (imeVisible || editorLayout.align != EDITOR_ALIGN_BOTTOM) Spacer(Modifier.weight(1f))
+            if (imeVisible || editorLayout.option != EDITOR_ALIGN_BOTTOM) Spacer(Modifier.weight(1f))
 
             // Web addresses, e-mail addresses and phone numbers in the note can be opened with one tap.
             val links = NoteLinks.find(listOf(title, text) + items.map { it.text })

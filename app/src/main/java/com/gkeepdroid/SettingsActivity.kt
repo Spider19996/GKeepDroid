@@ -199,9 +199,7 @@ class SettingsActivity : ComponentActivity() {
                     noteAlpha = w.noteAlpha
                     plainStyle = w.plainCardStyle
                     headerSize = w.headerSizeSp
-                    buttonSides = w.buttonSides
-                    buttonOrder = w.buttonOrder
-                    buttonSlots = w.buttonSlots
+                    buttonLayout = w.buttons
                     checkable = w.checkable
                     checkedToEnd = w.checkedToEnd
                     collapseChecked = w.collapseChecked
@@ -271,7 +269,7 @@ class SettingsActivity : ComponentActivity() {
                     text = { Text(stringResource(R.string.settings_button_hint)) },
                     confirmButton = {
                         TextButton(onClick = {
-                            buttonSides = buttonSides - BTN_SETTINGS
+                            buttonLayout = buttonLayout.moved(BTN_SETTINGS, BAR_HIDDEN, null)
                             confirmSettingsButtonOff = false
                         }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.turn_off)) }
                     },

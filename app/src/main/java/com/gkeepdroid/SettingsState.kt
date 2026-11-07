@@ -100,9 +100,7 @@ internal class SettingsState(val context: SettingsActivity) {
     var noteAlpha by mutableFloatStateOf(initialWidget.noteAlpha)
     var plainStyle by mutableIntStateOf(initialWidget.plainCardStyle)
     var headerSize by mutableIntStateOf(initialWidget.headerSizeSp)
-    var buttonSides by mutableStateOf(initialWidget.buttonSides)
-    var buttonOrder by mutableStateOf(initialWidget.buttonOrder)
-    var buttonSlots by mutableStateOf(initialWidget.buttonSlots)
+    var buttonLayout by mutableStateOf(initialWidget.buttons)
     var checkable by mutableStateOf(initialWidget.checkable)
     var checkedToEnd by mutableStateOf(initialWidget.checkedToEnd)
     var collapseChecked by mutableStateOf(initialWidget.collapseChecked)
@@ -170,9 +168,7 @@ internal class SettingsState(val context: SettingsActivity) {
         plainCardStyle = plainStyle,
         account = CredentialStore.resolve(context, widgetAccount).orEmpty(),
         headerSizeSp = headerSize,
-        buttonSides = buttonSides,
-        buttonOrder = buttonOrder,
-        buttonSlots = buttonSlots,
+        buttons = buttonLayout,
         checkable = checkable,
         checkedToEnd = checkedToEnd,
         collapseChecked = collapseChecked,
@@ -288,8 +284,6 @@ internal class SettingsState(val context: SettingsActivity) {
     /** Puts the button bar of [w] into the editor state. */
     fun applyLayout(w: WidgetSettings) {
         headerSize = w.headerSizeSp
-        buttonSides = w.buttonSides
-        buttonOrder = w.buttonOrder
-        buttonSlots = w.buttonSlots
+        buttonLayout = w.buttons
     }
 }

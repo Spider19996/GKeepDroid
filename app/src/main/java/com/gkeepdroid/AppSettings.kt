@@ -59,7 +59,7 @@ data class AppSettings(
     val filterChips: Int = FILTER_NOTES or FILTER_LISTS or FILTER_REMINDER or FILTER_RECENT or FILTER_LABELS,
     val pullToRefresh: Boolean = true,
     /** Where the buttons of the note editor stand: the two bars, the menu or nowhere. */
-    val editorLayout: EditorLayout = EditorLayout(),
+    val editorLayout: ButtonLayout = EDITOR_CATALOG.layout(),
 )
 
 const val FILTER_NOTES = 1
@@ -125,7 +125,7 @@ object AppSettingsStore {
             filterBar = p.getBoolean("filter_bar", d.filterBar),
             filterChips = p.getInt("filter_chips", d.filterChips),
             pullToRefresh = p.getBoolean("pull_to_refresh", d.pullToRefresh),
-            editorLayout = if (p.contains("editor_layout")) EditorLayout.fromJson(p.getString("editor_layout", null)) else d.editorLayout,
+            editorLayout = if (p.contains("editor_layout")) ButtonLayout.fromJson(EDITOR_CATALOG, p.getString("editor_layout", null)) else d.editorLayout,
         )
     }
 

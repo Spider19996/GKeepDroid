@@ -45,38 +45,37 @@ const val ALIGN_START = 1
 const val ALIGN_CENTER = 2
 const val ALIGN_END = 3
 
-/** The standard button bar: the main actions on the top, creating and searching at the bottom. */
-val DEFAULT_SIDES = mapOf(
-    BTN_ADD_ITEM to POS_TOP, BTN_REMINDER to POS_TOP, BTN_REFRESH to POS_TOP, BTN_SORT to POS_TOP, BTN_KEEP to POS_TOP, BTN_SETTINGS to POS_TOP,
-    BTN_NEW_NOTE to POS_BOTTOM, BTN_NEW_LIST to POS_BOTTOM, BTN_SEARCH to POS_BOTTOM, BTN_APP to POS_BOTTOM,
-    BTN_FOLD to POS_TOP,
+/** A button's place in a bar: the edge it sits on and where along it (start, middle or end). Zone -1 is "not shown". */
+const val BAR_HIDDEN = -1
+fun barZone(side: Int, slot: Int) = side * 10 + slot
+fun barSide(zone: Int) = zone / 10
+fun barSlot(zone: Int) = zone % 10
+
+private fun barButton(id: String, @androidx.annotation.DrawableRes icon: Int, @androidx.annotation.StringRes label: Int, side: Int, slot: Int) =
+    ButtonSpec(id, icon, label, defaultZone = barZone(side, slot))
+
+/**
+ * The buttons of the widget's bar and where they stand by default (the order here is the default order): the main actions on the
+ * top, creating and searching at the bottom. Which of them a widget has depends on its kind, so the settings page and the widget
+ * pick from these.
+ */
+val WIDGET_CATALOG = ButtonCatalog(
+    specs = listOf(
+        barButton(BTN_ADD_ITEM, R.drawable.ic_add, R.string.btn_add_item, POS_TOP, ALIGN_CENTER),
+        barButton(BTN_REMINDER, R.drawable.ic_alarm, R.string.reminders_title, POS_TOP, ALIGN_START),
+        barButton(BTN_KEEP, R.drawable.ic_open_new, R.string.btn_keep, POS_TOP, ALIGN_START),
+        barButton(BTN_NEW_NOTE, R.drawable.ic_add, R.string.btn_new_note, POS_BOTTOM, ALIGN_START),
+        barButton(BTN_NEW_LIST, R.drawable.ic_checklist, R.string.btn_new_list, POS_BOTTOM, ALIGN_START),
+        barButton(BTN_REFRESH, R.drawable.ic_refresh, R.string.btn_refresh, POS_TOP, ALIGN_END),
+        barButton(BTN_SETTINGS, R.drawable.ic_settings, R.string.btn_settings, POS_TOP, ALIGN_END),
+        barButton(BTN_SEARCH, R.drawable.ic_search, R.string.btn_search, POS_BOTTOM, ALIGN_END),
+        barButton(BTN_APP, R.drawable.ic_apps, R.string.btn_app, POS_BOTTOM, ALIGN_END),
+        barButton(BTN_SORT, R.drawable.ic_sort, R.string.btn_sort, POS_TOP, ALIGN_START),
+        barButton(BTN_FOLD, R.drawable.ic_fold, R.string.btn_fold, POS_TOP, ALIGN_START),
+    ),
+    hiddenZone = BAR_HIDDEN,
+    validZone = { it == BAR_HIDDEN || (barSide(it) in POS_TOP..POS_RIGHT && barSlot(it) in ALIGN_START..ALIGN_END) },
 )
-val DEFAULT_ORDER = listOf(
-    BTN_ADD_ITEM, BTN_REMINDER, BTN_KEEP, BTN_NEW_NOTE, BTN_NEW_LIST, BTN_REFRESH, BTN_SETTINGS, BTN_SEARCH, BTN_APP, BTN_SORT, BTN_FOLD,
-)
-val DEFAULT_SLOTS = mapOf(
-    BTN_NEW_NOTE to ALIGN_START, BTN_REFRESH to ALIGN_END, BTN_SETTINGS to ALIGN_END, BTN_NEW_LIST to ALIGN_START,
-    BTN_SORT to ALIGN_START, BTN_SEARCH to ALIGN_END, BTN_APP to ALIGN_END, BTN_KEEP to ALIGN_START,
-    BTN_REMINDER to ALIGN_START, BTN_FOLD to ALIGN_START,
-)
-
-val ALL_BUTTONS = listOf(BTN_REFRESH, BTN_ADD_ITEM, BTN_REMINDER, BTN_NEW_NOTE, BTN_NEW_LIST, BTN_SORT, BTN_SEARCH, BTN_APP, BTN_KEEP, BTN_SETTINGS, BTN_FOLD)
-
-fun idsFromJson(json: String?): List<String> = try {
-    val a = JSONArray(json ?: "[]")
-    (0 until a.length()).map { a.getString(it) }
-} catch (e: JSONException) {
-    emptyList()
-}
-
-fun sidesToJson(sides: Map<String, Int>): String = JSONObject().also { o -> sides.forEach { (k, v) -> o.put(k, v) } }.toString()
-
-fun sidesFromJson(json: String?): Map<String, Int> = try {
-    val o = JSONObject(json ?: "{}")
-    o.keys().asSequence().associateWith { o.getInt(it) }
-} catch (e: JSONException) {
-    emptyMap()
-}
 
 const val CB_SQUARE = 0
 const val CB_ROUNDED = 1
@@ -95,12 +94,8 @@ data class WidgetSettings(
     /** E-mail of the account shown by the widget; empty means the first account. */
     val account: String = "",
     val headerSizeSp: Int = 22,
-    /** Side of each shown button (BTN_* id to POS_*); a button without an entry is not shown. */
-    val buttonSides: Map<String, Int> = DEFAULT_SIDES,
-    /** Order of the buttons inside their bars: BTN_* ids, first one first; missing ones follow in default order. */
-    val buttonOrder: List<String> = DEFAULT_ORDER,
-    /** Where a button sits along its bar (ALIGN_START, ALIGN_CENTER or ALIGN_END); missing means the middle. */
-    val buttonSlots: Map<String, Int> = DEFAULT_SLOTS,
+    /** Where each button of the bar stands (edge and place along it, see [barZone]) or that it is not shown, and their order. */
+    val buttons: ButtonLayout = WIDGET_CATALOG.layout(),
     /** Lets the user tick checklist items directly in the widget. */
     val checkable: Boolean = false,
     /** Shows checked items after the unchecked ones. */
@@ -282,9 +277,7 @@ object SettingsStore {
             plainCardStyle = p.getInt("plain_card_style", d.plainCardStyle),
             account = p.getString("account", d.account).orEmpty(),
             headerSizeSp = p.getInt("header_size_sp", d.headerSizeSp),
-            buttonSides = if (p.contains("button_sides")) sidesFromJson(p.getString("button_sides", null)) else d.buttonSides,
-            buttonOrder = if (p.contains("button_order")) idsFromJson(p.getString("button_order", null)) else d.buttonOrder,
-            buttonSlots = if (p.contains("button_slots")) sidesFromJson(p.getString("button_slots", null)) else d.buttonSlots,
+            buttons = if (p.contains("button_layout")) ButtonLayout.fromJson(WIDGET_CATALOG, p.getString("button_layout", null)) else d.buttons,
             checkable = p.getBoolean("checkable", d.checkable),
             checkedToEnd = p.getBoolean("checked_to_end", d.checkedToEnd),
             collapseChecked = p.getBoolean("collapse_checked", d.collapseChecked),
@@ -322,9 +315,7 @@ object SettingsStore {
             putInt("plain_card_style", s.plainCardStyle)
             putString("account", s.account)
             putInt("header_size_sp", s.headerSizeSp)
-            putString("button_sides", sidesToJson(s.buttonSides))
-            putString("button_order", JSONArray(s.buttonOrder).toString())
-            putString("button_slots", sidesToJson(s.buttonSlots))
+            putString("button_layout", s.buttons.toJson())
             putBoolean("checkable", s.checkable)
             putBoolean("checked_to_end", s.checkedToEnd)
             putBoolean("collapse_checked", s.collapseChecked)

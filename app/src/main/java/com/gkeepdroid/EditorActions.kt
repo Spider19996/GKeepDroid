@@ -33,8 +33,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.json.JSONArray
-import org.json.JSONObject
 
 const val ZONE_TOP_LEFT = 0
 const val ZONE_TOP_RIGHT = 1
@@ -51,38 +49,33 @@ const val EDITOR_ALIGN_CENTER = 0
 const val EDITOR_ALIGN_TOP = 1
 const val EDITOR_ALIGN_BOTTOM = 2
 
-/** One thing the editor can do with a button: where it stands by default, and which group it belongs to in the menu. */
-class EditorActionSpec(
-    val id: String, @DrawableRes val icon: Int, @StringRes val label: Int, val group: Int, val defaultZone: Int,
-)
-
 /** Every action of the editor, in the order of the default layout. The menu is a place for them like the two bars are. */
 val EDITOR_ACTIONS = listOf(
-    EditorActionSpec("close", R.drawable.ic_close, R.string.discard_action, 3, ZONE_TOP_LEFT),
-    EditorActionSpec("pin", R.drawable.ic_push_pin_outline, R.string.pin_note, 3, ZONE_TOP_RIGHT),
-    EditorActionSpec("pin_bottom", R.drawable.ic_pin_bottom, R.string.pin_to_bottom, 3, ZONE_TOP_RIGHT),
-    EditorActionSpec("reminder", R.drawable.ic_alarm, R.string.reminders_title, 3, ZONE_TOP_RIGHT),
-    EditorActionSpec("save", R.drawable.ic_done, R.string.save, 3, ZONE_TOP_RIGHT),
-    EditorActionSpec("more", R.drawable.ic_more_vert, R.string.more_actions, 3, ZONE_TOP_RIGHT),
-    EditorActionSpec("palette", R.drawable.ic_palette, R.string.color_and_background, 3, ZONE_BOTTOM_LEFT),
-    EditorActionSpec("labels", R.drawable.ic_label, R.string.labels_title, 3, ZONE_BOTTOM_LEFT),
-    EditorActionSpec("image", R.drawable.ic_image, R.string.image_add_keep, 3, ZONE_BOTTOM_LEFT),
-    EditorActionSpec("undo", R.drawable.ic_undo, R.string.undo, 3, ZONE_BOTTOM_RIGHT),
-    EditorActionSpec("redo", R.drawable.ic_redo, R.string.redo, 3, ZONE_BOTTOM_RIGHT),
-    EditorActionSpec("convert", R.drawable.ic_checklist, R.string.editor_convert, 0, ZONE_MENU),
-    EditorActionSpec("list_number", R.drawable.ic_checklist, R.string.list_number, 0, ZONE_MENU),
-    EditorActionSpec("list_check_all", R.drawable.ic_done, R.string.list_check_all, 0, ZONE_MENU),
-    EditorActionSpec("list_uncheck_all", R.drawable.ic_close, R.string.list_uncheck_all, 0, ZONE_MENU),
-    EditorActionSpec("list_sort", R.drawable.ic_sort, R.string.list_sort_alpha, 0, ZONE_MENU),
-    EditorActionSpec("list_delete_checked", R.drawable.ic_delete, R.string.list_delete_checked, 0, ZONE_MENU),
-    EditorActionSpec("open_in_keep", R.drawable.ic_open_new, R.string.open_in_keep, 1, ZONE_MENU),
-    EditorActionSpec("share", R.drawable.ic_share, R.string.share_note, 1, ZONE_MENU),
-    EditorActionSpec("hide_content", R.drawable.ic_lock, R.string.hide_content, 1, ZONE_MENU),
-    EditorActionSpec("archive", R.drawable.ic_archive, R.string.archive_note, 2, ZONE_MENU),
-    EditorActionSpec("delete", R.drawable.ic_delete, R.string.move_to_trash, 2, ZONE_MENU),
+    ButtonSpec("close", R.drawable.ic_close, R.string.discard_action, 3, ZONE_TOP_LEFT),
+    ButtonSpec("pin", R.drawable.ic_push_pin_outline, R.string.pin_note, 3, ZONE_TOP_RIGHT),
+    ButtonSpec("pin_bottom", R.drawable.ic_pin_bottom, R.string.pin_to_bottom, 3, ZONE_TOP_RIGHT),
+    ButtonSpec("reminder", R.drawable.ic_alarm, R.string.reminders_title, 3, ZONE_TOP_RIGHT),
+    ButtonSpec("save", R.drawable.ic_done, R.string.save, 3, ZONE_TOP_RIGHT),
+    ButtonSpec("more", R.drawable.ic_more_vert, R.string.more_actions, 3, ZONE_TOP_RIGHT),
+    ButtonSpec("palette", R.drawable.ic_palette, R.string.color_and_background, 3, ZONE_BOTTOM_LEFT),
+    ButtonSpec("labels", R.drawable.ic_label, R.string.labels_title, 3, ZONE_BOTTOM_LEFT),
+    ButtonSpec("image", R.drawable.ic_image, R.string.image_add_keep, 3, ZONE_BOTTOM_LEFT),
+    ButtonSpec("undo", R.drawable.ic_undo, R.string.undo, 3, ZONE_BOTTOM_RIGHT),
+    ButtonSpec("redo", R.drawable.ic_redo, R.string.redo, 3, ZONE_BOTTOM_RIGHT),
+    ButtonSpec("convert", R.drawable.ic_checklist, R.string.editor_convert, 0, ZONE_MENU),
+    ButtonSpec("list_number", R.drawable.ic_checklist, R.string.list_number, 0, ZONE_MENU),
+    ButtonSpec("list_check_all", R.drawable.ic_done, R.string.list_check_all, 0, ZONE_MENU),
+    ButtonSpec("list_uncheck_all", R.drawable.ic_close, R.string.list_uncheck_all, 0, ZONE_MENU),
+    ButtonSpec("list_sort", R.drawable.ic_sort, R.string.list_sort_alpha, 0, ZONE_MENU),
+    ButtonSpec("list_delete_checked", R.drawable.ic_delete, R.string.list_delete_checked, 0, ZONE_MENU),
+    ButtonSpec("open_in_keep", R.drawable.ic_open_new, R.string.open_in_keep, 1, ZONE_MENU),
+    ButtonSpec("share", R.drawable.ic_share, R.string.share_note, 1, ZONE_MENU),
+    ButtonSpec("hide_content", R.drawable.ic_lock, R.string.hide_content, 1, ZONE_MENU),
+    ButtonSpec("archive", R.drawable.ic_archive, R.string.archive_note, 2, ZONE_MENU),
+    ButtonSpec("delete", R.drawable.ic_delete, R.string.move_to_trash, 2, ZONE_MENU),
     // A shortcut to the settings of these buttons; the last entry of the menu, apart from the others.
-    EditorActionSpec("editor_settings", R.drawable.ic_settings, R.string.editor_buttons_title, 5, ZONE_MENU),
-    EditorActionSpec("note", R.drawable.ic_notes, R.string.editor_buttons_note, 4, ZONE_NOTE),
+    ButtonSpec("editor_settings", R.drawable.ic_settings, R.string.editor_buttons_title, 5, ZONE_MENU),
+    ButtonSpec("note", R.drawable.ic_notes, R.string.editor_buttons_note, 4, ZONE_NOTE),
 )
 
 /** The checklist tools; in the menu they share one entry that opens a page of their own. */
@@ -91,6 +84,9 @@ private val LIST_TOOLS = setOf("list_number", "list_check_all", "list_uncheck_al
 fun isListTool(id: String) = id in LIST_TOOLS
 
 const val NOTE_ID = "note"
+
+/** Tells a saved layout file of the editor from the files of other editors. */
+const val EDITOR_LAYOUT_MARKER = "editorLayout"
 
 /** What the sheets of the bottom bar hold; set in the note's place, each shows itself there instead of opening a sheet. */
 val NOTE_INLINE = setOf("palette", "labels")
@@ -102,75 +98,22 @@ val NOTE_INLINE = setOf("palette", "labels")
 fun canSitInNote(id: String): Boolean =
     id == NOTE_ID || id == "image" || id in NOTE_INLINE || EDITOR_ACTIONS.firstOrNull { it.id == id }?.defaultZone == ZONE_MENU
 
-/** Where each action stands: its zone, and the order of all actions (the order inside a zone is the order here). */
-data class EditorLayout(
-    val zones: Map<String, Int> = emptyMap(), val order: List<String> = EDITOR_ACTIONS.map { it.id }, val align: Int = EDITOR_ALIGN_CENTER,
-) {
-    private val byId = EDITOR_ACTIONS.associateBy { it.id }
-
-    /**
-     * Only what has a name to show can stand in the note's place: the actions of the menu, not the symbols of the bars. A zone
-     * that is not known (any more) or not allowed for the action means its default place; the note itself never leaves its place.
-     */
-    fun zoneOf(id: String): Int {
-        if (id == NOTE_ID) return ZONE_NOTE
-        val default = byId[id]?.defaultZone ?: ZONE_HIDDEN
-        val zone = zones[id] ?: return default
-        return if (zone !in ZONE_TOP_LEFT..ZONE_NOTE || allowedZones(id)?.let { zone !in it } == true) default else zone
-    }
-
-    /**
-     * Where the button may be moved to: the note only within its own place, the symbols of the bars anywhere but there, "more"
-     * not into the menu it opens, the actions of the menu anywhere.
-     */
-    fun allowedZones(id: String): Set<Int>? = when {
-        id == NOTE_ID -> setOf(ZONE_NOTE)
-        id == "more" -> setOf(ZONE_TOP_LEFT, ZONE_TOP_RIGHT, ZONE_BOTTOM_LEFT, ZONE_BOTTOM_RIGHT, ZONE_HIDDEN)
-        !canSitInNote(id) -> setOf(ZONE_TOP_LEFT, ZONE_TOP_RIGHT, ZONE_BOTTOM_LEFT, ZONE_BOTTOM_RIGHT, ZONE_MENU, ZONE_HIDDEN)
-        else -> null
-    }
-
-    /** The actions of a zone in their order; actions that are not known (any more) or new ones are handled here. */
-    fun inZone(zone: Int): List<EditorActionSpec> =
-        (order + EDITOR_ACTIONS.map { it.id }).distinct().mapNotNull { byId[it] }.filter { zoneOf(it.id) == zone }
-
-    /** [id] moved to [zone], in front of [beforeId] (the end of the zone if that is null). */
-    fun moved(id: String, zone: Int, beforeId: String?): EditorLayout {
-        if (allowedZones(id)?.let { zone !in it } == true) return this
-        val ids = (order + EDITOR_ACTIONS.map { it.id }).distinct().filter { it != id && it in byId }
-        val at = beforeId?.let { ids.indexOf(it) }?.takeIf { it >= 0 }
-        val next = if (at != null) ids.take(at) + id + ids.drop(at) else {
-            // The end of a zone: right after the last action that is in it, so it does not jump to the end of everything.
-            val last = ids.indexOfLast { zoneOf(it) == zone }
-            if (last >= 0) ids.take(last + 1) + id + ids.drop(last + 1) else ids + id
-        }
-        return EditorLayout(zones + (id to zone), next, align)
-    }
-
-    fun toJson(): String = JSONObject()
-        .put("order", JSONArray(order))
-        .put("align", align)
-        .put("zones", JSONObject().also { o -> zones.forEach { (k, v) -> o.put(k, v) } })
-        .toString()
-
-    /** The layout as a file of its own for saving it; the marker tells it from other files. */
-    fun toFileJson(): String = JSONObject(toJson()).put("editorLayout", 1).toString(2)
-
-    companion object {
-        /** A layout read from a file; throws if the text is not one. */
-        fun fromFileJson(text: String): EditorLayout {
-            require(JSONObject(text).has("editorLayout")) { "Not an editor layout file" }
-            return fromJson(text)
-        }
-
-        fun fromJson(json: String?): EditorLayout = runCatching {
-            val o = JSONObject(json ?: return EditorLayout())
-            val order = o.getJSONArray("order").let { a -> (0 until a.length()).map { a.getString(it) } }
-            val z = o.getJSONObject("zones")
-            EditorLayout(z.keys().asSequence().associateWith { z.getInt(it) }, order, o.optInt("align", EDITOR_ALIGN_CENTER).coerceIn(EDITOR_ALIGN_CENTER, EDITOR_ALIGN_BOTTOM))
-        }.getOrDefault(EditorLayout())
-    }
+/**
+ * Where an action of the editor may be moved to: the note only within its own place, the symbols of the bars anywhere but there,
+ * "more" not into the menu it opens, the actions of the menu anywhere.
+ */
+private fun editorAllowedZones(id: String): Set<Int>? = when {
+    id == NOTE_ID -> setOf(ZONE_NOTE)
+    id == "more" -> setOf(ZONE_TOP_LEFT, ZONE_TOP_RIGHT, ZONE_BOTTOM_LEFT, ZONE_BOTTOM_RIGHT, ZONE_HIDDEN)
+    !canSitInNote(id) -> setOf(ZONE_TOP_LEFT, ZONE_TOP_RIGHT, ZONE_BOTTOM_LEFT, ZONE_BOTTOM_RIGHT, ZONE_MENU, ZONE_HIDDEN)
+    else -> null
 }
+
+/** The editor's buttons and its rules; the layout of them is a [ButtonLayout] of this catalog. */
+val EDITOR_CATALOG = ButtonCatalog(
+    EDITOR_ACTIONS, hiddenZone = ZONE_HIDDEN, validZone = { it in ZONE_TOP_LEFT..ZONE_NOTE }, allowedFor = ::editorAllowedZones,
+    optionRange = EDITOR_ALIGN_CENTER..EDITOR_ALIGN_BOTTOM,
+)
 
 /** What an action does and looks like in this moment of the editor (the screen builds one for each action). */
 class EditorActionState(
@@ -194,7 +137,7 @@ class EditorActionState(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun EditorBar(
-    left: List<EditorActionSpec>, right: List<EditorActionSpec>, states: Map<String, EditorActionState>, sidePadding: Dp = 12.dp,
+    left: List<ButtonSpec>, right: List<ButtonSpec>, states: Map<String, EditorActionState>, sidePadding: Dp = 12.dp,
     highlightId: String? = null,
 ) {
     val shown = (left + right).count { states[it.id]?.visible == true }
@@ -219,7 +162,7 @@ internal fun EditorBar(
 }
 
 @Composable
-private fun EditorActionButton(spec: EditorActionSpec, state: EditorActionState?, highlighted: Boolean = false) {
+private fun EditorActionButton(spec: ButtonSpec, state: EditorActionState?, highlighted: Boolean = false) {
     if (state == null || !state.visible) return
     val modifier = Modifier.size(40.dp)
     val icon: @Composable () -> Unit = {
@@ -248,11 +191,11 @@ private fun EditorActionButton(spec: EditorActionSpec, state: EditorActionState?
 
 /** The groups of the overflow menu: the actions of the menu zone that are possible now, checklist tools under one entry. */
 internal fun menuGroups(
-    layout: EditorLayout, states: Map<String, EditorActionState>, page: Int, toPage: (Int) -> Unit, listToolsLabel: String, backIcon: Int, forwardIcon: @Composable () -> Unit,
+    layout: ButtonLayout, states: Map<String, EditorActionState>, page: Int, toPage: (Int) -> Unit, listToolsLabel: String, backIcon: Int, forwardIcon: @Composable () -> Unit,
     closeMenu: () -> Unit,
 ): List<List<MenuEntry>> {
     val shown = layout.inZone(ZONE_MENU).filter { states[it.id]?.visible == true }
-    fun entry(spec: EditorActionSpec): MenuEntry {
+    fun entry(spec: ButtonSpec): MenuEntry {
         val state = states.getValue(spec.id)
         return MenuEntry(state.label, state.icon, checked = state.checked, onClick = { closeMenu(); state.onClick() })
     }
@@ -283,13 +226,13 @@ internal fun menuGroups(
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun NoteActionButtons(
-    specs: List<EditorActionSpec>, states: Map<String, EditorActionState>, highlightId: String? = null,
+    specs: List<ButtonSpec>, states: Map<String, EditorActionState>, highlightId: String? = null,
     inline: Map<String, @Composable (Boolean) -> Unit> = emptyMap(),
 ) {
     val shown = specs.filter { states[it.id]?.visible == true }
     if (shown.isEmpty()) return
     // Runs of buttons share a row; a block that shows itself breaks the run.
-    val runs = mutableListOf<List<EditorActionSpec>>()
+    val runs = mutableListOf<List<ButtonSpec>>()
     shown.forEach { spec ->
         if (spec.id in inline) runs.add(listOf(spec))
         else if (runs.isNotEmpty() && runs.last().first().id !in inline) runs[runs.lastIndex] = runs.last() + spec

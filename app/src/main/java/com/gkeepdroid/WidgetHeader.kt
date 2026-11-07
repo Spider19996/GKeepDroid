@@ -47,7 +47,7 @@ internal fun enabledButtons(settings: WidgetSettings, withNewButtons: Boolean, h
 }
 
 private fun enabledSet(settings: WidgetSettings, withNewButtons: Boolean, hasAddItem: Boolean): Set<String> =
-    settings.buttonSides.keys.filter {
+    WIDGET_CATALOG.specs.map { it.id }.filter { settings.buttons.zoneOf(it) != BAR_HIDDEN }.filter {
         when (it) {
             BTN_ADD_ITEM -> hasAddItem
             // Only the single-note widget has one note to set a reminder for.
@@ -62,9 +62,9 @@ private fun enabledSet(settings: WidgetSettings, withNewButtons: Boolean, hasAdd
     }.toSet()
 
 /** All button ids in the order the user chose; buttons never moved keep their default place at the end. */
-internal fun WidgetSettings.orderedIds(): List<String> = (buttonOrder + ALL_BUTTONS).distinct().filter { it in ALL_BUTTONS }
+internal fun WidgetSettings.orderedIds(): List<String> = buttons.ids()
 
-internal fun WidgetSettings.sideOf(button: String): Int = buttonSides[button] ?: POS_TOP
+internal fun WidgetSettings.sideOf(button: String): Int = barSide(buttons.zoneOf(button)).coerceAtLeast(POS_TOP)
 
 internal fun hasBarAt(settings: WidgetSettings, side: Int, withNewButtons: Boolean, hasAddItem: Boolean = false): Boolean =
     enabledButtons(settings, withNewButtons, hasAddItem).any { settings.sideOf(it) == side }
@@ -139,7 +139,7 @@ internal fun HeaderBar(
     val size = settings.headerSizeSp
     val vertical = side == POS_LEFT || side == POS_RIGHT
     // The buttons sit at the start, in the middle or at the end of the bar.
-    fun group(slot: Int) = buttons.filter { (settings.buttonSlots[it.id] ?: ALIGN_CENTER) == slot }
+    fun group(slot: Int) = buttons.filter { barSlot(settings.buttons.zoneOf(it.id)) == slot }
 
     if (vertical) {
         Column(GlanceModifier.fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {

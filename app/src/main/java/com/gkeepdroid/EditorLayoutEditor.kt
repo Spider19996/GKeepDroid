@@ -15,11 +15,11 @@ import androidx.compose.ui.unit.dp
  * [ButtonEditor].
  */
 @Composable
-internal fun EditorLayoutEditor(layout: EditorLayout, onChange: (EditorLayout) -> Unit) {
-    val items = (ZONE_TOP_LEFT..ZONE_NOTE).flatMap { zone -> layout.inZone(zone).map { ButtonItem(it.id, it.icon, it.label, zone, layout.allowedZones(it.id)) } }
+internal fun EditorLayoutEditor(layout: ButtonLayout, onChange: (ButtonLayout) -> Unit) {
+    val items = (ZONE_TOP_LEFT..ZONE_NOTE).flatMap { zone -> layout.inZone(zone).map { ButtonItem(it.id, it.icon, it.label, zone, layout.catalog.allowed(it.id)) } }
     ButtonEditor(
         items, { id, zone, before -> onChange(layout.moved(id, zone, before)) },
-        preview = { EditorPreview(it, layout.align) },
+        preview = { EditorPreview(it, layout.option) },
     ) {
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {

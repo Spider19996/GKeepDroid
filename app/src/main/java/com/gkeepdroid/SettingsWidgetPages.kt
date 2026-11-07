@@ -282,40 +282,21 @@ internal fun ColumnScope.ChecklistsPage(s: SettingsState) {
 @Composable
 internal fun ColumnScope.ButtonBarPage(s: SettingsState) {
     with(s) {
-        // The buttons this widget has, with the side each one sits on (null = not shown).
-        val unordered = buildList {
-            fun add(id: String, icon: Int, label: Int) =
-                add(LayoutButton(id, icon, label, buttonSides[id], buttonSlots[id] ?: ALIGN_CENTER))
-            add(BTN_REFRESH, R.drawable.ic_refresh, R.string.btn_refresh)
-            if (isSingleNote) add(BTN_ADD_ITEM, R.drawable.ic_add, R.string.btn_add_item)
-            if (isSingleNote) add(BTN_REMINDER, R.drawable.ic_alarm, R.string.reminders_title)
+        // Which buttons this widget has depends on its kind.
+        val available = buildSet {
+            add(BTN_REFRESH)
+            if (isSingleNote) { add(BTN_ADD_ITEM); add(BTN_REMINDER) }
             if (!isSingleNote) {
-                add(BTN_NEW_NOTE, R.drawable.ic_add, R.string.btn_new_note)
-                add(BTN_NEW_LIST, R.drawable.ic_checklist, R.string.btn_new_list)
-                add(BTN_SORT, R.drawable.ic_sort, R.string.btn_sort)
-                add(BTN_SEARCH, R.drawable.ic_search, R.string.btn_search)
+                add(BTN_NEW_NOTE); add(BTN_NEW_LIST); add(BTN_SORT); add(BTN_SEARCH)
                 // Only offered while the widget can fold its notes.
-                if (foldable) add(BTN_FOLD, R.drawable.ic_fold, R.string.btn_fold)
+                if (foldable) add(BTN_FOLD)
             }
-            add(BTN_APP, R.drawable.ic_apps, R.string.btn_app)
-            add(BTN_KEEP, R.drawable.ic_open_new, R.string.btn_keep)
-            add(BTN_SETTINGS, R.drawable.ic_settings, R.string.btn_settings)
+            add(BTN_APP); add(BTN_KEEP); add(BTN_SETTINGS)
         }
-        val order = (buttonOrder + ALL_BUTTONS).distinct()
-        val layout = unordered.sortedBy { order.indexOf(it.id) }
-        ButtonLayoutEditor(layout, headerSize) { id, side, slot, beforeId ->
-            if (side != null) {
-                buttonSides = buttonSides + (id to side)
-                buttonSlots = buttonSlots + (id to slot)
-                val rest = order - id
-                val at = beforeId?.let { rest.indexOf(it) }?.takeIf { it >= 0 } ?: rest.size
-                buttonOrder = rest.take(at) + id + rest.drop(at)
-            } else if (id == BTN_SETTINGS) {
-                // Without this button the settings are harder to reach, so a dialog asks first.
-                confirmSettingsButtonOff = true
-            } else {
-                buttonSides = buttonSides - id
-            }
+        ButtonLayoutEditor(buttonLayout, available, headerSize) { id, zone, beforeId ->
+            // Without the settings button the settings are harder to reach, so a dialog asks before it is switched off.
+            if (id == BTN_SETTINGS && zone == BAR_HIDDEN) confirmSettingsButtonOff = true
+            else buttonLayout = buttonLayout.moved(id, zone, beforeId)
         }
         Text(stringResource(R.string.header_size, headerSize))
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
