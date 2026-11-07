@@ -141,6 +141,13 @@ class EditNoteActivity : ComponentActivity() {
         onHome?.invoke()
     }
 
+    private var layoutKey by mutableIntStateOf(0)
+
+    override fun onResume() {
+        super.onResume()
+        layoutKey++
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val account = CredentialStore.resolve(this, intent.getStringExtra(EXTRA_ACCOUNT).orEmpty())
@@ -643,7 +650,8 @@ class EditNoteActivity : ComponentActivity() {
         val styleLabels = listOf(R.string.format_bold, R.string.format_italic, R.string.format_underline, R.string.format_strike).map { stringResource(it) }
         val applyStyle: (Int) -> Unit = { bit -> format.toggleSelected(::formatTextOf, bit) }
         // Every action of the editor with what it does now; the layout of the settings decides which bar or menu shows it.
-        val editorLayout = remember { AppSettingsStore.load(this@EditNoteActivity).editorLayout }
+        // Read again when the screen comes back, as the layout can be changed in the settings that open from here.
+        val editorLayout = remember(layoutKey) { AppSettingsStore.load(this@EditNoteActivity).editorLayout }
         val states = mutableMapOf<String, EditorActionState>()
         states["close"] = EditorActionState(R.drawable.ic_close, stringResource(R.string.discard_action), { if (hasChanges()) confirmDiscard = true else discard() }, enabled = !saving)
         states["pin"] = EditorActionState(
@@ -724,6 +732,10 @@ class EditNoteActivity : ComponentActivity() {
         states["open_in_keep"] = EditorActionState(
             R.drawable.ic_open_new, stringResource(R.string.open_in_keep), { if (existing != null) openInKeep(account, existing) },
             visible = existing != null && existing.serverId.isNotEmpty(),
+        )
+        states["editor_settings"] = EditorActionState(
+            R.drawable.ic_settings, stringResource(R.string.editor_buttons_title),
+            { startActivity(Intent(this@EditNoteActivity, SettingsActivity::class.java).putExtra(SettingsActivity.EXTRA_PAGE, "editor_buttons")) },
         )
         states["share"] = EditorActionState(R.drawable.ic_share, stringResource(R.string.share_note), { shareNote(title, text, isList, outItems()) }, visible = existing != null)
         states["hide_content"] = EditorActionState(

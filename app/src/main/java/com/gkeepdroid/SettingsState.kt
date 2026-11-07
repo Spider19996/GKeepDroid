@@ -81,7 +81,15 @@ internal class SettingsState(val context: SettingsActivity) {
     val initialWidget = SettingsStore.loadWidget(context, context.appWidgetId)
     val accounts = mutableStateListOf<String>().apply { addAll(CredentialStore.accounts(context)) }
 
-    var page by mutableStateOf(if (accounts.isEmpty() || context.intent.getStringExtra(SettingsActivity.EXTRA_PAGE) == "accounts") Page.Accounts else Page.Main)
+    /** Opened straight on the editor's buttons (from the editor): the way back leads out of the settings, to the note. */
+    val opensOnEditorButtons = context.intent.getStringExtra(SettingsActivity.EXTRA_PAGE) == "editor_buttons"
+    var page by mutableStateOf(
+        when {
+            accounts.isEmpty() || context.intent.getStringExtra(SettingsActivity.EXTRA_PAGE) == "accounts" -> Page.Accounts
+            opensOnEditorButtons -> Page.EditorButtons
+            else -> Page.Main
+        },
+    )
     var email by mutableStateOf("")
     var token by mutableStateOf("")
     var widgetAccount by mutableStateOf(initialWidget.account)

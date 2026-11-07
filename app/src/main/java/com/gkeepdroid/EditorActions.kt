@@ -78,6 +78,8 @@ val EDITOR_ACTIONS = listOf(
     EditorActionSpec("hide_content", R.drawable.ic_lock, R.string.hide_content, 1, ZONE_MENU),
     EditorActionSpec("archive", R.drawable.ic_archive, R.string.archive_note, 2, ZONE_MENU),
     EditorActionSpec("delete", R.drawable.ic_delete, R.string.move_to_trash, 2, ZONE_MENU),
+    // A shortcut to the settings of these buttons; the last entry of the menu, apart from the others.
+    EditorActionSpec("editor_settings", R.drawable.ic_settings, R.string.editor_buttons_title, 5, ZONE_MENU),
     EditorActionSpec("note", R.drawable.ic_notes, R.string.editor_buttons_note, 4, ZONE_NOTE),
 )
 

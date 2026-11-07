@@ -51,7 +51,7 @@ class SettingsActivity : ComponentActivity() {
     }
 
     companion object {
-        /** Opens the settings on a given page; "accounts" shows the accounts to sign in again. */
+        /** Opens the settings on a given page; "accounts" shows the accounts to sign in again, "editor_buttons" the editor's buttons. */
         const val EXTRA_PAGE = "page"
     }
 
@@ -112,8 +112,12 @@ class SettingsActivity : ComponentActivity() {
             val importDone = stringResource(R.string.import_done)
             val importFailed = stringResource(R.string.import_failed, "%s")
 
-            BackHandler(enabled = page != Page.Main || settingsQuery.isNotEmpty()) {
-                if (settingsQuery.isNotEmpty()) settingsQuery = "" else page = Page.Main
+            BackHandler(enabled = page != Page.Main || settingsQuery.isNotEmpty() || opensOnEditorButtons) {
+                when {
+                    settingsQuery.isNotEmpty() -> settingsQuery = ""
+                    opensOnEditorButtons -> finish()
+                    else -> page = Page.Main
+                }
             }
 
             loginLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -291,7 +295,7 @@ class SettingsActivity : ComponentActivity() {
                     title = { Text(stringResource(if (page == Page.Main && !hasWidget) R.string.menu_settings else page.title)) },
                     // On a page the arrow leads back to the main list; on the main list it closes the settings
                     // and returns to wherever they were opened from.
-                    navigationIcon = { BackButton { if (page != Page.Main) page = Page.Main else finish() } },
+                    navigationIcon = { BackButton { if (page != Page.Main && !opensOnEditorButtons) page = Page.Main else finish() } },
                     actions = {
                         // Rarely needed: the demo mode for screenshots lives in a menu of its own.
                         if (page == Page.Main && !hasWidget) {
