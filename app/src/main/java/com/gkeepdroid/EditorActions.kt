@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.json.JSONArray
 import org.json.JSONObject
@@ -35,6 +36,15 @@ const val ZONE_BOTTOM_LEFT = 2
 const val ZONE_BOTTOM_RIGHT = 3
 const val ZONE_MENU = 4
 const val ZONE_HIDDEN = 5
+// Rows inside the note's column, directly above the title and below the last field: they sit where the note sits, so on a big
+// screen they are not a long way off. Numbered after the older zones, so saved layouts keep their meaning.
+const val ZONE_CONTENT_TOP = 6
+const val ZONE_CONTENT_BOTTOM = 7
+
+/** Where a note that is shorter than the screen sits between the bars. */
+const val EDITOR_ALIGN_CENTER = 0
+const val EDITOR_ALIGN_TOP = 1
+const val EDITOR_ALIGN_BOTTOM = 2
 
 /** One thing the editor can do with a button: where it stands by default, and which group it belongs to in the menu. */
 class EditorActionSpec(
@@ -73,7 +83,9 @@ private val LIST_TOOLS = setOf("list_number", "list_check_all", "list_uncheck_al
 fun isListTool(id: String) = id in LIST_TOOLS
 
 /** Where each action stands: its zone, and the order of all actions (the order inside a zone is the order here). */
-data class EditorLayout(val zones: Map<String, Int> = emptyMap(), val order: List<String> = EDITOR_ACTIONS.map { it.id }) {
+data class EditorLayout(
+    val zones: Map<String, Int> = emptyMap(), val order: List<String> = EDITOR_ACTIONS.map { it.id }, val align: Int = EDITOR_ALIGN_CENTER,
+) {
     private val byId = EDITOR_ACTIONS.associateBy { it.id }
 
     fun zoneOf(id: String): Int = zones[id] ?: byId[id]?.defaultZone ?: ZONE_HIDDEN
@@ -92,11 +104,12 @@ data class EditorLayout(val zones: Map<String, Int> = emptyMap(), val order: Lis
             val last = ids.indexOfLast { zoneOf(it) == zone }
             if (last >= 0) ids.take(last + 1) + id + ids.drop(last + 1) else ids + id
         }
-        return EditorLayout(zones + (id to zone), next)
+        return EditorLayout(zones + (id to zone), next, align)
     }
 
     fun toJson(): String = JSONObject()
         .put("order", JSONArray(order))
+        .put("align", align)
         .put("zones", JSONObject().also { o -> zones.forEach { (k, v) -> o.put(k, v) } })
         .toString()
 
@@ -114,7 +127,7 @@ data class EditorLayout(val zones: Map<String, Int> = emptyMap(), val order: Lis
             val o = JSONObject(json ?: return EditorLayout())
             val order = o.getJSONArray("order").let { a -> (0 until a.length()).map { a.getString(it) } }
             val z = o.getJSONObject("zones")
-            EditorLayout(z.keys().asSequence().associateWith { z.getInt(it) }, order)
+            EditorLayout(z.keys().asSequence().associateWith { z.getInt(it) }, order, o.optInt("align", EDITOR_ALIGN_CENTER).coerceIn(EDITOR_ALIGN_CENTER, EDITOR_ALIGN_BOTTOM))
         }.getOrDefault(EditorLayout())
     }
 }
@@ -140,13 +153,15 @@ class EditorActionState(
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-internal fun EditorBar(left: List<EditorActionSpec>, right: List<EditorActionSpec>, states: Map<String, EditorActionState>) {
+internal fun EditorBar(
+    left: List<EditorActionSpec>, right: List<EditorActionSpec>, states: Map<String, EditorActionState>, sidePadding: Dp = 12.dp,
+) {
     val shown = (left + right).count { states[it.id]?.visible == true }
     if (shown == 0) return
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         // A button is 40 dp wide with 2 dp between (the save button a little more).
-        val fits = (maxWidth - 24.dp) / 44.dp >= shown
-        val padding = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)
+        val fits = (maxWidth - sidePadding * 2) / 44.dp >= shown
+        val padding = Modifier.fillMaxWidth().padding(horizontal = sidePadding, vertical = 4.dp)
         if (fits) Row(padding, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
             left.forEach { EditorActionButton(it, states[it.id]) }
             Spacer(Modifier.weight(1f))

@@ -420,6 +420,12 @@
     <string name="editor_buttons_hint">किसी बटन को देर तक दबाएँ और दूसरी जगह खींचें: नोट के ऊपर और नीचे की पट्टियाँ, मेन्यू या छिपा हुआ।</string>
     <string name="editor_zone_menu">मेन्यू</string>
     <string name="editor_zone_hidden">छिपा हुआ</string>
+    <string name="editor_zone_content_top">नोट के ऊपर</string>
+    <string name="editor_zone_content_bottom">नोट के नीचे</string>
+    <string name="editor_align_title">नोट की स्थिति</string>
+    <string name="editor_align_center">बीच में</string>
+    <string name="editor_align_top">ऊपर</string>
+    <string name="editor_align_bottom">नीचे</string>
     <string name="editor_buttons_reset">डिफ़ॉल्ट पर रीसेट करें</string>
     <string name="editor_buttons_note">नोट</string>
 </resources>

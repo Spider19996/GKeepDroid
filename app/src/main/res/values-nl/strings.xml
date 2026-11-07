@@ -420,6 +420,12 @@
     <string name="editor_buttons_hint">Houd een knop ingedrukt en sleep hem naar een andere plek: de balken boven en onder de notitie, het menu of verborgen.</string>
     <string name="editor_zone_menu">Menu</string>
     <string name="editor_zone_hidden">Verborgen</string>
+    <string name="editor_zone_content_top">Boven de notitie</string>
+    <string name="editor_zone_content_bottom">Onder de notitie</string>
+    <string name="editor_align_title">Positie van de notitie</string>
+    <string name="editor_align_center">Midden</string>
+    <string name="editor_align_top">Boven</string>
+    <string name="editor_align_bottom">Onder</string>
     <string name="editor_buttons_reset">Standaard herstellen</string>
     <string name="editor_buttons_note">Notitie</string>
 </resources>

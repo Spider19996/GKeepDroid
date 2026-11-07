@@ -434,6 +434,15 @@ internal fun ColumnScope.EditorButtonsPage(s: SettingsState) {
     with(s) {
         Hint(R.string.editor_buttons_hint)
         EditorLayoutEditor(appEditorLayout) { appEditorLayout = it }
+        Text(stringResource(R.string.editor_align_title))
+        ChoiceGroup(
+            listOf(
+                EDITOR_ALIGN_CENTER to stringResource(R.string.editor_align_center),
+                EDITOR_ALIGN_TOP to stringResource(R.string.editor_align_top),
+                EDITOR_ALIGN_BOTTOM to stringResource(R.string.editor_align_bottom),
+            ),
+            appEditorLayout.align,
+        ) { appEditorLayout = appEditorLayout.copy(align = it) }
         LayoutFileButtons(
             filePrefix = "gkeepdroid-editor-layout",
             export = { appEditorLayout.toFileJson() },

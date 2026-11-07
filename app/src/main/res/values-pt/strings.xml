@@ -429,6 +429,12 @@
     <string name="editor_buttons_hint">Mantenha um botão pressionado e arraste-o para outro lugar: as barras acima e abaixo da nota, o menu ou oculto.</string>
     <string name="editor_zone_menu">Menu</string>
     <string name="editor_zone_hidden">Oculto</string>
+    <string name="editor_zone_content_top">Acima da nota</string>
+    <string name="editor_zone_content_bottom">Abaixo da nota</string>
+    <string name="editor_align_title">Posição da nota</string>
+    <string name="editor_align_center">Meio</string>
+    <string name="editor_align_top">Topo</string>
+    <string name="editor_align_bottom">Fundo</string>
     <string name="editor_buttons_reset">Restaurar padrão</string>
     <string name="editor_buttons_note">Nota</string>
 </resources>

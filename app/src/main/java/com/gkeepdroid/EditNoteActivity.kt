@@ -923,7 +923,9 @@ class EditNoteActivity : ComponentActivity() {
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
-            if (!imeVisible) Spacer(Modifier.weight(1f))
+            // Where a short note sits is a setting; with the keyboard open it is at the top, where one types.
+            if (!imeVisible && editorLayout.align != EDITOR_ALIGN_TOP) Spacer(Modifier.weight(1f))
+            EditorBar(editorLayout.inZone(ZONE_CONTENT_TOP), emptyList(), states, sidePadding = 0.dp)
             OutlinedTextField(
                 value = title, onValueChange = { title = it }, readOnly = !canEdit,
                 label = { Text(stringResource(R.string.title_hint)) },
@@ -1053,7 +1055,8 @@ class EditNoteActivity : ComponentActivity() {
                 )
             }
 
-            Spacer(Modifier.weight(1f))
+            EditorBar(editorLayout.inZone(ZONE_CONTENT_BOTTOM), emptyList(), states, sidePadding = 0.dp)
+            if (imeVisible || editorLayout.align != EDITOR_ALIGN_BOTTOM) Spacer(Modifier.weight(1f))
 
             // Web addresses, e-mail addresses and phone numbers in the note can be opened with one tap.
             val links = NoteLinks.find(listOf(title, text) + items.map { it.text })

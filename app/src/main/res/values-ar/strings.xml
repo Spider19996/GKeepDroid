@@ -456,6 +456,12 @@
     <string name="editor_buttons_hint">اضغط مطولًا على زر واسحبه إلى مكان آخر: الشريطان فوق الملاحظة وتحتها، أو القائمة، أو مخفي.</string>
     <string name="editor_zone_menu">القائمة</string>
     <string name="editor_zone_hidden">مخفي</string>
+    <string name="editor_zone_content_top">فوق الملاحظة</string>
+    <string name="editor_zone_content_bottom">تحت الملاحظة</string>
+    <string name="editor_align_title">موضع الملاحظة</string>
+    <string name="editor_align_center">الوسط</string>
+    <string name="editor_align_top">الأعلى</string>
+    <string name="editor_align_bottom">الأسفل</string>
     <string name="editor_buttons_reset">إعادة الضبط</string>
     <string name="editor_buttons_note">ملاحظة</string>
 </resources>

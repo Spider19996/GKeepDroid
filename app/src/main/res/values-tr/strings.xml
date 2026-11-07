@@ -420,6 +420,12 @@
     <string name="editor_buttons_hint">Bir düğmeye uzun basıp başka bir yere sürükleyin: notun üstündeki ve altındaki çubuklar, menü ya da gizli.</string>
     <string name="editor_zone_menu">Menü</string>
     <string name="editor_zone_hidden">Gizli</string>
+    <string name="editor_zone_content_top">Notun üstü</string>
+    <string name="editor_zone_content_bottom">Notun altı</string>
+    <string name="editor_align_title">Notun konumu</string>
+    <string name="editor_align_center">Orta</string>
+    <string name="editor_align_top">Üst</string>
+    <string name="editor_align_bottom">Alt</string>
     <string name="editor_buttons_reset">Varsayılana sıfırla</string>
     <string name="editor_buttons_note">Not</string>
 </resources>
