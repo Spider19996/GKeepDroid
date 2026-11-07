@@ -925,7 +925,10 @@ class EditNoteActivity : ComponentActivity() {
             }
             // Where a short note sits is a setting; with the keyboard open it is at the top, where one types.
             if (!imeVisible && editorLayout.align != EDITOR_ALIGN_TOP) Spacer(Modifier.weight(1f))
-            EditorBar(editorLayout.inZone(ZONE_CONTENT_TOP), emptyList(), states, sidePadding = 0.dp)
+            // The buttons the layout sets before the note show above its fields, those after it below them.
+            val noteZone = editorLayout.inZone(ZONE_NOTE)
+            val noteAt = noteZone.indexOfFirst { it.id == NOTE_ID }.coerceAtLeast(0)
+            NoteActionButtons(noteZone.take(noteAt), states)
             OutlinedTextField(
                 value = title, onValueChange = { title = it }, readOnly = !canEdit,
                 label = { Text(stringResource(R.string.title_hint)) },
@@ -1055,7 +1058,7 @@ class EditNoteActivity : ComponentActivity() {
                 )
             }
 
-            EditorBar(editorLayout.inZone(ZONE_CONTENT_BOTTOM), emptyList(), states, sidePadding = 0.dp)
+            NoteActionButtons(editorLayout.inZone(ZONE_NOTE).dropWhile { it.id != NOTE_ID }.drop(1), states)
             if (imeVisible || editorLayout.align != EDITOR_ALIGN_BOTTOM) Spacer(Modifier.weight(1f))
 
             // Web addresses, e-mail addresses and phone numbers in the note can be opened with one tap.

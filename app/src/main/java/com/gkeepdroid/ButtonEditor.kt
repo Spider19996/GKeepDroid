@@ -47,8 +47,18 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-/** A button of a layout: where it stands is its [zone], null while it is off. The order of the list is the order inside a zone. */
-class ButtonItem(val id: String, @DrawableRes val icon: Int, @StringRes val label: Int, val zone: Int?)
+/**
+ * A button of a layout: where it stands is its [zone], null while it is off. The order of the list is the order inside a zone.
+ * [allowed] says where it may be dragged: null anywhere, a set only to those places (and in front of or behind others in its
+ * own), an empty set nowhere. The template marks the three kinds with colors.
+ */
+class ButtonItem(
+    val id: String, @DrawableRes val icon: Int, @StringRes val label: Int, val zone: Int?, val allowed: Set<Int>? = null,
+) {
+    val fixed get() = allowed != null && allowed.isEmpty()
+    val limited get() = allowed != null && allowed.isNotEmpty()
+    fun canGoTo(place: Int) = !fixed && (allowed == null || place in allowed || place == zone)
+}
 
 /** The places of a miniature; the settings page lays them out as it likes and names each by a key. */
 interface ButtonEditorScope {
@@ -90,6 +100,8 @@ fun ButtonEditor(
     fun target(): Pair<Int, String?>? {
         val id = dragId ?: return null
         val zone = zones.entries.firstOrNull { it.value.contains(pointer) }?.key ?: return null
+        // A place the button may not go to does not light up and takes nothing.
+        if (current.firstOrNull { it.id == id }?.canGoTo(zone) == false) return null
         val column = columns[zone] == true
         val before = current.filter { it.zone == zone && it.id != id }.firstOrNull {
             val r = chips[it.id] ?: return@firstOrNull false
@@ -108,9 +120,10 @@ fun ButtonEditor(
             Modifier
                 .onGloballyPositioned { coords = it; chips[item.id] = it.boundsInRoot() }
                 .alpha(if (dragId == item.id) 0.25f else 1f)
-                .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), MaterialTheme.shapes.medium)
-                .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.medium)
-                .pointerInput(item.id) {
+                .border(BorderStroke(if (item.fixed || item.limited) 2.dp else 1.dp, chipEdge(item)), MaterialTheme.shapes.medium)
+                .background(chipFill(item), MaterialTheme.shapes.medium)
+                .pointerInput(item.id, item.fixed) {
+                    if (item.fixed) return@pointerInput
                     detectDragGesturesAfterLongPress(
                         onDragStart = { start ->
                             dragId = item.id
@@ -174,6 +187,7 @@ fun ButtonEditor(
             Box(
                 modifier
                     .onGloballyPositioned { zones[key] = it.boundsInRoot() }
+                    .alpha(if (dragged != null && !dragged.canGoTo(key)) 0.4f else 1f)
                     .background(
                         if (here != null) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
                         MaterialTheme.shapes.medium,
@@ -194,7 +208,10 @@ fun ButtonEditor(
         }
     }
     Box(Modifier.fillMaxWidth().onGloballyPositioned { origin = it.positionInRoot() }) {
-        scope.content()
+        Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            scope.content()
+            Legend(items)
+        }
         // The button under the finger is drawn on top of every place, with its name.
         dragged?.let { button ->
             Row(
@@ -269,6 +286,41 @@ fun LayoutFileButtons(
         }
         androidx.compose.material3.OutlinedButton(enabled = resetEnabled, onClick = onReset, shapes = androidx.compose.material3.ButtonDefaults.shapes()) {
             Text(resetLabel)
+        }
+    }
+}
+
+/** Fill and edge of a button by what it may do: anywhere (plain), only to some places, nowhere. */
+@Composable
+private fun chipFill(item: ButtonItem) = when {
+    item.fixed -> MaterialTheme.colorScheme.tertiaryContainer
+    item.limited -> MaterialTheme.colorScheme.secondaryContainer
+    else -> MaterialTheme.colorScheme.surface
+}
+
+@Composable
+private fun chipEdge(item: ButtonItem) = when {
+    item.fixed -> MaterialTheme.colorScheme.tertiary
+    item.limited -> MaterialTheme.colorScheme.secondary
+    else -> MaterialTheme.colorScheme.outline
+}
+
+/** Explains the colors, for the kinds that exist in this layout only; nothing when all buttons may go anywhere. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun Legend(items: List<ButtonItem>) {
+    val kinds = listOf(
+        Triple(items.any { it.fixed }, ButtonItem("", 0, 0, null, emptySet()), R.string.button_legend_fixed),
+        Triple(items.any { it.limited }, ButtonItem("", 0, 0, null, setOf(-1)), R.string.button_legend_limited),
+    ).filter { it.first }
+    // Without a button that is held back there is nothing to explain.
+    if (kinds.isEmpty()) return
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        kinds.forEach { (_, sample, label) ->
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Box(Modifier.size(16.dp).border(BorderStroke(2.dp, chipEdge(sample)), MaterialTheme.shapes.small).background(chipFill(sample), MaterialTheme.shapes.small))
+                Text(stringResource(label), style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
 }

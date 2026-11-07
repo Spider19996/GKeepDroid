@@ -411,8 +411,8 @@
     <string name="editor_buttons_hint">长按按钮并拖到其他位置：便签上方和下方的栏、菜单或隐藏。</string>
     <string name="editor_zone_menu">菜单</string>
     <string name="editor_zone_hidden">隐藏</string>
-    <string name="editor_zone_content_top">笔记上方</string>
-    <string name="editor_zone_content_bottom">笔记下方</string>
+    <string name="button_legend_limited">只能移动到部分位置</string>
+    <string name="button_legend_fixed">无法移动</string>
     <string name="editor_align_title">笔记位置</string>
     <string name="editor_align_center">居中</string>
     <string name="editor_align_top">顶部</string>

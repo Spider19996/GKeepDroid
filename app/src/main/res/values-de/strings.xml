@@ -420,8 +420,8 @@
     <string name="editor_buttons_hint">Taste lange drücken und an eine andere Stelle ziehen: die Leisten über und unter der Notiz, das Menü oder ausgeblendet.</string>
     <string name="editor_zone_menu">Menü</string>
     <string name="editor_zone_hidden">Ausgeblendet</string>
-    <string name="editor_zone_content_top">Über der Notiz</string>
-    <string name="editor_zone_content_bottom">Unter der Notiz</string>
+    <string name="button_legend_limited">Kann nur an manche Stellen</string>
+    <string name="button_legend_fixed">Lässt sich nicht verschieben</string>
     <string name="editor_align_title">Position der Notiz</string>
     <string name="editor_align_center">Mitte</string>
     <string name="editor_align_top">Oben</string>

@@ -438,8 +438,8 @@
     <string name="editor_buttons_hint">Нажмите кнопку и перетащите её в другое место: панели над и под заметкой, меню или скрыто.</string>
     <string name="editor_zone_menu">Меню</string>
     <string name="editor_zone_hidden">Скрыто</string>
-    <string name="editor_zone_content_top">Над заметкой</string>
-    <string name="editor_zone_content_bottom">Под заметкой</string>
+    <string name="button_legend_limited">Можно переместить только в некоторые места</string>
+    <string name="button_legend_fixed">Нельзя переместить</string>
     <string name="editor_align_title">Положение заметки</string>
     <string name="editor_align_center">По центру</string>
     <string name="editor_align_top">Сверху</string>

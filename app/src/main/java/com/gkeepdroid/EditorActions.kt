@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalIconToggleButton
 import androidx.compose.material3.Icon
@@ -20,6 +22,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,10 +40,9 @@ const val ZONE_BOTTOM_LEFT = 2
 const val ZONE_BOTTOM_RIGHT = 3
 const val ZONE_MENU = 4
 const val ZONE_HIDDEN = 5
-// Rows inside the note's column, directly above the title and below the last field: they sit where the note sits, so on a big
-// screen they are not a long way off. Numbered after the older zones, so saved layouts keep their meaning.
-const val ZONE_CONTENT_TOP = 6
-const val ZONE_CONTENT_BOTTOM = 7
+// The note's own place: the note is one of its buttons (it cannot leave), the buttons before it show above the note's fields,
+// those after it below them, as buttons with a name. Numbered after the older zones, so saved layouts keep their meaning.
+const val ZONE_NOTE = 6
 
 /** Where a note that is shorter than the screen sits between the bars. */
 const val EDITOR_ALIGN_CENTER = 0
@@ -75,6 +78,7 @@ val EDITOR_ACTIONS = listOf(
     EditorActionSpec("hide_content", R.drawable.ic_lock, R.string.hide_content, 1, ZONE_MENU),
     EditorActionSpec("archive", R.drawable.ic_archive, R.string.archive_note, 2, ZONE_MENU),
     EditorActionSpec("delete", R.drawable.ic_delete, R.string.move_to_trash, 2, ZONE_MENU),
+    EditorActionSpec("note", R.drawable.ic_notes, R.string.editor_buttons_note, 4, ZONE_NOTE),
 )
 
 /** The checklist tools; in the menu they share one entry that opens a page of their own. */
@@ -82,13 +86,38 @@ private val LIST_TOOLS = setOf("list_number", "list_check_all", "list_uncheck_al
 
 fun isListTool(id: String) = id in LIST_TOOLS
 
+const val NOTE_ID = "note"
+
+/** The actions that have a name to show can be set beside the note (those of the menu); the symbols of the bars cannot. */
+fun canSitInNote(id: String): Boolean = id == NOTE_ID || EDITOR_ACTIONS.firstOrNull { it.id == id }?.defaultZone == ZONE_MENU
+
 /** Where each action stands: its zone, and the order of all actions (the order inside a zone is the order here). */
 data class EditorLayout(
     val zones: Map<String, Int> = emptyMap(), val order: List<String> = EDITOR_ACTIONS.map { it.id }, val align: Int = EDITOR_ALIGN_CENTER,
 ) {
     private val byId = EDITOR_ACTIONS.associateBy { it.id }
 
-    fun zoneOf(id: String): Int = zones[id] ?: byId[id]?.defaultZone ?: ZONE_HIDDEN
+    /**
+     * Only what has a name to show can stand in the note's place: the actions of the menu, not the symbols of the bars. A zone
+     * that is not known (any more) or not allowed for the action means its default place; the note itself never leaves its place.
+     */
+    fun zoneOf(id: String): Int {
+        if (id == NOTE_ID) return ZONE_NOTE
+        val default = byId[id]?.defaultZone ?: ZONE_HIDDEN
+        val zone = zones[id] ?: return default
+        return if (zone !in ZONE_TOP_LEFT..ZONE_NOTE || allowedZones(id)?.let { zone !in it } == true) default else zone
+    }
+
+    /**
+     * Where the button may be moved to: the note only within its own place, the symbols of the bars anywhere but there, "more"
+     * not into the menu it opens, the actions of the menu anywhere.
+     */
+    fun allowedZones(id: String): Set<Int>? = when {
+        id == NOTE_ID -> setOf(ZONE_NOTE)
+        id == "more" -> setOf(ZONE_TOP_LEFT, ZONE_TOP_RIGHT, ZONE_BOTTOM_LEFT, ZONE_BOTTOM_RIGHT, ZONE_HIDDEN)
+        !canSitInNote(id) -> setOf(ZONE_TOP_LEFT, ZONE_TOP_RIGHT, ZONE_BOTTOM_LEFT, ZONE_BOTTOM_RIGHT, ZONE_MENU, ZONE_HIDDEN)
+        else -> null
+    }
 
     /** The actions of a zone in their order; actions that are not known (any more) or new ones are handled here. */
     fun inZone(zone: Int): List<EditorActionSpec> =
@@ -96,7 +125,7 @@ data class EditorLayout(
 
     /** [id] moved to [zone], in front of [beforeId] (the end of the zone if that is null). */
     fun moved(id: String, zone: Int, beforeId: String?): EditorLayout {
-        if (id == "more" && zone == ZONE_MENU) return this
+        if (allowedZones(id)?.let { zone !in it } == true) return this
         val ids = (order + EDITOR_ACTIONS.map { it.id }).distinct().filter { it != id && it in byId }
         val at = beforeId?.let { ids.indexOf(it) }?.takeIf { it >= 0 }
         val next = if (at != null) ids.take(at) + id + ids.drop(at) else {
@@ -233,4 +262,22 @@ internal fun menuGroups(
         groups.last().add(entry)
     }
     return groups
+}
+
+/** The actions of the note's place as buttons with a name, side by side as far as they fit. */
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+internal fun NoteActionButtons(specs: List<EditorActionSpec>, states: Map<String, EditorActionState>) {
+    val shown = specs.filter { states[it.id]?.visible == true }
+    if (shown.isEmpty()) return
+    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        shown.forEach { spec ->
+            val state = states.getValue(spec.id)
+            TextButton(onClick = state.onClick, enabled = state.enabled, shapes = ButtonDefaults.shapes()) {
+                Icon(painterResource(state.icon), contentDescription = null, Modifier.size(18.dp))
+                Spacer(Modifier.size(8.dp))
+                Text(state.label)
+            }
+        }
+    }
 }

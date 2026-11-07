@@ -421,8 +421,8 @@
     <string name="editor_buttons_hint">Long-press a button and drag it to another place: the bars above and below the note, the menu, or hidden.</string>
     <string name="editor_zone_menu">Menu</string>
     <string name="editor_zone_hidden">Hidden</string>
-    <string name="editor_zone_content_top">Above the note</string>
-    <string name="editor_zone_content_bottom">Below the note</string>
+    <string name="button_legend_limited">Can only go to some places</string>
+    <string name="button_legend_fixed">Cannot be moved</string>
     <string name="editor_align_title">Position of the note</string>
     <string name="editor_align_center">Middle</string>
     <string name="editor_align_top">Top</string>

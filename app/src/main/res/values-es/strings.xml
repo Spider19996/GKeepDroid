@@ -429,8 +429,8 @@
     <string name="editor_buttons_hint">Mantén pulsado un botón y arrástralo a otro lugar: las barras sobre y bajo la nota, el menú u oculto.</string>
     <string name="editor_zone_menu">Menú</string>
     <string name="editor_zone_hidden">Oculto</string>
-    <string name="editor_zone_content_top">Encima de la nota</string>
-    <string name="editor_zone_content_bottom">Debajo de la nota</string>
+    <string name="button_legend_limited">Solo puede ir a algunos lugares</string>
+    <string name="button_legend_fixed">No se puede mover</string>
     <string name="editor_align_title">Posición de la nota</string>
     <string name="editor_align_center">Centro</string>
     <string name="editor_align_top">Arriba</string>
