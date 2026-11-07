@@ -411,7 +411,9 @@
     <string name="editor_buttons_hint">长按按钮并拖到其他位置：便签上方和下方的栏、菜单或隐藏。</string>
     <string name="editor_zone_menu">菜单</string>
     <string name="editor_zone_hidden">隐藏</string>
-    <string name="button_preview">预览：点按按钮可高亮，拖动可查看效果</string>
+    <string name="button_preview">预览</string>
+    <string name="button_preview_help">预览：点按按钮可高亮，拖动可查看效果</string>
+    <string name="show_explanation">显示说明</string>
     <string name="button_bar_top">顶栏</string>
     <string name="button_bar_bottom">底栏</string>
     <string name="button_bar_left">左栏</string>

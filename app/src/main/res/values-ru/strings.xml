@@ -438,7 +438,9 @@
     <string name="editor_buttons_hint">Нажмите кнопку и перетащите её в другое место: панели над и под заметкой, меню или скрыто.</string>
     <string name="editor_zone_menu">Меню</string>
     <string name="editor_zone_hidden">Скрыто</string>
-    <string name="button_preview">Предпросмотр: коснитесь кнопки, чтобы выделить её; перетащите, чтобы увидеть результат</string>
+    <string name="button_preview">Предпросмотр</string>
+    <string name="button_preview_help">Предпросмотр: коснитесь кнопки, чтобы выделить её; перетащите, чтобы увидеть результат</string>
+    <string name="show_explanation">Показать пояснение</string>
     <string name="button_bar_top">Верхняя панель</string>
     <string name="button_bar_bottom">Нижняя панель</string>
     <string name="button_bar_left">Левая панель</string>

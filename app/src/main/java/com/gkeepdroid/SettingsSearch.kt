@@ -147,3 +147,10 @@ internal fun settingEntries(isSingleNote: Boolean): List<SettingEntry> = buildLi
 }
 
 internal val WIDGET_PAGES = setOf(Page.Appearance, Page.Notes, Page.ManageNotes, Page.Checklists, Page.ButtonBar)
+
+/** The explanation of a page that has one: the texts the info button in its title bar shows, so they do not take room on the page. */
+internal fun Page.helpTexts(): List<Int>? = when (this) {
+    Page.EditorButtons -> listOf(R.string.editor_buttons_hint, R.string.button_preview_help)
+    Page.ButtonBar -> listOf(R.string.button_layout_hint, R.string.button_preview_help)
+    else -> null
+}

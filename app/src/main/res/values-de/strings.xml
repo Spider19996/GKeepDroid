@@ -420,7 +420,9 @@
     <string name="editor_buttons_hint">Taste lange drücken und an eine andere Stelle ziehen: die Leisten über und unter der Notiz, das Menü oder ausgeblendet.</string>
     <string name="editor_zone_menu">Menü</string>
     <string name="editor_zone_hidden">Ausgeblendet</string>
-    <string name="button_preview">Vorschau: Taste antippen zum Hervorheben, Ziehen zeigt, wie es aussähe</string>
+    <string name="button_preview">Vorschau</string>
+    <string name="button_preview_help">Vorschau: Taste antippen zum Hervorheben, Ziehen zeigt, wie es aussähe</string>
+    <string name="show_explanation">Erklärung anzeigen</string>
     <string name="button_bar_top">Obere Leiste</string>
     <string name="button_bar_bottom">Untere Leiste</string>
     <string name="button_bar_left">Linke Leiste</string>

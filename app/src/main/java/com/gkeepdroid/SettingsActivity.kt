@@ -297,6 +297,26 @@ class SettingsActivity : ComponentActivity() {
                     // and returns to wherever they were opened from.
                     navigationIcon = { BackButton { if (page != Page.Main && !opensOnEditorButtons) page = Page.Main else finish() } },
                     actions = {
+                        // The explanation of a page lives behind a button, so the page itself has room for what it is about.
+                        page.helpTexts()?.let { help ->
+                            var infoOpen by remember(page) { androidx.compose.runtime.mutableStateOf(false) }
+                            androidx.compose.material3.IconButton(onClick = { infoOpen = true }, shapes = IconButtonDefaults.shapes()) {
+                                androidx.compose.material3.Icon(
+                                    androidx.compose.ui.res.painterResource(R.drawable.ic_info),
+                                    contentDescription = stringResource(R.string.show_explanation),
+                                )
+                            }
+                            if (infoOpen) androidx.compose.material3.AlertDialog(
+                                onDismissRequest = { infoOpen = false },
+                                title = { Text(stringResource(page.title)) },
+                                text = { Column(verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)) { help.forEach { Text(stringResource(it)) } } },
+                                confirmButton = {
+                                    androidx.compose.material3.TextButton(onClick = { infoOpen = false }, shapes = androidx.compose.material3.ButtonDefaults.shapes()) {
+                                        Text(stringResource(android.R.string.ok))
+                                    }
+                                },
+                            )
+                        }
                         // Rarely needed: the demo mode for screenshots lives in a menu of its own.
                         if (page == Page.Main && !hasWidget) {
                             var menuOpen by remember { androidx.compose.runtime.mutableStateOf(false) }

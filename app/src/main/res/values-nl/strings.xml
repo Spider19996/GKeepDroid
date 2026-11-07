@@ -420,7 +420,9 @@
     <string name="editor_buttons_hint">Houd een knop ingedrukt en sleep hem naar een andere plek: de balken boven en onder de notitie, het menu of verborgen.</string>
     <string name="editor_zone_menu">Menu</string>
     <string name="editor_zone_hidden">Verborgen</string>
-    <string name="button_preview">Voorbeeld: tik op een knop om hem te markeren, sleep om te zien hoe het eruit zou zien</string>
+    <string name="button_preview">Voorbeeld</string>
+    <string name="button_preview_help">Voorbeeld: tik op een knop om hem te markeren, sleep om te zien hoe het eruit zou zien</string>
+    <string name="show_explanation">Uitleg tonen</string>
     <string name="button_bar_top">Bovenbalk</string>
     <string name="button_bar_bottom">Onderbalk</string>
     <string name="button_bar_left">Linkerbalk</string>

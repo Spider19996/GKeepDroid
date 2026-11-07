@@ -438,7 +438,9 @@
     <string name="editor_buttons_hint">Przytrzymaj przycisk i przeciągnij go w inne miejsce: paski nad i pod notatką, menu lub ukryte.</string>
     <string name="editor_zone_menu">Menu</string>
     <string name="editor_zone_hidden">Ukryte</string>
-    <string name="button_preview">Podgląd: dotknij przycisku, aby go wyróżnić; przeciągnij, aby zobaczyć efekt</string>
+    <string name="button_preview">Podgląd</string>
+    <string name="button_preview_help">Podgląd: dotknij przycisku, aby go wyróżnić; przeciągnij, aby zobaczyć efekt</string>
+    <string name="show_explanation">Pokaż wyjaśnienie</string>
     <string name="button_bar_top">Górny pasek</string>
     <string name="button_bar_bottom">Dolny pasek</string>
     <string name="button_bar_left">Lewy pasek</string>

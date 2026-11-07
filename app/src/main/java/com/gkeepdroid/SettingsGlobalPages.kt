@@ -432,7 +432,6 @@ internal fun ColumnScope.AppCheckboxPage(s: SettingsState) {
 @Composable
 internal fun ColumnScope.EditorButtonsPage(s: SettingsState) {
     with(s) {
-        Hint(R.string.editor_buttons_hint)
         EditorLayoutEditor(appEditorLayout) { appEditorLayout = it }
         Text(stringResource(R.string.editor_align_title))
         ChoiceGroup(

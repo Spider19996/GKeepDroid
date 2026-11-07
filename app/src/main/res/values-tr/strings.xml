@@ -420,7 +420,9 @@
     <string name="editor_buttons_hint">Bir düğmeye uzun basıp başka bir yere sürükleyin: notun üstündeki ve altındaki çubuklar, menü ya da gizli.</string>
     <string name="editor_zone_menu">Menü</string>
     <string name="editor_zone_hidden">Gizli</string>
-    <string name="button_preview">Önizleme: vurgulamak için bir düğmeye dokunun, nasıl görüneceğini görmek için sürükleyin</string>
+    <string name="button_preview">Önizleme</string>
+    <string name="button_preview_help">Önizleme: vurgulamak için bir düğmeye dokunun, nasıl görüneceğini görmek için sürükleyin</string>
+    <string name="show_explanation">Açıklamayı göster</string>
     <string name="button_bar_top">Üst çubuk</string>
     <string name="button_bar_bottom">Alt çubuk</string>
     <string name="button_bar_left">Sol çubuk</string>

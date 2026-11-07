@@ -282,7 +282,6 @@ internal fun ColumnScope.ChecklistsPage(s: SettingsState) {
 @Composable
 internal fun ColumnScope.ButtonBarPage(s: SettingsState) {
     with(s) {
-        Hint(R.string.button_layout_hint)
         // The buttons this widget has, with the side each one sits on (null = not shown).
         val unordered = buildList {
             fun add(id: String, icon: Int, label: Int) =
