@@ -331,16 +331,20 @@ fun LayoutFileButtons(
             },
         )
     }
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        androidx.compose.material3.OutlinedButton(onClick = { save.launch("$filePrefix-${java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US).format(java.util.Date())}.json") }, shapes = androidx.compose.material3.ButtonDefaults.shapes()) {
-            Text(stringResource(R.string.layout_save))
+    // Save and load side by side with the same width, reset below them across the whole width: they never wrap unevenly.
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            androidx.compose.material3.OutlinedButton(
+                onClick = { save.launch("$filePrefix-${java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US).format(java.util.Date())}.json") },
+                modifier = Modifier.weight(1f), shapes = androidx.compose.material3.ButtonDefaults.shapes(),
+            ) { Text(stringResource(R.string.layout_save), maxLines = 1) }
+            androidx.compose.material3.OutlinedButton(
+                onClick = { load.launch(arrayOf("*/*")) }, modifier = Modifier.weight(1f), shapes = androidx.compose.material3.ButtonDefaults.shapes(),
+            ) { Text(stringResource(R.string.layout_load), maxLines = 1) }
         }
-        androidx.compose.material3.OutlinedButton(onClick = { load.launch(arrayOf("*/*")) }, shapes = androidx.compose.material3.ButtonDefaults.shapes()) {
-            Text(stringResource(R.string.layout_load))
-        }
-        androidx.compose.material3.OutlinedButton(enabled = resetEnabled, onClick = onReset, shapes = androidx.compose.material3.ButtonDefaults.shapes()) {
-            Text(resetLabel)
-        }
+        androidx.compose.material3.OutlinedButton(
+            enabled = resetEnabled, onClick = onReset, modifier = Modifier.fillMaxWidth(), shapes = androidx.compose.material3.ButtonDefaults.shapes(),
+        ) { Text(resetLabel, maxLines = 1) }
     }
 }
 
