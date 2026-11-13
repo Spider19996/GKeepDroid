@@ -373,6 +373,7 @@ class SettingsActivity : ComponentActivity() {
                     Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
+                    ProvideFlash(state.flash) {
                     when (page) {
                         Page.Main -> MainPage(state)
                         Page.AppLayout -> AppLayoutPage(state)
@@ -393,6 +394,7 @@ class SettingsActivity : ComponentActivity() {
                         Page.Reminders -> RemindersPage(state)
                         Page.Backup -> BackupPage(state)
                         Page.Credits -> CreditsPage(state)
+                    }
                     }
                 }
 

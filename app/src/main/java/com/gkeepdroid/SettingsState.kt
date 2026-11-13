@@ -65,6 +65,7 @@ internal class SettingsState(val context: SettingsActivity) {
     var appListDeleteChecked by mutableStateOf(initialApp.listDeleteChecked)
     var appConvertPrefix by mutableIntStateOf(initialApp.convertPrefix)
     var appRenumberDisplay by mutableStateOf(initialApp.renumberDisplay)
+    var appTrimEmptyEdges by mutableStateOf(initialApp.trimEmptyEdges)
     var appWidgetGrace by mutableIntStateOf(initialApp.lockWidgetGraceSec)
     var appWidgetTitlesOnly by mutableStateOf(initialApp.widgetTitlesOnly)
     var appLockWidgetTick by mutableStateOf(initialApp.lockWidgetTick)
@@ -124,6 +125,7 @@ internal class SettingsState(val context: SettingsActivity) {
     var showProgress by mutableStateOf(initialWidget.showProgress)
     var foldable by mutableStateOf(initialWidget.foldable)
     var settingsQuery by mutableStateOf("")
+    val flash = FlashTarget()
     // A search hit for a popup setting opens that popup once the main list is shown again.
     var pendingPopup by mutableStateOf<String?>(null)
     var interval by mutableIntStateOf(initialGlobal.syncIntervalMin)
@@ -230,7 +232,7 @@ internal class SettingsState(val context: SettingsActivity) {
         appShowReminders = a.showReminders; appListCheckedToEnd = a.listCheckedToEnd; appListCollapseChecked = a.listCollapseChecked
         appListCheckboxStyle = a.listCheckboxStyle; appListCheckboxSize = a.listCheckboxSizeDp; appListSpacing = a.listSpacingDp
         appListCheckInApp = a.listCheckInApp; appListDeleteChecked = a.listDeleteChecked; appConvertPrefix = a.convertPrefix
-        appRenumberDisplay = a.renumberDisplay; appWidgetGrace = a.lockWidgetGraceSec; appWidgetTitlesOnly = a.widgetTitlesOnly
+        appRenumberDisplay = a.renumberDisplay; appTrimEmptyEdges = a.trimEmptyEdges; appWidgetGrace = a.lockWidgetGraceSec; appWidgetTitlesOnly = a.widgetTitlesOnly
         appLockWidgetTick = a.lockWidgetTick; appSwipeRight = a.swipeRight; appSwipeLeft = a.swipeLeft; appFoldNotes = a.foldNotes
         appFilterBar = a.filterBar; appFilterChips = a.filterChips; appPullToRefresh = a.pullToRefresh; appEditorLayout = a.editorLayout
     }
@@ -238,7 +240,7 @@ internal class SettingsState(val context: SettingsActivity) {
     fun currentApp() = AppSettings(
         appLayout, appSort, appPinnedSection, appShowImages, appShowColors, appPlainStyle, appPreviewLines, appShowEdited, appEditedAsDate, appShowLabels, appShowProgress, appLockPrivate, appLockApp, appLockEdit, appLockGrace,
         appShowReminders, appListCheckedToEnd, appListCollapseChecked, appListCheckboxStyle, appListCheckboxSize, appListSpacing,
-        appListCheckInApp, appListDeleteChecked, appConvertPrefix, appRenumberDisplay, appWidgetGrace, appWidgetTitlesOnly, appLockWidgetTick, appSwipeRight, appSwipeLeft, appFoldNotes, appFilterBar, appFilterChips, appPullToRefresh, appEditorLayout,
+        appListCheckInApp, appListDeleteChecked, appConvertPrefix, appRenumberDisplay, appTrimEmptyEdges, appWidgetGrace, appWidgetTitlesOnly, appLockWidgetTick, appSwipeRight, appSwipeLeft, appFoldNotes, appFilterBar, appFilterChips, appPullToRefresh, appEditorLayout,
     )
 
     /** Opens a page; the security page asks for the lock first (whenever the phone has one). */

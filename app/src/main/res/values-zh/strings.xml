@@ -423,14 +423,13 @@
     <string name="editor_zone_note">笔记，按钮可在其上方或下方</string>
     <string name="editor_zone_bottom_left">底栏，左侧</string>
     <string name="editor_zone_bottom_right">底栏，右侧</string>
-    <string name="button_legend_free">可以移动到任何位置</string>
-    <string name="button_legend_limited">只能移动到特定位置；拖动时允许的位置会亮起</string>
-    <string name="button_legend_stays">停留在原位；只能在其中调整顺序</string>
-    <string name="button_legend_fixed">无法移动</string>
     <string name="editor_align_title">笔记位置</string>
     <string name="editor_align_center">居中</string>
     <string name="editor_align_top">顶部</string>
     <string name="editor_align_bottom">底部</string>
     <string name="editor_buttons_reset">恢复默认</string>
     <string name="editor_buttons_note">便签</string>
+    <string name="trim_empty_edges">保存时删除首尾空行</string>
+    <string name="trim_empty_edges_hint">便笺会删除空的首行或末行，清单会删除空的首项或末项。</string>
+    <string name="add_divider">添加分隔线</string>
 </resources>

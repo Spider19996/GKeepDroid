@@ -450,14 +450,13 @@
     <string name="editor_zone_note">Заметка, с кнопками выше или ниже</string>
     <string name="editor_zone_bottom_left">Нижняя панель, слева</string>
     <string name="editor_zone_bottom_right">Нижняя панель, справа</string>
-    <string name="button_legend_free">Можно перенести куда угодно</string>
-    <string name="button_legend_limited">Можно перенести только в определённые места; допустимые места подсвечиваются при перетаскивании</string>
-    <string name="button_legend_stays">Остаётся на своём месте; там можно изменить только порядок</string>
-    <string name="button_legend_fixed">Нельзя переместить</string>
     <string name="editor_align_title">Положение заметки</string>
     <string name="editor_align_center">По центру</string>
     <string name="editor_align_top">Сверху</string>
     <string name="editor_align_bottom">Снизу</string>
     <string name="editor_buttons_reset">Сбросить</string>
     <string name="editor_buttons_note">Заметка</string>
+    <string name="trim_empty_edges">Удалять пустую первую и последнюю строку при сохранении</string>
+    <string name="trim_empty_edges_hint">В заметках удаляется пустая первая или последняя строка, в списках — пустой первый или последний пункт.</string>
+    <string name="add_divider">Добавить разделитель</string>
 </resources>

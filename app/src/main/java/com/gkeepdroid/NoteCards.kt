@@ -312,6 +312,10 @@ internal fun NoteTile(
             // setting says.
             val rowGap = (app.listSpacingDp / 2f).dp
             shownItems.forEach { item ->
+                if (item.isDivider()) {
+                    androidx.compose.material3.HorizontalDivider(Modifier.padding(vertical = rowGap + 4.dp), color = textColor.copy(alpha = 0.4f))
+                    return@forEach
+                }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         Modifier.clickable(enabled = app.listCheckInApp) { toggleItem(item) }

@@ -1,7 +1,16 @@
 package com.gkeepdroid
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -85,7 +94,7 @@ internal fun FirstSyncDialog(onConfirm: () -> Unit) {
 /** A whole number typed in, such as minutes between two syncs: the name on the left, a small field on the right. */
 @Composable
 internal fun NumberRow(label: Int, value: Int, unit: String, onChange: (Int) -> Unit) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().searchFlash(label), verticalAlignment = Alignment.CenterVertically) {
         Text(stringResource(label), Modifier.weight(1f))
         OutlinedTextField(
             value = value.toString(),
@@ -206,7 +215,7 @@ internal fun checkboxStyles(): List<Pair<Int, String>> = listOf(
 /** A labeled on/off switch. */
 @Composable
 internal fun SwitchRow(label: Int, checked: Boolean, onChange: (Boolean) -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.searchFlash(label), verticalAlignment = Alignment.CenterVertically) {
         Text(stringResource(label), Modifier.weight(1f))
         Switch(checked = checked, onCheckedChange = onChange)
     }
@@ -224,4 +233,46 @@ internal fun SectionTitle(text: String) {
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(top = 8.dp),
     )
+}
+
+
+/** The setting a search hit was tapped on: its row scrolls into view and flashes once, so it is easy to spot on its page. */
+internal class FlashTarget {
+    var label by mutableStateOf<Int?>(null)
+}
+
+internal val LocalFlash = staticCompositionLocalOf { FlashTarget() }
+
+/** Gives [content] a [FlashTarget]; a target that is not on the opened page is dropped after a moment, so it cannot flash later. */
+@Composable
+internal fun ProvideFlash(target: FlashTarget, content: @Composable () -> Unit) {
+    LaunchedEffect(target.label) {
+        if (target.label != null) {
+            delay(3000)
+            target.label = null
+        }
+    }
+    CompositionLocalProvider(LocalFlash provides target, content = content)
+}
+
+/** Makes the row of the setting [label] flash once when a search hit for it was tapped. */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+internal fun Modifier.searchFlash(label: Int): Modifier {
+    val flash = LocalFlash.current
+    val active = flash.label == label
+    val requester = remember { BringIntoViewRequester() }
+    val glow = remember { Animatable(0f) }
+    LaunchedEffect(active) {
+        if (active) {
+            requester.bringIntoView()
+            glow.animateTo(0.4f, tween(300))
+            glow.animateTo(0f, tween(900))
+            flash.label = null
+        }
+    }
+    val color = MaterialTheme.colorScheme.primary
+    return bringIntoViewRequester(requester).drawBehind {
+        if (glow.value > 0f) drawRoundRect(color.copy(alpha = glow.value), cornerRadius = CornerRadius(12.dp.toPx()))
+    }
 }

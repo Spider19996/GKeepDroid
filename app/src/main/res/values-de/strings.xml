@@ -432,14 +432,13 @@
     <string name="editor_zone_note">Notiz, mit Tasten darüber oder darunter</string>
     <string name="editor_zone_bottom_left">Untere Leiste, links</string>
     <string name="editor_zone_bottom_right">Untere Leiste, rechts</string>
-    <string name="button_legend_free">Lässt sich überallhin verschieben</string>
-    <string name="button_legend_limited">Lässt sich nur an bestimmte Stellen verschieben; die erlaubten Stellen leuchten beim Ziehen auf</string>
-    <string name="button_legend_stays">Bleibt an seinem Platz; dort lässt sich nur die Reihenfolge ändern</string>
-    <string name="button_legend_fixed">Lässt sich nicht verschieben</string>
     <string name="editor_align_title">Position der Notiz</string>
     <string name="editor_align_center">Mitte</string>
     <string name="editor_align_top">Oben</string>
     <string name="editor_align_bottom">Unten</string>
     <string name="editor_buttons_reset">Auf Standard zurücksetzen</string>
     <string name="editor_buttons_note">Notiz</string>
+    <string name="trim_empty_edges">Leere erste und letzte Zeile beim Speichern entfernen</string>
+    <string name="trim_empty_edges_hint">Notizen verlieren eine leere erste oder letzte Zeile, Checklisten einen leeren ersten oder letzten Eintrag.</string>
+    <string name="add_divider">Trenner hinzufügen</string>
 </resources>

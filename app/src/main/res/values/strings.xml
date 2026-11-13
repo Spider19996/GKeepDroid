@@ -433,14 +433,13 @@
     <string name="editor_zone_note">Note, with buttons above or below it</string>
     <string name="editor_zone_bottom_left">Bottom bar, left</string>
     <string name="editor_zone_bottom_right">Bottom bar, right</string>
-    <string name="button_legend_free">Can be moved anywhere</string>
-    <string name="button_legend_limited">Can only be moved to certain places; the places it may go to light up while you drag it</string>
-    <string name="button_legend_stays">Stays in its place; it can only be put in another order there</string>
-    <string name="button_legend_fixed">Cannot be moved</string>
     <string name="editor_align_title">Position of the note</string>
     <string name="editor_align_center">Middle</string>
     <string name="editor_align_top">Top</string>
     <string name="editor_align_bottom">Bottom</string>
     <string name="editor_buttons_reset">Reset to default</string>
     <string name="editor_buttons_note">Note</string>
+    <string name="trim_empty_edges">Remove empty first and last line when saving</string>
+    <string name="trim_empty_edges_hint">Notes lose an empty first or last line, checklists an empty first or last item.</string>
+    <string name="add_divider">Add divider</string>
 </resources>

@@ -43,6 +43,8 @@ data class AppSettings(
     val convertPrefix: Int = PREFIX_NONE,
     /** Numbered lists count again in the order cards and widgets show (checked items last); off shows the saved numbers. */
     val renumberDisplay: Boolean = false,
+    /** Saving removes an empty first or last line of a note (or empty first and last items of a checklist). */
+    val trimEmptyEdges: Boolean = true,
     /** Ticking in a widget with the edit lock on: seconds during which the lock is not asked again. */
     val lockWidgetGraceSec: Int = 10,
     /** While the whole app is locked, widgets show only the titles. */
@@ -116,6 +118,7 @@ object AppSettingsStore {
             listDeleteChecked = p.getBoolean("list_delete_checked", d.listDeleteChecked),
             convertPrefix = p.getInt("convert_prefix", d.convertPrefix),
             renumberDisplay = p.getBoolean("renumber_display", d.renumberDisplay),
+            trimEmptyEdges = p.getBoolean("trim_empty_edges", d.trimEmptyEdges),
             lockWidgetGraceSec = p.getInt("lock_widget_grace_sec", d.lockWidgetGraceSec),
             widgetTitlesOnly = p.getBoolean("widget_titles_only", d.widgetTitlesOnly),
             lockWidgetTick = p.getBoolean("lock_widget_tick", d.lockWidgetTick),
@@ -181,6 +184,7 @@ object AppSettingsStore {
             putBoolean("list_delete_checked", s.listDeleteChecked)
             putInt("convert_prefix", s.convertPrefix)
             putBoolean("renumber_display", s.renumberDisplay)
+            putBoolean("trim_empty_edges", s.trimEmptyEdges)
             putInt("lock_widget_grace_sec", s.lockWidgetGraceSec)
             putBoolean("widget_titles_only", s.widgetTitlesOnly)
             putBoolean("lock_widget_tick", s.lockWidgetTick)

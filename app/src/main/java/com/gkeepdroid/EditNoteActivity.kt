@@ -450,6 +450,25 @@ class EditNoteActivity : ComponentActivity() {
             if (saving || !canEdit) return
             saving = true
             error = ""
+            if (AppSettingsStore.load(this@EditNoteActivity).trimEmptyEdges) {
+                if (isList) {
+                    // Only if something stays: an all-empty list is left as it is.
+                    if (items.any { it.text.isNotBlank() }) {
+                        while (items.first().text.isBlank()) items.removeAt(0)
+                        while (items.last().text.isBlank()) items.removeAt(items.lastIndex)
+                    }
+                } else {
+                    val lines = text.split("\n")
+                    val first = lines.indexOfFirst { it.isNotBlank() }
+                    if (first >= 0) {
+                        val last = lines.indexOfLast { it.isNotBlank() }
+                        val trimmed = lines.subList(first, last + 1).joinToString("\n")
+                        // The styles stay with their characters.
+                        format.edited("text", text, trimmed)
+                        text = trimmed
+                    }
+                }
+            }
             val target = if (existing != null) account else targetAccount
             val galleryNow = if (background == CUSTOM_BACKGROUND) "" else background
             if (existing != null) NoteLook.save(this@EditNoteActivity, account, existing.id, ownText, variantDark)
@@ -727,7 +746,7 @@ class EditNoteActivity : ComponentActivity() {
             visible = isList,
         )
         states["list_check_all"] = EditorActionState(
-            R.drawable.ic_done, stringResource(R.string.list_check_all), { for (i in items.indices) items[i] = items[i].copy(checked = true) }, visible = isList,
+            R.drawable.ic_done, stringResource(R.string.list_check_all), { for (i in items.indices) if (!items[i].isDivider()) items[i] = items[i].copy(checked = true) }, visible = isList,
         )
         states["list_uncheck_all"] = EditorActionState(
             R.drawable.ic_close, stringResource(R.string.list_uncheck_all), { for (i in items.indices) items[i] = items[i].copy(checked = false) }, visible = isList,
@@ -736,7 +755,13 @@ class EditNoteActivity : ComponentActivity() {
             R.drawable.ic_sort, stringResource(R.string.list_sort_alpha),
             {
                 // Sub-items lose their parent when the order changes, so they become ordinary items.
-                val sorted = items.sortedBy { it.text.lowercase() }.map { it.copy(indent = false) }
+                // Dividers stay where they are: the items between two of them are sorted among themselves.
+                val sorted = buildList {
+                    var segment = mutableListOf<KeepItem>()
+                    fun flush() { addAll(segment.sortedBy { it.text.lowercase() }.map { it.copy(indent = false) }); segment = mutableListOf() }
+                    items.forEach { if (it.isDivider()) { flush(); add(it.copy(indent = false)) } else segment.add(it) }
+                    flush()
+                }
                 items.clear()
                 items.addAll(sorted)
             },
@@ -748,7 +773,22 @@ class EditNoteActivity : ComponentActivity() {
                 items.removeAll { it.checked }
                 if (items.isEmpty()) items.add(KeepItem(UUID.randomUUID().toString(), "", false))
             },
-            visible = isList,
+            // Always there, so it can be found; it works once something is ticked.
+            visible = isList && canEdit, enabled = items.any { it.checked },
+        )
+        states["add_item"] = EditorActionState(
+            R.drawable.ic_add, stringResource(R.string.add_item),
+            { items.add(KeepItem(UUID.randomUUID().toString(), "", false)) },
+            visible = isList && canEdit,
+        )
+        states["add_divider"] = EditorActionState(
+            R.drawable.ic_divider, stringResource(R.string.add_divider),
+            {
+                // Right after the item being edited, or at the end.
+                val at = items.indexOfFirst { it.id == format.focus }.let { if (it >= 0) it + 1 else items.size }
+                items.add(at, KeepItem(UUID.randomUUID().toString(), DIVIDER_TEXT, false))
+            },
+            visible = isList && canEdit,
         )
         states["open_in_keep"] = EditorActionState(
             R.drawable.ic_open_new, stringResource(R.string.open_in_keep), { if (existing != null) openInKeep(account, existing) },
@@ -965,6 +1005,7 @@ class EditNoteActivity : ComponentActivity() {
             OutlinedTextField(
                 value = title, onValueChange = { title = it }, readOnly = !canEdit,
                 label = { Text(stringResource(R.string.title_hint)) },
+                textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -1012,7 +1053,7 @@ class EditNoteActivity : ComponentActivity() {
                     key(item.id) {
                         ChecklistRow(
                             item, canEdit, dragging == item.id,
-                            number = if (numbered) items.take(index).count { it.text.isNotBlank() } + 1 else null,
+                            number = if (numbered) items.take(index).count { it.text.isNotBlank() && !it.isDivider() } + 1 else null,
                             onText = { text ->
                                 items.indexOfFirst { it.id == item.id }.let { i ->
                                     if (i >= 0) {
@@ -1026,7 +1067,7 @@ class EditNoteActivity : ComponentActivity() {
                             onFocus = { format.focus = item.id },
                             modifier = if (canFormat && canEdit) Modifier.textStyleMenu(styleLabels, applyStyle) else Modifier,
                             onSelection = { format.selection[item.id] = it },
-                            onToggle = { items.indexOfFirst { it.id == item.id }.let { i -> if (i >= 0) items[i] = items[i].copy(checked = !items[i].checked) } },
+                            onToggle = { items.indexOfFirst { it.id == item.id }.let { i -> if (i >= 0 && !items[i].isDivider()) items[i] = items[i].copy(checked = !items[i].checked) } },
                             onRemove = {
                                 items.removeAll { it.id == item.id }
                                 if (items.isEmpty()) items.add(KeepItem(UUID.randomUUID().toString(), "", false))
@@ -1045,10 +1086,6 @@ class EditNoteActivity : ComponentActivity() {
                             onDragEnd = { dragging = null },
                         )
                     }
-                }
-                if (canEdit) OutlinedButton(onClick = { items.add(KeepItem(UUID.randomUUID().toString(), "", false)) }, shapes = ButtonDefaults.shapes()) {
-                    Icon(painterResource(R.drawable.ic_add), contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-                    Text(stringResource(R.string.add_item))
                 }
             } else {
                 // Lines that start with "-" (or "*", "[ ]") are a list: offer to make it one, once.

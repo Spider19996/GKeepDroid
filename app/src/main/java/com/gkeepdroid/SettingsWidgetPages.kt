@@ -47,10 +47,10 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun ColumnScope.AppearancePage(s: SettingsState) {
     with(s) {
-        Text(stringResource(R.string.bg_opacity, (backgroundAlpha * 100).toInt()))
+        Text(stringResource(R.string.bg_opacity, (backgroundAlpha * 100).toInt()), Modifier.searchFlash(R.string.bg_opacity))
         ValueSlider(value = backgroundAlpha, onValueChange = { backgroundAlpha = it })
 
-        Text(stringResource(R.string.text_size, textSize))
+        Text(stringResource(R.string.text_size, textSize), Modifier.searchFlash(R.string.text_size))
         ValueSlider(
             value = textSize.toFloat(), onValueChange = { textSize = it.toInt() },
             valueRange = 10f..24f,
@@ -58,7 +58,7 @@ internal fun ColumnScope.AppearancePage(s: SettingsState) {
 
         SwitchRow(R.string.text_color_auto, textColorAuto) { textColorAuto = it }
         if (!textColorAuto) {
-        Text(stringResource(R.string.text_color))
+        Text(stringResource(R.string.text_color), Modifier.searchFlash(R.string.text_color))
         // Every circle sits in a 48 dp touch area, which also sets the distance between the circles.
         FlowRow {
             TEXT_COLORS.forEach { color ->
@@ -97,13 +97,13 @@ internal fun ColumnScope.AppearancePage(s: SettingsState) {
         HorizontalDivider(Modifier.padding(vertical = 4.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.show_note_colors), Modifier.weight(1f))
+            Text(stringResource(R.string.show_note_colors), Modifier.weight(1f).searchFlash(R.string.show_note_colors))
             Switch(checked = showNoteColors, onCheckedChange = { showNoteColors = it })
         }
-        Text(stringResource(R.string.note_opacity, (noteAlpha * 100).toInt()))
+        Text(stringResource(R.string.note_opacity, (noteAlpha * 100).toInt()), Modifier.searchFlash(R.string.note_opacity))
         ValueSlider(value = noteAlpha, onValueChange = { noteAlpha = it })
 
-        Text(stringResource(R.string.plain_style))
+        Text(stringResource(R.string.plain_style), Modifier.searchFlash(R.string.plain_style))
         ChoiceGroup(plainStyles(), plainStyle) { plainStyle = it }
     }
 }
@@ -112,7 +112,7 @@ internal fun ColumnScope.AppearancePage(s: SettingsState) {
 internal fun ColumnScope.NotesPage(s: SettingsState) {
     with(s) {
         if (!isSingleNote) {
-            Text(stringResource(R.string.sort_by), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.sort_by), Modifier.searchFlash(R.string.sort_by), style = MaterialTheme.typography.titleMedium)
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -160,6 +160,7 @@ internal fun ColumnScope.NotesPage(s: SettingsState) {
             Text(
                 if (maxLines == 0) stringResource(R.string.max_lines_unlimited)
                 else stringResource(R.string.max_lines, maxLines),
+                Modifier.searchFlash(R.string.max_lines),
             )
             ValueSlider(
                 value = maxLines.toFloat(), onValueChange = { maxLines = it.toInt() },
@@ -224,42 +225,42 @@ internal fun ColumnScope.ManageNotesPage(s: SettingsState) {
 internal fun ColumnScope.ChecklistsPage(s: SettingsState) {
     with(s) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.check_in_widget), Modifier.weight(1f))
+            Text(stringResource(R.string.check_in_widget), Modifier.weight(1f).searchFlash(R.string.check_in_widget))
             Switch(checked = checkable, onCheckedChange = { checkable = it })
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.checked_to_end), Modifier.weight(1f))
+            Text(stringResource(R.string.checked_to_end), Modifier.weight(1f).searchFlash(R.string.checked_to_end))
             Switch(checked = checkedToEnd, onCheckedChange = { checkedToEnd = it })
         }
         if (checkedToEnd) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.collapse_checked), Modifier.weight(1f))
+                Text(stringResource(R.string.collapse_checked), Modifier.weight(1f).searchFlash(R.string.collapse_checked))
                 Switch(checked = collapseChecked, onCheckedChange = { collapseChecked = it })
             }
         }
         if (checkable) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.delete_checked), Modifier.weight(1f))
+                Text(stringResource(R.string.delete_checked), Modifier.weight(1f).searchFlash(R.string.delete_checked))
                 Switch(checked = deleteChecked, onCheckedChange = { deleteChecked = it })
             }
         }
         HorizontalDivider(Modifier.padding(vertical = 4.dp))
-        Text("${stringResource(R.string.list_spacing)}: $listSpacingDp dp")
+        Text("${stringResource(R.string.list_spacing)}: $listSpacingDp dp", Modifier.searchFlash(R.string.list_spacing))
         ValueSlider(
             value = listSpacingDp.toFloat(), onValueChange = { listSpacingDp = it.toInt() },
             valueRange = 0f..24f,
         )
 
         HorizontalDivider(Modifier.padding(vertical = 4.dp))
-        Text(stringResource(R.string.checkbox_style), style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.checkbox_style), Modifier.searchFlash(R.string.checkbox_style), style = MaterialTheme.typography.titleMedium)
         ChoiceGroup(checkboxStyles(), checkboxStyle) { checkboxStyle = it }
-        Text(stringResource(R.string.checkbox_size, checkboxSizeDp))
+        Text(stringResource(R.string.checkbox_size, checkboxSizeDp), Modifier.searchFlash(R.string.checkbox_size))
         ValueSlider(
             value = checkboxSizeDp.toFloat(), onValueChange = { checkboxSizeDp = it.toInt() },
             valueRange = 14f..56f,
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.tap_whole_row), Modifier.weight(1f))
+            Text(stringResource(R.string.tap_whole_row), Modifier.weight(1f).searchFlash(R.string.tap_whole_row))
             Switch(checked = tapWholeRow, onCheckedChange = { tapWholeRow = it })
         }
         // Live preview of both states with the chosen style, size and spacing.
@@ -298,7 +299,7 @@ internal fun ColumnScope.ButtonBarPage(s: SettingsState) {
             if (id == BTN_SETTINGS && zone == BAR_HIDDEN) confirmSettingsButtonOff = true
             else buttonLayout = buttonLayout.moved(id, zone, beforeId)
         }
-        Text(stringResource(R.string.header_size, headerSize))
+        Text(stringResource(R.string.header_size, headerSize), Modifier.searchFlash(R.string.header_size))
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             ValueSlider(
                 value = headerSize.toFloat(), onValueChange = { headerSize = it.toInt() },

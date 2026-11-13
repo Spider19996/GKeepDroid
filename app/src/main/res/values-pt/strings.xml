@@ -441,14 +441,13 @@
     <string name="editor_zone_note">Nota, com botões acima ou abaixo</string>
     <string name="editor_zone_bottom_left">Barra inferior, esquerda</string>
     <string name="editor_zone_bottom_right">Barra inferior, direita</string>
-    <string name="button_legend_free">Pode ser movido para qualquer lugar</string>
-    <string name="button_legend_limited">Só pode ser movido para certos lugares; os permitidos acendem ao arrastar</string>
-    <string name="button_legend_stays">Fica no seu lugar; ali só se pode mudar a ordem</string>
-    <string name="button_legend_fixed">Não pode ser movido</string>
     <string name="editor_align_title">Posição da nota</string>
     <string name="editor_align_center">Meio</string>
     <string name="editor_align_top">Topo</string>
     <string name="editor_align_bottom">Fundo</string>
     <string name="editor_buttons_reset">Restaurar padrão</string>
     <string name="editor_buttons_note">Nota</string>
+    <string name="trim_empty_edges">Remover a primeira e a última linha vazias ao salvar</string>
+    <string name="trim_empty_edges_hint">As notas perdem uma primeira ou última linha vazia; as listas, um primeiro ou último item vazio.</string>
+    <string name="add_divider">Adicionar separador</string>
 </resources>

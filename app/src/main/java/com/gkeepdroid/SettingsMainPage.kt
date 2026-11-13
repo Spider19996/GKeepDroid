@@ -65,6 +65,7 @@ internal fun ColumnScope.MainPage(s: SettingsState) {
                     { shapes ->
                         MenuRow(label, if (pageTitle == label) null else pageTitle, shapes = shapes) {
                             settingsQuery = ""
+                            if (entry.popup == null) flash.label = entry.label
                             if (entry.popup != null) {
                                 page = Page.Main
                                 pendingPopup = entry.popup

@@ -432,14 +432,13 @@
     <string name="editor_zone_note">Notitie, met knoppen erboven of eronder</string>
     <string name="editor_zone_bottom_left">Onderbalk, links</string>
     <string name="editor_zone_bottom_right">Onderbalk, rechts</string>
-    <string name="button_legend_free">Kan overal naartoe</string>
-    <string name="button_legend_limited">Kan alleen naar bepaalde plekken; de toegestane plekken lichten op tijdens het slepen</string>
-    <string name="button_legend_stays">Blijft op zijn plek; daar kan alleen de volgorde veranderen</string>
-    <string name="button_legend_fixed">Kan niet worden verplaatst</string>
     <string name="editor_align_title">Positie van de notitie</string>
     <string name="editor_align_center">Midden</string>
     <string name="editor_align_top">Boven</string>
     <string name="editor_align_bottom">Onder</string>
     <string name="editor_buttons_reset">Standaard herstellen</string>
     <string name="editor_buttons_note">Notitie</string>
+    <string name="trim_empty_edges">Lege eerste en laatste regel bij opslaan verwijderen</string>
+    <string name="trim_empty_edges_hint">Notities verliezen een lege eerste of laatste regel, checklists een leeg eerste of laatste item.</string>
+    <string name="add_divider">Scheidingslijn toevoegen</string>
 </resources>

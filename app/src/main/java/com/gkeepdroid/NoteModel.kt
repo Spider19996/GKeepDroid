@@ -5,6 +5,12 @@ import java.io.File
 /** An item of a checklist; [indent] puts it under the item above, as a sub-item (Keep knows one level). */
 data class KeepItem(val id: String, val text: String, val checked: Boolean, val indent: Boolean = false)
 
+/** The text of a divider inside a checklist: an item of its own, so every other app (Keep on the web) shows it as a plain line of dashes. */
+const val DIVIDER_TEXT = "----------"
+
+/** A divider is an item that holds only dashes (three or more); the app draws it as a line without a check box. */
+fun KeepItem.isDivider(): Boolean = text.trim().let { it.length >= 3 && it.all { c -> c == '-' } }
+
 data class KeepNote(
     val id: String,
     /** Keep's own id of the note, used to link to it in the Keep app or on keep.google.com. */

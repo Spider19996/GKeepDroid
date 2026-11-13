@@ -441,14 +441,13 @@
     <string name="editor_zone_note">Note, avec des boutons au-dessus ou en dessous</string>
     <string name="editor_zone_bottom_left">Barre du bas, à gauche</string>
     <string name="editor_zone_bottom_right">Barre du bas, à droite</string>
-    <string name="button_legend_free">Peut être déplacé n\'importe où</string>
-    <string name="button_legend_limited">Ne peut être déplacé qu\'à certains endroits ; ils s\'allument pendant le glissement</string>
-    <string name="button_legend_stays">Reste à sa place ; seul son ordre peut y être modifié</string>
-    <string name="button_legend_fixed">Ne peut pas être déplacé</string>
     <string name="editor_align_title">Position de la note</string>
     <string name="editor_align_center">Au milieu</string>
     <string name="editor_align_top">En haut</string>
     <string name="editor_align_bottom">En bas</string>
     <string name="editor_buttons_reset">Rétablir</string>
     <string name="editor_buttons_note">Note</string>
+    <string name="trim_empty_edges">Supprimer la première et la dernière ligne vides à l\'enregistrement</string>
+    <string name="trim_empty_edges_hint">Les notes perdent une première ou dernière ligne vide, les listes un premier ou dernier élément vide.</string>
+    <string name="add_divider">Ajouter un séparateur</string>
 </resources>

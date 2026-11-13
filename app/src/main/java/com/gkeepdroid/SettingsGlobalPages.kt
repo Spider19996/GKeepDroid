@@ -72,7 +72,7 @@ internal fun ColumnScope.AccountsPage(s: SettingsState) {
 
         if (hasWidget && accounts.size > 1) {
             HorizontalDivider()
-            Text(stringResource(R.string.account_for_widget), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.account_for_widget), Modifier.searchFlash(R.string.account_for_widget), style = MaterialTheme.typography.titleMedium)
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -113,7 +113,7 @@ internal fun ColumnScope.AccountsPage(s: SettingsState) {
             Text(stringResource(if (showTokenForm) R.string.hide_token_form else R.string.use_token_instead))
         }
         if (showTokenForm) {
-            Text(stringResource(R.string.add_account), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.add_account), Modifier.searchFlash(R.string.add_account), style = MaterialTheme.typography.titleMedium)
             OutlinedTextField(
                 value = email, onValueChange = { email = it },
                 label = { Text(stringResource(R.string.email_label)) }, singleLine = true,
@@ -129,10 +129,10 @@ internal fun ColumnScope.AccountsPage(s: SettingsState) {
                 modifier = Modifier.fillMaxWidth(),
             )
             TextButton(onClick = { uriHandler.openUri(MASTER_TOKEN_HELP_URL) }, shapes = ButtonDefaults.shapes()) {
-                Text(stringResource(R.string.token_help))
+                Text(stringResource(R.string.token_help), Modifier.searchFlash(R.string.token_help))
             }
             Button(onClick = { addAccount() }, modifier = Modifier.fillMaxWidth(), shapes = ButtonDefaults.shapes()) {
-                Text(stringResource(R.string.add_account))
+                Text(stringResource(R.string.add_account), Modifier.searchFlash(R.string.add_account))
             }
         }
     }
@@ -232,7 +232,7 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
 
         // Settings: one file with everything except accounts and tokens.
         HorizontalDivider(Modifier.padding(vertical = 8.dp))
-        Text(stringResource(R.string.backup_note))
+        Text(stringResource(R.string.backup_note), Modifier.searchFlash(R.string.backup_note))
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = { exportLauncher.launch("gkeepdroid-settings.json") },
@@ -250,13 +250,13 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
 @Composable
 internal fun ColumnScope.AppLayoutPage(s: SettingsState) {
     with(s) {
-        Text(stringResource(R.string.layout_label), style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.layout_label), Modifier.searchFlash(R.string.layout_label), style = MaterialTheme.typography.titleMedium)
         ChoiceGroup(
             listOf(LAYOUT_GRID to stringResource(R.string.layout_grid), LAYOUT_LIST to stringResource(R.string.layout_list)),
             appLayout,
         ) { appLayout = it }
 
-        Text(stringResource(R.string.sort_by), style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.sort_by), Modifier.searchFlash(R.string.sort_by), style = MaterialTheme.typography.titleMedium)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(
                 SORT_KEEP to R.string.sort_keep,
@@ -274,13 +274,14 @@ internal fun ColumnScope.AppLayoutPage(s: SettingsState) {
         SwitchRow(R.string.pinned_section_switch, appPinnedSection) { appPinnedSection = it }
         SwitchRow(R.string.pull_to_refresh_switch, appPullToRefresh) { appPullToRefresh = it }
 
-        Text(stringResource(R.string.plain_style))
+        Text(stringResource(R.string.plain_style), Modifier.searchFlash(R.string.plain_style))
         ChoiceGroup(plainStyles(), appPlainStyle) { appPlainStyle = it }
 
         // 0 shows every line of a note and every item of a checklist.
         Text(
             if (appPreviewLines == 0) stringResource(R.string.max_lines_unlimited)
             else pluralStringResource(R.plurals.preview_lines, appPreviewLines, appPreviewLines),
+            Modifier.searchFlash(R.string.preview_length),
         )
         ValueSlider(
             value = appPreviewLines.toFloat(), onValueChange = { appPreviewLines = it.toInt() },
@@ -392,7 +393,7 @@ internal fun ColumnScope.AppChecklistsPage(s: SettingsState) {
         SwitchRow(R.string.checked_to_end, appListCheckedToEnd) { appListCheckedToEnd = it }
         if (appListCheckedToEnd) SwitchRow(R.string.collapse_checked, appListCollapseChecked) { appListCollapseChecked = it }
         // What the lines of a checklist start with when it is turned into a note.
-        Text(stringResource(R.string.convert_prefix_title), style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.convert_prefix_title), Modifier.searchFlash(R.string.convert_prefix_title), style = MaterialTheme.typography.titleMedium)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(
                 PREFIX_NONE to R.string.prefix_none, PREFIX_DASH to R.string.prefix_dash, PREFIX_STAR to R.string.prefix_star,
@@ -404,6 +405,8 @@ internal fun ColumnScope.AppChecklistsPage(s: SettingsState) {
         Hint(R.string.convert_prefix_hint)
         SwitchRow(R.string.renumber_display, appRenumberDisplay) { appRenumberDisplay = it }
         Hint(R.string.renumber_display_hint)
+        SwitchRow(R.string.trim_empty_edges, appTrimEmptyEdges) { appTrimEmptyEdges = it }
+        Hint(R.string.trim_empty_edges_hint)
         MenuRow(stringResource(R.string.checkbox_style), null) { page = Page.AppCheckbox }
     }
 }
@@ -412,11 +415,11 @@ internal fun ColumnScope.AppChecklistsPage(s: SettingsState) {
 @Composable
 internal fun ColumnScope.AppCheckboxPage(s: SettingsState) {
     with(s) {
-        Text("${stringResource(R.string.list_spacing)}: $appListSpacing dp")
+        Text("${stringResource(R.string.list_spacing)}: $appListSpacing dp", Modifier.searchFlash(R.string.list_spacing))
         ValueSlider(value = appListSpacing.toFloat(), onValueChange = { appListSpacing = it.toInt() }, valueRange = 0f..24f)
-        Text(stringResource(R.string.checkbox_style), style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.checkbox_style), Modifier.searchFlash(R.string.checkbox_style), style = MaterialTheme.typography.titleMedium)
         ChoiceGroup(checkboxStyles(), appListCheckboxStyle) { appListCheckboxStyle = it }
-        Text(stringResource(R.string.checkbox_size, appListCheckboxSize))
+        Text(stringResource(R.string.checkbox_size, appListCheckboxSize), Modifier.searchFlash(R.string.checkbox_size))
         ValueSlider(value = appListCheckboxSize.toFloat(), onValueChange = { appListCheckboxSize = it.toInt() }, valueRange = 12f..40f)
         // Live preview of both states with the chosen style, size and spacing.
         listOf(false, true).forEach { checked ->
@@ -433,7 +436,7 @@ internal fun ColumnScope.AppCheckboxPage(s: SettingsState) {
 internal fun ColumnScope.EditorButtonsPage(s: SettingsState) {
     with(s) {
         EditorLayoutEditor(appEditorLayout) { appEditorLayout = it }
-        Text(stringResource(R.string.editor_align_title))
+        Text(stringResource(R.string.editor_align_title), Modifier.searchFlash(R.string.editor_align_title))
         ChoiceGroup(
             listOf(
                 EDITOR_ALIGN_CENTER to stringResource(R.string.editor_align_center),

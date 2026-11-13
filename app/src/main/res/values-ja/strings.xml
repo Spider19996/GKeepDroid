@@ -423,14 +423,13 @@
     <string name="editor_zone_note">メモ（上または下にボタン）</string>
     <string name="editor_zone_bottom_left">下のバー・左</string>
     <string name="editor_zone_bottom_right">下のバー・右</string>
-    <string name="button_legend_free">どこにでも移動できます</string>
-    <string name="button_legend_limited">特定の場所にのみ移動できます。ドラッグ中は移動できる場所が光ります</string>
-    <string name="button_legend_stays">その場所にとどまります。そこでは順番だけ変えられます</string>
-    <string name="button_legend_fixed">移動できません</string>
     <string name="editor_align_title">メモの位置</string>
     <string name="editor_align_center">中央</string>
     <string name="editor_align_top">上</string>
     <string name="editor_align_bottom">下</string>
     <string name="editor_buttons_reset">初期設定に戻す</string>
     <string name="editor_buttons_note">メモ</string>
+    <string name="trim_empty_edges">保存時に先頭と末尾の空行を削除</string>
+    <string name="trim_empty_edges_hint">メモは先頭・末尾の空行、チェックリストは先頭・末尾の空の項目が削除されます。</string>
+    <string name="add_divider">区切りを追加</string>
 </resources>

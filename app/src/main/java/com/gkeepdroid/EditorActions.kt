@@ -11,7 +11,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -60,6 +64,8 @@ val EDITOR_ACTIONS = listOf(
     ButtonSpec("palette", R.drawable.ic_palette, R.string.color_and_background, 3, ZONE_BOTTOM_LEFT),
     ButtonSpec("labels", R.drawable.ic_label, R.string.labels_title, 3, ZONE_BOTTOM_LEFT),
     ButtonSpec("image", R.drawable.ic_image, R.string.image_add_keep, 3, ZONE_BOTTOM_LEFT),
+    // Next to undo: a delete that was not meant can be taken back at once.
+    ButtonSpec("list_delete_checked", R.drawable.ic_delete, R.string.list_delete_checked, 3, ZONE_BOTTOM_RIGHT),
     ButtonSpec("undo", R.drawable.ic_undo, R.string.undo, 3, ZONE_BOTTOM_RIGHT),
     ButtonSpec("redo", R.drawable.ic_redo, R.string.redo, 3, ZONE_BOTTOM_RIGHT),
     ButtonSpec("convert", R.drawable.ic_checklist, R.string.editor_convert, 0, ZONE_MENU),
@@ -67,7 +73,6 @@ val EDITOR_ACTIONS = listOf(
     ButtonSpec("list_check_all", R.drawable.ic_done, R.string.list_check_all, 0, ZONE_MENU),
     ButtonSpec("list_uncheck_all", R.drawable.ic_close, R.string.list_uncheck_all, 0, ZONE_MENU),
     ButtonSpec("list_sort", R.drawable.ic_sort, R.string.list_sort_alpha, 0, ZONE_MENU),
-    ButtonSpec("list_delete_checked", R.drawable.ic_delete, R.string.list_delete_checked, 0, ZONE_MENU),
     ButtonSpec("open_in_keep", R.drawable.ic_open_new, R.string.open_in_keep, 1, ZONE_MENU),
     ButtonSpec("share", R.drawable.ic_share, R.string.share_note, 1, ZONE_MENU),
     ButtonSpec("hide_content", R.drawable.ic_lock, R.string.hide_content, 1, ZONE_MENU),
@@ -76,10 +81,14 @@ val EDITOR_ACTIONS = listOf(
     // A shortcut to the settings of these buttons; the last entry of the menu, apart from the others.
     ButtonSpec("editor_settings", R.drawable.ic_settings, R.string.editor_buttons_title, 5, ZONE_MENU),
     ButtonSpec("note", R.drawable.ic_notes, R.string.editor_buttons_note, 4, ZONE_NOTE),
+    // Under the items of a checklist, as it always was; it can also be a symbol in a bar or an entry of the menu.
+    ButtonSpec("add_item", R.drawable.ic_add, R.string.add_item, 0, ZONE_NOTE),
+    // Beside the add button, under the items.
+    ButtonSpec("add_divider", R.drawable.ic_divider, R.string.add_divider, 0, ZONE_NOTE),
 )
 
 /** The checklist tools; in the menu they share one entry that opens a page of their own. */
-private val LIST_TOOLS = setOf("list_number", "list_check_all", "list_uncheck_all", "list_sort", "list_delete_checked")
+private val LIST_TOOLS = setOf("list_number", "list_check_all", "list_uncheck_all", "list_sort", "list_delete_checked", "add_item", "add_divider")
 
 fun isListTool(id: String) = id in LIST_TOOLS
 
@@ -91,28 +100,14 @@ const val EDITOR_LAYOUT_MARKER = "editorLayout"
 /** What the sheets of the bottom bar hold; set in the note's place, each shows itself there instead of opening a sheet. */
 val NOTE_INLINE = setOf("palette", "labels")
 
-/**
- * What can be set beside the note: the actions of the menu, which show as buttons with a name, the picture button, and the
- * color and label sections, which show themselves. The symbols of the bars that only do something (save, close, pin...) cannot.
- */
-fun canSitInNote(id: String): Boolean =
-    id == NOTE_ID || id == "image" || id in NOTE_INLINE || EDITOR_ACTIONS.firstOrNull { it.id == id }?.defaultZone == ZONE_MENU
-
-/**
- * Where an action of the editor may be moved to: the note only within its own place, the symbols of the bars anywhere but there,
- * "more" not into the menu it opens, the actions of the menu anywhere.
- */
-private fun editorAllowedZones(id: String): Set<Int>? = when {
-    id == NOTE_ID -> setOf(ZONE_NOTE)
-    id == "more" -> setOf(ZONE_TOP_LEFT, ZONE_TOP_RIGHT, ZONE_BOTTOM_LEFT, ZONE_BOTTOM_RIGHT, ZONE_HIDDEN)
-    !canSitInNote(id) -> setOf(ZONE_TOP_LEFT, ZONE_TOP_RIGHT, ZONE_BOTTOM_LEFT, ZONE_BOTTOM_RIGHT, ZONE_MENU, ZONE_HIDDEN)
-    else -> null
-}
+/** Where an action of the editor may be moved to: the note only within its own place, every other action anywhere (the note's place included, as a button with a name). */
+private fun editorAllowedZones(id: String): Set<Int>? = if (id == NOTE_ID) setOf(ZONE_NOTE) else null
 
 /** The editor's buttons and its rules; the layout of them is a [ButtonLayout] of this catalog. */
 val EDITOR_CATALOG = ButtonCatalog(
     EDITOR_ACTIONS, hiddenZone = ZONE_HIDDEN, validZone = { it in ZONE_TOP_LEFT..ZONE_NOTE }, allowedFor = ::editorAllowedZones,
     optionRange = EDITOR_ALIGN_CENTER..EDITOR_ALIGN_BOTTOM,
+    defaultAnchors = mapOf("list_delete_checked" to "undo"),
 )
 
 /** What an action does and looks like in this moment of the editor (the screen builds one for each action). */
@@ -242,19 +237,69 @@ internal fun NoteActionButtons(
         runs.forEach { run ->
             val block = inline[run.first().id]
             if (block != null) block(run.first().id == highlightId)
-            else FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                run.forEach { spec ->
-                    val state = states.getValue(spec.id)
-                    TextButton(
-                        onClick = state.onClick, enabled = state.enabled, shapes = ButtonDefaults.shapes(),
-                        modifier = if (spec.id == highlightId) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp)) else Modifier,
-                    ) {
-                        Icon(painterResource(state.icon), contentDescription = null, Modifier.size(18.dp))
-                        Spacer(Modifier.size(8.dp))
-                        Text(state.label)
+            else BoxWithConstraints(Modifier.fillMaxWidth()) {
+                // Buttons of a row share its width equally (long names wrap), so two of them sit side by side on a phone;
+                // a row takes as many as leave each at least 150 dp.
+                val perRow = (maxWidth / 150.dp).toInt().coerceAtLeast(1)
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    run.chunked(perRow).forEach { rowSpecs ->
+                        // A row that is not full keeps the width of the full ones, so the columns line up.
+                        Row(Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            rowSpecs.forEach { spec ->
+                                val state = states.getValue(spec.id)
+                                val content: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit = {
+                                    Icon(painterResource(state.icon), contentDescription = null, Modifier.size(18.dp))
+                                    Spacer(Modifier.size(8.dp))
+                                    // A name of two words always breaks between them, so the buttons of a row look alike.
+                                    Text(state.label.split(" ").let { if (it.size == 2) it.joinToString("\n") else state.label }, maxLines = 2, textAlign = androidx.compose.ui.text.style.TextAlign.Start)
+                                }
+                                val tight = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                                val mark = Modifier.fillMaxSize().then(
+                                    if (spec.id == highlightId) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp)) else Modifier,
+                                )
+                                // All buttons of the note's place have the outline the add button always had.
+                                val tint = noteButtonTint(spec.id)
+                                // The box is what the row divides; a menu of the action (the one of "more") hangs on it.
+                                Box(Modifier.weight(1f).fillMaxHeight()) {
+                                    androidx.compose.material3.OutlinedButton(
+                                        onClick = state.onClick, enabled = state.enabled, shapes = ButtonDefaults.shapes(), modifier = mark, contentPadding = tight,
+                                        colors = if (tint != null) ButtonDefaults.outlinedButtonColors(contentColor = tint) else ButtonDefaults.outlinedButtonColors(),
+                                        content = content,
+                                    )
+                                    state.popup?.invoke()
+                                }
+                            }
+                            repeat(perRow - rowSpecs.size) { Spacer(Modifier.weight(1f)) }
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+/**
+ * The color of a button in the note's place, by what it does, so the buttons differ at a glance: adding and ticking green, deleting
+ * red, changing the form or the order blue, undoing and archiving amber, going elsewhere (Keep, sharing) teal, hiding purple.
+ * The settings shortcut keeps the normal color.
+ */
+@Composable
+private fun noteButtonTint(id: String): Color? {
+    // Lighter tones on a dark screen, darker ones on a light one, so the text stays readable on both.
+    val dark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+    fun tone(onDark: Long, onLight: Long) = Color(if (dark) onDark else onLight)
+    return when (id) {
+        "add_item", "add_divider", "list_check_all" -> tone(0xFF81C784, 0xFF2E7D32)
+        "more" -> null
+        "list_delete_checked", "delete" -> tone(0xFFEF9A9A, 0xFFC62828)
+        "convert", "list_number", "list_sort" -> tone(0xFF90CAF9, 0xFF1565C0)
+        "list_uncheck_all", "archive" -> tone(0xFFFFCC80, 0xFFE65100)
+        "open_in_keep", "share" -> tone(0xFF80CBC4, 0xFF00695C)
+        "hide_content" -> tone(0xFFCE93D8, 0xFF6A1B9A)
+        "save" -> tone(0xFF81C784, 0xFF2E7D32)
+        "close" -> tone(0xFFEF9A9A, 0xFFC62828)
+        "undo", "redo" -> tone(0xFF90CAF9, 0xFF1565C0)
+        "reminder", "pin", "pin_bottom" -> tone(0xFFFFCC80, 0xFFE65100)
+        else -> null
     }
 }

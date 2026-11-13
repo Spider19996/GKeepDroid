@@ -423,14 +423,13 @@
     <string name="editor_zone_note">메모, 위나 아래에 버튼 배치</string>
     <string name="editor_zone_bottom_left">하단 바, 왼쪽</string>
     <string name="editor_zone_bottom_right">하단 바, 오른쪽</string>
-    <string name="button_legend_free">어디로든 이동할 수 있음</string>
-    <string name="button_legend_limited">특정 위치로만 이동할 수 있음. 끄는 동안 이동 가능한 위치가 밝아짐</string>
-    <string name="button_legend_stays">제자리에 있으며 그 안에서 순서만 바꿀 수 있음</string>
-    <string name="button_legend_fixed">이동할 수 없음</string>
     <string name="editor_align_title">메모 위치</string>
     <string name="editor_align_center">가운데</string>
     <string name="editor_align_top">위</string>
     <string name="editor_align_bottom">아래</string>
     <string name="editor_buttons_reset">기본값으로 재설정</string>
     <string name="editor_buttons_note">메모</string>
+    <string name="trim_empty_edges">저장할 때 처음과 마지막 빈 줄 삭제</string>
+    <string name="trim_empty_edges_hint">메모는 처음·마지막 빈 줄, 체크리스트는 처음·마지막 빈 항목이 삭제됩니다.</string>
+    <string name="add_divider">구분선 추가</string>
 </resources>

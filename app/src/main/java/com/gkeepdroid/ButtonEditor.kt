@@ -264,7 +264,6 @@ fun ButtonEditor(
                 ScaledPreview { preview(ButtonPreviewState(withDrop(), dragId ?: selectedId)) }
             }
             scope.content()
-            Legend(items)
         }
         // The button under the finger is drawn on top of every place, with its name.
         dragged?.let { button ->
@@ -354,7 +353,7 @@ fun LayoutFileButtons(
  * the light and the dark theme.
  */
 private val LIMITED_COLOR = Color(0xFFF29900)
-private val STAYS_COLOR = Color(0xFF9C5BD8)
+private val STAYS_COLOR = Color(0xFFE5484D)
 private val FIXED_COLOR = Color(0xFFE5484D)
 
 @Composable
@@ -374,29 +373,6 @@ private fun chipEdge(kind: ButtonKind) = when (kind) {
     ButtonKind.LIMITED -> LIMITED_COLOR
     ButtonKind.STAYS -> STAYS_COLOR
     ButtonKind.FIXED -> FIXED_COLOR
-}
-
-/**
- * Explains the colors: one line per kind that exists in this layout, plain buttons included, so the colors are not a riddle.
- * Nothing when all buttons may go anywhere, as then there is nothing to tell apart.
- */
-@Composable
-private fun Legend(items: List<ButtonItem>) {
-    val present = items.map { it.kind }.toSet()
-    if (present.all { it == ButtonKind.FREE }) return
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        listOf(
-            ButtonKind.FREE to R.string.button_legend_free,
-            ButtonKind.LIMITED to R.string.button_legend_limited,
-            ButtonKind.STAYS to R.string.button_legend_stays,
-            ButtonKind.FIXED to R.string.button_legend_fixed,
-        ).filter { it.first in present }.forEach { (kind, label) ->
-            Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Box(Modifier.padding(top = 2.dp).size(16.dp).border(BorderStroke(if (kind == ButtonKind.FREE) 1.dp else 2.dp, chipEdge(kind)), MaterialTheme.shapes.small).background(chipFill(kind), MaterialTheme.shapes.small))
-                Text(stringResource(label), style = MaterialTheme.typography.bodySmall)
-            }
-        }
-    }
 }
 
 private val PREVIEW_WIDTH = 360.dp

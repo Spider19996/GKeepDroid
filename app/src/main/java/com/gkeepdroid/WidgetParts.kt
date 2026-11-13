@@ -142,7 +142,9 @@ internal fun PrivateHint(settings: WidgetSettings, palette: TextPalette) {
 
 /** "3/7": ticked items of a checklist out of all of them, or null if there is nothing to show. */
 internal fun progressText(note: KeepNote): String? =
-    if (note.isList && note.items.isNotEmpty()) "${note.items.count { it.checked }}/${note.items.size}" else null
+    note.items.filter { !it.isDivider() }.let { real ->
+        if (note.isList && real.isNotEmpty()) "${real.count { it.checked }}/${real.size}" else null
+    }
 
 /** The checklist progress in a note's title line. */
 @Composable
@@ -261,6 +263,13 @@ private fun checkboxRes(style: Int, checked: Boolean): Int? = when (style) {
 internal fun ItemRow(note: KeepNote, item: KeepItem, account: String, settings: WidgetSettings, palette: TextPalette) {
     val context = androidx.glance.LocalContext.current
     val pad = settings.listSpacingDp.dp
+    if (item.isDivider()) {
+        // A line instead of a check box and text; a tap on it does nothing.
+        Box(GlanceModifier.fillMaxWidth().padding(vertical = pad + 4.dp)) {
+            Box(GlanceModifier.fillMaxWidth().height(1.dp).background(palette.provider(0.4f))) {}
+        }
+        return
+    }
     val itemColor = palette.provider(if (item.checked) 0.55f else 1f)
     val tick = if (settings.checkable && item.id.isNotEmpty()) {
         val parameters = actionParametersOf(

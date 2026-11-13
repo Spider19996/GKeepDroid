@@ -93,7 +93,8 @@ internal fun ChecklistRow(
                     orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
                     enabled = editable,
                     state = androidx.compose.foundation.gestures.rememberDraggableState { delta ->
-                        offsetX = (offsetX + delta).coerceIn(-maxPx, maxPx)
+                        // A divider cannot be ticked: it only moves to the left, to be removed.
+                        offsetX = (offsetX + delta).coerceIn(-maxPx, if (item.isDivider()) 0f else maxPx)
                     },
                     onDragStopped = {
                         val passed = kotlin.math.abs(offsetX) >= trigger
@@ -108,7 +109,9 @@ internal fun ChecklistRow(
             // Handle and checkbox sit in the left corners, one above the other and small. Every gap to an edge is 8 dp:
             // the handle to the top and left, the checkbox to the left and bottom, and the text to the checkbox.
             val mark = if (item.checked) green else red
-            OutlinedTextField(
+            if (item.isDivider()) Box(Modifier.fillMaxWidth().height(56.dp).padding(start = 56.dp, end = 16.dp), contentAlignment = Alignment.Center) {
+                androidx.compose.material3.HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.outline)
+            } else OutlinedTextField(
                 value = shownField, readOnly = !editable,
                 onValueChange = { typed ->
                     field = typed
@@ -170,11 +173,13 @@ internal fun ChecklistRow(
             ) {
                 Column(
                     Modifier
-                        .padding(start = 11.dp).size(width = 26.dp, height = 40.dp)
+                        .padding(start = 11.dp).size(width = 26.dp, height = if (item.isDivider()) 22.dp else 40.dp)
                         .border(1.5.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.extraSmall)
                         // The border is drawn inside the size, so the halves are measured inside it.
                         .padding(1.5.dp),
                 ) {
+                    // A divider has no check, only the grip to move it.
+                    if (!item.isDivider()) {
                     Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                         Icon(
                             painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close),
@@ -183,6 +188,7 @@ internal fun ChecklistRow(
                     }
                     // The line between the check and the grip.
                     Box(Modifier.fillMaxWidth().height(1.5.dp).background(MaterialTheme.colorScheme.outline))
+                    }
                     Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             repeat(3) { Box(Modifier.size(width = 12.dp, height = 1.5.dp).background(MaterialTheme.colorScheme.onSurfaceVariant)) }

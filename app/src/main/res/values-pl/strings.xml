@@ -450,14 +450,13 @@
     <string name="editor_zone_note">Notatka, z przyciskami nad nią lub pod nią</string>
     <string name="editor_zone_bottom_left">Dolny pasek, lewa strona</string>
     <string name="editor_zone_bottom_right">Dolny pasek, prawa strona</string>
-    <string name="button_legend_free">Można przenieść dokądkolwiek</string>
-    <string name="button_legend_limited">Można przenieść tylko w określone miejsca; dozwolone miejsca podświetlają się podczas przeciągania</string>
-    <string name="button_legend_stays">Zostaje na swoim miejscu; tam można tylko zmienić kolejność</string>
-    <string name="button_legend_fixed">Nie można przenieść</string>
     <string name="editor_align_title">Położenie notatki</string>
     <string name="editor_align_center">Środek</string>
     <string name="editor_align_top">Góra</string>
     <string name="editor_align_bottom">Dół</string>
     <string name="editor_buttons_reset">Przywróć domyślne</string>
     <string name="editor_buttons_note">Notatka</string>
+    <string name="trim_empty_edges">Usuń pustą pierwszą i ostatnią linię przy zapisie</string>
+    <string name="trim_empty_edges_hint">Notatki tracą pustą pierwszą lub ostatnią linię, listy pusty pierwszy lub ostatni element.</string>
+    <string name="add_divider">Dodaj separator</string>
 </resources>

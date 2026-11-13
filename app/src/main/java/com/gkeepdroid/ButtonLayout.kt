@@ -23,6 +23,11 @@ class ButtonCatalog(
     private val validZone: (Int) -> Boolean,
     private val allowedFor: (String) -> Set<Int>? = { null },
     val optionRange: IntRange = 0..0,
+    /**
+     * Buttons whose default place was moved in front of another one ("button" to "stands before this one") after layouts were
+     * saved: a saved layout takes them there too, as long as the person has not moved the button.
+     */
+    val defaultAnchors: Map<String, String> = emptyMap(),
 ) {
     val byId = specs.associateBy { it.id }
     fun allowed(id: String): Set<Int>? = allowedFor(id)
@@ -94,8 +99,14 @@ data class ButtonLayout(
         }
 
         private fun parse(catalog: ButtonCatalog, o: JSONObject): ButtonLayout {
-            val order = o.getJSONArray("order").let { a -> (0 until a.length()).map { a.getString(it) } }
+            var order = o.getJSONArray("order").let { a -> (0 until a.length()).map { a.getString(it) } }
             val z = o.getJSONObject("zones")
+            catalog.defaultAnchors.forEach { (id, anchor) ->
+                if (!z.has(id) && id in order && anchor in order) {
+                    val rest = order.filter { it != id }
+                    order = rest.take(rest.indexOf(anchor)) + id + rest.drop(rest.indexOf(anchor))
+                }
+            }
             return ButtonLayout(
                 catalog, z.keys().asSequence().associateWith { z.getInt(it) }, order,
                 o.optInt("option", catalog.optionRange.first).coerceIn(catalog.optionRange),

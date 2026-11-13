@@ -432,14 +432,13 @@
     <string name="editor_zone_note">नोट, ऊपर या नीचे बटनों के साथ</string>
     <string name="editor_zone_bottom_left">निचला बार, बायाँ</string>
     <string name="editor_zone_bottom_right">निचला बार, दायाँ</string>
-    <string name="button_legend_free">कहीं भी ले जाया जा सकता है</string>
-    <string name="button_legend_limited">केवल कुछ जगहों पर ले जाया जा सकता है; खींचते समय अनुमत जगहें चमकती हैं</string>
-    <string name="button_legend_stays">अपनी जगह पर रहता है; वहीं केवल क्रम बदला जा सकता है</string>
-    <string name="button_legend_fixed">हिलाया नहीं जा सकता</string>
     <string name="editor_align_title">नोट की स्थिति</string>
     <string name="editor_align_center">बीच में</string>
     <string name="editor_align_top">ऊपर</string>
     <string name="editor_align_bottom">नीचे</string>
     <string name="editor_buttons_reset">डिफ़ॉल्ट पर रीसेट करें</string>
     <string name="editor_buttons_note">नोट</string>
+    <string name="trim_empty_edges">सहेजते समय खाली पहली और आख़िरी पंक्ति हटाएँ</string>
+    <string name="trim_empty_edges_hint">नोट की खाली पहली या आख़िरी पंक्ति और चेकलिस्ट का खाली पहला या आख़िरी आइटम हट जाता है।</string>
+    <string name="add_divider">विभाजक जोड़ें</string>
 </resources>

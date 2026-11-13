@@ -143,7 +143,7 @@ internal object ListNumbering {
 
     /** Every filled item starts with a number. */
     fun isNumbered(items: List<KeepItem>): Boolean {
-        val filled = items.filter { it.text.isNotBlank() }
+        val filled = items.filter { it.text.isNotBlank() && !it.isDivider() }
         return filled.isNotEmpty() && filled.all { marker.containsMatchIn(it.text) }
     }
 
@@ -152,7 +152,7 @@ internal object ListNumbering {
     /** Puts "1. ", "2. " ... in front of the filled items, counting from [startAt]. */
     fun apply(items: List<KeepItem>, startAt: Int = 1): List<KeepItem> {
         var n = startAt - 1
-        return items.map { if (it.text.isBlank()) it else { n++; it.copy(text = "$n. ${it.text}") } }
+        return items.map { if (it.text.isBlank() || it.isDivider()) it else { n++; it.copy(text = "$n. ${it.text}") } }
     }
 
     /** For cards and widgets: with the setting on, a numbered list counts again in the order it is shown. */
