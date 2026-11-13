@@ -302,6 +302,8 @@ internal fun RemindersDialog(
     onChange: () -> Unit, onDismiss: () -> Unit, askNotifications: () -> Unit,
     /** For a note that does not exist yet: where the reminders are kept instead of being set at once. */
     onPut: ((Reminder) -> Unit)? = null, onRemove: ((String) -> Unit)? = null,
+    /** Shows the list as a sheet instead of a dialog: gets what to do on dismissing and the content. */
+    host: (@Composable (onDismiss: () -> Unit, content: @Composable ColumnScope.(close: () -> Unit) -> Unit) -> Unit)? = null,
 ) {
     var editing by remember { mutableStateOf<Reminder?>(null) }
     var exactHint by remember { mutableStateOf(false) }
@@ -325,7 +327,8 @@ internal fun RemindersDialog(
                 TextButton(onClick = { exactHint = false; newReminder() }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.reminder_not_now)) }
             },
         )
-        return
+        // A dialog replaces the list; over a sheet it simply lies on top of it.
+        if (host == null) return
     }
     editing?.let { reminder ->
         ReminderEditor(
@@ -336,8 +339,9 @@ internal fun RemindersDialog(
                 onChange()
             },
             onCancel = { editing = null },
+            host = host,
         )
-        return
+        if (host == null) return
     }
     val notificationsOn = rememberNotificationsOn(activity)
     /** Reminders only make sense with notifications: say so, and offer the permission where Android still allows asking. */
@@ -345,71 +349,82 @@ internal fun RemindersDialog(
         Toast.makeText(activity, R.string.reminder_needs_notifications, Toast.LENGTH_LONG).show()
         askNotifications()
     }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.reminders_title)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                if (!notificationsOn) {
-                    Column(
-                        Modifier.fillMaxWidth().padding(bottom = 12.dp).background(MaterialTheme.colorScheme.error, MaterialTheme.shapes.small).padding(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                    ) {
-                        Text(stringResource(R.string.reminder_notifications_off), color = MaterialTheme.colorScheme.onError, fontWeight = FontWeight.Bold)
-                        Text(
-                            stringResource(R.string.reminder_open_settings),
-                            color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold,
-                            modifier = Modifier.clickable { activity.startActivity(Reminders.notificationSettings(activity)) },
-                        )
-                    }
+    val list: @Composable () -> Unit = {
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            if (!notificationsOn) {
+                Column(
+                    Modifier.fillMaxWidth().padding(bottom = 12.dp).background(MaterialTheme.colorScheme.error, MaterialTheme.shapes.small).padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    Text(stringResource(R.string.reminder_notifications_off), color = MaterialTheme.colorScheme.onError, fontWeight = FontWeight.Bold)
+                    Text(
+                        stringResource(R.string.reminder_open_settings),
+                        color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold,
+                        modifier = Modifier.clickable { activity.startActivity(Reminders.notificationSettings(activity)) },
+                    )
                 }
-                if (reminders.isEmpty()) Text(stringResource(R.string.reminders_none))
-                reminders.forEach { reminder ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            Reminders.label(activity, reminder.at),
-                            modifier = Modifier.weight(1f).clickable { if (notificationsOn) editing = reminder else needNotifications() }.padding(vertical = 12.dp),
-                        )
-                        IconButton(onClick = {
-                            if (onRemove != null) onRemove(reminder.id) else Reminders.remove(activity, account, noteId, reminder.id)
-                            onChange()
-                        }, shapes = IconButtonDefaults.shapes()) {
-                            Icon(painterResource(R.drawable.ic_delete), contentDescription = stringResource(R.string.reminder_remove))
-                        }
+            }
+            if (reminders.isEmpty()) Text(stringResource(R.string.reminders_none))
+            reminders.forEach { reminder ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        Reminders.label(activity, reminder.at),
+                        modifier = Modifier.weight(1f).clickable { if (notificationsOn) editing = reminder else needNotifications() }.padding(vertical = 12.dp),
+                    )
+                    IconButton(onClick = {
+                        if (onRemove != null) onRemove(reminder.id) else Reminders.remove(activity, account, noteId, reminder.id)
+                        onChange()
+                    }, shapes = IconButtonDefaults.shapes()) {
+                        Icon(painterResource(R.drawable.ic_delete), contentDescription = stringResource(R.string.reminder_remove))
                     }
                 }
             }
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                if (!notificationsOn) {
-                    needNotifications()
-                    return@TextButton
-                }
-                val prefs = activity.getSharedPreferences("reminder_hints", android.content.Context.MODE_PRIVATE)
-                if (!Reminders.canScheduleExact(activity) && !prefs.getBoolean("exact_asked", false)) {
-                    prefs.edit { putBoolean("exact_asked", true) }
-                    exactHint = true
-                } else {
-                    newReminder()
-                }
-            }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.reminder_add)) }
-        },
+        }
+    }
+    val add: () -> Unit = {
+        if (!notificationsOn) {
+            needNotifications()
+        } else {
+            val prefs = activity.getSharedPreferences("reminder_hints", android.content.Context.MODE_PRIVATE)
+            if (!Reminders.canScheduleExact(activity) && !prefs.getBoolean("exact_asked", false)) {
+                prefs.edit { putBoolean("exact_asked", true) }
+                exactHint = true
+            } else {
+                newReminder()
+            }
+        }
+    }
+    if (host != null) {
+        host(onDismiss) { close ->
+            Text(stringResource(R.string.reminders_title), style = MaterialTheme.typography.titleLarge)
+            list()
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                TextButton(onClick = close, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.ok)) }
+                TextButton(onClick = add, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.reminder_add)) }
+            }
+        }
+        return
+    }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.reminders_title)) },
+        text = { list() },
+        confirmButton = { TextButton(onClick = add, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.reminder_add)) } },
         dismissButton = { TextButton(onClick = onDismiss, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.ok)) } },
     )
 }
 
 /** One reminder: its time, and sound, vibration and silent mode where they differ from the defaults. */
 @Composable
-private fun ReminderEditor(activity: Activity, initial: Reminder, onSave: (Reminder) -> Unit, onCancel: () -> Unit) {
+private fun ReminderEditor(
+    activity: Activity, initial: Reminder, onSave: (Reminder) -> Unit, onCancel: () -> Unit,
+    host: (@Composable (onDismiss: () -> Unit, content: @Composable ColumnScope.(close: () -> Unit) -> Unit) -> Unit)? = null,
+) {
     var reminder by remember { mutableStateOf(initial) }
     val global = SettingsStore.loadGlobal(activity)
     val pickSound = rememberSoundPicker(reminder.sound ?: global.reminderSound) { reminder = reminder.copy(sound = it) }
-    AlertDialog(
-        onDismissRequest = onCancel,
-        title = { Text(stringResource(R.string.reminder)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.verticalScroll(rememberScrollState())) {
+    val fields: @Composable () -> Unit = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = if (host == null) Modifier.verticalScroll(rememberScrollState()) else Modifier) {
                 // Quick times from the settings; the button below picks any other date and time.
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     ReminderPresets.parse(global.reminderPresets).forEach { preset ->
@@ -456,7 +471,22 @@ private fun ReminderEditor(activity: Activity, initial: Reminder, onSave: (Remin
                     }
                 }
             }
-        },
+    }
+    if (host != null) {
+        host(onCancel) { close ->
+            Text(stringResource(R.string.reminder), style = MaterialTheme.typography.titleLarge)
+            fields()
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                TextButton(onClick = close, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) }
+                TextButton(onClick = { onSave(reminder) }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.ok)) }
+            }
+        }
+        return
+    }
+    AlertDialog(
+        onDismissRequest = onCancel,
+        title = { Text(stringResource(R.string.reminder)) },
+        text = { fields() },
         confirmButton = { TextButton(onClick = { onSave(reminder) }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.ok)) } },
         dismissButton = { TextButton(onClick = onCancel, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) } },
     )

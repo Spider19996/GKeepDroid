@@ -1154,6 +1154,7 @@ class EditNoteActivity : ComponentActivity() {
             if (remindersOpen) {
                 RemindersDialog(
                     activity = this@EditNoteActivity, account = account, noteId = existing?.id.orEmpty(), reminders = shownReminders,
+                    host = { dismiss, content -> EditorSheet(dismiss, content) },
                     onChange = { if (existing != null) reminders = Reminders.list(this@EditNoteActivity, account, existing.id) },
                     onPut = if (existing == null) { r -> draftReminders = draftReminders.filter { it.id != r.id } + r } else null,
                     onRemove = if (existing == null) { id -> draftReminders = draftReminders.filter { it.id != id } } else null,
@@ -1181,12 +1182,8 @@ class EditNoteActivity : ComponentActivity() {
         // The bottom bar sits above the keyboard, where the thumb is while typing, and stays when the note scrolls.
         EditorBar(editorLayout.inZone(ZONE_BOTTOM_LEFT), editorLayout.inZone(ZONE_BOTTOM_RIGHT), states)
         }
-        if (paletteOpen) ModalBottomSheet(onDismissRequest = { paletteOpen = false }) {
-            Column(
-                Modifier.verticalScroll(rememberScrollState()).padding(horizontal = EDITOR_PADDING).padding(bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                AppearanceSection(
+        if (paletteOpen) EditorSheet({ paletteOpen = false }) {
+            AppearanceSection(
                 color = color, onColor = { color = it },
                 background = background, onBackground = { background = it; pickedBackground = null },
                 darkVersion = darkVersion, onDarkVersion = { variantDark = it },
@@ -1195,15 +1192,9 @@ class EditNoteActivity : ComponentActivity() {
                 picture = picture,
                 onPickPhoto = { if (hintPrefs.getBoolean("own_photo_local_dismissed", false)) pickBackground.launch("image/*") else localHint = true },
             )
-            }
         }
-        if (labelsOpen) ModalBottomSheet(onDismissRequest = { labelsOpen = false }) {
-            Column(
-                Modifier.verticalScroll(rememberScrollState()).padding(horizontal = EDITOR_PADDING).padding(bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                LabelsSection(account = targetAccount, labels = labels, onLabels = { labels = it }, canEdit = canEdit)
-            }
+        if (labelsOpen) EditorSheet({ labelsOpen = false }) {
+            LabelsSection(account = targetAccount, labels = labels, onLabels = { labels = it }, canEdit = canEdit)
         }
         if (confirmDiscard) AlertDialog(
             onDismissRequest = { confirmDiscard = false },
