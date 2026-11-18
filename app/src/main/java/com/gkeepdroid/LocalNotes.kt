@@ -28,9 +28,22 @@ object LocalNotes {
     fun run(context: Context, email: String, function: String, args: List<Any>): String {
         val notes = load(context)
         when (function) {
-            "create_note" -> create(notes, args)
+            "create_note" -> {
+                val id = create(notes, args)
+                (args.getOrNull(8) as? String)?.takeIf { it.isNotEmpty() }?.let { saveFormat(context, email, notes, id, it) }
+            }
             "update_note" -> update(notes, args)
-            "add_list_item" -> addItem(notes, args[0] as String, args[1] as String)
+            "add_list_item" -> {
+                val text = (args[1] as String).trim()
+                val id = addItem(notes, args[0] as String, text)
+                // An item made in a category: its name in bold, as in Keep.
+                val bold = (args.getOrNull(2) as? String)?.toIntOrNull() ?: 0
+                if (id != null && bold > 0) {
+                    val doc = JSONObject().put("t", text).put("r", JSONArray().put(JSONArray(listOf(0, minOf(bold, text.length), RichNotes.BOLD))))
+                    saveFormat(context, email, notes, args[0] as String, JSONObject().put(id, doc).toString())
+                }
+            }
+            "format_note" -> saveFormat(context, email, notes, args[0] as String, args[1] as String)
             "set_items_checked" -> applyTicks(notes, JSONArray(args[0] as String))
             "create_label" -> saveLabels(context, email, NotesCache.labelsOnly(context, email) + (args[0] as String).trim())
             "delete_label" -> {
@@ -45,6 +58,29 @@ object LocalNotes {
         val json = notes.toString()
         file(context).writeText(json)
         return json
+    }
+
+    /**
+     * Keeps the formatting of a local note where the app reads Keep's formatting from (the same file and format), so local notes
+     * show bold words, headings and categories like the others. [json] is what the editor sends to Keep: per item id (or "#n" for
+     * the n-th item, "text" for the body) the text and its styled stretches.
+     */
+    private fun saveFormat(context: Context, email: String, notes: JSONArray, noteId: String, json: String) {
+        val note = find(notes, noteId) ?: return
+        val items = note.optJSONArray("items") ?: JSONArray()
+        val file = NotesCache.richFile(context, email)
+        val all = runCatching { JSONObject(file.readText()) }.getOrNull() ?: JSONObject()
+        val byNote = all.optJSONObject("n") ?: JSONObject().also { all.put("n", it) }
+        val entry = byNote.optJSONObject(noteId) ?: JSONObject().put("bg", "").put("d", JSONObject()).also { byNote.put(noteId, it) }
+        val docs = entry.optJSONObject("d") ?: JSONObject().also { entry.put("d", it) }
+        val wanted = JSONObject(json)
+        wanted.keys().forEach { key ->
+            val target = if (key.startsWith("#")) key.drop(1).toIntOrNull()?.takeIf { it < items.length() }?.let { items.getJSONObject(it).getString("id") } else key
+            if (target == null) return@forEach
+            val doc = wanted.getJSONObject(key)
+            if (doc.optJSONArray("r")?.length() ?: 0 == 0) docs.remove(target) else docs.put(target, doc)
+        }
+        file.writeText(all.toString())
     }
 
     private fun saveLabels(context: Context, email: String, names: List<String>) {
@@ -105,7 +141,7 @@ object LocalNotes {
         return result
     }
 
-    private fun create(notes: JSONArray, args: List<Any>) {
+    private fun create(notes: JSONArray, args: List<Any>): String {
         val title = args[0]
         val text = args[1]
         val isList = args[2]
@@ -115,9 +151,10 @@ object LocalNotes {
         val now = System.currentTimeMillis()
         // A new note goes to the top, like in Keep: a higher sort value is further up.
         val top = (0 until notes.length()).maxOfOrNull { notes.getJSONObject(it).optLong("sort") } ?: 0L
+        val id = UUID.randomUUID().toString()
         notes.put(
             JSONObject()
-                .put("id", UUID.randomUUID().toString())
+                .put("id", id)
                 .put("serverId", "")
                 .put("title", title as String)
                 .put("text", if (isList as Boolean) "" else text as String)
@@ -131,6 +168,7 @@ object LocalNotes {
                 .put("updated", now)
                 .put("created", now)
         )
+        return id
     }
 
     private fun update(notes: JSONArray, args: List<Any>) {
@@ -143,12 +181,12 @@ object LocalNotes {
         note.put("updated", System.currentTimeMillis())
     }
 
-    private fun addItem(notes: JSONArray, noteId: String, text: String) {
-        val note = find(notes, noteId) ?: return
-        note.getJSONArray("items").put(
-            JSONObject().put("id", UUID.randomUUID().toString()).put("text", text.trim()).put("checked", false)
-        )
+    private fun addItem(notes: JSONArray, noteId: String, text: String): String? {
+        val note = find(notes, noteId) ?: return null
+        val id = UUID.randomUUID().toString()
+        note.getJSONArray("items").put(JSONObject().put("id", id).put("text", text.trim()).put("checked", false))
         note.put("updated", System.currentTimeMillis())
+        return id
     }
 
     private fun applyTicks(notes: JSONArray, ops: JSONArray) {

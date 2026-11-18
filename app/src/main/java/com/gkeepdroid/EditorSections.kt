@@ -400,9 +400,11 @@ internal fun quietToggleColors(
 
 /** The header of a category in the editor's checklist: its name and number of open items fold it, the "+" adds an item to it. */
 @Composable
-internal fun EditorCategoryHeader(name: String, open: Int, folded: Boolean, canEdit: Boolean, onToggle: () -> Unit, onAdd: () -> Unit) {
+internal fun EditorCategoryHeader(
+    name: String, open: Int, folded: Boolean, canEdit: Boolean, onToggle: () -> Unit, onAdd: () -> Unit, modifier: Modifier = Modifier,
+) {
     androidx.compose.foundation.layout.Row(
-        Modifier.fillMaxWidth().padding(top = 8.dp),
+        modifier.fillMaxWidth().padding(top = 8.dp),
         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
     ) {
         androidx.compose.foundation.layout.Row(

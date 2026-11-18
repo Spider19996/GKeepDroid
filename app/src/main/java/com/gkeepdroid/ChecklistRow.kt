@@ -11,6 +11,16 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.zIndex
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onPlaced
+import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.round
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.spring
+import androidx.compose.ui.composed
 import kotlinx.coroutines.launch
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -82,7 +92,30 @@ internal fun ChecklistRow(
     val scope = androidx.compose.runtime.rememberCoroutineScope()
     val green = MaterialTheme.colorScheme.tertiary
     val red = MaterialTheme.colorScheme.error
-    Box(Modifier.fillMaxWidth().onGloballyPositioned { onBounds(it.boundsInRoot()) }.alpha(if (dragged) 0.5f else 1f)) {
+    // While the row is held it follows the finger: where the finger is now, less where it took hold of the row, less where the
+    // row's place in the list is (that place moves as the row passes others). The other rows glide to their new places.
+    var rowTop by remember { mutableStateOf(0f) }
+    var fingerY by remember { mutableStateOf<Float?>(null) }
+    var grab by remember { mutableStateOf(0f) }
+    if (!dragged && fingerY != null) fingerY = null
+    // Let go, the row glides from under the finger into its place.
+    val settle = remember { Animatable(0f) }
+    val settleScope = androidx.compose.runtime.rememberCoroutineScope()
+    fun release() {
+        val y = fingerY
+        fingerY = null
+        if (y != null) settleScope.launch { settle.snapTo(y - grab - rowTop); settle.animateTo(0f, spring(dampingRatio = 0.8f, stiffness = 500f)) }
+    }
+    Box(
+        Modifier.fillMaxWidth()
+            .onGloballyPositioned { val bounds = it.boundsInRoot(); rowTop = bounds.top; onBounds(bounds) }
+            .then(if (dragged || settle.isRunning) Modifier.zIndex(1f) else Modifier.animatePlacement())
+            .graphicsLayer {
+                val y = fingerY
+                translationY = if (dragged && y != null) y - grab - rowTop else settle.value
+                if (dragged) { shadowElevation = 12f; scaleX = 1.02f; scaleY = 1.02f }
+            },
+    ) {
         if (offsetX != 0f) {
             val toRight = offsetX > 0f
             Box(
@@ -183,16 +216,17 @@ internal fun ChecklistRow(
                     .pointerInput(item.id, editable) {
                         if (!editable) return@pointerInput
                         detectDragGesturesAfterLongPress(
-                            onDragStart = {
+                            onDragStart = { start ->
                                 haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                                handle?.localToRoot(start)?.y?.let { fingerY = it; grab = it - rowTop }
                                 onDragStart()
                             },
                             onDrag = { change, _ ->
                                 change.consume()
-                                handle?.localToRoot(change.position)?.y?.let(onDragTo)
+                                handle?.localToRoot(change.position)?.y?.let { fingerY = it; onDragTo(it) }
                             },
-                            onDragEnd = { onDragEnd() },
-                            onDragCancel = { onDragEnd() },
+                            onDragEnd = { release(); onDragEnd() },
+                            onDragCancel = { release(); onDragEnd() },
                         )
                     }
                     .semantics { contentDescription = dragDescription },
@@ -225,4 +259,21 @@ internal fun ChecklistRow(
             }
         }
     }
+}
+
+/**
+ * Lets a row glide to its new place when the rows around it change (one is moved, added or removed) instead of jumping there.
+ * The first place is taken as it is.
+ */
+internal fun Modifier.animatePlacement(): Modifier = composed {
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    var target by remember { mutableStateOf<IntOffset?>(null) }
+    val animatable = remember { mutableStateOf<Animatable<IntOffset, androidx.compose.animation.core.AnimationVector2D>?>(null) }
+    this.onPlaced { target = it.positionInParent().round() }
+        .offset {
+            val to = target ?: return@offset IntOffset.Zero
+            val anim = animatable.value ?: Animatable(to, IntOffset.VectorConverter).also { animatable.value = it }
+            if (anim.targetValue != to) scope.launch { anim.animateTo(to, spring(dampingRatio = 0.85f, stiffness = 600f)) }
+            anim.value - to
+        }
 }

@@ -405,11 +405,30 @@ class EditNoteActivity : ComponentActivity() {
         val isLocal = CredentialStore.isLocal(account)
 
         // Text formatting (bold, italic, underline, strikethrough) of existing notes of a Keep account.
-        val canFormat = existing != null && !isLocal
+        // Formatting works for every note: a new one sends it along when it is made, a local one keeps it on the phone.
+        val canFormat = true
         val format = remember { FormatState(canFormat, existing?.let { RichNotes.of(this@EditNoteActivity, account, it.id) }) }
+        // Folded categories are remembered per note; a note that is being made has no id yet.
+        val noteKey = existing?.id ?: "new"
         /** The styles of the items as they are now in this editor, for finding their categories. */
         fun editorRich(): RichNote? =
             if (!canFormat) null else RichNote("", items.associate { it.id to RichDoc(it.text, format.flagsFor(it.id, it.text).runs()) })
+
+        /** Moves an item to category [name] (null: none): the old name in front of it goes, the new one comes in bold. */
+        fun setCategory(id: String, name: String?) {
+            val i = items.indexOfFirst { it.id == id }
+            if (i < 0) return
+            val item = items[i]
+            val cut = Categories.split(item, editorRich()?.docs?.get(id))?.restStart ?: 0
+            val rest = item.text.substring(cut)
+            val old = format.flagsFor(id, item.text).flags
+            val front = if (name == null) "" else "${name.trim()} "
+            val flags = IntArray(front.length + rest.length)
+            for (k in 0 until (name?.trim()?.length ?: 0)) flags[k] = RichNotes.BOLD
+            for (k in rest.indices) flags[front.length + k] = old.getOrElse(cut + k) { 0 } and TEXT_STYLE_MASK
+            format.replaceFlags(id, flags)
+            items[i] = item.copy(text = front + rest)
+        }
 
         /** A new item at the end of category [name] (a new category at the end of the list), its name in bold; null: no category. */
         fun addInCategory(name: String?) {
@@ -425,7 +444,7 @@ class EditNoteActivity : ComponentActivity() {
             val at = last?.let { l -> items.indexOfFirst { it.id == l.id } + 1 }?.takeIf { it > 0 } ?: items.size
             items.add(at, KeepItem(id, text, false))
             format.setStyle(id, text, 0, clean.length, RichNotes.BOLD)
-            CategoryFolds.set(this@EditNoteActivity, account, existing?.id.orEmpty(), clean, false)
+            CategoryFolds.set(this@EditNoteActivity, account, noteKey, clean, false)
             focusItemId = id
         }
         fun formatTextOf(key: String): String = if (key == "text") text else items.firstOrNull { it.id == key }?.text.orEmpty()
@@ -492,7 +511,7 @@ class EditNoteActivity : ComponentActivity() {
          * address their items by their place.
          */
         fun formatJson(): String? = format.toJson(
-            ::formatTextOf, if (isList) outItems().filter { it.text.isNotBlank() }.map { it.id } else null, convertFrom != null,
+            ::formatTextOf, if (isList) outItems().filter { it.text.isNotBlank() }.map { it.id } else null, convertFrom != null || existing == null,
             known = if (convertFrom == null) existing?.items?.map { it.id }?.toSet().orEmpty() else emptySet(),
         )
 
@@ -545,7 +564,7 @@ class EditNoteActivity : ComponentActivity() {
                     if (isLocal || galleryNow == originalGallery) "" else galleryNow.ifEmpty { "default" },
                 )
             } else {
-                KeepRepository.createNoteArgs(title, text, isList, outItems(), color, pinned, withHiddenLabel(labels, hiddenInWidgets), galleryNow, if (converting) formatJson().orEmpty() else "")
+                KeepRepository.createNoteArgs(title, text, isList, outItems(), color, pinned, withHiddenLabel(labels, hiddenInWidgets), galleryNow, formatJson().orEmpty())
             }
             // The mark in Keep replaces the older one that only this phone knew.
             if (existing != null) PrivateNotes.set(this@EditNoteActivity, account, existing.id, false)
@@ -564,7 +583,7 @@ class EditNoteActivity : ComponentActivity() {
                     },
                 )
                 // Sent after the change of the text, so the styles meet the text Keep has by then.
-                if (!converting) formatJson()?.let { KeepRepository.queueEdit(this@EditNoteActivity, PendingEdit(target, "format_note", listOf(existing!!.id, it))) }
+                if (!converting && existing != null) formatJson()?.let { KeepRepository.queueEdit(this@EditNoteActivity, PendingEdit(target, "format_note", listOf(existing.id, it))) }
                 Toast.makeText(applicationContext, R.string.note_saved, Toast.LENGTH_SHORT).show()
                 val prefs = getSharedPreferences("reminder_hints", MODE_PRIVATE)
                 if (!fromHome && !CredentialStore.isLocal(target) && android.os.Build.VERSION.SDK_INT >= 33 && !notificationsOn && !prefs.getBoolean("save_asked", false)) {
@@ -578,7 +597,10 @@ class EditNoteActivity : ComponentActivity() {
             scope.launch {
                 try {
                     val before = Reminders.noteIds(this@EditNoteActivity, target)
+                    // Taken before the note is written, while the items are still the ones the styles belong to.
+                    val styles = if (existing != null) formatJson() else null
                     KeepRepository.run(this@EditNoteActivity, target, function, args)
+                    if (styles != null) KeepRepository.run(this@EditNoteActivity, target, "format_note", listOf(existing!!.id, styles))
                     if (existing == null) Reminders.attachToNew(this@EditNoteActivity, PendingEdit(target, function, args, reminders = draftReminders), before)
                     Toast.makeText(applicationContext, R.string.note_saved, Toast.LENGTH_SHORT).show()
                     finish()
@@ -852,6 +874,8 @@ class EditNoteActivity : ComponentActivity() {
             R.drawable.ic_add, stringResource(R.string.add_item),
             { if (categoryNames.isEmpty()) addInCategory(null) else addMenuOpen = true },
             visible = isList && canEdit,
+            // Held, it offers the categories in a list without any yet too: that is where the first one is made.
+            onLongClick = if (isList && canEdit && canFormat) ({ addMenuOpen = true }) else null,
             popup = {
                 GroupedMenu(
                     expanded = addMenuOpen, onDismissRequest = { addMenuOpen = false },
@@ -863,11 +887,7 @@ class EditNoteActivity : ComponentActivity() {
                 )
             },
         )
-        // A new category: its name is asked, then its first item waits for its text.
-        states["add_category"] = EditorActionState(
-            R.drawable.ic_category, stringResource(R.string.add_category), { newCategoryDialog = true },
-            visible = isList && canEdit && canFormat,
-        )
+
         states["add_divider"] = EditorActionState(
             R.drawable.ic_divider, stringResource(R.string.add_divider),
             {
@@ -1118,6 +1138,8 @@ class EditNoteActivity : ComponentActivity() {
                 // The handle of a row moves it; the bounds tell which row the finger is over.
                 var dragging by remember { mutableStateOf<String?>(null) }
                 val rowBounds = remember { mutableStateMapOf<String, Rect>() }
+                // Where the headers of the categories are, so a dragged item can be dropped onto one.
+                val headerBounds = remember { mutableStateMapOf<String, Rect>() }
                 // "1. " typed at the start of the first item offers to number the whole list.
                 val firstFilled = items.firstOrNull { it.text.isNotBlank() }?.text.orEmpty()
                 if (canEdit && !numbered && !numberOfferDismissed && Regex("""^\s*1[.)]\s""").containsMatchIn(firstFilled)) {
@@ -1138,26 +1160,35 @@ class EditNoteActivity : ComponentActivity() {
                         }
                     }
                 }
-                // One item of the list as it is edited.
+                // With categories the items stand under their category's header (as on the cards); the header folds them and
+                // its "+" adds an item to them. The list itself keeps its order.
+                val editorGroups = if (canFormat) Categories.groups(items, editorRich()) else null
+                val groupOf = editorGroups?.flatMap { g -> g.items.map { it.id to g.name } }?.toMap().orEmpty()
+                // One item of the list as it is edited. Under a category's header it shows without the category's name, which
+                // stays in front of it in Keep; what is typed goes behind the name.
                 @Composable
-                fun ItemEditor(index: Int, item: KeepItem) {
+                fun ItemEditor(index: Int, item: KeepItem, inCategory: Boolean) {
+                    val split = if (inCategory) Categories.split(item, editorRich()?.docs?.get(item.id)) else null
+                    val cut = split?.restStart ?: 0
+                    val fullFlags = if (canFormat) format.flagsFor(item.id, item.text) else null
                     key(item.id) {
                         ChecklistRow(
-                            item, canEdit, dragging == item.id,
+                            if (cut > 0) item.copy(text = item.text.substring(cut)) else item, canEdit, dragging == item.id,
                             number = if (numbered) items.take(index).count { it.text.isNotBlank() && !it.isDivider() } + 1 else null,
                             onText = { text ->
                                 items.indexOfFirst { it.id == item.id }.let { i ->
                                     if (i >= 0) {
-                                        format.edited(item.id, items[i].text, text)
-                                        items[i] = items[i].copy(text = text)
+                                        val full = items[i].text.take(cut) + text
+                                        format.edited(item.id, items[i].text, full)
+                                        items[i] = items[i].copy(text = full)
                                     }
                                 }
                             },
-                            flags = if (canFormat) format.flagsFor(item.id, item.text) else null,
+                            flags = fullFlags?.let { if (cut > 0 && it.flags.size >= cut) DocFlags(it.flags.copyOfRange(cut, it.flags.size)) else it },
                             flagsVersion = format.version,
                             onFocus = { format.focus = item.id },
                             modifier = if (canFormat && canEdit) Modifier.textStyleMenu(styleLabels, applyStyle) else Modifier,
-                            onSelection = { format.selection[item.id] = it },
+                            onSelection = { format.selection[item.id] = androidx.compose.ui.text.TextRange(it.start + cut, it.end + cut) },
                             onToggle = { items.indexOfFirst { it.id == item.id }.let { i -> if (i >= 0 && !items[i].isDivider()) items[i] = items[i].copy(checked = !items[i].checked) } },
                             onRemove = {
                                 items.removeAll { it.id == item.id }
@@ -1168,35 +1199,53 @@ class EditNoteActivity : ComponentActivity() {
                             onDragStart = { dragging = item.id },
                             onDragTo = { y ->
                                 val from = items.indexOfFirst { it.id == item.id }
-                                val to = items.indexOfFirst { rowBounds[it.id]?.let { r -> y >= r.top && y < r.bottom } == true }
-                                if (from >= 0 && to >= 0 && to != from) {
-                                    items.add(to, items.removeAt(from))
-                                    if (items.isNotEmpty() && items[0].indent) items[0] = items[0].copy(indent = false)
+                                val over = items.firstOrNull { it.id != item.id && rowBounds[it.id]?.let { r -> y >= r.top && y < r.bottom } == true }
+                                val header = headerBounds.entries.firstOrNull { (_, r) -> y >= r.top && y < r.bottom }?.key
+                                if (from >= 0 && editorGroups != null && (header != null || (over != null && groupOf[over.id] != groupOf[item.id]))) {
+                                    // Over another category (or its header): the item takes that category's name.
+                                    val target = header ?: groupOf[over!!.id]
+                                    if (target != groupOf[item.id]) {
+                                        setCategory(item.id, target)
+                                        val at = if (over != null) items.indexOfFirst { it.id == over.id } else items.indexOfLast { groupOf[it.id] == target } + 1
+                                        val now = items.indexOfFirst { it.id == item.id }
+                                        if (at >= 0 && now >= 0 && at != now) items.add(at.coerceAtMost(items.lastIndex), items.removeAt(now))
+                                    }
+                                } else if (from >= 0 && over != null) {
+                                    val to = items.indexOfFirst { it.id == over.id }
+                                    if (to >= 0 && to != from) items.add(to, items.removeAt(from))
                                 }
+                                if (items.isNotEmpty() && items[0].indent) items[0] = items[0].copy(indent = false)
                             },
                             onDragEnd = { dragging = null },
                             focusNow = focusItemId == item.id, onFocused = { focusItemId = null },
                         )
                     }
                 }
-                // With categories the items stand under their category's header (as on the cards); the header folds them and
-                // its "+" adds an item to them. The list itself keeps its order.
-                val editorGroups = if (canFormat) Categories.groups(items, editorRich()) else null
                 if (editorGroups == null) {
-                    items.forEachIndexed { index, item -> ItemEditor(index, item) }
+                    items.forEachIndexed { index, item -> ItemEditor(index, item, inCategory = false) }
                 } else {
                     val folds = remember(CategoryFolds.version.intValue) { CategoryFolds.load(this@EditNoteActivity) }
+                    // Only what is shown can be dropped onto: rows of folded categories and headers that are gone are forgotten.
+                    val shownRows = editorGroups.filter { g -> g.name == null || CategoryFolds.key(account, noteKey, g.name) !in folds }.flatMap { g -> g.items.map { it.id } }.toSet()
+                    val shownHeaders = editorGroups.mapNotNull { it.name }.toSet()
+                    androidx.compose.runtime.SideEffect {
+                        rowBounds.keys.retainAll(shownRows)
+                        headerBounds.keys.retainAll(shownHeaders)
+                    }
                     editorGroups.forEach { group ->
                         if (group.name != null) {
-                            val folded = CategoryFolds.key(account, existing!!.id, group.name) in folds
-                            EditorCategoryHeader(
-                                group.name, group.items.count { !it.checked }, folded, canEdit,
-                                onToggle = { CategoryFolds.set(this@EditNoteActivity, account, existing.id, group.name, !folded) },
-                                onAdd = { addInCategory(group.name) },
-                            )
+                            val folded = CategoryFolds.key(account, noteKey, group.name) in folds
+                            key("category:" + group.name) {
+                                EditorCategoryHeader(
+                                    group.name, group.items.count { !it.checked }, folded, canEdit,
+                                    onToggle = { CategoryFolds.set(this@EditNoteActivity, account, noteKey, group.name, !folded) },
+                                    onAdd = { addInCategory(group.name) },
+                                    modifier = Modifier.onGloballyPositioned { headerBounds[group.name] = it.boundsInRoot() }.animatePlacement(),
+                                )
+                            }
                             if (folded) return@forEach
                         }
-                        group.items.forEach { item -> ItemEditor(items.indexOfFirst { it.id == item.id }, item) }
+                        group.items.forEach { item -> ItemEditor(items.indexOfFirst { it.id == item.id }, item, inCategory = group.name != null) }
                     }
                 }
             } else {

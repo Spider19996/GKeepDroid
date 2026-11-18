@@ -160,6 +160,14 @@ class FormatState(private val enabled: Boolean, private val rich: RichNote?) {
         return if (range.collapsed) cursorStyles(key, text, range.min) and bit != 0 else flagsFor(key, text).has(range.min, range.max, bit)
     }
 
+    /** Sets all styles of the text of [key] at once (an item moved to another category gets a new name in front). */
+    fun replaceFlags(key: String, flags: IntArray) {
+        if (!enabled) return
+        docs[key] = DocFlags(flags)
+        if (key !in touched) touched.add(key)
+        version++
+    }
+
     /** Gives the text of [key] the style [bit] from [start] to [end], for an item made in a category (its bold name). */
     fun setStyle(key: String, text: String, start: Int, end: Int, bit: Int) {
         if (!enabled) return

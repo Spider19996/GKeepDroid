@@ -43,6 +43,10 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.painterResource
@@ -99,12 +103,10 @@ val EDITOR_ACTIONS = listOf(
     ButtonSpec("add_item", R.drawable.ic_add, R.string.add_item, 0, ZONE_NOTE),
     // Beside the add button, under the items.
     ButtonSpec("add_divider", R.drawable.ic_divider, R.string.add_divider, 0, ZONE_NOTE),
-    // A new category of the checklist (a bold word at the start of its items), with its first item.
-    ButtonSpec("add_category", R.drawable.ic_category, R.string.add_category, 0, ZONE_NOTE),
 )
 
 /** The checklist tools; in the menu they share one entry that opens a page of their own. */
-private val LIST_TOOLS = setOf("list_number", "list_check_all", "list_uncheck_all", "list_sort", "list_delete_checked", "add_item", "add_divider", "add_category")
+private val LIST_TOOLS = setOf("list_number", "list_check_all", "list_uncheck_all", "list_sort", "list_delete_checked", "add_item", "add_divider")
 
 fun isListTool(id: String) = id in LIST_TOOLS
 
@@ -139,7 +141,36 @@ class EditorActionState(
     val tint: Color? = null,
     /** Drawn next to the button; the overflow menu hangs here. */
     val popup: (@Composable () -> Unit)? = null,
+    /** What holding the button does, if anything (adding an item: the menu of categories). */
+    val onLongClick: (() -> Unit)? = null,
 )
+
+/**
+ * Holding the element calls [onLongPress]; the tap that the element itself handles is then left out. The press is watched before
+ * the element sees it, so buttons keep their own tap.
+ */
+internal fun Modifier.longPressFirst(onLongPress: (() -> Unit)?): Modifier = if (onLongPress == null) this else pointerInput(onLongPress) {
+    awaitEachGesture {
+        val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+        val released = withTimeoutOrNull(viewConfiguration.longPressTimeoutMillis) {
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Initial)
+                val change = event.changes.firstOrNull { it.id == down.id } ?: return@withTimeoutOrNull true
+                if (!change.pressed || (change.position - down.position).getDistance() > viewConfiguration.touchSlop) return@withTimeoutOrNull true
+            }
+            @Suppress("UNREACHABLE_CODE") true
+        }
+        if (released == null) {
+            onLongPress()
+            // The rest of the press is taken, so the button does not also count it as a tap.
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Initial)
+                event.changes.forEach { it.consume() }
+                if (event.changes.none { it.pressed }) break
+            }
+        }
+    }
+}
 
 /**
  * One bar of the editor: the actions of its left zone at the left edge, those of its right zone at the right edge. When they
@@ -238,7 +269,7 @@ private fun EditorActionButton(spec: ButtonSpec, state: EditorActionState?, high
             tint = if (state.dimmed) tint.copy(alpha = 0.38f) else tint,
         )
     }
-    Box(if (highlighted) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(14.dp)) else Modifier) {
+    Box((if (highlighted) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(14.dp)) else Modifier).longPressFirst(state.onLongClick)) {
         when {
             spec.id == "save" -> FilledIconButton(
                 onClick = state.onClick, enabled = state.enabled, shapes = IconButtonDefaults.shapes(),
@@ -335,7 +366,7 @@ internal fun NoteActionButtons(
                                 // All buttons of the note's place have the outline the add button always had.
                                 val tint = noteButtonTint(spec.id)
                                 // The box is what the row divides; a menu of the action (the one of "more") hangs on it.
-                                Box(Modifier.weight(1f).fillMaxHeight()) {
+                                Box(Modifier.weight(1f).fillMaxHeight().longPressFirst(state.onLongClick)) {
                                     androidx.compose.material3.OutlinedButton(
                                         onClick = state.onClick, enabled = state.enabled, shapes = ButtonDefaults.shapes(), modifier = mark, contentPadding = tight,
                                         colors = if (tint != null) ButtonDefaults.outlinedButtonColors(contentColor = tint) else ButtonDefaults.outlinedButtonColors(),
@@ -364,7 +395,7 @@ private fun noteButtonTint(id: String): Color? {
     val dark = MaterialTheme.colorScheme.background.luminance() < 0.5f
     fun tone(onDark: Long, onLight: Long) = Color(if (dark) onDark else onLight)
     return when (id) {
-        "add_item", "add_divider", "add_category", "list_check_all" -> tone(0xFF81C784, 0xFF2E7D32)
+        "add_item", "add_divider", "list_check_all" -> tone(0xFF81C784, 0xFF2E7D32)
         "more" -> null
         "list_delete_checked", "delete" -> tone(0xFFEF9A9A, 0xFFC62828)
         "convert", "list_number", "list_sort" -> tone(0xFF90CAF9, 0xFF1565C0)
