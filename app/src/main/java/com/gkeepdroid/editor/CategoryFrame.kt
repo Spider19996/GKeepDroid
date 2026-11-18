@@ -36,6 +36,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.zIndex
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.rememberScrollState
@@ -357,11 +359,17 @@ internal fun CategorySwipeBand(
             // The symbol in the middle of the whole category (its pieces report where they are), not of the header's piece.
             val mine = bounds["$category#$index"]
             val all = bounds.filterKeys { it.startsWith("$category#") }.values
-            val middle = if (all.isEmpty()) null else (all.minOf { it.first } + all.maxOf { it.second }) / 2f
-            Box(Modifier.matchParentSize().padding(start = 20.dp, end = 20.dp), contentAlignment = if (offset > 0f) androidx.compose.ui.Alignment.TopStart else androidx.compose.ui.Alignment.TopEnd) {
+            val middle = if (all.isEmpty()) null else (all.minOf { it.first } + with(androidx.compose.ui.platform.LocalDensity.current) { topInset.toPx() } + all.maxOf { it.second }) / 2f
+            // Only the strip the category has left shows it: it lies under the moving rows, not on top of them.
+            Box(
+                Modifier.matchParentSize().drawWithContent {
+                    val from = if (offset > 0f) 0f else size.width + offset
+                    val to = if (offset > 0f) offset else size.width
+                    clipRect(from, -100000f, to, 100000f) { this@drawWithContent.drawContent() }
+                }.padding(start = 20.dp, end = 20.dp), contentAlignment = if (offset > 0f) androidx.compose.ui.Alignment.TopStart else androidx.compose.ui.Alignment.TopEnd) {
                 Icon(
                     painterResource(icon), contentDescription = null, tint = tint,
-                    modifier = Modifier.requiredSize(24.dp).offset { androidx.compose.ui.unit.IntOffset(0, if (middle != null && mine != null) (middle - mine.first - 12.dp.toPx()).toInt() else topInset.roundToPx() + 4.dp.roundToPx()) },
+                    modifier = Modifier.wrapContentSize(if (offset > 0f) androidx.compose.ui.Alignment.TopStart else androidx.compose.ui.Alignment.TopEnd, unbounded = true).size(24.dp).offset { androidx.compose.ui.unit.IntOffset(0, if (middle != null && mine != null) (middle - mine.first - 12.dp.toPx()).toInt() else topInset.roundToPx() + 4.dp.roundToPx()) },
                 )
             }
         }
