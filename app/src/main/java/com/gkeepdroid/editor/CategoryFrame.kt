@@ -344,20 +344,29 @@ internal fun CategorySwipeBand(
                 val r = 18.dp.toPx()
                 val from = if (top) topInset.toPx() + half else 0f
                 val to = if (bottom) size.height - half else size.height + 12.dp.toPx()
-                fun shape(dx: Float): androidx.compose.ui.graphics.Path {
+                // The frame that is cut out is a hair smaller than the line's centre path, so the band reaches under the line (which is
+                // 1 dp thick) and the antialiasing of its arcs, which meet the line at a very shallow angle at the top, leaves no gap.
+                val e = 0.5.dp.toPx()
+                fun shape(dx: Float, grow: Float): androidx.compose.ui.graphics.Path {
                     val zero = androidx.compose.ui.geometry.CornerRadius.Zero
-                    val round = androidx.compose.ui.geometry.CornerRadius(r)
+                    val round = androidx.compose.ui.geometry.CornerRadius(r - grow)
                     return androidx.compose.ui.graphics.Path().apply {
                         addRoundRect(
                             androidx.compose.ui.geometry.RoundRect(
-                                half + dx, from, size.width - half + dx, to,
+                                half + dx + grow, if (top) from + grow else from, size.width - half + dx - grow, if (bottom) to - grow else to,
                                 topLeftCornerRadius = if (top) round else zero, topRightCornerRadius = if (top) round else zero,
                                 bottomLeftCornerRadius = if (bottom) round else zero, bottomRightCornerRadius = if (bottom) round else zero,
                             ),
                         )
                     }
                 }
-                drawPath(androidx.compose.ui.graphics.Path.combine(androidx.compose.ui.graphics.PathOperation.Difference, shape(0f), shape(offset)), color)
+                val band = androidx.compose.ui.graphics.Path.combine(androidx.compose.ui.graphics.PathOperation.Difference, shape(0f, 0f), shape(offset, e))
+                // Only as far as the arcs reach: what is left of the shrunk frame along the top (over the title's gap) is not drawn.
+                val reach = 14.dp.toPx()
+                clipRect(
+                    if (offset > 0f) 0f else size.width + offset - half - reach, -100000f,
+                    if (offset > 0f) offset + half + reach else size.width, 100000f,
+                ) { drawPath(band, color) }
             },
         ),
     ) {
