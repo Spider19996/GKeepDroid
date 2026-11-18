@@ -384,7 +384,9 @@ internal fun ChecklistBody(
             // A widget's padding before a background is no margin, so the gap between two frames is a box of its own.
             Box(GlanceModifier.fillMaxWidth().padding(vertical = 4.dp)) { Column(
                 GlanceModifier.fillMaxWidth().background(ImageProvider(R.drawable.card_border))
-                    .padding(start = 10.dp, end = 4.dp, top = 4.dp, bottom = 6.dp),
+                    // The name as far below the frame's top as the note's title is below the card's top (8 dp, of which the
+                    // header row's own top padding is the list spacing).
+                    .padding(start = 10.dp, end = 4.dp, top = (8 - settings.listSpacingDp).coerceAtLeast(0).dp, bottom = 6.dp),
             ) {
                 val folded = CategoryFolds.key(account, note.id, group.name) in folds
                 CategoryHeaderRow(note, account, group.name, Categories.progress(group.items), folded, settings, palette)

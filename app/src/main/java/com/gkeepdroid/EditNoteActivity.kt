@@ -1488,7 +1488,8 @@ class EditNoteActivity : ComponentActivity() {
                                     if (draggingCategory == name) Modifier.zIndex(1f)
                                         .onPlaced { headerLayoutTop[name] = it.positionInRoot().y }
                                         .graphicsLayer { translationY = categoryFingerTop - (headerLayoutTop[name] ?: categoryFingerTop) }
-                                    else Modifier.onPlaced { headerLayoutTop[name] = it.positionInRoot().y }.animatePlacement(),
+                                    // Not gliding by itself: the frame's other pieces would stay behind when the layout moves.
+                                    else Modifier.onPlaced { headerLayoutTop[name] = it.positionInRoot().y },
                                 )
                                 .categoryFrame(frameAt(entryIndex), notches),
                         ) { EditorCategoryHeader(
@@ -1518,6 +1519,7 @@ class EditNoteActivity : ComponentActivity() {
                             onDragEnd = { draggingCategory = null },
                             swipeRight = itemSwipe.first, swipeLeft = itemSwipe.second,
                             onSwipe = { right -> swipeItems(group.items.map { it.id }, if (right) itemSwipe.first else itemSwipe.second) },
+                            alone = group.items.isEmpty() || folded || draggingCategory != null,
                         ) }
                     }
                 } }

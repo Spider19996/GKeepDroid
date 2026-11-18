@@ -426,6 +426,8 @@ internal fun EditorCategoryHeader(
     onRename: () -> Unit = {}, dragged: Boolean = false,
     onDragStart: () -> Unit = {}, onDragTo: (Float) -> Unit = {}, onDragEnd: () -> Unit = {}, onShift: (Float) -> Unit = {},
     swipeRight: Int = ITEM_SWIPE_NONE, swipeLeft: Int = ITEM_SWIPE_NONE, onSwipe: (Boolean) -> Unit = {},
+    /** Nothing under the header (the category is empty, folded or held): it is a box of a hand's height then, not just a line. */
+    alone: Boolean = false,
 ) {
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     val density = androidx.compose.ui.platform.LocalDensity.current
@@ -456,7 +458,8 @@ internal fun EditorCategoryHeader(
             .layout { m, c ->
                 val p = m.measure(c)
                 // Below the line it takes a little less than its lower half, so the first item is not far from the name.
-                layout(p.width, (p.height / 2 - 14.dp.roundToPx()).coerceAtLeast(0)) { p.place(0, -p.height / 2) }
+                val below = if (alone) 36.dp.roundToPx() else (p.height / 2 - 14.dp.roundToPx()).coerceAtLeast(0)
+                layout(p.width, below) { p.place(0, -p.height / 2 + (if (alone) 4.dp.roundToPx() else 0)) }
             }
             .offset { androidx.compose.ui.unit.IntOffset(offsetX.toInt(), 0) }
             .draggable(
