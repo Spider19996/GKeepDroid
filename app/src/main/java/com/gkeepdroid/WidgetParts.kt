@@ -385,7 +385,7 @@ internal fun ChecklistBody(
                     .padding(horizontal = 6.dp, vertical = 6.dp),
             ) {
                 val folded = CategoryFolds.key(account, note.id, group.name) in folds
-                CategoryHeaderRow(note, account, group.name, group.items.count { !it.checked }, folded, settings, palette)
+                CategoryHeaderRow(note, account, group.name, Categories.progress(group.items), folded, settings, palette)
                 if (!folded) group.rows(settings).forEach { item -> if (left > 0) { ItemRow(note, item, account, settings, palette, inCategory = true); left-- } else hidden++ }
             } }
         }
@@ -445,7 +445,7 @@ internal fun Categories.Group.rows(settings: WidgetSettings): List<KeepItem> =
  */
 @Composable
 internal fun CategoryHeaderRow(
-    note: KeepNote, account: String, name: String, open: Int, folded: Boolean, settings: WidgetSettings, palette: TextPalette,
+    note: KeepNote, account: String, name: String, progress: String, folded: Boolean, settings: WidgetSettings, palette: TextPalette,
 ) {
     val context = LocalContext.current
     Row(GlanceModifier.fillMaxWidth().padding(top = settings.listSpacingDp.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -458,10 +458,16 @@ internal fun CategoryHeaderRow(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                name + (if (open > 0) "  $open" else ""),
+                name,
                 maxLines = 1,
                 style = TextStyle(color = palette.provider(0.85f), fontSize = settings.textSizeSp.sp, fontWeight = FontWeight.Bold),
                 modifier = GlanceModifier.defaultWeight(),
+            )
+            // Where the progress of a checklist stands, and in its style: right before the arrow.
+            if (settings.showProgress) Text(
+                progress,
+                style = TextStyle(color = palette.provider(0.7f), fontSize = (settings.textSizeSp - 1).coerceAtLeast(9).sp),
+                modifier = GlanceModifier.padding(horizontal = 4.dp),
             )
         }
         // The same arrows as on the notes: down when open, left when folded.

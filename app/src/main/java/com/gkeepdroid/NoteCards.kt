@@ -368,16 +368,19 @@ internal fun NoteTile(
                     // Each category in a frame of its own, rounded like the card around it.
                     Column(
                         // Little room around it: a card in the grid is narrow, so the frame reaches into the card's own padding.
-                        Modifier.fillMaxWidth().padding(vertical = 2.dp).layout { m, c ->
+                        // It also takes 1 dp of the card's 6 dp between its parts above and below, so between two frames there is
+                        // the 4 dp there is between a frame and the card's edge.
+                        Modifier.fillMaxWidth().layout { m, c ->
                             val grow = 8.dp.roundToPx()
+                            val lift = 1.dp.roundToPx()
                             val p = m.measure(c.copy(maxWidth = c.maxWidth + grow * 2, minWidth = (c.minWidth + grow * 2).coerceAtMost(c.maxWidth + grow * 2)))
-                            layout(c.maxWidth, p.height) { p.place(-grow, 0) }
+                            layout(c.maxWidth, (p.height - lift * 2).coerceAtLeast(0)) { p.place(-grow, -lift) }
                         }
                             .border(1.dp, textColor.copy(alpha = 0.35f), MaterialTheme.shapes.medium)
                             .padding(start = 6.dp, end = 2.dp, bottom = 2.dp),
                     ) {
                         val folded = CategoryFolds.key(account, note.id, group.name) in folds
-                        CategoryHeader(group.name, open.size, folded, textColor) {
+                        CategoryHeader(group.name, if (app.showProgress) Categories.progress(group.items) else null, folded, textColor) {
                             CategoryFolds.set(context, account, note.id, group.name, !folded)
                         }
                         if (!folded) rows.forEach { item -> if (left > 0) { ItemLine(item, inCategory = true); left-- } else hidden++ }
@@ -458,7 +461,7 @@ internal fun NoteTile(
 
 /** The header of a category in a checklist: its name, how many of its items are open, and the arrow that folds it. */
 @Composable
-internal fun CategoryHeader(name: String, open: Int, folded: Boolean, color: Color, onToggle: () -> Unit) {
+internal fun CategoryHeader(name: String, progress: String?, folded: Boolean, color: Color, onToggle: () -> Unit) {
     Row(
         Modifier.fillMaxWidth().clickable(onClick = onToggle).padding(top = 4.dp, bottom = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -467,8 +470,9 @@ internal fun CategoryHeader(name: String, open: Int, folded: Boolean, color: Col
             name, color = color, style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
             maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false),
         )
-        if (open > 0) Text(" $open", color = color.copy(alpha = 0.65f), style = MaterialTheme.typography.labelMedium)
         Spacer(Modifier.weight(1f))
+        // Where the progress of the checklist stands, and in its style: right before the arrow.
+        if (progress != null) Text(progress, color = color.copy(alpha = 0.8f), style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(end = 4.dp))
         Icon(
             // Folded it points to the right, where the items would open, like the "▸" of the widgets.
             painterResource(if (folded) R.drawable.ic_arrow_right else R.drawable.ic_arrow_down),

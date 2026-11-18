@@ -48,6 +48,12 @@ object Categories {
         return order.map { name -> Group(name, items.filterIndexed { i, _ -> names[i] == name }) }.filter { it.name != null || it.items.isNotEmpty() }
     }
 
+    /** How far a category is, as the checklists show it: ticked of all its items ("1/3"); dividers do not count. */
+    fun progress(items: List<KeepItem>): String {
+        val real = items.filter { !it.isDivider() }
+        return "${real.count { it.checked }}/${real.size}"
+    }
+
     /** The names of the categories a checklist has, in order. */
     fun names(items: List<KeepItem>, rich: RichNote?): List<String> = groups(items, rich).orEmpty().mapNotNull { it.name }
 

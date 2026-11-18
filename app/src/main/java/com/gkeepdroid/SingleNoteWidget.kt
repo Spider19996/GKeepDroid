@@ -202,7 +202,7 @@ class SingleNoteWidget : GlanceAppWidget() {
                             // The gap above the frame is a box of its own: a widget's padding before a background is no margin.
                             Box(GlanceModifier.fillMaxWidth().padding(top = 8.dp)) {
                                 Box(GlanceModifier.fillMaxWidth().categoryFramePiece(0, count)) {
-                                    CategoryHeaderRow(note, account, group.name, group.items.count { !it.checked }, folded, settings, palette)
+                                    CategoryHeaderRow(note, account, group.name, Categories.progress(group.items), folded, settings, palette)
                                 }
                             }
                         }

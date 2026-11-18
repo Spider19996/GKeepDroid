@@ -414,7 +414,7 @@ internal fun quietToggleColors(
 /** The header of a category in the editor's checklist: its name and number of open items fold it, the "+" adds an item to it. */
 @Composable
 internal fun EditorCategoryHeader(
-    name: String, open: Int, folded: Boolean, canEdit: Boolean, onToggle: () -> Unit, onAdd: () -> Unit, modifier: Modifier = Modifier,
+    name: String, progress: String, folded: Boolean, canEdit: Boolean, onToggle: () -> Unit, onAdd: () -> Unit, modifier: Modifier = Modifier,
     allChecked: Boolean = false, onCheckAll: () -> Unit = {}, dragged: Boolean = false,
     onDragStart: () -> Unit = {}, onDragTo: (Float) -> Unit = {}, onDragEnd: () -> Unit = {},
     swipeRight: Int = ITEM_SWIPE_NONE, swipeLeft: Int = ITEM_SWIPE_NONE, onSwipe: (Boolean) -> Unit = {},
@@ -515,8 +515,9 @@ internal fun EditorCategoryHeader(
             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
         ) {
             Text(name, style = MaterialTheme.typography.titleSmall.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), maxLines = 1)
-            if (open > 0) Text("  $open", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
+            // As the checklists show their progress: right before the arrow.
+            Text(progress, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(end = 8.dp))
             Icon(
                 painterResource(if (folded) R.drawable.ic_arrow_right else R.drawable.ic_arrow_down),
                 contentDescription = stringResource(if (folded) R.string.unfold_all else R.string.fold_all), modifier = Modifier.size(20.dp),
@@ -593,25 +594,23 @@ internal fun Modifier.categoryFrame(position: Int): Modifier {
     // The same line as the fields have (1 dp in the outline color).
     val color = MaterialTheme.colorScheme.outline
     val last = position == FRAME_LAST || position == FRAME_ONLY
-    // Room below a category, so two frames do not touch.
-    return this.padding(bottom = if (last) 8.dp else 0.dp).drawBehind {
+    // The gap to what follows is the editor's own between its rows, as between two fields.
+    return this.drawBehind {
         val stroke = 1.dp.toPx()
-        // Concentric with the fields inside: their rounding (12 dp, Material's medium shape) plus the 8 dp between them and the frame.
         val radius = 20.dp.toPx()
-        // Far enough over the gap to the next row that the sides never break.
-        val gap = 32.dp.toPx()
-        val top = if (position == FRAME_FIRST || position == FRAME_ONLY) stroke / 2 else -gap / 2 - 1f
-        val bottom = if (position == FRAME_LAST || position == FRAME_ONLY) size.height + 6.dp.toPx() else size.height + gap / 2 + 1f
-        // A rounded box that is cut where the frame goes on in the next or the previous row.
-        val extendTop = if (position == FRAME_FIRST || position == FRAME_ONLY) 0f else radius
-        val extendBottom = if (position == FRAME_LAST || position == FRAME_ONLY) 0f else radius
-        clipRect(top = top, bottom = bottom) {
+        // The pieces reach over the gaps between the rows (whatever they are), and draw the same line where they overlap.
+        val reach = 32.dp.toPx()
+        val first = position == FRAME_FIRST || position == FRAME_ONLY
+        // The whole line lies inside the piece at the top and the bottom, so it is as thick there as at the sides.
+        val top = if (first) stroke / 2 else -reach - radius
+        val bottom = if (last) size.height - stroke / 2 else size.height + reach + radius
+        clipRect(top = if (first) 0f else -reach, bottom = if (last) size.height else size.height + reach) {
             drawRoundRect(
-                color, topLeft = androidx.compose.ui.geometry.Offset(stroke / 2, top - extendTop),
-                size = androidx.compose.ui.geometry.Size(size.width - stroke, bottom - top + extendTop + extendBottom),
+                color, topLeft = androidx.compose.ui.geometry.Offset(stroke / 2, top),
+                size = androidx.compose.ui.geometry.Size(size.width - stroke, bottom - top),
                 cornerRadius = androidx.compose.ui.geometry.CornerRadius(radius),
                 style = androidx.compose.ui.graphics.drawscope.Stroke(stroke),
             )
         }
-    }.padding(start = 8.dp, end = 8.dp, bottom = if (position == FRAME_LAST || position == FRAME_ONLY) 6.dp else 0.dp)
+    }.padding(start = 8.dp, end = 8.dp, bottom = if (last) 8.dp else 0.dp)
 }

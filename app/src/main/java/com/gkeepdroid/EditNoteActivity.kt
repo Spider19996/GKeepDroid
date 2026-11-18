@@ -1459,7 +1459,7 @@ class EditNoteActivity : ComponentActivity() {
                         val folded = CategoryFolds.key(account, noteKey, name) in folds
                         val real = group.items.filter { !it.isDivider() }
                         Box(Modifier.categoryFrame(frameAt(entryIndex))) { EditorCategoryHeader(
-                            name, real.count { !it.checked }, folded, canEdit,
+                            name, Categories.progress(group.items), folded, canEdit,
                             onToggle = { CategoryFolds.set(this@EditNoteActivity, account, noteKey, name, !folded) },
                             onAdd = { addInCategory(name) },
                             modifier = Modifier.onGloballyPositioned { headerBounds[name] = it.boundsInRoot() }
