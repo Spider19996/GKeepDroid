@@ -411,6 +411,8 @@
     <string name="list_check_all">تحديد الكل</string>
     <string name="list_uncheck_all">إلغاء تحديد الكل</string>
     <string name="list_sort_alpha">فرز أبجدي</string>
+    <string name="list_categorize">استخدام الفئات</string>
+    <string name="list_uncategorize">إلغاء الفئات</string>
     <string name="list_delete_checked">حذف العناصر المحددة</string>
     <string name="filter_notes">ملاحظات</string>
     <string name="filter_reminders">مع تذكير</string>

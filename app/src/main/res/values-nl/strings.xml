@@ -375,6 +375,8 @@
     <string name="list_check_all">Alles afvinken</string>
     <string name="list_uncheck_all">Alles uitvinken</string>
     <string name="list_sort_alpha">Alfabetisch sorteren</string>
+    <string name="list_categorize">Categorieën gebruiken</string>
+    <string name="list_uncategorize">Categorieën opheffen</string>
     <string name="list_delete_checked">Afgevinkte items verwijderen</string>
     <string name="filter_notes">Notities</string>
     <string name="filter_reminders">Met herinnering</string>

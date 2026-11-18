@@ -375,6 +375,8 @@
     <string name="list_check_all">सभी टिक करें</string>
     <string name="list_uncheck_all">सभी टिक हटाएँ</string>
     <string name="list_sort_alpha">वर्णानुक्रम में क्रमबद्ध करें</string>
+    <string name="list_categorize">श्रेणियाँ इस्तेमाल करें</string>
+    <string name="list_uncategorize">श्रेणियाँ हटाएँ</string>
     <string name="list_delete_checked">टिक किए आइटम हटाएँ</string>
     <string name="filter_notes">नोट</string>
     <string name="filter_reminders">रिमाइंडर के साथ</string>

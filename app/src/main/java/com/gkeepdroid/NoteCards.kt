@@ -456,7 +456,8 @@ internal fun CategoryHeader(name: String, open: Int, folded: Boolean, color: Col
         if (open > 0) Text(" $open", color = color.copy(alpha = 0.65f), style = MaterialTheme.typography.labelMedium)
         Spacer(Modifier.weight(1f))
         Icon(
-            painterResource(if (folded) R.drawable.ic_arrow_left else R.drawable.ic_arrow_down),
+            // Folded it points to the right, where the items would open, like the "▸" of the widgets.
+            painterResource(if (folded) R.drawable.ic_arrow_right else R.drawable.ic_arrow_down),
             contentDescription = stringResource(if (folded) R.string.unfold_all else R.string.fold_all),
             tint = color.copy(alpha = 0.8f), modifier = Modifier.size(18.dp),
         )

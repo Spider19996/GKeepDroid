@@ -376,6 +376,8 @@
     <string name="list_check_all">Check all</string>
     <string name="list_uncheck_all">Uncheck all</string>
     <string name="list_sort_alpha">Sort alphabetically</string>
+    <string name="list_categorize">Use categories</string>
+    <string name="list_uncategorize">Dissolve categories</string>
     <string name="list_delete_checked">Delete checked items</string>
     <string name="filter_notes">Notes</string>
     <string name="filter_reminders">With reminder</string>

@@ -375,6 +375,8 @@
     <string name="list_check_all">Tümünü işaretle</string>
     <string name="list_uncheck_all">Tüm işaretleri kaldır</string>
     <string name="list_sort_alpha">Alfabetik sırala</string>
+    <string name="list_categorize">Kategorileri kullan</string>
+    <string name="list_uncategorize">Kategorileri kaldır</string>
     <string name="list_delete_checked">İşaretli öğeleri sil</string>
     <string name="filter_notes">Notlar</string>
     <string name="filter_reminders">Hatırlatıcılı</string>

@@ -91,6 +91,8 @@ val EDITOR_ACTIONS = listOf(
     ButtonSpec("list_check_all", R.drawable.ic_done_all, R.string.list_check_all, 0, ZONE_MENU),
     ButtonSpec("list_uncheck_all", R.drawable.ic_remove_done, R.string.list_uncheck_all, 0, ZONE_MENU),
     ButtonSpec("list_sort", R.drawable.ic_sort, R.string.list_sort_alpha, 0, ZONE_MENU),
+    // Gives an ordinary checklist categories (its first one, empty), or takes them all away again.
+    ButtonSpec("list_categories", R.drawable.ic_category, R.string.list_categorize, 0, ZONE_MENU),
     ButtonSpec("open_in_keep", R.drawable.ic_open_new, R.string.open_in_keep, 1, ZONE_MENU),
     ButtonSpec("share", R.drawable.ic_share, R.string.share_note, 1, ZONE_MENU),
     ButtonSpec("hide_content", R.drawable.ic_visibility_off, R.string.hide_content, 1, ZONE_MENU),
@@ -106,7 +108,7 @@ val EDITOR_ACTIONS = listOf(
 )
 
 /** The checklist tools; in the menu they share one entry that opens a page of their own. */
-private val LIST_TOOLS = setOf("list_number", "list_check_all", "list_uncheck_all", "list_sort", "list_delete_checked", "add_item", "add_divider")
+private val LIST_TOOLS = setOf("list_number", "list_check_all", "list_uncheck_all", "list_sort", "list_categories", "list_delete_checked", "add_item", "add_divider")
 
 fun isListTool(id: String) = id in LIST_TOOLS
 
@@ -398,7 +400,7 @@ private fun noteButtonTint(id: String): Color? {
         "add_item", "add_divider", "list_check_all" -> tone(0xFF81C784, 0xFF2E7D32)
         "more" -> null
         "list_delete_checked", "delete" -> tone(0xFFEF9A9A, 0xFFC62828)
-        "convert", "list_number", "list_sort" -> tone(0xFF90CAF9, 0xFF1565C0)
+        "convert", "list_number", "list_sort", "list_categories" -> tone(0xFF90CAF9, 0xFF1565C0)
         "list_uncheck_all", "archive" -> tone(0xFFFFCC80, 0xFFE65100)
         "open_in_keep", "share" -> tone(0xFF80CBC4, 0xFF00695C)
         "hide_content" -> tone(0xFFCE93D8, 0xFF6A1B9A)

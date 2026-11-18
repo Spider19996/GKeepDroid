@@ -375,6 +375,8 @@
     <string name="list_check_all">Alle abhaken</string>
     <string name="list_uncheck_all">Alle zurücksetzen</string>
     <string name="list_sort_alpha">Alphabetisch sortieren</string>
+    <string name="list_categorize">Kategorisieren</string>
+    <string name="list_uncategorize">Kategorien auflösen</string>
     <string name="list_delete_checked">Abgehakte löschen</string>
     <string name="filter_notes">Notizen</string>
     <string name="filter_reminders">Mit Erinnerung</string>

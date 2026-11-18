@@ -412,7 +412,7 @@ internal fun EditorCategoryHeader(
             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
         ) {
             Icon(
-                painterResource(if (folded) R.drawable.ic_arrow_left else R.drawable.ic_arrow_down),
+                painterResource(if (folded) R.drawable.ic_arrow_right else R.drawable.ic_arrow_down),
                 contentDescription = stringResource(if (folded) R.string.unfold_all else R.string.fold_all), modifier = Modifier.size(20.dp),
             )
             androidx.compose.foundation.layout.Spacer(Modifier.size(8.dp))
@@ -422,5 +422,23 @@ internal fun EditorCategoryHeader(
         if (canEdit) IconButton(onClick = onAdd, shapes = IconButtonDefaults.shapes()) {
             Icon(painterResource(R.drawable.ic_add), contentDescription = stringResource(R.string.category_add_item, name))
         }
+    }
+}
+
+/** Shown at the end of a checklist while an item is held: letting it go here puts it into a new category. */
+@Composable
+internal fun NewCategoryDropZone(active: Boolean, modifier: Modifier = Modifier) {
+    val color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+    androidx.compose.foundation.layout.Row(
+        modifier.fillMaxWidth().padding(top = 8.dp).clip(MaterialTheme.shapes.medium)
+            .background(if (active) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else androidx.compose.ui.graphics.Color.Transparent)
+            .border(if (active) 2.dp else 1.dp, color, MaterialTheme.shapes.medium)
+            .padding(horizontal = 16.dp, vertical = 18.dp),
+        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        Icon(painterResource(R.drawable.ic_add), contentDescription = null, tint = color)
+        androidx.compose.foundation.layout.Spacer(Modifier.size(8.dp))
+        Text(stringResource(R.string.category_new), color = color, style = MaterialTheme.typography.titleSmall)
     }
 }

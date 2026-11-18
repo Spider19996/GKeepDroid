@@ -384,6 +384,8 @@
     <string name="list_check_all">Tout cocher</string>
     <string name="list_uncheck_all">Tout décocher</string>
     <string name="list_sort_alpha">Trier par ordre alphabétique</string>
+    <string name="list_categorize">Utiliser des catégories</string>
+    <string name="list_uncategorize">Supprimer les catégories</string>
     <string name="list_delete_checked">Supprimer les éléments cochés</string>
     <string name="filter_notes">Notes</string>
     <string name="filter_reminders">Avec rappel</string>

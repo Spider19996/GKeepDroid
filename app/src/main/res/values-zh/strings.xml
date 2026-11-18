@@ -366,6 +366,8 @@
     <string name="list_check_all">全部勾选</string>
     <string name="list_uncheck_all">全部取消勾选</string>
     <string name="list_sort_alpha">按字母顺序排序</string>
+    <string name="list_categorize">使用类别</string>
+    <string name="list_uncategorize">取消类别</string>
     <string name="list_delete_checked">删除已勾选项目</string>
     <string name="filter_notes">笔记</string>
     <string name="filter_reminders">有提醒</string>

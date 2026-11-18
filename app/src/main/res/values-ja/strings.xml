@@ -366,6 +366,8 @@
     <string name="list_check_all">すべてチェック</string>
     <string name="list_uncheck_all">すべてのチェックを外す</string>
     <string name="list_sort_alpha">アルファベット順に並べ替え</string>
+    <string name="list_categorize">カテゴリを使う</string>
+    <string name="list_uncategorize">カテゴリを解除</string>
     <string name="list_delete_checked">チェック済みを削除</string>
     <string name="filter_notes">メモ</string>
     <string name="filter_reminders">リマインダーあり</string>

@@ -384,6 +384,8 @@
     <string name="list_check_all">Marcar tudo</string>
     <string name="list_uncheck_all">Desmarcar tudo</string>
     <string name="list_sort_alpha">Ordenar alfabeticamente</string>
+    <string name="list_categorize">Usar categorias</string>
+    <string name="list_uncategorize">Remover categorias</string>
     <string name="list_delete_checked">Eliminar itens marcados</string>
     <string name="filter_notes">Notas</string>
     <string name="filter_reminders">Com lembrete</string>

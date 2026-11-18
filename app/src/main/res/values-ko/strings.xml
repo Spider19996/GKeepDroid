@@ -366,6 +366,8 @@
     <string name="list_check_all">모두 체크</string>
     <string name="list_uncheck_all">모두 체크 해제</string>
     <string name="list_sort_alpha">가나다순 정렬</string>
+    <string name="list_categorize">카테고리 사용</string>
+    <string name="list_uncategorize">카테고리 해제</string>
     <string name="list_delete_checked">체크한 항목 삭제</string>
     <string name="filter_notes">메모</string>
     <string name="filter_reminders">미리 알림 있음</string>

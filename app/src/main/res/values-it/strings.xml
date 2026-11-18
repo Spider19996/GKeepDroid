@@ -384,6 +384,8 @@
     <string name="list_check_all">Spunta tutto</string>
     <string name="list_uncheck_all">Deseleziona tutto</string>
     <string name="list_sort_alpha">Ordina alfabeticamente</string>
+    <string name="list_categorize">Usa categorie</string>
+    <string name="list_uncategorize">Rimuovi categorie</string>
     <string name="list_delete_checked">Elimina le voci spuntate</string>
     <string name="filter_notes">Note</string>
     <string name="filter_reminders">Con promemoria</string>

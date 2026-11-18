@@ -393,6 +393,8 @@
     <string name="list_check_all">Отметить все</string>
     <string name="list_uncheck_all">Снять все отметки</string>
     <string name="list_sort_alpha">Сортировать по алфавиту</string>
+    <string name="list_categorize">Использовать категории</string>
+    <string name="list_uncategorize">Убрать категории</string>
     <string name="list_delete_checked">Удалить отмеченные пункты</string>
     <string name="filter_notes">Заметки</string>
     <string name="filter_reminders">С напоминанием</string>

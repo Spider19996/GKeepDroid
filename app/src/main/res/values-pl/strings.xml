@@ -393,6 +393,8 @@
     <string name="list_check_all">Zaznacz wszystko</string>
     <string name="list_uncheck_all">Odznacz wszystko</string>
     <string name="list_sort_alpha">Sortuj alfabetycznie</string>
+    <string name="list_categorize">Użyj kategorii</string>
+    <string name="list_uncategorize">Usuń kategorie</string>
     <string name="list_delete_checked">Usuń zaznaczone pozycje</string>
     <string name="filter_notes">Notatki</string>
     <string name="filter_reminders">Z przypomnieniem</string>
