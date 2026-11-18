@@ -456,7 +456,7 @@ internal fun EditorCategoryHeader(
             .layout { m, c ->
                 val p = m.measure(c)
                 // Below the line it takes a little less than its lower half, so the first item is not far from the name.
-                layout(p.width, (p.height / 2 - 8.dp.roundToPx()).coerceAtLeast(0)) { p.place(0, -p.height / 2) }
+                layout(p.width, (p.height / 2 - 14.dp.roundToPx()).coerceAtLeast(0)) { p.place(0, -p.height / 2) }
             }
             .offset { androidx.compose.ui.unit.IntOffset(offsetX.toInt(), 0) }
             .draggable(
@@ -493,12 +493,13 @@ internal fun EditorCategoryHeader(
                     detectDragGesturesAfterLongPress(
                         onDragStart = { start ->
                             haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                            nameCoords?.localToRoot(start)?.y?.let { grab = it - rowTop }
+                            nameCoords?.localToRoot(start)?.y?.let { grab = it }
                             dragStart()
                         },
                         onDrag = { change, _ ->
                             change.consume()
                             // Where the header's top should be now; the editor moves it there from its place in the layout.
+                            // How far the finger has come since it took hold.
                             nameCoords?.localToRoot(change.position)?.y?.let { y -> shift(y - grab); dragTo(y) }
                         },
                         onDragEnd = { dragEnd() },
