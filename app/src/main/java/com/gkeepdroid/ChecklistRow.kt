@@ -72,6 +72,8 @@ internal fun ChecklistRow(
     swipeRight: Int = ITEM_SWIPE_TICK, swipeLeft: Int = ITEM_SWIPE_REMOVE, onSwipe: ((Boolean) -> Unit)? = null,
     /** An item in a category: a second frame around it shows that it belongs to one. */
     framed: Boolean = false,
+    /** Moved along by something else (its category is held): it does not glide on its own then. */
+    carried: Boolean = false,
 ) {
     // The gesture lives as long as the row; it calls what the row is given now, not what it was given when it started (the
     // category of the item changes while it is dragged).
@@ -119,7 +121,7 @@ internal fun ChecklistRow(
     Box(
         Modifier.fillMaxWidth()
             .onGloballyPositioned { val bounds = it.boundsInRoot(); rowTop = bounds.top; onBounds(bounds) }
-            .then(if (dragged || settle.isRunning) Modifier.zIndex(1f) else Modifier.animatePlacement())
+            .then(if (dragged || settle.isRunning) Modifier.zIndex(1f) else if (carried) Modifier else Modifier.animatePlacement())
             .graphicsLayer {
                 val y = fingerY
                 translationY = if (dragged && y != null) y - grab - rowTop else settle.value

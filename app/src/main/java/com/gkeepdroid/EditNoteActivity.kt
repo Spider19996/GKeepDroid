@@ -127,6 +127,9 @@ internal const val CUSTOM_BACKGROUND = "custom"
 /** Marks a drop place among the rows of the editor; what follows is its category ("" for none). */
 private const val SLOT_PREFIX = "\u0000slot:"
 
+/** The place after the last category, for a category that is moved there. */
+private const val CATEGORY_END = "\u0000end"
+
 class EditNoteActivity : ComponentActivity() {
     override fun attachBaseContext(newBase: android.content.Context) {
         super.attachBaseContext(LocaleHelper.wrap(newBase))
@@ -1295,6 +1298,10 @@ class EditNoteActivity : ComponentActivity() {
                 var draggingCategory by remember { mutableStateOf<String?>(null) }
                 // How far the held header is from its place, and the stretches of each frame's top line its header covers.
                 var categoryShift by remember { mutableStateOf(0f) }
+                // Where the held header started, and the category it would be put in front of (or the end).
+                var categoryStartTop by remember { mutableStateOf(0f) }
+                var categoryTarget by remember { mutableStateOf<String?>(null) }
+                val headerLayoutTop = remember { mutableMapOf<String, Float>() }
                 val headerNotches = remember { mutableMapOf<String, androidx.compose.runtime.snapshots.SnapshotStateList<Pair<Float, Float>>>() }
                 // The drop places of the categories that have nothing else in them ("" for no category), and the one the item is over.
                 val slotBounds = remember { mutableStateMapOf<String, Rect>() }
@@ -1410,6 +1417,7 @@ class EditNoteActivity : ComponentActivity() {
                                 dragging = null
                             },
                             focusNow = focusItemId == item.id, onFocused = { focusItemId = null },
+                            carried = draggingCategory != null && groupOf[item.id] == draggingCategory,
                             swipeRight = itemSwipe.first, swipeLeft = itemSwipe.second,
                             onSwipe = { right -> swipeItems(listOf(item.id), if (right) itemSwipe.first else itemSwipe.second) },
                         )
@@ -1426,7 +1434,8 @@ class EditNoteActivity : ComponentActivity() {
                     if (holding != null && editorGroups.none { it.name == null && it.items.any { i -> i.id != holding } }) add(SLOT_PREFIX to null)
                     editorGroups.forEach { group ->
                         if (group.name != null) add(group.name to null)
-                        val hidden = group.name != null && (CategoryFolds.key(account, noteKey, group.name) in folds || group.name == draggingCategory)
+                        // A held category takes its items along (see below), so they stay shown.
+                        val hidden = group.name != null && CategoryFolds.key(account, noteKey, group.name) in folds
                         if (!hidden) group.items.forEach { add(group.name to it) }
                         if (holding != null && group.name != null && !hidden && group.items.none { it.id != holding }) add(SLOT_PREFIX + group.name to null)
                     }
@@ -1450,7 +1459,11 @@ class EditNoteActivity : ComponentActivity() {
                 // The key sits right in the loop: inside a function called from it, it would not let the row move along.
                 entries.forEachIndexed { entryIndex, (name, item) -> key(item?.id ?: "category:$name") {
                     if (item != null) {
-                        ItemEditor(items.indexOfFirst { it.id == item.id }, item, inCategory = name != null, frame = frameAt(entryIndex))
+                        // The items of a held category move with its header.
+                        val carried = name != null && name == draggingCategory
+                        Box(if (carried) Modifier.zIndex(1f).graphicsLayer { translationY = categoryShift } else Modifier) {
+                            ItemEditor(items.indexOfFirst { it.id == item.id }, item, inCategory = name != null, frame = frameAt(entryIndex))
+                        }
                     } else if (name != null && name.startsWith(SLOT_PREFIX)) {
                         val target = name.removePrefix(SLOT_PREFIX)
                         if (target.isNotEmpty()) Box(Modifier.categoryFrame(frameAt(entryIndex))) { CategoryDropSlot(
@@ -1466,9 +1479,13 @@ class EditNoteActivity : ComponentActivity() {
                         val folded = CategoryFolds.key(account, noteKey, name) in folds
                         val real = group.items.filter { !it.isDivider() }
                         val notches = headerNotches.getOrPut(name) { androidx.compose.runtime.mutableStateListOf() }
+                        // The place the held category would go: a line above this header.
+                        if (draggingCategory != null && categoryTarget == name && draggingCategory != name) DropLine()
                         // Room above for the half of the header that lies over the frame's top line.
                         Box(
+                            // Its place in the layout is read before it is moved, so moving it does not move what it is measured against.
                             Modifier.padding(top = 10.dp)
+                                .onGloballyPositioned { headerLayoutTop[name] = it.boundsInRoot().top }
                                 .then(if (draggingCategory == name) Modifier.zIndex(1f).graphicsLayer { translationY = categoryShift } else Modifier.animatePlacement())
                                 .categoryFrame(frameAt(entryIndex), notches),
                         ) { EditorCategoryHeader(
@@ -1479,28 +1496,36 @@ class EditNoteActivity : ComponentActivity() {
                             modifier = Modifier.onGloballyPositioned { headerBounds[name] = it.boundsInRoot() },
                             onRename = { renameCategory = name },
                             dragged = draggingCategory == name,
-                            onDragStart = { draggingCategory = name },
-                            onShift = { categoryShift = it },
+                            // The order stays as it is while the category is held, so nothing jumps: the category follows the
+                            // finger, a line shows where it would go, and it is put there when it is let go.
+                            onDragStart = { draggingCategory = name; categoryStartTop = headerLayoutTop[name] ?: 0f; categoryTarget = null },
+                            onShift = { top -> categoryShift = top - categoryStartTop },
                             onDragTo = { y ->
-                                // Over another header: the held category takes its place in the order.
-                                val over = headerBounds.entries.firstOrNull { (other, r) -> other != name && y >= r.top - 40f && y < r.bottom + 40f }?.key
-                                if (over != null) {
-                                    val from = sessionCategories.indexOf(name)
-                                    val to = sessionCategories.indexOf(over)
-                                    if (from >= 0 && to >= 0) sessionCategories.add(to, sessionCategories.removeAt(from))
-                                }
+                                // The category whose header the finger is above (in the order as it is), or the end.
+                                val order = sessionCategories.filter { it in headerBounds }
+                                val below = order.firstOrNull { other -> other != name && (headerBounds[other]?.let { y < it.center.y } == true) }
+                                categoryTarget = below ?: CATEGORY_END
                                 editorViewport?.let { v ->
                                     val edge = 160f
                                     val step = when { y > v.bottom - edge -> (y - (v.bottom - edge)) / 4f; y < v.top + edge -> -((v.top + edge) - y) / 4f; else -> 0f }
                                     if (step != 0f) scope.launch { scroll.scrollBy(step) }
                                 }
                             },
-                            onDragEnd = { draggingCategory = null; categoryShift = 0f },
+                            onDragEnd = {
+                                val target = categoryTarget
+                                if (target != null && target != name) {
+                                    sessionCategories.remove(name)
+                                    val at = if (target == CATEGORY_END) sessionCategories.size else sessionCategories.indexOf(target).coerceAtLeast(0)
+                                    sessionCategories.add(at, name)
+                                }
+                                draggingCategory = null; categoryShift = 0f; categoryTarget = null
+                            },
                             swipeRight = itemSwipe.first, swipeLeft = itemSwipe.second,
                             onSwipe = { right -> swipeItems(group.items.map { it.id }, if (right) itemSwipe.first else itemSwipe.second) },
                         ) }
                     }
                 } }
+                if (draggingCategory != null && categoryTarget == CATEGORY_END) DropLine()
                 // While an item is held, a place at the end takes it into a new category.
                 if (dragging != null && canFormat) NewCategoryDropZone(
                     active = overNewCategory,

@@ -254,7 +254,7 @@ internal fun NoteTile(
                 )
                 // On the height of the arrow that floats in the corner (its middle is 24 dp below the card's top).
                 if (progress != null) {
-                    Text(progress, color = textColor.copy(alpha = 0.7f), style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(top = 4.dp))
+                    Text(progress, color = textColor.copy(alpha = 0.7f), style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(top = 2.dp))
                 }
                 if (note.pinned) {
                     Icon(
@@ -429,7 +429,8 @@ internal fun NoteTile(
         actions?.let { Column { it() } }
     }
     if (foldable || cornerExtra > 0) {
-        Row(Modifier.align(Alignment.TopEnd).padding(end = if (foldable) 0.dp else 12.dp, top = if (foldable) 0.dp else 12.dp), verticalAlignment = Alignment.CenterVertically) {
+        // Its middle on the middle of the title's first line (22 dp below the card's top).
+        Row(Modifier.align(Alignment.TopEnd).offset(y = if (foldable) (-2).dp else 0.dp).padding(end = if (foldable) 0.dp else 12.dp, top = if (foldable) 0.dp else 12.dp), verticalAlignment = Alignment.CenterVertically) {
             if (!hasTitleRow) {
                 if (progress != null) Text(progress, color = textColor.copy(alpha = 0.7f), style = MaterialTheme.typography.labelMedium)
                 if (note.pinned) {

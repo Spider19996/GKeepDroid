@@ -305,7 +305,8 @@ class NotesWidget : GlanceAppWidget() {
                 if (foldable || cornerExtra > 0) {
                     // A row with a spacer, not the alignment of the box: in a list a reused view sometimes lost that
                     // alignment and drew the arrow at the left edge over the title.
-                    Box(GlanceModifier.fillMaxWidth().padding(top = 2.dp, end = 2.dp)) {
+                    // The arrow's middle on the middle of the title's first line.
+                    Box(GlanceModifier.fillMaxWidth().padding(top = 5.dp, end = 2.dp)) {
                         Row(GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                             androidx.glance.layout.Spacer(GlanceModifier.defaultWeight())
                             if (!hasTitleRow) {

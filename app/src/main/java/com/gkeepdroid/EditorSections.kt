@@ -498,10 +498,11 @@ internal fun EditorCategoryHeader(
                         },
                         onDrag = { change, _ ->
                             change.consume()
-                            nameCoords?.localToRoot(change.position)?.y?.let { y -> shift(y - grab - rowTop); dragTo(y) }
+                            // Where the header's top should be now; the editor moves it there from its place in the layout.
+                            nameCoords?.localToRoot(change.position)?.y?.let { y -> shift(y - grab); dragTo(y) }
                         },
-                        onDragEnd = { shift(0f); dragEnd() },
-                        onDragCancel = { shift(0f); dragEnd() },
+                        onDragEnd = { dragEnd() },
+                        onDragCancel = { dragEnd() },
                     )
                 }
                 .padding(horizontal = 4.dp, vertical = 6.dp),
@@ -630,4 +631,10 @@ internal fun Modifier.categoryFrame(position: Int, notches: List<Pair<Float, Flo
             )
         }
     }.padding(start = 8.dp, end = 8.dp, bottom = if (last) 8.dp else 0.dp)
+}
+
+/** Where a held category would be put: a line in the primary color. */
+@Composable
+internal fun DropLine() {
+    Box(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 2.dp).height(3.dp).clip(androidx.compose.foundation.shape.CircleShape).background(MaterialTheme.colorScheme.primary))
 }
