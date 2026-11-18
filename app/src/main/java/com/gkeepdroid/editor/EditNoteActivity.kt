@@ -354,43 +354,14 @@ class EditNoteActivity : ComponentActivity() {
         var variantDark by model::variantDark
         remember { model.ownText = originalLook.textColor }
         var ownText by model::ownText
-        val darkVersion = variantDark ?: darkTheme
-        // What is on the device already is there in the first frame, so the picture does not pop in.
-        val firstPicture = remember {
-            when {
-                !showColors -> null
-                background == CUSTOM_BACKGROUND -> existing?.let { CustomBackgrounds.peek(this@EditNoteActivity, account, it.id) }
-                background.isEmpty() -> null
-                else -> NoteBackgrounds.peek(this@EditNoteActivity, background, darkVersion)
-            }
-        }
-        val picture by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(firstPicture, background, picked, darkVersion) {
-            value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-                when {
-                    background == CUSTOM_BACKGROUND ->
-                        if (picked != null) CustomBackgrounds.preview(this@EditNoteActivity, picked)
-                        else existing?.let { CustomBackgrounds.load(this@EditNoteActivity, account, it.id) }
-                    background.isEmpty() -> null
-                    else -> NoteBackgrounds.load(this@EditNoteActivity, background, darkVersion)
-                }
-            }
-        }
-        // The dark version of one of Keep's pictures keeps the editor dark, with light text.
-        val darkPicture = darkVersion && background != CUSTOM_BACKGROUND && background.isNotEmpty()
-        val tint = if (showColors) NoteColors.argb(color, darkVersion) else null
-        val shownPicture = if (showColors) picture else null
-        val tinted = tint != null || shownPicture != null
-        // Dark colors and dark pictures keep the editor dark, with light text.
-        val darkLook = (shownPicture != null && darkPicture) || (shownPicture == null && tint != null && darkVersion)
-        // The buttons take their colors from the note's color; without one, from the average color of its picture.
-        val accent = tint ?: shownPicture?.let { remember(it) { NoteBackgrounds.averageColor(it) } }
-        DisposableEffect(tint, shownPicture, darkLook) {
-            screenTint.color = tint
-            screenTint.image = shownPicture
-            screenTint.darkImage = darkLook
-            onDispose { screenTint.color = null; screenTint.image = null; screenTint.darkImage = false }
-        }
-        remember { model.labels = existing?.labels.orEmpty() }
+        val look = rememberEditorLook(this@EditNoteActivity, model, existing, account, showColors, picked, screenTint, darkTheme)
+        val darkVersion = look.darkVersion
+        val picture = look.picture
+        val tint = look.tint
+        val shownPicture = look.shownPicture
+        val tinted = look.tinted
+        val darkLook = look.darkLook
+        val accent = look.accent
         var labels by model::labels
         // A numbered checklist keeps "1. ", "2. " in the text of its items (so Keep shows them too); in the editor
         // the number is a label in front of the field and the field holds only the text.
@@ -644,123 +615,7 @@ class EditNoteActivity : ComponentActivity() {
         val viewport = maxHeight
         Column(Modifier.fillMaxSize().onGloballyPositioned { editorViewport = it.boundsInRoot() }.verticalScroll(scroll).padding(EDITOR_PADDING)) {
         Column(Modifier.fillMaxWidth().heightIn(min = viewport - EDITOR_PADDING * 2), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            if (unsent != null) {
-                Text(
-                    if (unsent.error.isBlank()) stringResource(R.string.note_unsent)
-                    else stringResource(R.string.note_unsent_failed, unsent.error),
-                    color = if (unsent.error.isBlank()) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                )
-            }
-
-
-            if (confirmDelete && existing != null) {
-                AlertDialog(
-                    onDismissRequest = { confirmDelete = false },
-                    text = { Text(stringResource(R.string.delete_local_confirm)) },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            confirmDelete = false
-                            leaveNote { KeepRepository.trashNote(this@EditNoteActivity, account, existing.id) }
-                        }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.delete_note)) }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { confirmDelete = false }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) }
-                    },
-                )
-            }
-
-            if (existing == null && allAccounts.size > 1) {
-                Text(stringResource(R.string.save_to_account), style = MaterialTheme.typography.titleSmall)
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    allAccounts.forEach { candidate ->
-                        FilterChip(
-                            selected = targetAccount == candidate,
-                            onClick = { targetAccount = candidate },
-                            label = { Text(CredentialStore.displayName(this@EditNoteActivity, candidate)) },
-                        )
-                    }
-                }
-            }
-
-            // The labels of the note as chips; they are chosen in the sheet of the bottom bar.
-            if (labels.isNotEmpty()) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                labels.forEach { name -> AssistChip(onClick = { labelsOpen = true }, label = { Text(name) }) }
-            }
-
-            if (remote != null) {
-                // The note changed in Keep while it was open here.
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        stringResource(R.string.note_changed_remote),
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.weight(1f),
-                    )
-                    TextButton(onClick = onReload, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.reload)) }
-                }
-            }
-
-            if (offline) {
-                Text(
-                    stringResource(R.string.offline_note),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                )
-            }
-
-            // Tap an image to view it full screen; it can also be opened in the gallery or marked for
-            // removal. Nothing is deleted before "Save", and "Cancel" keeps every image.
-            images.forEach { imageId ->
-                if (imageId in removedImages) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            stringResource(R.string.image_removal_pending),
-                            Modifier.weight(1f),
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                        TextButton(onClick = { removedImages = removedImages - imageId }, shapes = ButtonDefaults.shapes()) {
-                            Text(stringResource(R.string.image_undo))
-                        }
-                    }
-                } else {
-                    val bitmap = remember(imageId) { NoteImages.thumbnail(this@EditNoteActivity, account, imageId) }
-                    if (bitmap != null) {
-                        Column {
-                            Image(
-                                bitmap = bitmap.asImageBitmap(),
-                                contentDescription = stringResource(R.string.note_image),
-                                contentScale = ContentScale.Fit,
-                                modifier = Modifier.fillMaxWidth().heightIn(max = 280.dp).clickable { viewerImage = imageId },
-                            )
-                            // Centered under the image, sharing the width equally.
-                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                                TextButton(onClick = { openInGallery(account, imageId) }, shapes = ButtonDefaults.shapes()) {
-                                    Text(stringResource(R.string.image_open_gallery))
-                                }
-                                if (existing != null) {
-                                    TextButton(onClick = { removedImages = removedImages + imageId }, shapes = ButtonDefaults.shapes()) {
-                                        Text(stringResource(R.string.image_remove))
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            viewerImage?.let { imageId ->
-                val full = remember(imageId) { NoteImages.full(this@EditNoteActivity, account, imageId) }
-                if (full != null) ImageViewerDialog(full) { viewerImage = null }
-            }
-
-            if (convertFrom != null) {
-                Text(
-                    stringResource(R.string.convert_existing_hint),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall,
-                )
-            }
+            EditorNoteHeader(model, existing, account, allAccounts, unsent, remote, offline, images, scope, onReload, { leaveNote(it) })
             // Where a short note sits is a setting; with the keyboard open it is at the top, where one types.
             if (!imeVisible && editorLayout.option != EDITOR_ALIGN_TOP) Spacer(Modifier.weight(1f))
             // The buttons the layout sets before the note show above its fields, those after it below them.
