@@ -1623,52 +1623,6 @@ class EditNoteActivity : ComponentActivity() {
         }
     }
 
-    /**
-     * Opens this note in the Google Keep app, or on keep.google.com if the app is not installed or
-     * does not handle the link. Keep has no documented link format for the app, so the web link of
-     * the note is tried with the app first.
-     */
-    private fun openInKeep(account: String, note: KeepNote) {
-        val kind = if (note.isList) "LIST" else "NOTE"
-        // With several signed-in accounts the web link has to say which one it means.
-        val authUser = if (CredentialStore.accounts(this).size > 1) "?authuser=${Uri.encode(account)}" else ""
-        val web = Intent(Intent.ACTION_VIEW, "https://keep.google.com/$authUser#$kind/${note.serverId}".toUri())
-        val app = Intent(web).setPackage("com.google.android.keep")
-        try {
-            startActivity(if (app.resolveActivity(packageManager) != null) app else web)
-        } catch (e: ActivityNotFoundException) {
-            // No app can open the link; nothing sensible to do.
-        }
-    }
-
-    /** Hands the note, as it is shown in the editor, to another app as plain text. */
-    private fun shareNote(title: String, text: String, isList: Boolean, items: List<KeepItem>) {
-        val body = if (isList) {
-            items.filter { it.text.isNotBlank() }.joinToString("\n") { (if (it.checked) "☑ " else "☐ ") + it.text }
-        } else {
-            text
-        }
-        val send = Intent(Intent.ACTION_SEND)
-            .setType("text/plain")
-            .putExtra(Intent.EXTRA_SUBJECT, title)
-            .putExtra(Intent.EXTRA_TEXT, listOf(title, body).filter { it.isNotBlank() }.joinToString("\n\n"))
-        startActivity(Intent.createChooser(send, null))
-    }
-
-    /** Opens the original image in the gallery (or any other app that shows images). */
-    private fun openInGallery(account: String, imageId: String) {
-        val file = NoteImages.exportForSharing(this, account, imageId) ?: return
-        val uri = FileProvider.getUriForFile(this, "$packageName.files", file)
-        val intent = Intent(Intent.ACTION_VIEW)
-            .setDataAndType(uri, if (file.extension == "png") "image/png" else "image/jpeg")
-            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        try {
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            // No app can show images; nothing sensible to do.
-        }
-    }
-
     companion object {
         const val EXTRA_NOTE_ID = "note_id"
         const val EXTRA_ACCOUNT = "account"
