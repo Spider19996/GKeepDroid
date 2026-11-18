@@ -191,11 +191,22 @@ class SingleNoteWidget : GlanceAppWidget() {
                     // A checklist with categories: each under its header, which folds it; checked items stay in their category.
                     groups.forEach { group ->
                         val folded = group.name != null && CategoryFolds.key(account, note.id, group.name) in folds
-                        if (group.name != null) item(itemId = stableId("c", group.name)) {
-                            CategoryHeaderRow(note, account, group.name, group.items.count { !it.checked }, folded, settings, palette)
+                        val rows = if (folded) emptyList() else group.rows(settings)
+                        if (group.name == null) {
+                            items(rows, itemId = { stableId("i", it.id) }) { ItemRow(note, it, account, settings, palette) }
+                            return@forEach
                         }
-                        if (!folded) items(group.rows(settings), itemId = { stableId("i", it.id) }) {
-                            ItemRow(note, it, account, settings, palette, inCategory = group.name != null)
+                        // Each row of the list is a view of its own, so each draws its piece of the category's frame.
+                        val count = rows.size + 1
+                        item(itemId = stableId("c", group.name)) {
+                            Box(GlanceModifier.fillMaxWidth().categoryFramePiece(0, count)) {
+                                CategoryHeaderRow(note, account, group.name, group.items.count { !it.checked }, folded, settings, palette)
+                            }
+                        }
+                        rows.forEachIndexed { i, row ->
+                            item(itemId = stableId("i", row.id)) {
+                                Box(GlanceModifier.fillMaxWidth().categoryFramePiece(i + 1, count)) { ItemRow(note, row, account, settings, palette, inCategory = true) }
+                            }
                         }
                     }
                     item(itemId = 8L) { AddItemRow(note, account, settings, palette) }

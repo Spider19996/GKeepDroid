@@ -152,7 +152,7 @@ internal fun NoteTile(
         if (AppLock.editAllowed(activity)) apply() else unlock?.invoke(R.string.lock_prompt_edit) { if (it) apply() }
     }
     // Formatting and the background picture that Keep's own editor gave the note.
-    val rich = remember(resumeKey, NotesCache.version.intValue, note.id) { RichNotes.of(context, account, note.id) }
+    val rich = remember(resumeKey, NotesCache.version.intValue, RichNotes.version.intValue, note.id) { RichNotes.of(context, account, note.id) }
     val backgroundName = rich?.background?.takeIf { app.showNoteColors && it.isNotEmpty() && it != "default" }
     // A photo of the user's own wins over Keep's pictures (choosing it takes Keep's picture away).
     val customStamp = remember(resumeKey, NotesCache.version.intValue, note.id) { CustomBackgrounds.stamp(context, account, note.id) }
@@ -360,14 +360,22 @@ internal fun NoteTile(
                         app.listCollapseChecked -> open
                         else -> open + done
                     }
-                    if (group.name != null) {
+                    if (group.name == null) {
+                        rows.forEach { item -> if (left > 0) { ItemLine(item, inCategory = false); left-- } else hidden++ }
+                        return@forEach
+                    }
+                    // Each category in a frame of its own, rounded like the card around it.
+                    Column(
+                        Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                            .border(1.dp, textColor.copy(alpha = 0.35f), MaterialTheme.shapes.medium)
+                            .padding(start = 8.dp, end = 8.dp, bottom = 4.dp),
+                    ) {
                         val folded = CategoryFolds.key(account, note.id, group.name) in folds
                         CategoryHeader(group.name, open.size, folded, textColor) {
                             CategoryFolds.set(context, account, note.id, group.name, !folded)
                         }
-                        if (folded) return@forEach
+                        if (!folded) rows.forEach { item -> if (left > 0) { ItemLine(item, inCategory = true); left-- } else hidden++ }
                     }
-                    rows.forEach { item -> if (left > 0) { ItemLine(item, inCategory = group.name != null); left-- } else hidden++ }
                 }
                 if (hidden > 0) {
                     Text(

@@ -27,6 +27,9 @@ object RichNotes {
     private class Cached(val stamp: Long, val size: Long, val notes: Map<String, RichNote>, var checkedAt: Long)
 
     private val cache = HashMap<String, Cached>()
+
+    /** Changes whenever the app writes formatting itself, so open cards read it again at once. */
+    val version = androidx.compose.runtime.mutableIntStateOf(0)
     private const val RECHECK_MS = 500L
 
     private fun load(context: Context, account: String): Map<String, RichNote> {
@@ -69,6 +72,34 @@ object RichNotes {
         load(context, account).values.map { it.background }.filter { it.isNotEmpty() }.toSet()
 
     fun of(context: Context, account: String, noteId: String): RichNote? = load(context, account)[noteId]
+
+    /**
+     * Writes formatting into the file the app reads it from, at once: for a local note it is the only place, for a Keep note it
+     * is shown until Keep sends it back (otherwise a note opened again right after saving would show its old styles, and a bold
+     * category word would look like an ordinary one). [json] is what the editor sends: per item id (or "#n" for the n-th of
+     * [itemIds], "text" for the body) the text and its styled stretches.
+     */
+    fun applyLocally(context: Context, account: String, noteId: String, itemIds: List<String>, json: String) {
+        synchronized(cache) {
+            val file = NotesCache.richFile(context, account)
+            val all = runCatching { JSONObject(file.readText()) }.getOrNull() ?: JSONObject()
+            val byNote = all.optJSONObject("n") ?: JSONObject().also { all.put("n", it) }
+            val entry = byNote.optJSONObject(noteId) ?: JSONObject().put("bg", "").put("d", JSONObject()).also { byNote.put(noteId, it) }
+            val docs = entry.optJSONObject("d") ?: JSONObject().also { entry.put("d", it) }
+            val wanted = runCatching { JSONObject(json) }.getOrNull() ?: return
+            wanted.keys().forEach { key ->
+                val target = if (key.startsWith("#")) key.drop(1).toIntOrNull()?.let { itemIds.getOrNull(it) } else key
+                if (target == null) return@forEach
+                val doc = wanted.getJSONObject(key)
+                // The body of a text note is the note's only document; its key in Keep's file is not "text".
+                val name = if (target == "text") docs.keys().asSequence().firstOrNull() ?: "text" else target
+                if ((doc.optJSONArray("r")?.length() ?: 0) == 0) docs.remove(name) else docs.put(name, doc)
+            }
+            file.writeText(all.toString())
+            cache.remove(account)
+        }
+        version.intValue++
+    }
 
     /**
      * The styles that every letter of [start] until [end] of [text] has (spaces do not count); 0 if the text here is not the one

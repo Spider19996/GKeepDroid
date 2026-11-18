@@ -66,21 +66,8 @@ object LocalNotes {
      * the n-th item, "text" for the body) the text and its styled stretches.
      */
     private fun saveFormat(context: Context, email: String, notes: JSONArray, noteId: String, json: String) {
-        val note = find(notes, noteId) ?: return
-        val items = note.optJSONArray("items") ?: JSONArray()
-        val file = NotesCache.richFile(context, email)
-        val all = runCatching { JSONObject(file.readText()) }.getOrNull() ?: JSONObject()
-        val byNote = all.optJSONObject("n") ?: JSONObject().also { all.put("n", it) }
-        val entry = byNote.optJSONObject(noteId) ?: JSONObject().put("bg", "").put("d", JSONObject()).also { byNote.put(noteId, it) }
-        val docs = entry.optJSONObject("d") ?: JSONObject().also { entry.put("d", it) }
-        val wanted = JSONObject(json)
-        wanted.keys().forEach { key ->
-            val target = if (key.startsWith("#")) key.drop(1).toIntOrNull()?.takeIf { it < items.length() }?.let { items.getJSONObject(it).getString("id") } else key
-            if (target == null) return@forEach
-            val doc = wanted.getJSONObject(key)
-            if (doc.optJSONArray("r")?.length() ?: 0 == 0) docs.remove(target) else docs.put(target, doc)
-        }
-        file.writeText(all.toString())
+        val items = find(notes, noteId)?.optJSONArray("items") ?: return
+        RichNotes.applyLocally(context, email, noteId, (0 until items.length()).map { items.getJSONObject(it).getString("id") }, json)
     }
 
     private fun saveLabels(context: Context, email: String, names: List<String>) {

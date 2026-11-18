@@ -27,6 +27,7 @@ import androidx.glance.appwidget.cornerRadius
 import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
+import androidx.glance.layout.Column
 import androidx.glance.layout.ContentScale
 import androidx.glance.layout.Row
 import androidx.glance.layout.fillMaxWidth
@@ -373,12 +374,19 @@ internal fun ChecklistBody(
         var left = if (rowLimit > 0) rowLimit else Int.MAX_VALUE
         var hidden = 0
         groups.forEach { group ->
-            if (group.name != null) {
+            if (group.name == null) {
+                group.rows(settings).forEach { item -> if (left > 0) { ItemRow(note, item, account, settings, palette); left-- } else hidden++ }
+                return@forEach
+            }
+            // Each category in a frame of its own, with the line and rounding of the cards' border.
+            Column(
+                GlanceModifier.fillMaxWidth().padding(vertical = 2.dp).background(ImageProvider(R.drawable.card_border))
+                    .padding(start = 6.dp, end = 4.dp, bottom = 4.dp),
+            ) {
                 val folded = CategoryFolds.key(account, note.id, group.name) in folds
                 CategoryHeaderRow(note, account, group.name, group.items.count { !it.checked }, folded, settings, palette)
-                if (folded) return@forEach
+                if (!folded) group.rows(settings).forEach { item -> if (left > 0) { ItemRow(note, item, account, settings, palette, inCategory = true); left-- } else hidden++ }
             }
-            group.rows(settings).forEach { item -> if (left > 0) { ItemRow(note, item, account, settings, palette, inCategory = group.name != null); left-- } else hidden++ }
         }
         if (hidden > 0) {
             Text(
@@ -410,6 +418,21 @@ internal fun ChecklistBody(
         if (!collapsed) ListNumbering.display(note.items, checked, renumber, startAt = shown.size + 1).forEach { ItemRow(note, it, account, settings, palette) }
     }
 }
+
+/**
+ * The piece of a category's frame for one of its rows in a list where every row is a view of its own: [index] of [count] rows
+ * (the header is the first).
+ */
+internal fun GlanceModifier.categoryFramePiece(index: Int, count: Int): GlanceModifier = background(
+    ImageProvider(
+        when {
+            count == 1 -> R.drawable.card_border
+            index == 0 -> R.drawable.category_frame_top
+            index == count - 1 -> R.drawable.category_frame_bottom
+            else -> R.drawable.category_frame_middle
+        },
+    ),
+).padding(start = 6.dp, end = 4.dp, bottom = if (index == count - 1) 4.dp else 0.dp)
 
 /** The items of a category in a widget: open ones first when the widget moves checked items to the end, checked ones after. */
 internal fun Categories.Group.rows(settings: WidgetSettings): List<KeepItem> =

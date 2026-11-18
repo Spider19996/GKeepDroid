@@ -139,6 +139,12 @@ object KeepRepository {
         val appContext = context.applicationContext
         PendingEdits.add(appContext, edit)
         val changed = NotesCache.reapplyEdits(appContext, edit.account)
+        // Formatting is shown at once too, from the app's own file, until Keep has it.
+        if (edit.function == "format_note" && !CredentialStore.isLocal(edit.account)) runCatching {
+            val noteId = edit.args[0] as String
+            val note = NotesCache.read(appContext, edit.account).firstOrNull { it.id == noteId }
+            RichNotes.applyLocally(appContext, edit.account, noteId, note?.items?.filter { it.text.isNotBlank() }?.map { it.id }.orEmpty(), edit.args[1] as String)
+        }
         backgroundScope.launch {
             if (changed) {
                 WidgetRefresh.all(appContext)

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One piece of the frame around a category in a widget's list, whose rows are views of their own: the top piece. The edge
+     that goes on in the next row lies outside the view and is cut off. The same line and rounding as the cards' border. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:bottom="-3dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#00000000" />
+            <stroke android:width="1.5dp" android:color="#B3A0A0A0" />
+            <corners android:topLeftRadius="@dimen/widget_inner_corner" android:topRightRadius="@dimen/widget_inner_corner" android:bottomLeftRadius="0dp" android:bottomRightRadius="0dp" />
+        </shape>
+    </item>
+</layer-list>
