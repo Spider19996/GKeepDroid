@@ -73,6 +73,12 @@ internal fun ChecklistRow(
     /** An item in a category: a second frame around it shows that it belongs to one. */
     framed: Boolean = false,
 ) {
+    // The gesture lives as long as the row; it calls what the row is given now, not what it was given when it started (the
+    // category of the item changes while it is dragged).
+    val dragTo by androidx.compose.runtime.rememberUpdatedState(onDragTo)
+    val dragStart by androidx.compose.runtime.rememberUpdatedState(onDragStart)
+    val dragEnd by androidx.compose.runtime.rememberUpdatedState(onDragEnd)
+    val toggleNow by androidx.compose.runtime.rememberUpdatedState(onToggle)
     // The field keeps its own selection, which the formatting buttons need.
     var field by remember(item.id) { mutableStateOf(androidx.compose.ui.text.input.TextFieldValue(item.text)) }
     val shownField = if (field.text == item.text) field else androidx.compose.ui.text.input.TextFieldValue(item.text, androidx.compose.ui.text.TextRange(item.text.length))
@@ -219,7 +225,7 @@ internal fun ChecklistRow(
                     .onGloballyPositioned { handle = it }
                     .pointerInput(item.id, editable) {
                         if (!editable) return@pointerInput
-                        detectTapGestures(onTap = { onToggle() })
+                        detectTapGestures(onTap = { toggleNow() })
                     }
                     .pointerInput(item.id, editable) {
                         if (!editable) return@pointerInput
@@ -227,14 +233,14 @@ internal fun ChecklistRow(
                             onDragStart = { start ->
                                 haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                                 handle?.localToRoot(start)?.y?.let { fingerY = it; grab = it - rowTop }
-                                onDragStart()
+                                dragStart()
                             },
                             onDrag = { change, _ ->
                                 change.consume()
-                                handle?.localToRoot(change.position)?.y?.let { fingerY = it; onDragTo(it) }
+                                handle?.localToRoot(change.position)?.y?.let { fingerY = it; dragTo(it) }
                             },
-                            onDragEnd = { release(); onDragEnd() },
-                            onDragCancel = { release(); onDragEnd() },
+                            onDragEnd = { release(); dragEnd() },
+                            onDragCancel = { release(); dragEnd() },
                         )
                     }
                     .semantics { contentDescription = dragDescription },

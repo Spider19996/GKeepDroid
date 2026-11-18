@@ -464,6 +464,16 @@ class EditNoteActivity : ComponentActivity() {
             val cut = Categories.split(item, editorRich()?.docs?.get(id))?.restStart ?: 0
             val rest = item.text.substring(cut)
             val old = format.flagsFor(id, item.text).flags
+            // The word is already in front (a category that was dissolved, or typed by hand): it only becomes bold again.
+            val clean = name?.trim()
+            if (clean != null && cut == 0 && rest.startsWith("$clean ", ignoreCase = true)) {
+                val flags = old.copyOf()
+                for (k in clean.indices) flags[k] = flags[k] or RichNotes.BOLD
+                format.replaceFlags(id, flags)
+                items[i] = item.copy(text = rest.substring(0, clean.length) + rest.substring(clean.length))
+                keepCategory(rest.substring(0, clean.length))
+                return
+            }
             val front = if (name == null) "" else "${name.trim()} "
             val flags = IntArray(front.length + rest.length)
             for (k in 0 until (name?.trim()?.length ?: 0)) flags[k] = RichNotes.BOLD
@@ -1290,11 +1300,12 @@ class EditNoteActivity : ComponentActivity() {
                 // One item of the list as it is edited. Under a category's header it shows without the category's name, which
                 // stays in front of it in Keep; what is typed goes behind the name.
                 @Composable
-                fun ItemEditor(index: Int, item: KeepItem, inCategory: Boolean) {
+                fun ItemEditor(index: Int, item: KeepItem, inCategory: Boolean, frame: Int = FRAME_NONE) {
                     val split = if (inCategory) Categories.split(item, editorRich()?.docs?.get(item.id)) else null
                     val cut = split?.restStart ?: 0
                     val fullFlags = if (canFormat) format.flagsFor(item.id, item.text) else null
                     key(item.id) {
+                      Box(Modifier.categoryFrame(frame)) {
                         ChecklistRow(
                             if (cut > 0) item.copy(text = item.text.substring(cut)) else item, canEdit, dragging == item.id,
                             number = if (numbered) items.take(index).count { it.text.isNotBlank() && !it.isDivider() } + 1 else null,
@@ -1375,8 +1386,8 @@ class EditNoteActivity : ComponentActivity() {
                             focusNow = focusItemId == item.id, onFocused = { focusItemId = null },
                             swipeRight = itemSwipe.first, swipeLeft = itemSwipe.second,
                             onSwipe = { right -> swipeItems(listOf(item.id), if (right) itemSwipe.first else itemSwipe.second) },
-                            framed = inCategory,
                         )
+                      }
                     }
                 }
                 // Headers and items in one flat run, each under its own key: an item dragged into another category keeps its
@@ -1402,13 +1413,24 @@ class EditNoteActivity : ComponentActivity() {
                     headerBounds.keys.retainAll(shownHeaders)
                     slotBounds.keys.retainAll(entries.mapNotNull { (n, i) -> if (i == null && n != null && n.startsWith(SLOT_PREFIX)) n.removePrefix(SLOT_PREFIX) else null }.toSet())
                 }
+                // One frame around each category: its header, its items and its drop place, each drawing its piece.
+                val categoryOf = entries.map { (n, i) -> if (i != null) n else n?.let { if (it.startsWith(SLOT_PREFIX)) it.removePrefix(SLOT_PREFIX).ifEmpty { null } else it } }
+                fun frameAt(index: Int): Int {
+                    val c = categoryOf[index] ?: return FRAME_NONE
+                    val first = index == 0 || categoryOf[index - 1] != c
+                    val last = index == categoryOf.lastIndex || categoryOf[index + 1] != c
+                    return when { first && last -> FRAME_ONLY; first -> FRAME_FIRST; last -> FRAME_LAST; else -> FRAME_MIDDLE }
+                }
                 // The key sits right in the loop: inside a function called from it, it would not let the row move along.
-                entries.forEach { (name, item) -> key(item?.id ?: "category:$name") {
+                entries.forEachIndexed { entryIndex, (name, item) -> key(item?.id ?: "category:$name") {
                     if (item != null) {
-                        ItemEditor(items.indexOfFirst { it.id == item.id }, item, inCategory = name != null)
+                        ItemEditor(items.indexOfFirst { it.id == item.id }, item, inCategory = name != null, frame = frameAt(entryIndex))
                     } else if (name != null && name.startsWith(SLOT_PREFIX)) {
                         val target = name.removePrefix(SLOT_PREFIX)
-                        CategoryDropSlot(
+                        if (target.isNotEmpty()) Box(Modifier.categoryFrame(frameAt(entryIndex))) { CategoryDropSlot(
+                            null, active = hoverTarget == target,
+                            modifier = Modifier.onGloballyPositioned { slotBounds[target] = it.boundsInRoot() }.animatePlacement(),
+                        ) } else CategoryDropSlot(
                             if (target.isEmpty()) stringResource(R.string.category_none) else null,
                             active = hoverTarget == target,
                             modifier = Modifier.onGloballyPositioned { slotBounds[target] = it.boundsInRoot() }.animatePlacement(),
@@ -1417,7 +1439,7 @@ class EditNoteActivity : ComponentActivity() {
                         val group = editorGroups!!.first { it.name == name }
                         val folded = CategoryFolds.key(account, noteKey, name) in folds
                         val real = group.items.filter { !it.isDivider() }
-                        EditorCategoryHeader(
+                        Box(Modifier.categoryFrame(frameAt(entryIndex))) { EditorCategoryHeader(
                             name, real.count { !it.checked }, folded, canEdit,
                             onToggle = { CategoryFolds.set(this@EditNoteActivity, account, noteKey, name, !folded) },
                             onAdd = { addInCategory(name) },
@@ -1448,7 +1470,7 @@ class EditNoteActivity : ComponentActivity() {
                             onDragEnd = { draggingCategory = null },
                             swipeRight = itemSwipe.first, swipeLeft = itemSwipe.second,
                             onSwipe = { right -> swipeItems(group.items.map { it.id }, if (right) itemSwipe.first else itemSwipe.second) },
-                        )
+                        ) }
                     }
                 } }
                 // While an item is held, a place at the end takes it into a new category.

@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.combinedClickable
@@ -436,6 +438,12 @@ internal fun EditorCategoryHeader(
     var handle by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<androidx.compose.ui.layout.LayoutCoordinates?>(null) }
     if (!dragged && fingerY != null) fingerY = null
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+    // The gestures call what the header is given now (the order changes while it is dragged).
+    val dragTo by androidx.compose.runtime.rememberUpdatedState(onDragTo)
+    val dragStart by androidx.compose.runtime.rememberUpdatedState(onDragStart)
+    val dragEnd by androidx.compose.runtime.rememberUpdatedState(onDragEnd)
+    val checkAll by androidx.compose.runtime.rememberUpdatedState(onCheckAll)
+    val swipe by androidx.compose.runtime.rememberUpdatedState(onSwipe)
     androidx.compose.foundation.layout.Row(
         Modifier.fillMaxWidth().padding(top = 8.dp)
             .offset { androidx.compose.ui.unit.IntOffset(offsetX.toInt(), 0) }
@@ -449,7 +457,7 @@ internal fun EditorCategoryHeader(
                     val passed = kotlin.math.abs(offsetX) >= maxPx * 0.75f
                     val toRight = offsetX > 0f
                     androidx.compose.animation.core.animate(offsetX, 0f) { value, _ -> offsetX = value }
-                    if (passed) onSwipe(toRight)
+                    if (passed) swipe(toRight)
                 },
             )
             .onGloballyPositioned { rowTop = it.boundsInRoot().top }
@@ -467,17 +475,17 @@ internal fun EditorCategoryHeader(
         if (canEdit) Box(
             Modifier.width(48.dp).height(56.dp)
                 .onGloballyPositioned { handle = it }
-                .pointerInput(name) { detectTapGestures(onTap = { onCheckAll() }) }
+                .pointerInput(name) { detectTapGestures(onTap = { checkAll() }) }
                 .pointerInput(name) {
                     detectDragGesturesAfterLongPress(
                         onDragStart = { start ->
                             haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                             handle?.localToRoot(start)?.y?.let { fingerY = it; grab = it - rowTop }
-                            onDragStart()
+                            dragStart()
                         },
-                        onDrag = { change, _ -> change.consume(); handle?.localToRoot(change.position)?.y?.let { fingerY = it; onDragTo(it) } },
-                        onDragEnd = { fingerY = null; onDragEnd() },
-                        onDragCancel = { fingerY = null; onDragEnd() },
+                        onDrag = { change, _ -> change.consume(); handle?.localToRoot(change.position)?.y?.let { fingerY = it; dragTo(it) } },
+                        onDragEnd = { fingerY = null; dragEnd() },
+                        onDragCancel = { fingerY = null; dragEnd() },
                     )
                 },
             contentAlignment = androidx.compose.ui.Alignment.CenterStart,
@@ -565,4 +573,38 @@ internal fun CategoryDropSlot(label: String?, active: Boolean, modifier: Modifie
     ) {
         if (label != null) Text(label, color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.titleSmall)
     }
+}
+
+const val FRAME_NONE = 0
+const val FRAME_FIRST = 1
+const val FRAME_MIDDLE = 2
+const val FRAME_LAST = 3
+const val FRAME_ONLY = 4
+
+/**
+ * One piece of the frame around a category: the first row draws the top with its round corners, the last one the bottom, all of
+ * them the sides; the sides reach over the gaps between the rows, so the pieces make one frame. The row moves in a little.
+ */
+@Composable
+internal fun Modifier.categoryFrame(position: Int): Modifier {
+    if (position == FRAME_NONE) return this
+    val color = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
+    return this.drawBehind {
+        val stroke = 1.5.dp.toPx()
+        val radius = 16.dp.toPx()
+        val gap = 12.dp.toPx()
+        val top = if (position == FRAME_FIRST || position == FRAME_ONLY) stroke / 2 else -gap / 2 - 1f
+        val bottom = if (position == FRAME_LAST || position == FRAME_ONLY) size.height + 6.dp.toPx() else size.height + gap / 2 + 1f
+        // A rounded box that is cut where the frame goes on in the next or the previous row.
+        val extendTop = if (position == FRAME_FIRST || position == FRAME_ONLY) 0f else radius
+        val extendBottom = if (position == FRAME_LAST || position == FRAME_ONLY) 0f else radius
+        clipRect(top = top, bottom = bottom) {
+            drawRoundRect(
+                color, topLeft = androidx.compose.ui.geometry.Offset(stroke / 2, top - extendTop),
+                size = androidx.compose.ui.geometry.Size(size.width - stroke, bottom - top + extendTop + extendBottom),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(radius),
+                style = androidx.compose.ui.graphics.drawscope.Stroke(stroke),
+            )
+        }
+    }.padding(start = 8.dp, end = 8.dp, bottom = if (position == FRAME_LAST || position == FRAME_ONLY) 6.dp else 0.dp)
 }
