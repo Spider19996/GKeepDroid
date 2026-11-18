@@ -396,6 +396,8 @@ internal fun NoteTile(
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
+                // The items of a plain list bring room of their own at the end; the frame does not, so what follows it gets some.
+                Spacer(Modifier.height(4.dp))
             }
         } else if (note.text.isNotBlank()) {
             Text(
