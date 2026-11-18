@@ -126,12 +126,6 @@ import kotlinx.coroutines.launch
 internal const val CUSTOM_BACKGROUND = "custom"
 
 /** Edits an existing note (EXTRA_NOTE_ID) or creates a new note or checklist. */
-/** Marks a drop place among the rows of the editor; what follows is its category ("" for none). */
-private const val SLOT_PREFIX = "\u0000slot:"
-
-/** The place after the last category, for a category that is moved there. */
-private const val CATEGORY_END = "\u0000end"
-
 class EditNoteActivity : ComponentActivity() {
     override fun attachBaseContext(newBase: android.content.Context) {
         super.attachBaseContext(LocaleHelper.wrap(newBase))
@@ -145,8 +139,8 @@ class EditNoteActivity : ComponentActivity() {
     private val screenTint = ScreenTint().apply { instant = true }
 
     /** A photo chosen as the note's own background (kept on this phone only), until the note is saved. */
-    private var pickedBackground by androidx.compose.runtime.mutableStateOf<android.net.Uri?>(null)
-    private val pickBackground = registerForActivityResult(ActivityResultContracts.GetContent()) { uri -> if (uri != null) pickedBackground = uri }
+    internal var pickedBackground by androidx.compose.runtime.mutableStateOf<android.net.Uri?>(null)
+    internal val pickBackground = registerForActivityResult(ActivityResultContracts.GetContent()) { uri -> if (uri != null) pickedBackground = uri }
 
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
@@ -273,8 +267,10 @@ class EditNoteActivity : ComponentActivity() {
         remote: KeepNote?, onReload: () -> Unit,
     ) {
         val scope = rememberCoroutineScope()
+        val model = remember { EditorModel() }
         // With the edit lock on, a note opens for reading only until the lock is passed.
-        var canEdit by remember { mutableStateOf(AppLock.editAllowed(this@EditNoteActivity)) }
+        remember { model.canEdit = AppLock.editAllowed(this@EditNoteActivity) }
+        var canEdit by model::canEdit
         val unlock = AppLock.rememberUnlock(this@EditNoteActivity)
         fun toastUnlockFirst() = Toast.makeText(this@EditNoteActivity, R.string.edit_first_hint, Toast.LENGTH_SHORT).show()
         fun askEdit() {
@@ -285,10 +281,13 @@ class EditNoteActivity : ComponentActivity() {
         // A new note is all editing, so the lock is asked for at once.
         LaunchedEffect(Unit) { if (!canEdit && existing == null) askEdit() }
         // A new note can become a checklist while typing (see the offer under the text field).
-        var isList by remember { mutableStateOf(startAsList) }
+        remember { model.isList = startAsList }
+        var isList by model::isList
         // Text shared from another app arrives as a prefill for a new note.
-        var title by remember { mutableStateOf(existing?.title ?: intent.getStringExtra(EXTRA_PREFILL_TITLE).orEmpty()) }
-        var text by remember { mutableStateOf(existing?.text ?: intent.getStringExtra(EXTRA_PREFILL_TEXT).orEmpty()) }
+        remember { model.title = existing?.title ?: intent.getStringExtra(EXTRA_PREFILL_TITLE).orEmpty() }
+        var title by model::title
+        remember { model.text = existing?.text ?: intent.getStringExtra(EXTRA_PREFILL_TEXT).orEmpty() }
+        var text by model::text
         // The editor stays in the list of recent apps under the note's title, so it can be found again after leaving it.
         val untitled = stringResource(if (existing != null) R.string.app_name else if (isList) R.string.new_list else R.string.new_note)
         val firstLine = if (title.isBlank() && !isList) text.lineSequence().firstOrNull { it.isNotBlank() }?.take(40) else null
@@ -300,15 +299,18 @@ class EditNoteActivity : ComponentActivity() {
                 else android.app.ActivityManager.TaskDescription(label),
             )
         }
-        var textSel by remember { mutableStateOf(androidx.compose.ui.text.TextRange(text.length)) }
+        remember { model.textSel = androidx.compose.ui.text.TextRange(text.length) }
+        var textSel by model::textSel
         // The keyboard's composing region; dropping it on every keystroke makes the word suggestions flicker.
-        var textComp by remember { mutableStateOf<androidx.compose.ui.text.TextRange?>(null) }
-        var color by remember { mutableStateOf(existing?.color ?: NoteColors.DEFAULT) }
+        var textComp by model::textComp
+        remember { model.color = existing?.color ?: NoteColors.DEFAULT }
+        var color by model::color
         // The note's own look fills the screen behind the editor: a color, one of Keep's pictures or a photo of the user's own.
         // The color and the picture are set separately (the picture hides the color); CUSTOM_BACKGROUND stands for the photo.
         val originalGallery = remember { existing?.let { RichNotes.of(this@EditNoteActivity, account, it.id)?.background }.orEmpty() }
         val originalCustom = remember { existing != null && CustomBackgrounds.stamp(this@EditNoteActivity, account, existing.id) != 0L }
-        var background by remember { mutableStateOf(if (originalCustom) CUSTOM_BACKGROUND else originalGallery) }
+        remember { model.background = if (originalCustom) CUSTOM_BACKGROUND else originalGallery }
+        var background by model::background
         val picked = pickedBackground
         val showColors = remember { AppSettingsStore.load(this@EditNoteActivity).showNoteColors }
         LaunchedEffect(picked) {
@@ -316,7 +318,7 @@ class EditNoteActivity : ComponentActivity() {
         }
         // A photo of one's own stays on this phone; that is said before it is chosen, every time until it is marked as understood.
         val hintPrefs = remember { getSharedPreferences("hints", MODE_PRIVATE) }
-        var localHint by remember { mutableStateOf(false) }
+        var localHint by model::localHint
         if (localHint) {
             var never by remember { mutableStateOf(false) }
             AlertDialog(
@@ -348,8 +350,10 @@ class EditNoteActivity : ComponentActivity() {
         val darkTheme = LocalDarkTheme.current
         // This phone's own look of the note: a text color, and which version (light or dark) of Keep's picture it shows.
         val originalLook = remember { existing?.let { NoteLook.of(this@EditNoteActivity, account, it.id) } ?: NoteLook.Look(null, null) }
-        var variantDark by remember { mutableStateOf(originalLook.dark) }
-        var ownText by remember { mutableStateOf(originalLook.textColor) }
+        remember { model.variantDark = originalLook.dark }
+        var variantDark by model::variantDark
+        remember { model.ownText = originalLook.textColor }
+        var ownText by model::ownText
         val darkVersion = variantDark ?: darkTheme
         // What is on the device already is there in the first frame, so the picture does not pop in.
         val firstPicture = remember {
@@ -386,14 +390,16 @@ class EditNoteActivity : ComponentActivity() {
             screenTint.darkImage = darkLook
             onDispose { screenTint.color = null; screenTint.image = null; screenTint.darkImage = false }
         }
-        var labels by remember { mutableStateOf(existing?.labels.orEmpty()) }
+        remember { model.labels = existing?.labels.orEmpty() }
+        var labels by model::labels
         // A numbered checklist keeps "1. ", "2. " in the text of its items (so Keep shows them too); in the editor
         // the number is a label in front of the field and the field holds only the text.
         val startNumbered = existing != null && existing.isList && ListNumbering.isNumbered(existing.items)
-        var numbered by remember { mutableStateOf(startNumbered) }
-        var numberOfferDismissed by remember { mutableStateOf(false) }
+        remember { model.numbered = startNumbered }
+        var numbered by model::numbered
+        var numberOfferDismissed by model::numberOfferDismissed
         val items = remember {
-            mutableStateListOf<KeepItem>().apply {
+            model.items.apply {
                 val start = existing?.items ?: if (isList) listOf(KeepItem(UUID.randomUUID().toString(), "", false)) else emptyList()
                 addAll(if (startNumbered) ListNumbering.strip(start) else start)
             }
@@ -401,31 +407,33 @@ class EditNoteActivity : ComponentActivity() {
         /** The items as they are saved: with their numbers in the text when the list is numbered. */
         fun outItems(): List<KeepItem> = if (numbered) ListNumbering.apply(items.toList()) else items.toList()
         // The item that takes the focus once it is shown (one just made in a category).
-        var focusItemId by remember { mutableStateOf<String?>(null) }
-        var addMenuOpen by remember { mutableStateOf(false) }
-        var newCategoryDialog by remember { mutableStateOf(false) }
+        var focusItemId by model::focusItemId
+        var addMenuOpen by model::addMenuOpen
+        var newCategoryDialog by model::newCategoryDialog
         // What the name of a new category is for: its first item (null), or an item dropped onto "New category", or none
         // (the list is being given categories and the new one starts empty).
-        var newCategoryFor by remember { mutableStateOf<String?>(null) }
-        var newCategoryEmpty by remember { mutableStateOf(false) }
+        var newCategoryFor by model::newCategoryFor
+        var newCategoryEmpty by model::newCategoryEmpty
         // The items (one, or all of a category) that a swipe moves to another category; the dialog then offers all of them.
-        var moveItems by remember { mutableStateOf<List<String>?>(null) }
+        var moveItems by model::moveItems
         // An earlier category held once: it turns red, held again it is forgotten.
-        var armedForget by remember { mutableStateOf<String?>(null) }
-        var historyVersion by remember { mutableIntStateOf(0) }
+        var armedForget by model::armedForget
+        var historyVersion by model::historyVersion
         // The category whose name is being changed.
-        var renameCategory by remember { mutableStateOf<String?>(null) }
+        var renameCategory by model::renameCategory
         // The visible part of the note, for scrolling along while an item is dragged near its edges.
-        var editorViewport by remember { mutableStateOf<Rect?>(null) }
+        var editorViewport by model::editorViewport
         val allAccounts = remember { CredentialStore.accounts(this@EditNoteActivity) }
-        var targetAccount by remember { mutableStateOf(account) }
+        remember { model.targetAccount = account }
+        var targetAccount by model::targetAccount
         val wasHidden = existing != null && PrivateNotes.isPrivate(existing, account, PrivateNotes.load(this@EditNoteActivity))
         // Changed with "Hide content"; like every other change it only counts once the note is saved.
-        var hiddenInWidgets by remember { mutableStateOf(wasHidden) }
-        var saving by remember { mutableStateOf(false) }
-        var menuOpen by remember { mutableStateOf(false) }
-        var formatMenuOpen by remember { mutableStateOf(false) }
-        var menuPage by remember { mutableStateOf(0) }
+        remember { model.hiddenInWidgets = wasHidden }
+        var hiddenInWidgets by model::hiddenInWidgets
+        var saving by model::saving
+        var menuOpen by model::menuOpen
+        var formatMenuOpen by model::formatMenuOpen
+        var menuPage by model::menuPage
         LaunchedEffect(menuOpen) { if (!menuOpen) menuPage = 0 }
         val isLocal = CredentialStore.isLocal(account)
 
@@ -504,38 +512,38 @@ class EditNoteActivity : ComponentActivity() {
             }
         }
         val notificationsOn = rememberNotificationsOn(this@EditNoteActivity)
-        var confirmDelete by remember { mutableStateOf(false) }
-        var viewerImage by remember { mutableStateOf<String?>(null) }
+        var confirmDelete by model::confirmDelete
+        var viewerImage by model::viewerImage
         val images = remember { existing?.images.orEmpty() }
         // Images marked for removal; they are only deleted in Keep when the note is saved.
-        var removedImages by remember { mutableStateOf(setOf<String>()) }
+        var removedImages by model::removedImages
         // Keep's own pin: saved to Google Keep together with the note, like the color.
-        var pinned by remember { mutableStateOf(existing?.pinned ?: false) }
+        remember { model.pinned = existing?.pinned ?: false }
+        var pinned by model::pinned
         // Keep has no "bottom": this only changes where the note sits in the widget, and applies at once.
-        var pinBottom by remember {
-            mutableStateOf(
-                pinWidgetId != null && existing != null &&
-                    existing.id in SettingsStore.loadWidget(this@EditNoteActivity, pinWidgetId).pinBottom
-            )
-        }
+        remember { model.pinBottom = pinWidgetId != null && existing != null &&
+                    existing.id in SettingsStore.loadWidget(this@EditNoteActivity, pinWidgetId).pinBottom }
+        var pinBottom by model::pinBottom
         // Reminders belong to the phone only and are saved at once, not with the note.
-        var reminders by remember { mutableStateOf(existing?.let { Reminders.list(this@EditNoteActivity, account, it.id) }.orEmpty()) }
+        remember { model.reminders = existing?.let { Reminders.list(this@EditNoteActivity, account, it.id) }.orEmpty() }
+        var reminders by model::reminders
         val askNotifications = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
         // Saving in the background is the first thing that needs notifications (they tell about a failed
         // send), so the right is asked for once, when a note is saved; the editor closes after the answer.
         val askAfterSave = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { finish() }
-        var remindersOpen by remember { mutableStateOf(false) }
+        var remindersOpen by model::remindersOpen
         // Reminders of a new note wait here until the note exists and has its id.
-        var draftReminders by remember { mutableStateOf(listOf<Reminder>()) }
+        var draftReminders by model::draftReminders
         // Set while an existing note is turned into the other kind: nothing changes until "Save", which
         // then creates the new note and moves this one to the trash.
-        var convertFrom by remember { mutableStateOf<KeepNote?>(null) }
+        var convertFrom by model::convertFrom
         val shownReminders = if (existing != null) reminders else draftReminders.sortedBy { it.at }
         val convertPrefs = remember { getSharedPreferences("convert_hints", MODE_PRIVATE) }
         val convertKey = existing?.let { account + "|" + it.id }
         // Asked once per existing note; "No" is remembered.
-        var convertDismissed by remember { mutableStateOf(convertKey != null && convertPrefs.getBoolean(convertKey, false)) }
-        var error by remember { mutableStateOf("") }
+        remember { model.convertDismissed = convertKey != null && convertPrefs.getBoolean(convertKey, false) }
+        var convertDismissed by model::convertDismissed
+        var error by model::error
         val failedTemplate = stringResource(R.string.save_failed, "%s")
 
         /** Runs an action that ends the editing of this note (archive, trash) and closes the editor. */
@@ -724,9 +732,9 @@ class EditNoteActivity : ComponentActivity() {
             }
         }
 
-        var confirmDiscard by remember { mutableStateOf(false) }
-        var paletteOpen by remember { mutableStateOf(false) }
-        var labelsOpen by remember { mutableStateOf(false) }
+        var confirmDiscard by model::confirmDiscard
+        var paletteOpen by model::paletteOpen
+        var labelsOpen by model::labelsOpen
 
         fun hasChanges() = if (existing != null) {
             title != existing.title || text != existing.text || outItems() != existing.items || color != existing.color ||
@@ -809,222 +817,15 @@ class EditNoteActivity : ComponentActivity() {
         // Read again when the screen comes back, as the layout can be changed in the settings that open from here.
         val editorLayout = remember(layoutKey) { AppSettingsStore.load(this@EditNoteActivity).editorLayout }
         val barSnapBack = remember(layoutKey) { AppSettingsStore.load(this@EditNoteActivity).editorBarSnapBack }
-        val states = mutableMapOf<String, EditorActionState>()
-        states["close"] = EditorActionState(R.drawable.ic_close, stringResource(R.string.discard_action), { if (hasChanges()) confirmDiscard = true else discard() }, enabled = !saving)
-        states["pin"] = EditorActionState(
-            if (pinned) R.drawable.ic_push_pin else R.drawable.ic_push_pin_outline, stringResource(R.string.pin_note),
-            { if (canEdit) pinned = !pinned else toastUnlockFirst() }, checked = pinned, dimmed = !canEdit,
+        val buttons = editorButtons(
+            this@EditNoteActivity, model,
+            existing, account, canFormat, isLocal, pinWidgetId, editorLayout, scope, images, picture, darkVersion, hintPrefs, notificationsOn,
+            shownReminders, format, history, categories, formatEntries, formatOptions,
+            { askEdit() }, { toastUnlockFirst() }, { action -> leaveNote(action) }, undo, redo, { save() }, { requestConvert() },
+            { dissolveCategories() }, { addInCategory(it) }, { discard() }, { hasChanges() }, { outItems() },
         )
-        states["pin_bottom"] = EditorActionState(
-            R.drawable.ic_pin_bottom, stringResource(R.string.pin_to_bottom),
-            {
-                pinBottom = !pinBottom
-                if (pinWidgetId != null && existing != null) {
-                    val widget = SettingsStore.loadWidget(this@EditNoteActivity, pinWidgetId)
-                    SettingsStore.saveWidget(
-                        this@EditNoteActivity, pinWidgetId,
-                        widget.copy(pinBottom = if (pinBottom) widget.pinBottom + existing.id else widget.pinBottom - existing.id),
-                    )
-                    scope.launch { WidgetRefresh.all(this@EditNoteActivity) }
-                }
-            },
-            visible = pinWidgetId != null && existing != null, checked = pinBottom,
-        )
-        states["reminder"] = EditorActionState(
-            R.drawable.ic_alarm, stringResource(R.string.reminders_title), { if (canEdit) remindersOpen = true else askEdit() },
-            checked = shownReminders.isNotEmpty(), tint = if (notificationsOn) null else MaterialTheme.colorScheme.error,
-        )
-        states["save"] = EditorActionState(
-            if (canEdit) R.drawable.ic_done else R.drawable.ic_lock,
-            stringResource(if (canEdit) R.string.save else if (isList) R.string.edit_list else R.string.edit_note),
-            { if (canEdit) save() else askEdit() }, enabled = !saving,
-        )
-        states["palette"] = EditorActionState(R.drawable.ic_palette, stringResource(R.string.color_and_background), { paletteOpen = true }, visible = canEdit)
-        states["labels"] = EditorActionState(R.drawable.ic_label, stringResource(R.string.labels_title), { labelsOpen = true }, visible = canEdit)
-        // Keep's API has no way to upload pictures, so adding one is left to the Keep app.
-        states["image"] = EditorActionState(
-            R.drawable.ic_image, stringResource(R.string.image_add_keep), { startActivity(keepIntent(this@EditNoteActivity)) },
-            visible = canEdit && existing != null && !isLocal && images.isEmpty(),
-        )
-        // What the sheets of the bottom bar hold, to show where the layout sets them beside the note (the highlight is for the preview).
-        val inlineBlocks: Map<String, @Composable (Boolean) -> Unit> = mapOf(
-            "palette" to { _ ->
-                if (canEdit) Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    AppearanceSection(
-                        color = color, onColor = { color = it },
-                        background = background, onBackground = { background = it; pickedBackground = null },
-                        darkVersion = darkVersion, onDarkVersion = { variantDark = it },
-                        canEdit = canEdit, isExisting = existing != null, isLocal = isLocal,
-                        ownText = ownText, onOwnText = { ownText = it },
-                        picture = picture,
-                        onPickPhoto = { if (hintPrefs.getBoolean("own_photo_local_dismissed", false)) pickBackground.launch("image/*") else localHint = true },
-                    )
-                }
-            },
-            "format" to { highlighted -> if (canFormat && canEdit) FormatBar(formatOptions, highlighted) },
-            "labels" to { _ ->
-                if (canEdit) Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    LabelsSection(account = targetAccount, labels = labels, onLabels = { labels = it }, canEdit = canEdit)
-                }
-            },
-        )
-        // The text styles: one button with a list of them, or a bar of them in the note's place. They work on the selection of the
-        // focused field, or on what is typed next at the cursor.
-        states["format"] = EditorActionState(
-            R.drawable.ic_text_format, stringResource(R.string.format_title), { formatMenuOpen = true }, visible = canFormat && canEdit,
-            popup = { GroupedMenu(expanded = formatMenuOpen, onDismissRequest = { formatMenuOpen = false }, groups = listOf(formatEntries)) },
-        )
-        states["undo"] = EditorActionState(R.drawable.ic_undo, stringResource(R.string.undo), undo, visible = canEdit, enabled = history.canUndo)
-        states["redo"] = EditorActionState(R.drawable.ic_redo, stringResource(R.string.redo), redo, visible = canEdit, enabled = history.canRedo)
-        states["convert"] = EditorActionState(
-            if (isList) R.drawable.ic_subject else R.drawable.ic_checklist, stringResource(if (isList) R.string.convert_to_note else R.string.convert_to_list), { requestConvert() },
-        )
-        states["list_number"] = EditorActionState(
-            R.drawable.ic_list_numbered, stringResource(if (numbered) R.string.list_unnumber else R.string.list_number),
-            {
-                // Numbers are shown from the position; an old "1. " typed by hand is not counted twice.
-                val stripped = ListNumbering.strip(items.toList())
-                items.clear()
-                items.addAll(stripped)
-                numbered = !numbered
-            },
-            visible = isList,
-        )
-        states["list_check_all"] = EditorActionState(
-            R.drawable.ic_done_all, stringResource(R.string.list_check_all), { for (i in items.indices) if (!items[i].isDivider()) items[i] = items[i].copy(checked = true) }, visible = isList,
-        )
-        states["list_uncheck_all"] = EditorActionState(
-            R.drawable.ic_remove_done, stringResource(R.string.list_uncheck_all), { for (i in items.indices) items[i] = items[i].copy(checked = false) }, visible = isList,
-        )
-        states["list_sort"] = EditorActionState(
-            R.drawable.ic_sort, stringResource(R.string.list_sort_alpha),
-            {
-                // Sub-items lose their parent when the order changes, so they become ordinary items.
-                // Dividers stay where they are: the items between two of them are sorted among themselves.
-                val sorted = buildList {
-                    var segment = mutableListOf<KeepItem>()
-                    fun flush() { addAll(segment.sortedBy { it.text.lowercase() }.map { it.copy(indent = false) }); segment = mutableListOf() }
-                    items.forEach { if (it.isDivider()) { flush(); add(it.copy(indent = false)) } else segment.add(it) }
-                    flush()
-                }
-                items.clear()
-                items.addAll(sorted)
-            },
-            visible = isList,
-        )
-        val hasCategories = isList && canFormat && (sessionCategories.isNotEmpty() || Categories.names(items, editorRich()).isNotEmpty())
-        states["list_categories"] = EditorActionState(
-            R.drawable.ic_category, stringResource(if (hasCategories) R.string.list_uncategorize else R.string.list_categorize),
-            {
-                if (hasCategories) dissolveCategories()
-                else { newCategoryEmpty = true; newCategoryDialog = true }
-            },
-            visible = isList && canEdit && canFormat,
-        )
-        states["list_delete_checked"] = EditorActionState(
-            R.drawable.ic_delete_sweep, stringResource(R.string.list_delete_checked),
-            {
-                items.removeAll { it.checked }
-                if (items.isEmpty()) items.add(KeepItem(UUID.randomUUID().toString(), "", false))
-            },
-            // Always there, so it can be found; it works once something is ticked.
-            visible = isList && canEdit, enabled = items.any { it.checked },
-        )
-        // In a list with categories adding asks where the item goes: no category, one of them, or a new one.
-        val categoryNames = if (isList && canFormat) Categories.names(items, editorRich()) else emptyList()
-        states["add_item"] = EditorActionState(
-            R.drawable.ic_add, stringResource(R.string.add_item),
-            { if (categoryNames.isEmpty()) addInCategory(null) else addMenuOpen = true },
-            visible = isList && canEdit,
-            // Held, it offers the categories in a list without any yet too: that is where the first one is made.
-            onLongClick = if (isList && canEdit && canFormat) ({ addMenuOpen = true }) else null,
-            popup = {
-                GroupedMenu(
-                    expanded = addMenuOpen, onDismissRequest = { addMenuOpen = false },
-                    groups = listOf(
-                        listOf(MenuEntry(stringResource(R.string.category_none)) { addMenuOpen = false; addInCategory(null) }),
-                        categoryNames.map { name -> MenuEntry(name) { addMenuOpen = false; addInCategory(name) } },
-                        listOf(MenuEntry(stringResource(R.string.category_new), R.drawable.ic_add) { addMenuOpen = false; newCategoryDialog = true }),
-                    ),
-                )
-            },
-        )
-
-        states["add_divider"] = EditorActionState(
-            R.drawable.ic_divider, stringResource(R.string.add_divider),
-            {
-                // Right after the item being edited, or at the end.
-                val at = items.indexOfFirst { it.id == format.focus }.let { if (it >= 0) it + 1 else items.size }
-                items.add(at, KeepItem(UUID.randomUUID().toString(), DIVIDER_TEXT, false))
-            },
-            visible = isList && canEdit,
-        )
-        states["open_in_keep"] = EditorActionState(
-            R.drawable.ic_open_new, stringResource(R.string.open_in_keep), { if (existing != null) openInKeep(account, existing) },
-            visible = existing != null && existing.serverId.isNotEmpty(),
-        )
-        states["editor_settings"] = EditorActionState(
-            R.drawable.ic_settings, stringResource(R.string.editor_buttons_title),
-            { startActivity(Intent(this@EditNoteActivity, SettingsActivity::class.java).putExtra(SettingsActivity.EXTRA_PAGE, "editor_buttons")) },
-        )
-        states["share"] = EditorActionState(R.drawable.ic_share, stringResource(R.string.share_note), { shareNote(title, text, isList, outItems()) }, visible = existing != null)
-        states["hide_content"] = EditorActionState(
-            if (hiddenInWidgets) R.drawable.ic_visibility else R.drawable.ic_visibility_off,
-            stringResource(if (hiddenInWidgets) R.string.show_content else R.string.hide_content),
-            {
-                if (canEdit) {
-                    hiddenInWidgets = !hiddenInWidgets
-                    scope.launch { WidgetRefresh.all(this@EditNoteActivity) }
-                } else {
-                    askEdit()
-                }
-            },
-            visible = existing != null,
-        )
-        states["archive"] = EditorActionState(
-            R.drawable.ic_archive, stringResource(R.string.archive_note),
-            {
-                if (existing != null) leaveNote {
-                    KeepRepository.archiveNote(this@EditNoteActivity, account, existing.id)
-                    UndoStore.set(account, existing.id, UndoStore.Kind.ARCHIVE)
-                }
-            },
-            visible = existing != null && !isLocal,
-        )
-        states["delete"] = EditorActionState(
-            R.drawable.ic_delete, stringResource(if (isLocal) R.string.delete_note else R.string.move_to_trash),
-            {
-                if (existing != null) {
-                    // Local notes have no trash, so deleting them asks first.
-                    if (isLocal) {
-                        confirmDelete = true
-                    } else {
-                        leaveNote {
-                            KeepRepository.trashNote(this@EditNoteActivity, account, existing.id)
-                            UndoStore.set(account, existing.id, UndoStore.Kind.TRASH)
-                        }
-                    }
-                }
-            },
-            visible = existing != null,
-        )
-        // The overflow menu is shown when any of its actions is possible; it grays out until the note is open for editing.
-        val listToolsLabel = stringResource(R.string.list_tools)
-        states["more"] = EditorActionState(
-            R.drawable.ic_more_vert, stringResource(R.string.more_actions), { if (canEdit) menuOpen = true else toastUnlockFirst() },
-            visible = editorLayout.inZone(ZONE_MENU).any { states[it.id]?.visible == true }, dimmed = !canEdit,
-            popup = {
-                GroupedMenu(
-                    expanded = menuOpen && canEdit,
-                    onDismissRequest = { menuOpen = false },
-                    groups = menuGroups(
-                        editorLayout, states, menuPage, { menuPage = it }, listToolsLabel, R.drawable.ic_arrow_left,
-                        { Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null) }, { menuOpen = false },
-                        formatEntries = formatEntries,
-                    ),
-                )
-            },
-        )
+        val states = buttons.states
+        val inlineBlocks = buttons.inlineBlocks
         val scroll = rememberScrollState()
         // The editor opens in its final look; only changes made while it is open fade.
         LaunchedEffect(Unit) { kotlinx.coroutines.delay(500); screenTint.instant = false }
@@ -1200,302 +1001,12 @@ class EditNoteActivity : ComponentActivity() {
             }
 
             if (isList) {
-                // How the rows work; the cross hides this explanation for good.
-                val hintPrefs = remember { getSharedPreferences("hints", MODE_PRIVATE) }
-                var hintHidden by remember { mutableStateOf(hintPrefs.getBoolean("list_hint_hidden", false)) }
-                if (canEdit && !hintHidden) Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        stringResource(R.string.list_swipe_hint),
-                        Modifier.weight(1f),
-                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    IconButton(onClick = {
-                        hintPrefs.edit { putBoolean("list_hint_hidden", true) }
-                        hintHidden = true
-                    }, shapes = IconButtonDefaults.shapes()) {
-                        Icon(painterResource(R.drawable.ic_close), contentDescription = stringResource(R.string.notif_hint_dismiss), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                }
-                // The handle of a row moves it; the bounds tell which row the finger is over.
-                var dragging by remember { mutableStateOf<String?>(null) }
-                val rowBounds = remember { mutableStateMapOf<String, Rect>() }
-                // Where the headers of the categories are, so a dragged item can be dropped onto one.
-                val headerBounds = remember { mutableStateMapOf<String, Rect>() }
-                // The place to drop an item into a new category, and whether the dragged item is over it.
-                var newCategoryZone by remember { mutableStateOf<Rect?>(null) }
-                var overNewCategory by remember { mutableStateOf(false) }
-                // The category whose header is held: its items are left out while it moves, and follow it when it is let go.
-                var draggingCategory by remember { mutableStateOf<String?>(null) }
-                // How far the held header is from its place, and the stretches of each frame's top line its header covers.
-                // Where the finger wants the held header's top (in the root).
-                var categoryFingerTop by remember { mutableStateOf(0f) }
-                var categoryStartTop by remember { mutableStateOf(0f) }
-                val headerLayoutTop = remember { mutableStateMapOf<String, Float>() }
-                val headerNotches = remember { mutableMapOf<String, androidx.compose.runtime.snapshots.SnapshotStateList<Pair<Float, Float>>>() }
-                // The drop places of the categories that have nothing else in them ("" for no category), and the one the item is over.
-                val slotBounds = remember { mutableStateMapOf<String, Rect>() }
-                var hoverTarget by remember { mutableStateOf<String?>(null) }
-                // "1. " typed at the start of the first item offers to number the whole list.
-                val firstFilled = items.firstOrNull { it.text.isNotBlank() }?.text.orEmpty()
-                if (canEdit && !numbered && !numberOfferDismissed && Regex("""^\s*1[.)]\s""").containsMatchIn(firstFilled)) {
-                    Column(
-                        Modifier.fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.shapes.medium)
-                            .padding(start = 16.dp, top = 12.dp, end = 8.dp, bottom = 4.dp),
-                    ) {
-                        Text(stringResource(R.string.number_offer), color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.bodyMedium)
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                            TextButton(onClick = { numberOfferDismissed = true }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.convert_to_list_no)) }
-                            TextButton(onClick = {
-                                val stripped = ListNumbering.strip(items.toList())
-                                items.clear()
-                                items.addAll(stripped)
-                                numbered = true
-                            }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.list_number)) }
-                        }
-                    }
-                }
-                // With categories the items stand under their category's header (as on the cards); the header folds them and
-                // its "+" adds an item to them. The list itself keeps its order.
-                val editorGroups = categoryGroups()
-                val groupOf = editorGroups?.flatMap { g -> g.items.map { it.id to g.name } }?.toMap().orEmpty()
-                // One item of the list as it is edited. Under a category's header it shows without the category's name, which
-                // stays in front of it in Keep; what is typed goes behind the name.
-                @Composable
-                fun ItemEditor(index: Int, item: KeepItem, inCategory: Boolean, frame: Int = FRAME_NONE) {
-                    val split = if (inCategory) Categories.split(item, editorRich()?.docs?.get(item.id)) else null
-                    val cut = split?.restStart ?: 0
-                    val fullFlags = if (canFormat) format.flagsFor(item.id, item.text) else null
-                    key(item.id) {
-                      Box(Modifier.categoryFrame(frame)) {
-                        ChecklistRow(
-                            if (cut > 0) item.copy(text = item.text.substring(cut)) else item, canEdit, dragging == item.id,
-                            number = if (numbered) items.take(index).count { it.text.isNotBlank() && !it.isDivider() } + 1 else null,
-                            onText = { text ->
-                                items.indexOfFirst { it.id == item.id }.let { i ->
-                                    if (i >= 0) {
-                                        val full = items[i].text.take(cut) + text
-                                        format.edited(item.id, items[i].text, full)
-                                        items[i] = items[i].copy(text = full)
-                                    }
-                                }
-                            },
-                            flags = fullFlags?.let { if (cut > 0 && it.flags.size >= cut) DocFlags(it.flags.copyOfRange(cut, it.flags.size)) else it },
-                            flagsVersion = format.version,
-                            onFocus = { format.focus = item.id },
-                            modifier = if (canFormat && canEdit) Modifier.textStyleMenu(styleLabels, applyStyle) else Modifier,
-                            onSelection = { format.selection[item.id] = androidx.compose.ui.text.TextRange(it.start + cut, it.end + cut) },
-                            onToggle = { items.indexOfFirst { it.id == item.id }.let { i -> if (i >= 0 && !items[i].isDivider()) items[i] = items[i].copy(checked = !items[i].checked) } },
-                            onRemove = {
-                                items.removeAll { it.id == item.id }
-                                if (items.isEmpty()) items.add(KeepItem(UUID.randomUUID().toString(), "", false))
-                                if (items.isNotEmpty() && items[0].indent) items[0] = items[0].copy(indent = false)
-                            },
-                            onBounds = { rowBounds[item.id] = it },
-                            onDragStart = { dragging = item.id },
-                            onDragTo = { y ->
-                                // Near the top or bottom of the visible part the note scrolls along, so every place can be reached.
-                                editorViewport?.let { v ->
-                                    val edge = 160f
-                                    val step = when {
-                                        y > v.bottom - edge -> (y - (v.bottom - edge)) / 4f
-                                        y < v.top + edge -> -((v.top + edge) - y) / 4f
-                                        else -> 0f
-                                    }
-                                    if (step != 0f) scope.launch { scroll.scrollBy(step) }
-                                }
-                                overNewCategory = newCategoryZone?.let { y >= it.top && y < it.bottom } == true
-                                if (overNewCategory) return@ChecklistRow
-                                val from = items.indexOfFirst { it.id == item.id }
-                                val over = items.firstOrNull { it.id != item.id && rowBounds[it.id]?.let { r -> y >= r.top && y < r.bottom } == true }
-                                val header = headerBounds.entries.firstOrNull { (_, r) -> y >= r.top && y < r.bottom }?.key
-                                val slot = slotBounds.entries.firstOrNull { (_, r) -> y >= r.top && y < r.bottom }?.key
-                                val firstHeader = headerBounds.values.minOfOrNull { it.top }
-                                // Where the item is meant to go: a drop place, a header, an item of another category, or above all
-                                // categories (no category).
-                                val found = slot != null || header != null || (over != null && groupOf[over.id] != groupOf[item.id]) ||
-                                    (firstHeader != null && y < firstHeader && groupOf[item.id] != null)
-                                hoverTarget = slot
-                                if (from >= 0 && editorGroups != null && found) {
-                                    val target = when {
-                                        slot != null -> slot.ifEmpty { null }
-                                        header != null -> header
-                                        over != null && groupOf[over.id] != groupOf[item.id] -> groupOf[over.id]
-                                        else -> null
-                                    }
-                                    if (target != groupOf[item.id]) {
-                                        setCategory(item.id, target)
-                                        val at = if (over != null) items.indexOfFirst { it.id == over.id } else if (target == null) 0 else items.indexOfLast { groupOf[it.id] == target } + 1
-                                        val now = items.indexOfFirst { it.id == item.id }
-                                        if (at >= 0 && now >= 0 && at != now) items.add(at.coerceAtMost(items.lastIndex), items.removeAt(now))
-                                    }
-                                } else if (from >= 0 && over != null) {
-                                    val to = items.indexOfFirst { it.id == over.id }
-                                    if (to >= 0 && to != from) items.add(to, items.removeAt(from))
-                                }
-                                if (items.isNotEmpty() && items[0].indent) items[0] = items[0].copy(indent = false)
-                            },
-                            onDragEnd = {
-                                // Let go over "New category": its name is asked, then the item goes into it.
-                                if (overNewCategory) {
-                                    newCategoryFor = item.id
-                                    newCategoryDialog = true
-                                }
-                                overNewCategory = false
-                                hoverTarget = null
-                                dragging = null
-                            },
-                            focusNow = focusItemId == item.id, onFocused = { focusItemId = null },
-                            carried = draggingCategory != null && groupOf[item.id] == draggingCategory,
-                            swipeRight = itemSwipe.first, swipeLeft = itemSwipe.second,
-                            onSwipe = { right -> swipeItems(listOf(item.id), if (right) itemSwipe.first else itemSwipe.second) },
-                        )
-                      }
-                    }
-                }
-                // Headers and items in one flat run, each under its own key: an item dragged into another category keeps its
-                // place in the composition (and so the finger that holds it).
-                val folds = remember(CategoryFolds.version.intValue) { CategoryFolds.load(this@EditNoteActivity) }
-                // While an item is held, a category that has nothing else in it (and "no category" at the top) gets a place of
-                // the size of a row to drop it into, so an empty category is as easy to hit as a full one.
-                val holding = dragging
-                val entries: List<Pair<String?, KeepItem?>> = if (editorGroups == null) items.map { null to it } else buildList {
-                    if (holding != null && editorGroups.none { it.name == null && it.items.any { i -> i.id != holding } }) add(SLOT_PREFIX to null)
-                    editorGroups.forEach { group ->
-                        if (group.name != null) add(group.name to null)
-                        // While a category is held every category shows only its header, so they are quick to pass.
-                        val hidden = group.name != null && (CategoryFolds.key(account, noteKey, group.name) in folds || draggingCategory != null)
-                        if (!hidden) group.items.forEach { add(group.name to it) }
-                        if (holding != null && group.name != null && !hidden && group.items.none { it.id != holding }) add(SLOT_PREFIX + group.name to null)
-                    }
-                }
-                // Only what is shown can be dropped onto: rows of folded categories and headers that are gone are forgotten.
-                val shownRows = entries.mapNotNull { it.second?.id }.toSet()
-                val shownHeaders = editorGroups?.mapNotNull { it.name }?.toSet().orEmpty()
-                androidx.compose.runtime.SideEffect {
-                    rowBounds.keys.retainAll(shownRows)
-                    headerBounds.keys.retainAll(shownHeaders)
-                    slotBounds.keys.retainAll(entries.mapNotNull { (n, i) -> if (i == null && n != null && n.startsWith(SLOT_PREFIX)) n.removePrefix(SLOT_PREFIX) else null }.toSet())
-                }
-                // One frame around each category: its header, its items and its drop place, each drawing its piece.
-                val categoryOf = entries.map { (n, i) -> if (i != null) n else n?.let { if (it.startsWith(SLOT_PREFIX)) it.removePrefix(SLOT_PREFIX).ifEmpty { null } else it } }
-                fun frameAt(index: Int): Int {
-                    val c = categoryOf[index] ?: return FRAME_NONE
-                    val first = index == 0 || categoryOf[index - 1] != c
-                    val last = index == categoryOf.lastIndex || categoryOf[index + 1] != c
-                    return when { first && last -> FRAME_ONLY; first -> FRAME_FIRST; last -> FRAME_LAST; else -> FRAME_MIDDLE }
-                }
-                // The key sits right in the loop: inside a function called from it, it would not let the row move along.
-                entries.forEachIndexed { entryIndex, (name, item) -> key(item?.id ?: "category:$name") {
-                    if (item != null) {
-                        // The items of a held category move with its header.
-                        Box {
-                            ItemEditor(items.indexOfFirst { it.id == item.id }, item, inCategory = name != null, frame = frameAt(entryIndex))
-                        }
-                    } else if (name != null && name.startsWith(SLOT_PREFIX)) {
-                        val target = name.removePrefix(SLOT_PREFIX)
-                        if (target.isNotEmpty()) Box(Modifier.categoryFrame(frameAt(entryIndex))) { CategoryDropSlot(
-                            null, active = hoverTarget == target,
-                            modifier = Modifier.onGloballyPositioned { slotBounds[target] = it.boundsInRoot() }.animatePlacement(),
-                        ) } else CategoryDropSlot(
-                            if (target.isEmpty()) stringResource(R.string.category_none) else null,
-                            active = hoverTarget == target,
-                            modifier = Modifier.onGloballyPositioned { slotBounds[target] = it.boundsInRoot() }.animatePlacement(),
-                        )
-                    } else if (name != null) {
-                        val group = editorGroups!!.first { it.name == name }
-                        val folded = CategoryFolds.key(account, noteKey, name) in folds
-                        val real = group.items.filter { !it.isDivider() }
-                        val notches = headerNotches.getOrPut(name) { androidx.compose.runtime.mutableStateListOf() }
-                        // Room above for the half of the header that lies over the frame's top line.
-                        Box(
-                            // Held, it is drawn where the finger has it: its place in the layout is read while it is placed, in the
-                            // same frame as a new order, so passing another category does not make it jump.
-                            Modifier.padding(top = 10.dp)
-                                .then(
-                                    if (draggingCategory == name) Modifier.zIndex(1f)
-                                        .onPlaced { headerLayoutTop[name] = it.positionInRoot().y }
-                                        .graphicsLayer { translationY = categoryFingerTop - (headerLayoutTop[name] ?: categoryFingerTop) }
-                                    // Not gliding by itself: the frame's other pieces would stay behind when the layout moves.
-                                    else Modifier.onPlaced { headerLayoutTop[name] = it.positionInRoot().y },
-                                )
-                                .categoryFrame(frameAt(entryIndex), notches),
-                        ) { EditorCategoryHeader(
-                            name, Categories.progress(group.items), folded, canEdit,
-                            onToggle = { CategoryFolds.set(this@EditNoteActivity, account, noteKey, name, !folded) },
-                            onAdd = { addInCategory(name) },
-                            notches = notches,
-                            modifier = Modifier.onGloballyPositioned { headerBounds[name] = it.boundsInRoot() },
-                            onRename = { renameCategory = name },
-                            dragged = draggingCategory == name,
-                            // The order changes at once when the held header passes the middle of a neighbor's; the others glide.
-                            onDragStart = { draggingCategory = name; categoryStartTop = headerLayoutTop[name] ?: 0f; categoryFingerTop = categoryStartTop },
-                            onShift = { moved -> categoryFingerTop = categoryStartTop + moved },
-                            onDragTo = { y ->
-                                val order = sessionCategories.toList()
-                                val at = order.indexOf(name)
-                                val prev = order.getOrNull(at - 1)?.let { headerBounds[it] }
-                                val next = order.getOrNull(at + 1)?.let { headerBounds[it] }
-                                if (prev != null && y < prev.center.y) { sessionCategories.removeAt(at); sessionCategories.add(at - 1, name) }
-                                else if (next != null && y > next.center.y) { sessionCategories.removeAt(at); sessionCategories.add(at + 1, name) }
-                                editorViewport?.let { v ->
-                                    val edge = 160f
-                                    val step = when { y > v.bottom - edge -> (y - (v.bottom - edge)) / 4f; y < v.top + edge -> -((v.top + edge) - y) / 4f; else -> 0f }
-                                    if (step != 0f) scope.launch { scroll.scrollBy(step) }
-                                }
-                            },
-                            onDragEnd = { draggingCategory = null },
-                            swipeRight = itemSwipe.first, swipeLeft = itemSwipe.second,
-                            onSwipe = { right -> swipeItems(group.items.map { it.id }, if (right) itemSwipe.first else itemSwipe.second) },
-                            alone = group.items.isEmpty() || folded || draggingCategory != null,
-                        ) }
-                    }
-                } }
-                // While an item is held, a place at the end takes it into a new category.
-                if (dragging != null && canFormat) NewCategoryDropZone(
-                    active = overNewCategory,
-                    modifier = Modifier.onGloballyPositioned { newCategoryZone = it.boundsInRoot() },
-                ) else if (newCategoryZone != null) androidx.compose.runtime.SideEffect { newCategoryZone = null }
-            } else {
-                // Lines that start with "-" (or "*", "[ ]") are a list: offer to make it one, once.
-                if (!convertDismissed && ChecklistText.looksLikeList(text) && existing?.images.isNullOrEmpty()) {
-                    Column(
-                        Modifier.fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.shapes.medium)
-                            .padding(start = 16.dp, top = 12.dp, end = 8.dp, bottom = 4.dp),
-                    ) {
-                        Text(
-                            stringResource(R.string.convert_to_list_hint),
-                            color = MaterialTheme.colorScheme.onSecondaryContainer,
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                            TextButton(onClick = {
-                                convertDismissed = true
-                                convertKey?.let { convertPrefs.edit { putBoolean(it, true) } }
-                            }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.convert_to_list_no)) }
-                            TextButton(onClick = { requestConvert() }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.convert_to_list)) }
-                        }
-                    }
-                }
-                OutlinedTextField(
-                    shape = MaterialTheme.shapes.medium,
-                    // Enter after "1. ..." (or "- ...") starts the next line with "2. " (or "- "); Enter on an empty one ends the list.
-                    value = androidx.compose.ui.text.input.TextFieldValue(text, textSel, textComp),
-                    onValueChange = { typed ->
-                        val result = ListContinue.apply(text, typed)
-                        format.edited("text", text, result.text)
-                        text = result.text
-                        format.selection["text"] = result.selection
-                        textSel = result.selection
-                        textComp = if (result === typed) typed.composition else null
-                    },
-                    readOnly = !canEdit,
-                    label = { Text(stringResource(R.string.note_hint)) },
-                    visualTransformation = if (canFormat) remember(format.version, text) { FlagsTransformation(format.flagsFor("text", text)) } else VisualTransformation.None,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp).onFocusChanged { if (it.isFocused) format.focus = "text" }
-                        .then(if (canFormat && canEdit) Modifier.textStyleMenu(styleLabels, applyStyle) else Modifier),
+                EditorChecklist(
+                    model, categories, format, itemSwipe, account, noteKey, canFormat, styleLabels, applyStyle,
+                    { ids, action -> swipeItems(ids, action) }, { addInCategory(it) }, scroll, scope,
                 )
+            } else {
+                EditorTextBody(model, format, existing, canFormat, styleLabels, applyStyle, convertKey, convertPrefs) { requestConvert() }
             }
 
             NoteActionButtons(editorLayout.inZone(ZONE_NOTE).dropWhile { it.id != NOTE_ID }.drop(1), states, inline = inlineBlocks)
@@ -1566,59 +1077,7 @@ class EditNoteActivity : ComponentActivity() {
         if (labelsOpen) EditorSheet({ labelsOpen = false }) {
             LabelsSection(account = targetAccount, labels = labels, onLabels = { labels = it }, canEdit = canEdit)
         }
-        renameCategory?.let { old ->
-            RenameCategoryDialog(
-                old,
-                onDone = { clean ->
-                    if (clean.isNotEmpty() && clean != old) {
-                        // Every item of the category gets the new name in front; the category keeps its place.
-                        val at = sessionCategories.indexOf(old)
-                        categoryGroups()?.firstOrNull { it.name == old }?.items?.forEach { setCategory(it.id, clean) }
-                        sessionCategories.remove(clean)
-                        if (at >= 0 && at <= sessionCategories.size) { sessionCategories.remove(old); sessionCategories.add(at.coerceAtMost(sessionCategories.size), clean) }
-                    }
-                    renameCategory = null
-                },
-                onDismiss = { renameCategory = null },
-            )
-        }
-        if (newCategoryDialog) {
-            val moving = moveItems
-            val current = categoryGroups()?.mapNotNull { it.name }.orEmpty()
-            // The categories this list had before (also ones that are gone since it was last saved), less the ones it has now.
-            val earlier = historyVersion.let { CategoryHistory.load(this@EditNoteActivity, account, noteKey) }.filter { it !in current }
-            val close = { newCategoryDialog = false; newCategoryFor = null; newCategoryEmpty = false; moveItems = null; armedForget = null }
-            CategoryChoiceDialog(
-                moving = moving != null, current = current, earlier = earlier, armed = armedForget,
-                onLongPress = { old ->
-                    // Held once an earlier category turns red, held again it is forgotten.
-                    if (armedForget == old) {
-                        CategoryHistory.remove(this@EditNoteActivity, account, noteKey, old)
-                        armedForget = null
-                        historyVersion++
-                    } else armedForget = old
-                },
-                onChoose = { target ->
-                    if (moving != null) {
-                        // Moving items by a swipe: every category, the ones they are in too, and "no category".
-                        close()
-                        moving.forEach { setCategory(it, target) }
-                        if (target != null) keepCategory(target)
-                    } else if (target != null) { newCategoryDialog = false; createCategory(target) }
-                },
-                onCreate = { typed ->
-                    if (moving != null) { val n = typed.trim(); close(); moving.forEach { setCategory(it, n) }; keepCategory(n) }
-                    else { newCategoryDialog = false; createCategory(typed) }
-                },
-                onDismiss = close,
-            )
-        }
-        if (confirmDiscard) AlertDialog(
-            onDismissRequest = { confirmDiscard = false },
-            title = { Text(stringResource(R.string.discard_title)) },
-            confirmButton = { TextButton(onClick = { confirmDiscard = false; discard() }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.discard_action)) } },
-            dismissButton = { TextButton(onClick = { confirmDiscard = false }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.keep_editing)) } },
-        )
+        EditorDialogs(model, categories, account, noteKey, { createCategory(it) }, { discard() })
         }
         }
     }
