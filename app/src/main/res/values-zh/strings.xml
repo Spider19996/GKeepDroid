@@ -448,4 +448,11 @@
     <string name="category_new">新类别</string>
     <string name="category_none">无类别</string>
     <string name="category_add_item">向 %1$s 添加项目</string>
+    <string name="category_move">移到类别</string>
+    <string name="category_forget_hint">长按类别以标记，再次长按以忘记它。</string>
+    <string name="item_swipe_right">向右滑动项目</string>
+    <string name="item_swipe_left">向左滑动项目</string>
+    <string name="item_swipe_tick">勾选</string>
+    <string name="item_swipe_remove">移除</string>
+    <string name="item_swipe_hint">滑动类别标题会对其所有项目执行相同操作。</string>
 </resources>

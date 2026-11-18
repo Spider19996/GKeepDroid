@@ -457,4 +457,11 @@
     <string name="category_new">Nieuwe categorie</string>
     <string name="category_none">Geen categorie</string>
     <string name="category_add_item">Item toevoegen aan %1$s</string>
+    <string name="category_move">Naar categorie verplaatsen</string>
+    <string name="category_forget_hint">Houd een categorie ingedrukt om haar te markeren, nog eens om haar te vergeten.</string>
+    <string name="item_swipe_right">Item naar rechts vegen</string>
+    <string name="item_swipe_left">Item naar links vegen</string>
+    <string name="item_swipe_tick">Afvinken</string>
+    <string name="item_swipe_remove">Verwijderen</string>
+    <string name="item_swipe_hint">Vegen over de kop van een categorie doet hetzelfde voor al haar items.</string>
 </resources>

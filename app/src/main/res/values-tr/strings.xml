@@ -457,4 +457,11 @@
     <string name="category_new">Yeni kategori</string>
     <string name="category_none">Kategorisiz</string>
     <string name="category_add_item">%1$s kategorisine öğe ekle</string>
+    <string name="category_move">Kategoriye taşı</string>
+    <string name="category_forget_hint">İşaretlemek için kategoriye basılı tutun, unutmak için tekrar basılı tutun.</string>
+    <string name="item_swipe_right">Öğeyi sağa kaydır</string>
+    <string name="item_swipe_left">Öğeyi sola kaydır</string>
+    <string name="item_swipe_tick">İşaretle</string>
+    <string name="item_swipe_remove">Kaldır</string>
+    <string name="item_swipe_hint">Bir kategorinin başlığını kaydırmak aynısını tüm öğelerine yapar.</string>
 </resources>

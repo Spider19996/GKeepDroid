@@ -475,4 +475,11 @@
     <string name="category_new">Новая категория</string>
     <string name="category_none">Без категории</string>
     <string name="category_add_item">Добавить пункт в %1$s</string>
+    <string name="category_move">Переместить в категорию</string>
+    <string name="category_forget_hint">Удерживайте категорию, чтобы отметить её, ещё раз — чтобы забыть.</string>
+    <string name="item_swipe_right">Смахнуть пункт вправо</string>
+    <string name="item_swipe_left">Смахнуть пункт влево</string>
+    <string name="item_swipe_tick">Отметить</string>
+    <string name="item_swipe_remove">Удалить</string>
+    <string name="item_swipe_hint">Смахивание заголовка категории делает то же со всеми её пунктами.</string>
 </resources>

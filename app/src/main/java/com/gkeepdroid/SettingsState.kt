@@ -68,6 +68,8 @@ internal class SettingsState(val context: SettingsActivity) {
     var appTrimEmptyEdges by mutableStateOf(initialApp.trimEmptyEdges)
     var appEditorInRecents by mutableStateOf(initialApp.editorInRecents)
     var appEditorBarSnapBack by mutableStateOf(initialApp.editorBarSnapBack)
+    var appItemSwipeRight by mutableIntStateOf(initialApp.itemSwipeRight)
+    var appItemSwipeLeft by mutableIntStateOf(initialApp.itemSwipeLeft)
     var appWidgetGrace by mutableIntStateOf(initialApp.lockWidgetGraceSec)
     var appWidgetTitlesOnly by mutableStateOf(initialApp.widgetTitlesOnly)
     var appLockWidgetTick by mutableStateOf(initialApp.lockWidgetTick)
@@ -238,13 +240,14 @@ internal class SettingsState(val context: SettingsActivity) {
         appLockWidgetTick = a.lockWidgetTick; appSwipeRight = a.swipeRight; appSwipeLeft = a.swipeLeft; appFoldNotes = a.foldNotes
         appFilterBar = a.filterBar; appFilterChips = a.filterChips; appPullToRefresh = a.pullToRefresh; appEditorLayout = a.editorLayout
         appEditorInRecents = a.editorInRecents; appEditorBarSnapBack = a.editorBarSnapBack
+        appItemSwipeRight = a.itemSwipeRight; appItemSwipeLeft = a.itemSwipeLeft
     }
 
     fun currentApp() = AppSettings(
         appLayout, appSort, appPinnedSection, appShowImages, appShowColors, appPlainStyle, appPreviewLines, appShowEdited, appEditedAsDate, appShowLabels, appShowProgress, appLockPrivate, appLockApp, appLockEdit, appLockGrace,
         appShowReminders, appListCheckedToEnd, appListCollapseChecked, appListCheckboxStyle, appListCheckboxSize, appListSpacing,
         appListCheckInApp, appListDeleteChecked, appConvertPrefix, appRenumberDisplay, appTrimEmptyEdges, appWidgetGrace, appWidgetTitlesOnly, appLockWidgetTick, appSwipeRight, appSwipeLeft, appFoldNotes, appFilterBar, appFilterChips, appPullToRefresh, appEditorLayout,
-        appEditorInRecents, appEditorBarSnapBack,
+        appEditorInRecents, appEditorBarSnapBack, appItemSwipeRight, appItemSwipeLeft,
     )
 
     /** Opens a page; the security page asks for the lock first (whenever the phone has one). */

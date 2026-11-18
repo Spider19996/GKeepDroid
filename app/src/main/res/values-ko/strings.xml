@@ -448,4 +448,11 @@
     <string name="category_new">새 카테고리</string>
     <string name="category_none">카테고리 없음</string>
     <string name="category_add_item">%1$s에 항목 추가</string>
+    <string name="category_move">카테고리로 이동</string>
+    <string name="category_forget_hint">카테고리를 길게 눌러 표시하고, 다시 길게 눌러 잊습니다.</string>
+    <string name="item_swipe_right">항목을 오른쪽으로 스와이프</string>
+    <string name="item_swipe_left">항목을 왼쪽으로 스와이프</string>
+    <string name="item_swipe_tick">체크</string>
+    <string name="item_swipe_remove">삭제</string>
+    <string name="item_swipe_hint">카테고리 제목을 스와이프하면 모든 항목에 똑같이 적용됩니다.</string>
 </resources>

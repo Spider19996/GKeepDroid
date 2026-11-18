@@ -448,4 +448,11 @@
     <string name="category_new">新しいカテゴリ</string>
     <string name="category_none">カテゴリなし</string>
     <string name="category_add_item">%1$s に項目を追加</string>
+    <string name="category_move">カテゴリへ移動</string>
+    <string name="category_forget_hint">カテゴリを長押しで選択、もう一度長押しで削除します。</string>
+    <string name="item_swipe_right">項目を右にスワイプ</string>
+    <string name="item_swipe_left">項目を左にスワイプ</string>
+    <string name="item_swipe_tick">チェック</string>
+    <string name="item_swipe_remove">削除</string>
+    <string name="item_swipe_hint">カテゴリの見出しをスワイプすると、そのすべての項目に同じ操作をします。</string>
 </resources>

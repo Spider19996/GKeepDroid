@@ -466,4 +466,11 @@
     <string name="category_new">Nova categoria</string>
     <string name="category_none">Sem categoria</string>
     <string name="category_add_item">Adicionar item a %1$s</string>
+    <string name="category_move">Mover para categoria</string>
+    <string name="category_forget_hint">Mantenha premida uma categoria para a marcar e outra vez para a esquecer.</string>
+    <string name="item_swipe_right">Deslizar item para a direita</string>
+    <string name="item_swipe_left">Deslizar item para a esquerda</string>
+    <string name="item_swipe_tick">Marcar</string>
+    <string name="item_swipe_remove">Remover</string>
+    <string name="item_swipe_hint">Deslizar o cabeçalho de uma categoria faz o mesmo a todos os seus itens.</string>
 </resources>

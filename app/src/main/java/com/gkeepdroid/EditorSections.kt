@@ -22,6 +22,9 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.input.pointer.pointerInput
@@ -412,7 +415,20 @@ internal fun EditorCategoryHeader(
     name: String, open: Int, folded: Boolean, canEdit: Boolean, onToggle: () -> Unit, onAdd: () -> Unit, modifier: Modifier = Modifier,
     allChecked: Boolean = false, onCheckAll: () -> Unit = {}, dragged: Boolean = false,
     onDragStart: () -> Unit = {}, onDragTo: (Float) -> Unit = {}, onDragEnd: () -> Unit = {},
+    swipeRight: Int = ITEM_SWIPE_NONE, swipeLeft: Int = ITEM_SWIPE_NONE, onSwipe: (Boolean) -> Unit = {},
 ) {
+    // Swiped like an item, for all items of the category; the row stops where the symbol is shown.
+    val maxPx = with(androidx.compose.ui.platform.LocalDensity.current) { 72.dp.toPx() }
+    var offsetX by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0f) }
+    Box(modifier.fillMaxWidth()) {
+    if (offsetX != 0f) {
+        val toRight = offsetX > 0f
+        val (color, icon, tint) = swipeLook(if (toRight) swipeRight else swipeLeft)
+        Box(
+            Modifier.matchParentSize().padding(top = 8.dp).clip(MaterialTheme.shapes.medium).background(color).padding(horizontal = 20.dp),
+            contentAlignment = if (toRight) androidx.compose.ui.Alignment.CenterStart else androidx.compose.ui.Alignment.CenterEnd,
+        ) { Icon(painterResource(icon), contentDescription = null, tint = tint) }
+    }
     // Held, the header follows the finger (as an item does); the others make room.
     var rowTop by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0f) }
     var fingerY by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<Float?>(null) }
@@ -421,7 +437,21 @@ internal fun EditorCategoryHeader(
     if (!dragged && fingerY != null) fingerY = null
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     androidx.compose.foundation.layout.Row(
-        modifier.fillMaxWidth().padding(top = 8.dp)
+        Modifier.fillMaxWidth().padding(top = 8.dp)
+            .offset { androidx.compose.ui.unit.IntOffset(offsetX.toInt(), 0) }
+            .draggable(
+                orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
+                enabled = canEdit && (swipeRight != ITEM_SWIPE_NONE || swipeLeft != ITEM_SWIPE_NONE),
+                state = androidx.compose.foundation.gestures.rememberDraggableState { delta ->
+                    offsetX = (offsetX + delta).coerceIn(if (swipeLeft != ITEM_SWIPE_NONE) -maxPx else 0f, if (swipeRight != ITEM_SWIPE_NONE) maxPx else 0f)
+                },
+                onDragStopped = {
+                    val passed = kotlin.math.abs(offsetX) >= maxPx * 0.75f
+                    val toRight = offsetX > 0f
+                    androidx.compose.animation.core.animate(offsetX, 0f) { value, _ -> offsetX = value }
+                    if (passed) onSwipe(toRight)
+                },
+            )
             .onGloballyPositioned { rowTop = it.boundsInRoot().top }
             .then(if (dragged) Modifier.zIndex(1f) else Modifier)
             .graphicsLayer {
@@ -487,6 +517,7 @@ internal fun EditorCategoryHeader(
         }
     }
 }
+}
 
 /** Shown at the end of a checklist while an item is held: letting it go here puts it into a new category. */
 @Composable
@@ -503,5 +534,35 @@ internal fun NewCategoryDropZone(active: Boolean, modifier: Modifier = Modifier)
         Icon(painterResource(R.drawable.ic_add), contentDescription = null, tint = color)
         androidx.compose.foundation.layout.Spacer(Modifier.size(8.dp))
         Text(stringResource(R.string.category_new), color = color, style = MaterialTheme.typography.titleSmall)
+    }
+}
+
+/** A category to choose; held, [onLongClick] runs (an earlier category turns red, held again it is forgotten). */
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+@Composable
+internal fun CategoryChip(name: String, armed: Boolean = false, onLongClick: (() -> Unit)? = null, onClick: () -> Unit) {
+    val color = if (armed) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline
+    Box(
+        Modifier.clip(MaterialTheme.shapes.small)
+            .background(if (armed) MaterialTheme.colorScheme.errorContainer else androidx.compose.ui.graphics.Color.Transparent)
+            .border(1.dp, color, MaterialTheme.shapes.small)
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+    ) {
+        Text(name, style = MaterialTheme.typography.labelLarge, color = if (armed) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onSurface)
+    }
+}
+
+/** A place to drop a held item into a category that has nothing else in it; [label] names it where no header does. */
+@Composable
+internal fun CategoryDropSlot(label: String?, active: Boolean, modifier: Modifier = Modifier) {
+    val color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
+    Box(
+        modifier.fillMaxWidth().padding(top = 4.dp).height(56.dp).clip(MaterialTheme.shapes.medium)
+            .background(if (active) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else androidx.compose.ui.graphics.Color.Transparent)
+            .border(if (active) 2.dp else 1.dp, color, MaterialTheme.shapes.medium),
+        contentAlignment = androidx.compose.ui.Alignment.Center,
+    ) {
+        if (label != null) Text(label, color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.titleSmall)
     }
 }

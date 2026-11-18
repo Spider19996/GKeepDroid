@@ -466,4 +466,11 @@
     <string name="category_new">Nouvelle catégorie</string>
     <string name="category_none">Sans catégorie</string>
     <string name="category_add_item">Ajouter un élément à %1$s</string>
+    <string name="category_move">Déplacer vers une catégorie</string>
+    <string name="category_forget_hint">Maintenez une catégorie pour la marquer, maintenez à nouveau pour l’oublier.</string>
+    <string name="item_swipe_right">Balayer un élément vers la droite</string>
+    <string name="item_swipe_left">Balayer un élément vers la gauche</string>
+    <string name="item_swipe_tick">Cocher</string>
+    <string name="item_swipe_remove">Retirer</string>
+    <string name="item_swipe_hint">Balayer l’en-tête d’une catégorie fait de même pour tous ses éléments.</string>
 </resources>

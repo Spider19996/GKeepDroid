@@ -457,4 +457,11 @@
     <string name="category_new">Neue Kategorie</string>
     <string name="category_none">Ohne Kategorie</string>
     <string name="category_add_item">Eintrag zu %1$s hinzufügen</string>
+    <string name="category_move">In Kategorie verschieben</string>
+    <string name="category_forget_hint">Kategorie gedrückt halten zum Markieren, nochmal gedrückt halten zum Vergessen.</string>
+    <string name="item_swipe_right">Eintrag nach rechts wischen</string>
+    <string name="item_swipe_left">Eintrag nach links wischen</string>
+    <string name="item_swipe_tick">Abhaken</string>
+    <string name="item_swipe_remove">Entfernen</string>
+    <string name="item_swipe_hint">Wischen über die Überschrift einer Kategorie macht das für alle ihre Einträge.</string>
 </resources>

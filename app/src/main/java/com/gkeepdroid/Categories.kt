@@ -75,6 +75,10 @@ object CategoryHistory {
         runCatching { org.json.JSONArray(prefs(context).getString("$account|$noteId", "[]")) }.getOrNull()
             ?.let { a -> (0 until a.length()).map { a.getString(it) } }.orEmpty()
 
+    fun remove(context: Context, account: String, noteId: String, name: String) {
+        prefs(context).edit { putString("$account|$noteId", org.json.JSONArray(load(context, account, noteId) - name).toString()) }
+    }
+
     fun add(context: Context, account: String, noteId: String, names: Collection<String>) {
         val all = (load(context, account, noteId) + names.map { it.trim() }.filter { it.isNotEmpty() }).distinct()
         prefs(context).edit { putString("$account|$noteId", org.json.JSONArray(all).toString()) }

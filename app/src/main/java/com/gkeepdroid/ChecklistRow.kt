@@ -68,6 +68,10 @@ internal fun ChecklistRow(
     onBounds: (Rect) -> Unit, onDragStart: () -> Unit, onDragTo: (Float) -> Unit, onDragEnd: () -> Unit,
     modifier: Modifier = Modifier, flags: DocFlags? = null, flagsVersion: Int = 0, onFocus: () -> Unit = {}, onSelection: (androidx.compose.ui.text.TextRange) -> Unit = {},
     focusNow: Boolean = false, onFocused: () -> Unit = {},
+    /** What swiping to the right and to the left does (ITEM_SWIPE_*); [onSwipe] gets the direction, true for right. */
+    swipeRight: Int = ITEM_SWIPE_TICK, swipeLeft: Int = ITEM_SWIPE_REMOVE, onSwipe: ((Boolean) -> Unit)? = null,
+    /** An item in a category: a second frame around it shows that it belongs to one. */
+    framed: Boolean = false,
 ) {
     // The field keeps its own selection, which the formatting buttons need.
     var field by remember(item.id) { mutableStateOf(androidx.compose.ui.text.input.TextFieldValue(item.text)) }
@@ -118,21 +122,23 @@ internal fun ChecklistRow(
     ) {
         if (offsetX != 0f) {
             val toRight = offsetX > 0f
+            val (color, icon, tint) = swipeLook(if (toRight) swipeRight else swipeLeft)
             Box(
                 Modifier.matchParentSize().clip(MaterialTheme.shapes.medium)
-                    .background(if (toRight) green else red).padding(horizontal = 20.dp),
+                    .background(color).padding(horizontal = 20.dp),
                 contentAlignment = if (toRight) Alignment.CenterStart else Alignment.CenterEnd,
             ) {
-                Icon(
-                    painterResource(if (toRight) R.drawable.ic_done else R.drawable.ic_close),
-                    contentDescription = null,
-                    tint = if (toRight) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onError,
-                )
+                Icon(painterResource(icon), contentDescription = null, tint = tint)
             }
         }
         Box(
             Modifier
                 .offset { androidx.compose.ui.unit.IntOffset(offsetX.toInt(), 0) }
+                // In a category, a second, lighter frame around the field.
+                .then(
+                    if (framed) Modifier.border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), MaterialTheme.shapes.medium).padding(4.dp)
+                    else Modifier,
+                )
                 .onSizeChanged { size ->
                     val target = ((size.height - handleHeightPx) / 2f).coerceAtLeast(0f)
                     if (!measured) {
@@ -153,15 +159,17 @@ internal fun ChecklistRow(
                     orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
                     enabled = editable,
                     state = androidx.compose.foundation.gestures.rememberDraggableState { delta ->
-                        // A divider cannot be ticked: it only moves to the left, to be removed.
-                        offsetX = (offsetX + delta).coerceIn(-maxPx, if (item.isDivider()) 0f else maxPx)
+                        // A direction that does nothing does not move; a divider cannot be ticked.
+                        fun allowed(action: Int) = action != ITEM_SWIPE_NONE && !(item.isDivider() && action == ITEM_SWIPE_TICK)
+                        offsetX = (offsetX + delta).coerceIn(if (allowed(swipeLeft)) -maxPx else 0f, if (allowed(swipeRight)) maxPx else 0f)
                     },
                     onDragStopped = {
                         val passed = kotlin.math.abs(offsetX) >= trigger
                         val toRight = offsetX > 0f
                         androidx.compose.animation.core.animate(offsetX, 0f) { value, _ -> offsetX = value }
                         if (passed) {
-                            if (toRight) onToggle() else onRemove()
+                            val swipe = onSwipe
+                            if (swipe != null) swipe(toRight) else if (toRight) onToggle() else onRemove()
                         }
                     },
                 )
@@ -276,4 +284,12 @@ internal fun Modifier.animatePlacement(): Modifier = composed {
             if (anim.targetValue != to) scope.launch { anim.animateTo(to, spring(dampingRatio = 0.85f, stiffness = 600f)) }
             anim.value - to
         }
+}
+
+/** How a swipe looks under the row: ticking green, removing red, moving to a category in the primary color. */
+@Composable
+internal fun swipeLook(action: Int): Triple<androidx.compose.ui.graphics.Color, Int, androidx.compose.ui.graphics.Color> = when (action) {
+    ITEM_SWIPE_TICK -> Triple(MaterialTheme.colorScheme.tertiary, R.drawable.ic_done, MaterialTheme.colorScheme.onTertiary)
+    ITEM_SWIPE_CATEGORY -> Triple(MaterialTheme.colorScheme.primary, R.drawable.ic_category, MaterialTheme.colorScheme.onPrimary)
+    else -> Triple(MaterialTheme.colorScheme.error, R.drawable.ic_close, MaterialTheme.colorScheme.onError)
 }

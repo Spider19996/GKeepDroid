@@ -475,4 +475,11 @@
     <string name="category_new">Nowa kategoria</string>
     <string name="category_none">Bez kategorii</string>
     <string name="category_add_item">Dodaj pozycję do %1$s</string>
+    <string name="category_move">Przenieś do kategorii</string>
+    <string name="category_forget_hint">Przytrzymaj kategorię, aby ją zaznaczyć, przytrzymaj ponownie, aby ją zapomnieć.</string>
+    <string name="item_swipe_right">Przesuń pozycję w prawo</string>
+    <string name="item_swipe_left">Przesuń pozycję w lewo</string>
+    <string name="item_swipe_tick">Zaznacz</string>
+    <string name="item_swipe_remove">Usuń</string>
+    <string name="item_swipe_hint">Przesunięcie nagłówka kategorii robi to samo dla wszystkich jej pozycji.</string>
 </resources>

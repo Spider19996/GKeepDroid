@@ -407,6 +407,23 @@ internal fun ColumnScope.AppChecklistsPage(s: SettingsState) {
         Hint(R.string.renumber_display_hint)
         SwitchRow(R.string.trim_empty_edges, appTrimEmptyEdges) { appTrimEmptyEdges = it }
         Hint(R.string.trim_empty_edges_hint)
+        // What swiping an item in the editor does (and a category's header, for all its items).
+        listOf(R.string.item_swipe_right to true, R.string.item_swipe_left to false).forEach { (label, right) ->
+            Text(stringResource(label), Modifier.searchFlash(label), style = MaterialTheme.typography.titleMedium)
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(
+                    ITEM_SWIPE_NONE to R.string.swipe_none, ITEM_SWIPE_TICK to R.string.item_swipe_tick,
+                    ITEM_SWIPE_REMOVE to R.string.item_swipe_remove, ITEM_SWIPE_CATEGORY to R.string.category_move,
+                ).forEach { (action, name) ->
+                    FilterChip(
+                        selected = (if (right) appItemSwipeRight else appItemSwipeLeft) == action,
+                        onClick = { if (right) appItemSwipeRight = action else appItemSwipeLeft = action },
+                        label = { Text(stringResource(name)) },
+                    )
+                }
+            }
+        }
+        Hint(R.string.item_swipe_hint)
         MenuRow(stringResource(R.string.checkbox_style), null) { page = Page.AppCheckbox }
     }
 }

@@ -458,4 +458,11 @@
     <string name="category_new">New category</string>
     <string name="category_none">No category</string>
     <string name="category_add_item">Add item to %1$s</string>
+    <string name="category_move">Move to category</string>
+    <string name="category_forget_hint">Hold a category to mark it, hold again to forget it.</string>
+    <string name="item_swipe_right">Swipe item to the right</string>
+    <string name="item_swipe_left">Swipe item to the left</string>
+    <string name="item_swipe_tick">Tick</string>
+    <string name="item_swipe_remove">Remove</string>
+    <string name="item_swipe_hint">Swiping a category\'s header does the same for all its items.</string>
 </resources>
