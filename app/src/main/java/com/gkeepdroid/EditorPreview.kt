@@ -35,7 +35,14 @@ internal fun EditorPreview(state: ButtonPreviewState, align: Int) {
     fun inZone(zone: Int) = state.items.filter { it.zone == zone }.mapNotNull { byId[it.id] }
     val noteZone = inZone(ZONE_NOTE)
     // The color and the label section are shown as a block with their name, as the sketch of what they would show.
-    val inline: Map<String, @Composable (Boolean) -> Unit> = NOTE_INLINE.associateWith { id -> { hl -> InlinePlaceholder(byId.getValue(id), hl) } }
+    val styles = listOf(
+        R.drawable.ic_format_bold to R.string.format_bold, R.drawable.ic_format_italic to R.string.format_italic,
+        R.drawable.ic_format_underlined to R.string.format_underline, R.drawable.ic_format_strike to R.string.format_strike,
+    ).map { (icon, label) -> FormatOption(icon, stringResource(label), false) {} }
+    // The text styles show as the bar they would be.
+    val inline: Map<String, @Composable (Boolean) -> Unit> = NOTE_INLINE.associateWith { id ->
+        if (id == "format") { hl -> FormatBar(styles, hl) } else { hl -> InlinePlaceholder(byId.getValue(id), hl) }
+    }
     val noteAt = noteZone.indexOfFirst { it.id == NOTE_ID }.coerceAtLeast(0)
     val highlighted = state.items.firstOrNull { it.id == state.highlightId }
     val shape = RoundedCornerShape(16.dp)

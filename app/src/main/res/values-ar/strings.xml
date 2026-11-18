@@ -189,6 +189,9 @@
     <string name="format_italic">مائل</string>
     <string name="format_underline">تسطير</string>
     <string name="format_strike">يتوسطه خط</string>
+    <string name="format_title">التنسيق</string>
+    <string name="editor_in_recents">إبقاء الملاحظات في التطبيقات الأخيرة</string>
+    <string name="editor_in_recents_hint">تبقى الملاحظة المفتوحة من أداة أو اختصار في قائمة التطبيقات الأخيرة بعنوانها بعد مغادرتها.</string>
     <string name="note_text_color">لون النص</string>
     <string name="note_text_color_auto">تلقائي</string>
     <string name="background_dark_version">النسخة الداكنة للصورة</string>

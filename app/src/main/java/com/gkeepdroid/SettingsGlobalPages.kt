@@ -453,5 +453,7 @@ internal fun ColumnScope.EditorButtonsPage(s: SettingsState) {
             onReset = { appEditorLayout = EDITOR_CATALOG.layout() },
             onStatus = { status = it },
         )
+        SwitchRow(R.string.editor_in_recents, appEditorInRecents) { appEditorInRecents = it }
+        Hint(R.string.editor_in_recents_hint)
     }
 }

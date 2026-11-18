@@ -62,6 +62,8 @@ data class AppSettings(
     val pullToRefresh: Boolean = true,
     /** Where the buttons of the note editor stand: the two bars, the menu or nowhere. */
     val editorLayout: ButtonLayout = EDITOR_CATALOG.layout(),
+    /** A note opened from a widget (or elsewhere outside the app) stays in the list of recent apps after leaving it. */
+    val editorInRecents: Boolean = true,
 )
 
 const val FILTER_NOTES = 1
@@ -128,6 +130,7 @@ object AppSettingsStore {
             filterBar = p.getBoolean("filter_bar", d.filterBar),
             filterChips = p.getInt("filter_chips", d.filterChips),
             pullToRefresh = p.getBoolean("pull_to_refresh", d.pullToRefresh),
+            editorInRecents = p.getBoolean("editor_in_recents", d.editorInRecents),
             editorLayout = if (p.contains("editor_layout")) ButtonLayout.fromJson(EDITOR_CATALOG, p.getString("editor_layout", null)) else d.editorLayout,
         )
     }
@@ -195,6 +198,7 @@ object AppSettingsStore {
             putInt("filter_chips", s.filterChips)
             putBoolean("pull_to_refresh", s.pullToRefresh)
             putString("editor_layout", s.editorLayout.toJson())
+            putBoolean("editor_in_recents", s.editorInRecents)
         }
     }
 }

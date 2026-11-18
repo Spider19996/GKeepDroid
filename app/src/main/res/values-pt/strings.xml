@@ -180,6 +180,9 @@
     <string name="format_italic">Itálico</string>
     <string name="format_underline">Sublinhado</string>
     <string name="format_strike">Tachado</string>
+    <string name="format_title">Formatação</string>
+    <string name="editor_in_recents">Manter notas nos apps recentes</string>
+    <string name="editor_in_recents_hint">Uma nota aberta a partir de um widget ou atalho fica na lista de apps recentes, com o seu título, depois de sair dela.</string>
     <string name="note_text_color">Cor do texto</string>
     <string name="note_text_color_auto">Automática</string>
     <string name="background_dark_version">Versão escura da imagem</string>

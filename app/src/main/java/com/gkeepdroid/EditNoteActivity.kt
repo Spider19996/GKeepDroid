@@ -150,6 +150,15 @@ class EditNoteActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Opened from a widget or a shortcut the editor is a task of its own, which stays in the recent apps unless that is
+        // switched off. Opened from the app it belongs to the app's task, which is left as it is.
+        if (isTaskRoot && !AppSettingsStore.load(this).editorInRecents) {
+            getSystemService(android.app.ActivityManager::class.java).appTasks
+                .firstOrNull { task ->
+                    @Suppress("DEPRECATION")
+                    task.taskInfo?.let { if (android.os.Build.VERSION.SDK_INT >= 29) it.taskId else it.persistentId } == taskId
+                }?.setExcludeFromRecents(true)
+        }
         val account = CredentialStore.resolve(this, intent.getStringExtra(EXTRA_ACCOUNT).orEmpty())
         if (account == null) {
             finish()
@@ -386,6 +395,10 @@ class EditNoteActivity : ComponentActivity() {
         var hiddenInWidgets by remember { mutableStateOf(wasHidden) }
         var saving by remember { mutableStateOf(false) }
         var menuOpen by remember { mutableStateOf(false) }
+        var formatMenuOpen by remember { mutableStateOf(false) }
+        // The buttons that did not fit into the top and the bottom bar; they are shown in the menu.
+        var overflowTop by remember { mutableStateOf(emptyList<String>()) }
+        var overflowBottom by remember { mutableStateOf(emptyList<String>()) }
         var menuPage by remember { mutableStateOf(0) }
         LaunchedEffect(menuOpen) { if (!menuOpen) menuPage = 0 }
         val isLocal = CredentialStore.isLocal(account)
@@ -679,6 +692,12 @@ class EditNoteActivity : ComponentActivity() {
         // The text styles live in the selection menu of Android (next to Cut, Copy, Paste), for the text field that has the focus.
         val styleLabels = listOf(R.string.format_bold, R.string.format_italic, R.string.format_underline, R.string.format_strike).map { stringResource(it) }
         val applyStyle: (Int) -> Unit = { bit -> format.toggleSelected(::formatTextOf, bit) }
+        val formatOptions = listOf(
+            Triple(R.drawable.ic_format_bold, RichNotes.BOLD, 0), Triple(R.drawable.ic_format_italic, RichNotes.ITALIC, 1),
+            Triple(R.drawable.ic_format_underlined, RichNotes.UNDERLINE, 2), Triple(R.drawable.ic_format_strike, RichNotes.STRIKE, 3),
+        ).map { (icon, bit, i) -> FormatOption(icon, styleLabels[i], format.version.let { format.isActive(::formatTextOf, bit) }) { applyStyle(bit) } }
+        // The list stays open, so more than one style can be switched.
+        val formatEntries = formatOptions.map { MenuEntry(it.label, it.icon, checked = it.active, onClick = it.toggle) }
         // Every action of the editor with what it does now; the layout of the settings decides which bar or menu shows it.
         // Read again when the screen comes back, as the layout can be changed in the settings that open from here.
         val editorLayout = remember(layoutKey) { AppSettingsStore.load(this@EditNoteActivity).editorLayout }
@@ -734,23 +753,19 @@ class EditNoteActivity : ComponentActivity() {
                     )
                 }
             },
+            "format" to { highlighted -> if (canFormat && canEdit) FormatBar(formatOptions, highlighted) },
             "labels" to { _ ->
                 if (canEdit) Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     LabelsSection(account = targetAccount, labels = labels, onLabels = { labels = it }, canEdit = canEdit)
                 }
             },
         )
-        // The text styles as buttons: they work on the selection of the focused field, or on what is typed next at the cursor.
-        listOf(
-            "format_bold" to RichNotes.BOLD, "format_italic" to RichNotes.ITALIC,
-            "format_underline" to RichNotes.UNDERLINE, "format_strike" to RichNotes.STRIKE,
-        ).forEachIndexed { i, (id, bit) ->
-            states[id] = EditorActionState(
-                EDITOR_CATALOG.byId.getValue(id).icon, styleLabels[i], { applyStyle(bit) },
-                visible = canFormat && canEdit,
-                checked = format.version.let { format.isActive(::formatTextOf, bit) },
-            )
-        }
+        // The text styles: one button with a list of them, or a bar of them in the note's place. They work on the selection of the
+        // focused field, or on what is typed next at the cursor.
+        states["format"] = EditorActionState(
+            R.drawable.ic_text_format, stringResource(R.string.format_title), { formatMenuOpen = true }, visible = canFormat && canEdit,
+            popup = { GroupedMenu(expanded = formatMenuOpen, onDismissRequest = { formatMenuOpen = false }, groups = listOf(formatEntries)) },
+        )
         states["undo"] = EditorActionState(R.drawable.ic_undo, stringResource(R.string.undo), undo, visible = canEdit, enabled = history.canUndo)
         states["redo"] = EditorActionState(R.drawable.ic_redo, stringResource(R.string.redo), redo, visible = canEdit, enabled = history.canRedo)
         states["convert"] = EditorActionState(
@@ -865,7 +880,7 @@ class EditNoteActivity : ComponentActivity() {
         val listToolsLabel = stringResource(R.string.list_tools)
         states["more"] = EditorActionState(
             R.drawable.ic_more_vert, stringResource(R.string.more_actions), { if (canEdit) menuOpen = true else toastUnlockFirst() },
-            visible = editorLayout.inZone(ZONE_MENU).any { states[it.id]?.visible == true }, dimmed = !canEdit,
+            visible = editorLayout.inZone(ZONE_MENU).any { states[it.id]?.visible == true } || (overflowTop + overflowBottom).isNotEmpty(), dimmed = !canEdit,
             popup = {
                 GroupedMenu(
                     expanded = menuOpen && canEdit,
@@ -873,10 +888,14 @@ class EditNoteActivity : ComponentActivity() {
                     groups = menuGroups(
                         editorLayout, states, menuPage, { menuPage = it }, listToolsLabel, R.drawable.ic_arrow_left,
                         { Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null) }, { menuOpen = false },
+                        overflow = overflowTop + overflowBottom, formatEntries = formatEntries,
                     ),
                 )
             },
         )
+        // The menu button for a bar whose buttons move into the menu, when the menu button is switched off (anywhere else it shows).
+        val moreInBars = editorLayout.zoneOf("more") != ZONE_HIDDEN
+        val moreSpec = EDITOR_CATALOG.byId.getValue("more")
         val scroll = rememberScrollState()
         // The editor opens in its final look; only changes made while it is open fade.
         LaunchedEffect(Unit) { kotlinx.coroutines.delay(500); screenTint.instant = false }
@@ -895,7 +914,10 @@ class EditNoteActivity : ComponentActivity() {
         }) {
         Column(Modifier.fillMaxSize()) {
         // The bar stays on screen while the note scrolls: discard, the note's switches, save.
-            EditorBar(editorLayout.inZone(ZONE_TOP_LEFT), editorLayout.inZone(ZONE_TOP_RIGHT), states)
+            EditorBar(
+                editorLayout.inZone(ZONE_TOP_LEFT), editorLayout.inZone(ZONE_TOP_RIGHT), states,
+                onOverflow = { if (it != overflowTop) overflowTop = it }, withMore = if (moreInBars) null else moreSpec,
+            )
         // A short note sits in the middle of the screen between the bars; with the keyboard open, at the top, where one types.
         val imeVisible = WindowInsets.isImeVisible
         BoxWithConstraints(Modifier.weight(1f)) {
@@ -1203,7 +1225,11 @@ class EditNoteActivity : ComponentActivity() {
         }
         }
         // The bottom bar sits above the keyboard, where the thumb is while typing, and stays when the note scrolls.
-        EditorBar(editorLayout.inZone(ZONE_BOTTOM_LEFT), editorLayout.inZone(ZONE_BOTTOM_RIGHT), states)
+        EditorBar(
+            editorLayout.inZone(ZONE_BOTTOM_LEFT), editorLayout.inZone(ZONE_BOTTOM_RIGHT), states,
+            onOverflow = { if (it != overflowBottom) overflowBottom = it },
+            withMore = if (moreInBars || overflowTop.isNotEmpty()) null else moreSpec,
+        )
         }
         if (paletteOpen) EditorSheet({ paletteOpen = false }) {
             AppearanceSection(

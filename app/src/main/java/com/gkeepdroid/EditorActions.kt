@@ -5,7 +5,6 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -30,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -64,11 +64,9 @@ val EDITOR_ACTIONS = listOf(
     ButtonSpec("palette", R.drawable.ic_palette, R.string.color_and_background, 3, ZONE_BOTTOM_LEFT),
     ButtonSpec("labels", R.drawable.ic_label, R.string.labels_title, 3, ZONE_BOTTOM_LEFT),
     ButtonSpec("image", R.drawable.ic_image, R.string.image_add_keep, 3, ZONE_BOTTOM_LEFT),
-    // The text styles of the selected text (or of what is typed next); the same as in the selection menu of Android.
-    ButtonSpec("format_bold", R.drawable.ic_format_bold, R.string.format_bold, 3, ZONE_BOTTOM_LEFT),
-    ButtonSpec("format_italic", R.drawable.ic_format_italic, R.string.format_italic, 3, ZONE_BOTTOM_LEFT),
-    ButtonSpec("format_underline", R.drawable.ic_format_underlined, R.string.format_underline, 3, ZONE_BOTTOM_LEFT),
-    ButtonSpec("format_strike", R.drawable.ic_format_strike, R.string.format_strike, 3, ZONE_BOTTOM_LEFT),
+    // The text styles of the selected text (or of what is typed next): one button with a list of them, off until it is placed;
+    // set in the note's place it is a bar of its own.
+    ButtonSpec("format", R.drawable.ic_text_format, R.string.format_title, 3, ZONE_HIDDEN),
     // Next to undo: a delete that was not meant can be taken back at once.
     ButtonSpec("list_delete_checked", R.drawable.ic_delete_sweep, R.string.list_delete_checked, 3, ZONE_BOTTOM_RIGHT),
     ButtonSpec("undo", R.drawable.ic_undo, R.string.undo, 3, ZONE_BOTTOM_RIGHT),
@@ -102,8 +100,8 @@ const val NOTE_ID = "note"
 /** Tells a saved layout file of the editor from the files of other editors. */
 const val EDITOR_LAYOUT_MARKER = "editorLayout"
 
-/** What the sheets of the bottom bar hold; set in the note's place, each shows itself there instead of opening a sheet. */
-val NOTE_INLINE = setOf("palette", "labels")
+/** What the sheets of the bottom bar (and the list of text styles) hold; set in the note's place, each shows itself there instead of opening. */
+val NOTE_INLINE = setOf("palette", "labels", "format")
 
 /** Where an action of the editor may be moved to: the note only within its own place, every other action anywhere (the note's place included, as a button with a name). */
 private fun editorAllowedZones(id: String): Set<Int>? = if (id == NOTE_ID) setOf(ZONE_NOTE) else null
@@ -130,42 +128,72 @@ class EditorActionState(
     val popup: (@Composable () -> Unit)? = null,
 )
 
+/** Buttons that always stay in their bar: closing, saving and the menu the others move into. */
+private val NEVER_OVERFLOW = setOf("close", "save", "more")
+
 /**
  * One bar of the editor: the actions of its left zone at the left edge, those of its right zone at the right edge. When they
- * do not fit in one line, the buttons move closer and get narrower, so the bar stays one line; only when they would get too
- * small to hit does the bar grow: the left ones stay in the first line, the right ones follow below at the right edge.
+ * do not fit in one line, the buttons move closer and get narrower; when they would get too small to hit, the ones nearest the
+ * middle of the bar move into the menu (they are given to [onOverflow]), so the bar always stays one line. [withMore] is the
+ * menu button, for a bar that has to show it when something moves out of it (the menu button is not in a bar of its own).
+ * Without [onOverflow] (the preview of the settings) every button stays, as narrow as it has to be.
  */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun EditorBar(
     left: List<ButtonSpec>, right: List<ButtonSpec>, states: Map<String, EditorActionState>, sidePadding: Dp = 12.dp,
-    highlightId: String? = null,
+    highlightId: String? = null, onOverflow: ((List<String>) -> Unit)? = null, withMore: ButtonSpec? = null,
 ) {
-    val shown = (left + right).count { states[it.id]?.visible == true }
-    if (shown == 0) return
+    val visibleLeft = left.filter { states[it.id]?.visible == true }
+    val visibleRight = right.filter { states[it.id]?.visible == true }
+    val shown = visibleLeft.size + visibleRight.size
+    if (shown == 0) {
+        if (onOverflow != null) SideEffect { onOverflow(emptyList()) }
+        return
+    }
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         // A button is 40 dp wide with 2 dp between (the save button a little more); squeezed, down to 32 dp with nothing between.
         val room = maxWidth - sidePadding * 2
-        val slot = room / shown
-        val padding = Modifier.fillMaxWidth().padding(horizontal = sidePadding, vertical = 4.dp)
-        if (slot >= 32.dp) {
-            val width = if (slot >= 44.dp) 40.dp else slot
-            val gap = if (slot >= 44.dp) 2.dp else 0.dp
-            Row(padding, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(gap)) {
-                left.forEach { EditorActionButton(it, states[it.id], it.id == highlightId, width) }
-                Spacer(Modifier.weight(1f))
-                right.forEach { EditorActionButton(it, states[it.id], it.id == highlightId, width) }
+        val fitting = (room / 32.dp).toInt().coerceAtLeast(1)
+        var keepLeft = visibleLeft
+        var keepRight = visibleRight
+        val moved = mutableListOf<String>()
+        if (onOverflow != null && shown > fitting) {
+            val addMore = withMore != null && withMore !in visibleLeft && withMore !in visibleRight
+            val limit = fitting - (if (addMore) 1 else 0)
+            // From the middle outwards: the end of the left side first, then the start of the right side.
+            val candidates = (visibleLeft.reversed() + visibleRight).filter { it.id !in NEVER_OVERFLOW }
+            for (spec in candidates) {
+                if (keepLeft.size + keepRight.size <= limit) break
+                moved += spec.id
+                keepLeft = keepLeft - spec
+                keepRight = keepRight - spec
             }
-        } else Column(padding) {
-            FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                left.forEach { EditorActionButton(it, states[it.id], it.id == highlightId) }
+            if (addMore && moved.isNotEmpty()) keepRight = keepRight + withMore!!
+        }
+        if (onOverflow != null) SideEffect { onOverflow(moved.toList()) }
+        val count = keepLeft.size + keepRight.size
+        val slot = room / count.coerceAtLeast(1)
+        val width = if (slot >= 44.dp) 40.dp else slot
+        val gap = if (slot >= 44.dp) 2.dp else 0.dp
+        Row(
+            Modifier.fillMaxWidth().padding(horizontal = sidePadding, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(gap),
+        ) {
+            keepLeft.forEach { EditorActionButton(it, states[it.id], it.id == highlightId, width) }
+            Spacer(Modifier.weight(1f))
+            keepRight.forEach { spec ->
+                // The menu button can be here only because something moved into the menu.
+                val state = states[spec.id]?.let { if (spec == withMore) forceVisible(it) else it }
+                EditorActionButton(spec, state, spec.id == highlightId, width)
             }
-            FlowRow(
-                Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.End), verticalArrangement = Arrangement.spacedBy(2.dp),
-            ) { right.forEach { EditorActionButton(it, states[it.id], it.id == highlightId) } }
         }
     }
 }
+
+private fun forceVisible(state: EditorActionState) = EditorActionState(
+    state.icon, state.label, state.onClick, visible = true, enabled = state.enabled, checked = state.checked, dimmed = state.dimmed,
+    tint = state.tint, popup = state.popup,
+)
 
 @Composable
 private fun EditorActionButton(spec: ButtonSpec, state: EditorActionState?, highlighted: Boolean = false, width: Dp = 40.dp) {
@@ -199,18 +227,25 @@ private fun EditorActionButton(spec: ButtonSpec, state: EditorActionState?, high
 /** The groups of the overflow menu: the actions of the menu zone that are possible now, checklist tools under one entry. */
 internal fun menuGroups(
     layout: ButtonLayout, states: Map<String, EditorActionState>, page: Int, toPage: (Int) -> Unit, listToolsLabel: String, backIcon: Int, forwardIcon: @Composable () -> Unit,
-    closeMenu: () -> Unit,
+    closeMenu: () -> Unit, overflow: List<String> = emptyList(), formatEntries: List<MenuEntry> = emptyList(),
 ): List<List<MenuEntry>> {
-    val shown = layout.inZone(ZONE_MENU).filter { states[it.id]?.visible == true }
+    val shown = layout.inZone(ZONE_MENU).filter { states[it.id]?.visible == true && it.id !in overflow }
+    val formatLabel = states["format"]?.label.orEmpty()
     fun entry(spec: ButtonSpec): MenuEntry {
         val state = states.getValue(spec.id)
+        // The text styles are a page of their own, as the checklist tools are.
+        if (spec.id == "format") return MenuEntry(state.label, state.icon, trailing = forwardIcon) { toPage(2) }
         return MenuEntry(state.label, state.icon, checked = state.checked, onClick = { closeMenu(); state.onClick() })
     }
     if (page == 1) {
         val tools = shown.filter { isListTool(it.id) }.map(::entry)
         return listOf(listOf(MenuEntry(listToolsLabel, backIcon) { toPage(0) }), tools)
     }
+    if (page == 2) return listOf(listOf(MenuEntry(formatLabel, backIcon) { toPage(0) }), formatEntries)
     val groups = mutableListOf<MutableList<MenuEntry>>()
+    // What did not fit into its bar comes first, each as itself (a checklist tool too), in the order of the bars.
+    val moved = overflow.mapNotNull { id -> layout.catalog.byId[id]?.takeIf { states[id]?.visible == true } }
+    if (moved.isNotEmpty()) groups.add(moved.map(::entry).toMutableList())
     var lastGroup = -1
     var toolsAdded = false
     shown.forEach { spec ->
@@ -219,7 +254,7 @@ internal fun menuGroups(
             toolsAdded = true
             MenuEntry(listToolsLabel, R.drawable.ic_list_tools, trailing = forwardIcon) { toPage(1) }
         } else entry(spec)
-        if (spec.group != lastGroup || groups.isEmpty()) groups.add(mutableListOf())
+        if (spec.group != lastGroup || groups.size == (if (moved.isNotEmpty()) 1 else 0)) groups.add(mutableListOf())
         lastGroup = spec.group
         groups.last().add(entry)
     }
@@ -308,11 +343,35 @@ private fun noteButtonTint(id: String): Color? {
         "list_uncheck_all", "archive" -> tone(0xFFFFCC80, 0xFFE65100)
         "open_in_keep", "share" -> tone(0xFF80CBC4, 0xFF00695C)
         "hide_content" -> tone(0xFFCE93D8, 0xFF6A1B9A)
-        "format_bold", "format_italic", "format_underline", "format_strike" -> tone(0xFF90CAF9, 0xFF1565C0)
+        "format" -> tone(0xFF90CAF9, 0xFF1565C0)
         "save" -> tone(0xFF81C784, 0xFF2E7D32)
         "close" -> tone(0xFFEF9A9A, 0xFFC62828)
         "undo", "redo" -> tone(0xFF90CAF9, 0xFF1565C0)
         "reminder", "pin", "pin_bottom" -> tone(0xFFFFCC80, 0xFFE65100)
         else -> null
+    }
+}
+
+/** One text style of the format button: its symbol, its name, whether it is on where the cursor is, and switching it. */
+internal class FormatOption(@DrawableRes val icon: Int, val label: String, val active: Boolean, val toggle: () -> Unit)
+
+/** The text styles as a bar of their own: what the format button shows when it is set in the note's place. */
+@Composable
+internal fun FormatBar(options: List<FormatOption>, highlighted: Boolean = false) {
+    // The same pill and outline as the buttons with a name beside it.
+    val shape = RoundedCornerShape(percent = 50)
+    val outline = ButtonDefaults.outlinedButtonBorder(true)
+    Row(
+        Modifier.fillMaxWidth()
+            .then(if (highlighted) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, shape) else Modifier.border(outline, shape))
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically,
+    ) {
+        options.forEach { option ->
+            FilledTonalIconToggleButton(
+                checked = option.active, onCheckedChange = { option.toggle() }, shapes = IconButtonDefaults.toggleableShapes(),
+                colors = quietToggleColors(),
+            ) { Icon(painterResource(option.icon), contentDescription = option.label) }
+        }
     }
 }

@@ -66,6 +66,7 @@ internal class SettingsState(val context: SettingsActivity) {
     var appConvertPrefix by mutableIntStateOf(initialApp.convertPrefix)
     var appRenumberDisplay by mutableStateOf(initialApp.renumberDisplay)
     var appTrimEmptyEdges by mutableStateOf(initialApp.trimEmptyEdges)
+    var appEditorInRecents by mutableStateOf(initialApp.editorInRecents)
     var appWidgetGrace by mutableIntStateOf(initialApp.lockWidgetGraceSec)
     var appWidgetTitlesOnly by mutableStateOf(initialApp.widgetTitlesOnly)
     var appLockWidgetTick by mutableStateOf(initialApp.lockWidgetTick)
@@ -235,12 +236,14 @@ internal class SettingsState(val context: SettingsActivity) {
         appRenumberDisplay = a.renumberDisplay; appTrimEmptyEdges = a.trimEmptyEdges; appWidgetGrace = a.lockWidgetGraceSec; appWidgetTitlesOnly = a.widgetTitlesOnly
         appLockWidgetTick = a.lockWidgetTick; appSwipeRight = a.swipeRight; appSwipeLeft = a.swipeLeft; appFoldNotes = a.foldNotes
         appFilterBar = a.filterBar; appFilterChips = a.filterChips; appPullToRefresh = a.pullToRefresh; appEditorLayout = a.editorLayout
+        appEditorInRecents = a.editorInRecents
     }
 
     fun currentApp() = AppSettings(
         appLayout, appSort, appPinnedSection, appShowImages, appShowColors, appPlainStyle, appPreviewLines, appShowEdited, appEditedAsDate, appShowLabels, appShowProgress, appLockPrivate, appLockApp, appLockEdit, appLockGrace,
         appShowReminders, appListCheckedToEnd, appListCollapseChecked, appListCheckboxStyle, appListCheckboxSize, appListSpacing,
         appListCheckInApp, appListDeleteChecked, appConvertPrefix, appRenumberDisplay, appTrimEmptyEdges, appWidgetGrace, appWidgetTitlesOnly, appLockWidgetTick, appSwipeRight, appSwipeLeft, appFoldNotes, appFilterBar, appFilterChips, appPullToRefresh, appEditorLayout,
+        appEditorInRecents,
     )
 
     /** Opens a page; the security page asks for the lock first (whenever the phone has one). */

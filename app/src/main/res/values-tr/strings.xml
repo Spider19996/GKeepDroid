@@ -177,6 +177,9 @@
     <string name="format_italic">İtalik</string>
     <string name="format_underline">Altı çizili</string>
     <string name="format_strike">Üstü çizili</string>
+    <string name="format_title">Biçimlendirme</string>
+    <string name="editor_in_recents">Notları son uygulamalarda tut</string>
+    <string name="editor_in_recents_hint">Bir widget veya kısayoldan açılan not, çıktıktan sonra başlığıyla son uygulamalar listesinde kalır.</string>
     <string name="note_text_color">Metin rengi</string>
     <string name="note_text_color_auto">Otomatik</string>
     <string name="background_dark_version">Resmin koyu sürümü</string>

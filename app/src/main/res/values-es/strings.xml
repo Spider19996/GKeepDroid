@@ -180,6 +180,9 @@
     <string name="format_italic">Cursiva</string>
     <string name="format_underline">Subrayado</string>
     <string name="format_strike">Tachado</string>
+    <string name="format_title">Formato</string>
+    <string name="editor_in_recents">Mantener notas en apps recientes</string>
+    <string name="editor_in_recents_hint">Una nota abierta desde un widget o un acceso directo se queda en la lista de apps recientes con su título al salir de ella.</string>
     <string name="note_text_color">Color del texto</string>
     <string name="note_text_color_auto">Automático</string>
     <string name="background_dark_version">Versión oscura de la imagen</string>
