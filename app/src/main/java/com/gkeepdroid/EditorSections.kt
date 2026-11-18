@@ -514,7 +514,7 @@ internal fun EditorCategoryHeader(
         androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
         androidx.compose.foundation.layout.Row(
             // The last symbol ends 16 dp from the frame's line, as the title field's content does (its box is 4 dp wider than the symbol).
-            Modifier.padding(end = 4.dp).onGloballyPositioned { c ->
+            Modifier.padding(end = 0.dp).onGloballyPositioned { c ->
                 val x = c.positionInParent().x
                 toolsRange = x to x + c.size.width
             },
