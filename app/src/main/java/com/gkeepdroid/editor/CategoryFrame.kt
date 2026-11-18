@@ -341,7 +341,7 @@ internal fun CategorySwipeBand(
                 // The frame's own extent: 8 dp in from the sides, down over the 12 dp gap to the next piece, so the bands meet.
                 val side = 0f
                 val r = 18.dp.toPx()
-                val from = if (top) topInset.toPx() + 0.5.dp.toPx() else 0f
+                val from = if (top) topInset.toPx() else 0f
                 val to = if (bottom) size.height else size.height + 12.dp.toPx()
                 val rr = androidx.compose.ui.geometry.RoundRect(
                     side, from, size.width - side, to,
