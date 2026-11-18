@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A text with styles inside it (bold words and the like) for the widgets; Glance's own text can only style a whole text. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rich_text"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:ellipsize="end" />

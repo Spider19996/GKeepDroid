@@ -181,6 +181,8 @@
     <string name="editor_title">एडिटर</string>
     <string name="editor_in_recents">नोट्स को हाल के ऐप्स में रखें</string>
     <string name="editor_in_recents_hint">विजेट या शॉर्टकट से खोला गया नोट छोड़ने के बाद अपने शीर्षक के साथ हाल के ऐप्स की सूची में रहता है।</string>
+    <string name="editor_bar_snap_back">टैप के बाद बार वापस खिसकाएँ</string>
+    <string name="editor_bar_snap_back_hint">जिस एडिटर बार में जगह से ज़्यादा बटन हों, वह किसी बटन पर टैप करने के बाद वापस वहाँ खिसक जाता है जहाँ उसके दोनों हिस्से मिलते हैं।</string>
     <string name="note_text_color">टेक्स्ट का रंग</string>
     <string name="note_text_color_auto">अपने आप</string>
     <string name="background_dark_version">चित्र का गहरा संस्करण</string>

@@ -178,6 +178,8 @@
     <string name="editor_title">エディタ</string>
     <string name="editor_in_recents">メモを最近のアプリに残す</string>
     <string name="editor_in_recents_hint">ウィジェットやショートカットから開いたメモは、閉じた後もタイトル付きで最近のアプリの一覧に残ります。</string>
+    <string name="editor_bar_snap_back">タップ後にバーを戻す</string>
+    <string name="editor_bar_snap_back_hint">ボタンが入りきらないエディタのバーは、ボタンをタップした後、左右が接する位置に戻ります。</string>
     <string name="note_text_color">文字色</string>
     <string name="note_text_color_auto">自動</string>
     <string name="background_dark_version">画像のダーク版</string>

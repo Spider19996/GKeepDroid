@@ -698,6 +698,7 @@ class EditNoteActivity : ComponentActivity() {
         // Every action of the editor with what it does now; the layout of the settings decides which bar or menu shows it.
         // Read again when the screen comes back, as the layout can be changed in the settings that open from here.
         val editorLayout = remember(layoutKey) { AppSettingsStore.load(this@EditNoteActivity).editorLayout }
+        val barSnapBack = remember(layoutKey) { AppSettingsStore.load(this@EditNoteActivity).editorBarSnapBack }
         val states = mutableMapOf<String, EditorActionState>()
         states["close"] = EditorActionState(R.drawable.ic_close, stringResource(R.string.discard_action), { if (hasChanges()) confirmDiscard = true else discard() }, enabled = !saving)
         states["pin"] = EditorActionState(
@@ -908,7 +909,7 @@ class EditNoteActivity : ComponentActivity() {
         }) {
         Column(Modifier.fillMaxSize()) {
         // The bar stays on screen while the note scrolls: discard, the note's switches, save.
-            EditorBar(editorLayout.inZone(ZONE_TOP_LEFT), editorLayout.inZone(ZONE_TOP_RIGHT), states)
+            EditorBar(editorLayout.inZone(ZONE_TOP_LEFT), editorLayout.inZone(ZONE_TOP_RIGHT), states, snapBack = barSnapBack)
         // A short note sits in the middle of the screen between the bars; with the keyboard open, at the top, where one types.
         val imeVisible = WindowInsets.isImeVisible
         BoxWithConstraints(Modifier.weight(1f)) {
@@ -1216,7 +1217,7 @@ class EditNoteActivity : ComponentActivity() {
         }
         }
         // The bottom bar sits above the keyboard, where the thumb is while typing, and stays when the note scrolls.
-        EditorBar(editorLayout.inZone(ZONE_BOTTOM_LEFT), editorLayout.inZone(ZONE_BOTTOM_RIGHT), states)
+        EditorBar(editorLayout.inZone(ZONE_BOTTOM_LEFT), editorLayout.inZone(ZONE_BOTTOM_RIGHT), states, snapBack = barSnapBack)
         }
         if (paletteOpen) EditorSheet({ paletteOpen = false }) {
             AppearanceSection(

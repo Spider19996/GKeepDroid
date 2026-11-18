@@ -181,6 +181,8 @@
     <string name="editor_title">Düzenleyici</string>
     <string name="editor_in_recents">Notları son uygulamalarda tut</string>
     <string name="editor_in_recents_hint">Bir widget veya kısayoldan açılan not, çıktıktan sonra başlığıyla son uygulamalar listesinde kalır.</string>
+    <string name="editor_bar_snap_back">Dokunduktan sonra çubukları geri kaydır</string>
+    <string name="editor_bar_snap_back_hint">Sığdığından fazla düğmesi olan bir düzenleyici çubuğu, düğmelerinden birine dokunduktan sonra iki tarafının buluştuğu yere geri kayar.</string>
     <string name="note_text_color">Metin rengi</string>
     <string name="note_text_color_auto">Otomatik</string>
     <string name="background_dark_version">Resmin koyu sürümü</string>

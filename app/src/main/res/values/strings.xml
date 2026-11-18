@@ -182,6 +182,8 @@
     <string name="editor_title">Editor</string>
     <string name="editor_in_recents">Keep notes in recent apps</string>
     <string name="editor_in_recents_hint">A note opened from a widget or a shortcut stays in the list of recent apps after you leave it, under its title.</string>
+    <string name="editor_bar_snap_back">Scroll bars back after a tap</string>
+    <string name="editor_bar_snap_back_hint">A bar of the editor with more buttons than fit goes back to where its two sides meet after you tap one of its buttons.</string>
     <string name="note_text_color">Text color</string>
     <string name="note_text_color_auto">Automatic</string>
     <string name="background_dark_version">Dark version of the picture</string>

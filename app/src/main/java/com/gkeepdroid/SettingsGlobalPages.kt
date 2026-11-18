@@ -463,5 +463,7 @@ internal fun ColumnScope.EditorPage(s: SettingsState) {
         MenuRow(stringResource(R.string.editor_buttons_title), null) { page = Page.EditorButtons }
         SwitchRow(R.string.editor_in_recents, appEditorInRecents) { appEditorInRecents = it }
         Hint(R.string.editor_in_recents_hint)
+        SwitchRow(R.string.editor_bar_snap_back, appEditorBarSnapBack) { appEditorBarSnapBack = it }
+        Hint(R.string.editor_bar_snap_back_hint)
     }
 }

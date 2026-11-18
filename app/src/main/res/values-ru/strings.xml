@@ -187,6 +187,8 @@
     <string name="editor_title">Редактор</string>
     <string name="editor_in_recents">Оставлять заметки в недавних приложениях</string>
     <string name="editor_in_recents_hint">Заметка, открытая из виджета или ярлыка, после выхода остаётся в списке недавних приложений под своим заголовком.</string>
+    <string name="editor_bar_snap_back">Возвращать панели после нажатия</string>
+    <string name="editor_bar_snap_back_hint">Панель редактора, в которую не помещаются все кнопки, после нажатия на одну из них возвращается туда, где встречаются её две стороны.</string>
     <string name="note_text_color">Цвет текста</string>
     <string name="note_text_color_auto">Автоматически</string>
     <string name="background_dark_version">Тёмная версия картинки</string>

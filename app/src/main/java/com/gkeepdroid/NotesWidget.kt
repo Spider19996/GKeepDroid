@@ -291,7 +291,7 @@ class NotesWidget : GlanceAppWidget() {
                         } else if (note.text.isNotBlank()) {
                             RichBody(
                                 note, account, TextStyle(color = textColor, fontSize = settings.textSizeSp.sp), settings.textSizeSp,
-                                maxLines = settings.maxLines,
+                                maxLines = settings.maxLines, palette = palette,
                             )
                         }
                         EditedTime(note, settings, palette)

@@ -32,6 +32,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,6 +42,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.layout.onSizeChanged
+import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
@@ -143,7 +147,7 @@ class EditorActionState(
 @Composable
 internal fun EditorBar(
     left: List<ButtonSpec>, right: List<ButtonSpec>, states: Map<String, EditorActionState>, sidePadding: Dp = 12.dp,
-    highlightId: String? = null,
+    highlightId: String? = null, snapBack: Boolean = true,
 ) {
     val shown = (left + right).count { states[it.id]?.visible == true }
     if (shown == 0) return
@@ -163,8 +167,21 @@ internal fun EditorBar(
             }
         } else {
             // Too many for one line: the left and the right ones in a row that is pushed sideways, a gap between the two sides.
-            // Where more buttons wait, the row fades out and a small arrow points there.
+            // It rests where the two sides meet: a side that fits stays at its edge and the full side takes the rest, its
+            // surplus out of sight at its outer edge; when both are full they meet in the middle. Where more buttons wait, the
+            // row fades out and a small arrow points there. A tap on a button brings it back to rest (unless switched off).
             val scroll = rememberScrollState()
+            val scope = androidx.compose.runtime.rememberCoroutineScope()
+            val density = androidx.compose.ui.platform.LocalDensity.current
+            var leftWidth by androidx.compose.runtime.remember { androidx.compose.runtime.mutableIntStateOf(0) }
+            val gapWidth = 16.dp
+            val rest = with(density) { (sidePadding + gapWidth / 2 - maxWidth / 2).toPx() }.toInt() + leftWidth
+            val restAt = rest.coerceIn(0, scroll.maxValue)
+            androidx.compose.runtime.LaunchedEffect(restAt) { scroll.scrollTo(restAt) }
+            fun withReturn(state: EditorActionState?): EditorActionState? = if (state == null || !snapBack) state else EditorActionState(
+                state.icon, state.label, { state.onClick(); scope.launch { scroll.animateScrollTo(restAt) } },
+                visible = state.visible, enabled = state.enabled, checked = state.checked, dimmed = state.dimmed, tint = state.tint, popup = state.popup,
+            )
             val fade = 32.dp
             Box(Modifier.fillMaxWidth()) {
                 Row(
@@ -182,11 +199,16 @@ internal fun EditorBar(
                             )
                         }
                         .horizontalScroll(scroll).padding(horizontal = sidePadding, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    left.forEach { EditorActionButton(it, states[it.id], it.id == highlightId) }
-                    Spacer(Modifier.width(16.dp))
-                    right.forEach { EditorActionButton(it, states[it.id], it.id == highlightId) }
+                    Row(
+                        Modifier.onSizeChanged { leftWidth = it.width },
+                        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    ) { left.forEach { EditorActionButton(it, withReturn(states[it.id]), it.id == highlightId) } }
+                    Spacer(Modifier.width(gapWidth))
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                        right.forEach { EditorActionButton(it, withReturn(states[it.id]), it.id == highlightId) }
+                    }
                 }
                 val hint = MaterialTheme.colorScheme.onSurfaceVariant
                 if (scroll.canScrollBackward) Icon(

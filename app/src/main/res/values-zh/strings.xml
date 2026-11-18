@@ -178,6 +178,8 @@
     <string name="editor_title">编辑器</string>
     <string name="editor_in_recents">在最近使用的应用中保留笔记</string>
     <string name="editor_in_recents_hint">从小部件或快捷方式打开的笔记在离开后仍以其标题保留在最近使用的应用列表中。</string>
+    <string name="editor_bar_snap_back">点按后将工具栏移回</string>
+    <string name="editor_bar_snap_back_hint">按钮放不下的编辑器工具栏在点按其中一个按钮后，会移回左右两侧相接的位置。</string>
     <string name="note_text_color">文字颜色</string>
     <string name="note_text_color_auto">自动</string>
     <string name="background_dark_version">图片的深色版本</string>

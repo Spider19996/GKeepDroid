@@ -187,6 +187,8 @@
     <string name="editor_title">Edytor</string>
     <string name="editor_in_recents">Zachowuj notatki w ostatnich aplikacjach</string>
     <string name="editor_in_recents_hint">Notatka otwarta z widżetu lub skrótu zostaje po wyjściu na liście ostatnich aplikacji pod swoim tytułem.</string>
+    <string name="editor_bar_snap_back">Przesuwaj paski z powrotem po dotknięciu</string>
+    <string name="editor_bar_snap_back_hint">Pasek edytora z większą liczbą przycisków, niż się mieści, po dotknięciu jednego z nich wraca tam, gdzie spotykają się jego dwie strony.</string>
     <string name="note_text_color">Kolor tekstu</string>
     <string name="note_text_color_auto">Automatycznie</string>
     <string name="background_dark_version">Ciemna wersja obrazu</string>

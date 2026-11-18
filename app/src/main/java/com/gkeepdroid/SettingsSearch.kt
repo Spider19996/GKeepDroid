@@ -50,6 +50,7 @@ internal fun settingEntries(isSingleNote: Boolean): List<SettingEntry> = buildLi
     add(SettingEntry(R.string.editor_buttons_title, Page.EditorButtons))
     add(SettingEntry(R.string.editor_title, Page.Editor))
     add(SettingEntry(R.string.editor_in_recents, Page.Editor))
+    add(SettingEntry(R.string.editor_bar_snap_back, Page.Editor))
     add(SettingEntry(R.string.app_cards, Page.AppCards))
     add(SettingEntry(R.string.fold_notes_app, Page.AppCards))
     add(SettingEntry(R.string.filter_bar_title, Page.AppFilters))

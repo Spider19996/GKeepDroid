@@ -4,6 +4,7 @@ import androidx.glance.color.ColorProvider as DayNightColorProvider
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.glance.background
 import androidx.glance.text.Text
 import androidx.glance.unit.ColorProvider
@@ -50,6 +51,21 @@ internal fun cardLook(context: Context, settings: WidgetSettings, account: Strin
  * the system theme changes, without being redrawn.
  */
 internal class TextPalette(private val day: Color, private val night: Color) {
+    /** Gives a text view of a widget this color, light and dark where the widget follows the system. */
+    fun applyTo(views: android.widget.RemoteViews, viewId: Int, context: android.content.Context, alpha: Float = 1f) {
+        val dayColor = day.copy(alpha = alpha).toArgb()
+        val nightColor = night.copy(alpha = alpha).toArgb()
+        when {
+            dayColor == nightColor -> views.setTextColor(viewId, dayColor)
+            android.os.Build.VERSION.SDK_INT >= 31 -> views.setColorInt(viewId, "setTextColor", dayColor, nightColor)
+            else -> {
+                val night = context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK ==
+                    android.content.res.Configuration.UI_MODE_NIGHT_YES
+                views.setTextColor(viewId, if (night) nightColor else dayColor)
+            }
+        }
+    }
+
     fun provider(alpha: Float = 1f): ColorProvider =
         if (day == night) {
             ColorProvider(day.copy(alpha = alpha))

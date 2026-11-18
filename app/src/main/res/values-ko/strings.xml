@@ -178,6 +178,8 @@
     <string name="editor_title">편집기</string>
     <string name="editor_in_recents">최근 앱에 메모 유지</string>
     <string name="editor_in_recents_hint">위젯이나 바로가기에서 연 메모는 나간 뒤에도 제목과 함께 최근 앱 목록에 남습니다.</string>
+    <string name="editor_bar_snap_back">탭한 후 막대 되돌리기</string>
+    <string name="editor_bar_snap_back_hint">버튼이 다 들어가지 않는 편집기 막대는 버튼을 탭한 뒤 양쪽이 만나는 위치로 돌아갑니다.</string>
     <string name="note_text_color">글자 색</string>
     <string name="note_text_color_auto">자동</string>
     <string name="background_dark_version">이미지의 어두운 버전</string>

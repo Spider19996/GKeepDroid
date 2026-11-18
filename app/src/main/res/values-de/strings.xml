@@ -181,6 +181,8 @@
     <string name="editor_title">Editor</string>
     <string name="editor_in_recents">Notizen im App-Verlauf behalten</string>
     <string name="editor_in_recents_hint">Eine aus einem Widget oder einer Verknüpfung geöffnete Notiz bleibt nach dem Verlassen mit ihrem Titel im Verlauf der letzten Apps.</string>
+    <string name="editor_bar_snap_back">Leisten nach dem Tippen zurückschieben</string>
+    <string name="editor_bar_snap_back_hint">Eine Editor-Leiste mit mehr Buttons, als hineinpassen, gleitet nach dem Tippen auf einen ihrer Buttons zurück dorthin, wo sich ihre beiden Seiten treffen.</string>
     <string name="note_text_color">Textfarbe</string>
     <string name="note_text_color_auto">Automatisch</string>
     <string name="background_dark_version">Dunkle Version des Bildes</string>

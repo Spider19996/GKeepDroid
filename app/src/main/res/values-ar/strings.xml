@@ -193,6 +193,8 @@
     <string name="editor_title">المحرر</string>
     <string name="editor_in_recents">إبقاء الملاحظات في التطبيقات الأخيرة</string>
     <string name="editor_in_recents_hint">تبقى الملاحظة المفتوحة من أداة أو اختصار في قائمة التطبيقات الأخيرة بعنوانها بعد مغادرتها.</string>
+    <string name="editor_bar_snap_back">إرجاع الأشرطة بعد النقر</string>
+    <string name="editor_bar_snap_back_hint">يعود شريط المحرر الذي يحتوي على أزرار أكثر مما يتسع له إلى موضع التقاء جانبيه بعد النقر على أحد أزراره.</string>
     <string name="note_text_color">لون النص</string>
     <string name="note_text_color_auto">تلقائي</string>
     <string name="background_dark_version">النسخة الداكنة للصورة</string>

@@ -84,6 +84,26 @@ object RichNotes {
     }
 
     /**
+     * The text with Keep's formatting as Android spans, which a widget can show; null if the text here is not the one Keep has
+     * or nothing in it is styled. [extra] styles the whole text on top (a checked item is struck through).
+     */
+    fun spanned(text: String, doc: RichDoc?, extra: Int = 0): CharSequence? {
+        if (doc == null || doc.text.trimEnd('\n') != text.trimEnd('\n') || doc.runs.isEmpty()) return null
+        val out = android.text.SpannableString(text)
+        fun mark(flags: Int, start: Int, end: Int) {
+            val flag = android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            if (flags and (BOLD or HEADING) != 0) out.setSpan(android.text.style.StyleSpan(android.graphics.Typeface.BOLD), start, end, flag)
+            if (flags and ITALIC != 0) out.setSpan(android.text.style.StyleSpan(android.graphics.Typeface.ITALIC), start, end, flag)
+            if (flags and UNDERLINE != 0) out.setSpan(android.text.style.UnderlineSpan(), start, end, flag)
+            if (flags and STRIKE != 0) out.setSpan(android.text.style.StrikethroughSpan(), start, end, flag)
+            if (flags and HEADING != 0) out.setSpan(android.text.style.RelativeSizeSpan(1.25f), start, end, flag)
+        }
+        doc.runs.forEach { (start, end, flags) -> minOf(end, text.length).let { to -> if (start < to) mark(flags, start, to) } }
+        if (extra != 0 && text.isNotEmpty()) mark(extra, 0, text.length)
+        return out
+    }
+
+    /**
      * The text with Keep's formatting. The styles are positions in the text Keep has; if the text here is a different
      * one (changed on this phone and not synced yet), they would sit in the wrong place, so the text stays plain.
      */

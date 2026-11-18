@@ -181,6 +181,8 @@
     <string name="editor_title">Editor</string>
     <string name="editor_in_recents">Notities in recente apps houden</string>
     <string name="editor_in_recents_hint">Een notitie die je vanuit een widget of snelkoppeling opent, blijft na het verlaten met haar titel in de lijst met recente apps staan.</string>
+    <string name="editor_bar_snap_back">Balken na een tik terugschuiven</string>
+    <string name="editor_bar_snap_back_hint">Een balk van de editor met meer knoppen dan erin passen, schuift na een tik op een van zijn knoppen terug naar waar zijn twee kanten elkaar raken.</string>
     <string name="note_text_color">Tekstkleur</string>
     <string name="note_text_color_auto">Automatisch</string>
     <string name="background_dark_version">Donkere versie van de afbeelding</string>

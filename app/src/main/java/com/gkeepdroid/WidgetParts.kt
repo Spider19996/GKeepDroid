@@ -305,7 +305,17 @@ internal fun ItemRow(note: KeepNote, item: KeepItem, account: String, settings: 
                 )
             }
         }
-        val flags = RichNotes.uniformFlags(RichNotes.of(context, account, note.id)?.docs?.get(item.id), item.text)
+        val doc = RichNotes.of(context, account, note.id)?.docs?.get(item.id)
+        // Styles inside the item (a bold word) need a text view of their own; a plain item stays a plain text.
+        val spanned = RichNotes.spanned(item.text, doc, if (item.checked) RichNotes.STRIKE else 0)
+        if (spanned != null) {
+            StyledText(
+                spanned, palette, settings.textSizeSp.toFloat(), alpha = if (item.checked) 0.55f else 1f,
+                modifier = GlanceModifier.defaultWeight().padding(top = pad, bottom = pad),
+            )
+            return@Row
+        }
+        val flags = RichNotes.uniformFlags(doc, item.text)
         Text(
             item.text,
             style = TextStyle(

@@ -196,7 +196,7 @@ class SingleNoteWidget : GlanceAppWidget() {
                     item(itemId = 4L) {
                         RichBody(
                             note, account, TextStyle(color = textColor, fontSize = settings.textSizeSp.sp), settings.textSizeSp, maxLines = 0,
-                            modifier = GlanceModifier.fillMaxWidth().clickable(openEditor),
+                            modifier = GlanceModifier.fillMaxWidth().clickable(openEditor), palette = palette,
                         )
                     }
                 }
