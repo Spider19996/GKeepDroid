@@ -425,7 +425,28 @@ class EditNoteActivity : ComponentActivity() {
         // The categories of this editing session: one that loses its last item (moved elsewhere) stays until the note is
         // saved, so items can be moved back into it, and a new one can be empty for a moment.
         val sessionCategories = remember { androidx.compose.runtime.mutableStateListOf<String>().apply { addAll(Categories.names(items, editorRich())) } }
-        fun keepCategory(name: String?) { if (name != null && name.trim().isNotEmpty() && name.trim() !in sessionCategories) sessionCategories.add(name.trim()) }
+        fun keepCategory(name: String?) {
+            if (name == null || name.trim().isEmpty()) return
+            if (name.trim() !in sessionCategories) sessionCategories.add(name.trim())
+            CategoryHistory.add(this@EditNoteActivity, account, noteKey, listOf(name))
+        }
+        // The categories this checklist had on this device before (also ones that are gone), for choosing one again.
+        remember { CategoryHistory.add(this@EditNoteActivity, account, noteKey, sessionCategories) }
+
+        /**
+         * The items in their categories, the categories in a fixed order (the order of this session, not of the items), so a
+         * header stays where it is while items move between categories; categories that lost their items stay as empty headers
+         * until the note is saved. Null for a list without categories.
+         */
+        fun categoryGroups(): List<Categories.Group>? {
+            if (!canFormat) return null
+            val rich = editorRich()
+            val nameOf = items.associate { it.id to Categories.split(it, rich?.docs?.get(it.id))?.name }
+            val order = sessionCategories.toList() + nameOf.values.filterNotNull().filter { it !in sessionCategories }.distinct()
+            if (order.isEmpty()) return null
+            return (listOf<String?>(null) + order).map { name -> Categories.Group(name, items.filter { nameOf[it.id] == name }) }
+                .filter { it.name != null || it.items.isNotEmpty() }
+        }
 
         /** Moves an item to category [name] (null: none): the old name in front of it goes, the new one comes in bold. */
         fun setCategory(id: String, name: String?) {
@@ -444,9 +465,18 @@ class EditNoteActivity : ComponentActivity() {
             keepCategory(name)
         }
 
-        /** Takes every item out of its category: the list becomes an ordinary checklist again. */
+        /**
+         * Makes the list an ordinary checklist again: the words of the categories stay in front of the items, only no longer in
+         * bold, so they are no categories any more.
+         */
         fun dissolveCategories() {
-            items.toList().forEach { item -> if (Categories.split(item, editorRich()?.docs?.get(item.id)) != null) setCategory(item.id, null) }
+            val rich = editorRich()
+            items.toList().forEach { item ->
+                val split = Categories.split(item, rich?.docs?.get(item.id)) ?: return@forEach
+                val flags = format.flagsFor(item.id, item.text).flags.copyOf()
+                for (k in 0 until minOf(split.restStart, flags.size)) flags[k] = flags[k] and RichNotes.BOLD.inv()
+                format.replaceFlags(item.id, flags)
+            }
             sessionCategories.clear()
         }
 
@@ -564,6 +594,11 @@ class EditNoteActivity : ComponentActivity() {
                 val rich = editorRich()
                 items.removeAll { item -> Categories.split(item, rich?.docs?.get(item.id))?.let { item.text.substring(it.restStart).isBlank() } == true }
                 if (items.isEmpty()) items.add(KeepItem(UUID.randomUUID().toString(), "", false))
+                // Kept in Keep in the order shown here: the items without a category, then each category with its items.
+                categoryGroups()?.flatMap { it.items }?.let { grouped ->
+                    if (grouped.size == items.size && grouped.map { it.id } != items.map { it.id }) { items.clear(); items.addAll(grouped) }
+                }
+                CategoryHistory.add(this@EditNoteActivity, account, noteKey, sessionCategories)
             }
             if (AppSettingsStore.load(this@EditNoteActivity).trimEmptyEdges) {
                 if (isList) {
@@ -1192,6 +1227,8 @@ class EditNoteActivity : ComponentActivity() {
                 // The place to drop an item into a new category, and whether the dragged item is over it.
                 var newCategoryZone by remember { mutableStateOf<Rect?>(null) }
                 var overNewCategory by remember { mutableStateOf(false) }
+                // The category whose header is held: its items are left out while it moves, and follow it when it is let go.
+                var draggingCategory by remember { mutableStateOf<String?>(null) }
                 // "1. " typed at the start of the first item offers to number the whole list.
                 val firstFilled = items.firstOrNull { it.text.isNotBlank() }?.text.orEmpty()
                 if (canEdit && !numbered && !numberOfferDismissed && Regex("""^\s*1[.)]\s""").containsMatchIn(firstFilled)) {
@@ -1214,16 +1251,7 @@ class EditNoteActivity : ComponentActivity() {
                 }
                 // With categories the items stand under their category's header (as on the cards); the header folds them and
                 // its "+" adds an item to them. The list itself keeps its order.
-                val editorGroups = if (!canFormat) null else {
-                    val found = Categories.groups(items, editorRich())
-                    // Categories of this session that have no items (any more) stay as empty headers until the note is saved.
-                    val empty = sessionCategories.filter { name -> found?.none { it.name == name } != false }
-                    when {
-                        found != null -> found + empty.map { Categories.Group(it, emptyList()) }
-                        empty.isNotEmpty() -> listOf(Categories.Group(null, items.toList())) + empty.map { Categories.Group(it, emptyList()) }
-                        else -> null
-                    }?.filter { it.name != null || it.items.isNotEmpty() }
-                }
+                val editorGroups = categoryGroups()
                 val groupOf = editorGroups?.flatMap { g -> g.items.map { it.id to g.name } }?.toMap().orEmpty()
                 // One item of the list as it is edited. Under a category's header it shows without the category's name, which
                 // stays in front of it in Keep; what is typed goes behind the name.
@@ -1308,7 +1336,8 @@ class EditNoteActivity : ComponentActivity() {
                 val entries: List<Pair<String?, KeepItem?>> = if (editorGroups == null) items.map { null to it } else buildList {
                     editorGroups.forEach { group ->
                         if (group.name != null) add(group.name to null)
-                        if (group.name == null || CategoryFolds.key(account, noteKey, group.name) !in folds) group.items.forEach { add(group.name to it) }
+                        val hidden = group.name != null && (CategoryFolds.key(account, noteKey, group.name) in folds || group.name == draggingCategory)
+                        if (!hidden) group.items.forEach { add(group.name to it) }
                     }
                 }
                 // Only what is shown can be dropped onto: rows of folded categories and headers that are gone are forgotten.
@@ -1325,11 +1354,36 @@ class EditNoteActivity : ComponentActivity() {
                     } else if (name != null) {
                         val group = editorGroups!!.first { it.name == name }
                         val folded = CategoryFolds.key(account, noteKey, name) in folds
+                        val real = group.items.filter { !it.isDivider() }
                         EditorCategoryHeader(
-                            name, group.items.count { !it.checked }, folded, canEdit,
+                            name, real.count { !it.checked }, folded, canEdit,
                             onToggle = { CategoryFolds.set(this@EditNoteActivity, account, noteKey, name, !folded) },
                             onAdd = { addInCategory(name) },
-                            modifier = Modifier.onGloballyPositioned { headerBounds[name] = it.boundsInRoot() }.animatePlacement(),
+                            modifier = Modifier.onGloballyPositioned { headerBounds[name] = it.boundsInRoot() }
+                                .then(if (draggingCategory == name) Modifier else Modifier.animatePlacement()),
+                            allChecked = real.isNotEmpty() && real.all { it.checked },
+                            onCheckAll = {
+                                val tick = !(real.isNotEmpty() && real.all { it.checked })
+                                val ids = real.map { it.id }.toSet()
+                                for (i in items.indices) if (items[i].id in ids) items[i] = items[i].copy(checked = tick)
+                            },
+                            dragged = draggingCategory == name,
+                            onDragStart = { draggingCategory = name },
+                            onDragTo = { y ->
+                                // Over another header: the held category takes its place in the order.
+                                val over = headerBounds.entries.firstOrNull { (other, r) -> other != name && y >= r.top && y < r.bottom }?.key
+                                if (over != null) {
+                                    val from = sessionCategories.indexOf(name)
+                                    val to = sessionCategories.indexOf(over)
+                                    if (from >= 0 && to >= 0) sessionCategories.add(to, sessionCategories.removeAt(from))
+                                }
+                                editorViewport?.let { v ->
+                                    val edge = 160f
+                                    val step = when { y > v.bottom - edge -> (y - (v.bottom - edge)) / 4f; y < v.top + edge -> -((v.top + edge) - y) / 4f; else -> 0f }
+                                    if (step != 0f) scope.launch { scroll.scrollBy(step) }
+                                }
+                            },
+                            onDragEnd = { draggingCategory = null },
                         )
                     }
                 } }
@@ -1458,13 +1512,34 @@ class EditNoteActivity : ComponentActivity() {
                 onDismissRequest = cancel,
                 title = { Text(stringResource(R.string.add_category)) },
                 text = {
-                    OutlinedTextField(
-                        value = name, onValueChange = { name = it }, singleLine = true,
-                        placeholder = { Text(stringResource(R.string.category_name)) },
-                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Done),
-                        keyboardActions = androidx.compose.foundation.text.KeyboardActions(onDone = { create() }),
-                        modifier = Modifier.focusRequester(nameFocus),
-                    )
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        // An item dropped here can also leave its category, or go into one this list had before (also one that
+                        // is gone since it was last saved); the ones it has now are its own headers.
+                        val current = categoryGroups()?.mapNotNull { it.name }.orEmpty()
+                        val earlier = (CategoryHistory.load(this@EditNoteActivity, account, noteKey) + sessionCategories).distinct().filter { it !in current }
+                        val forItem = newCategoryFor
+                        if (forItem != null || earlier.isNotEmpty()) androidx.compose.foundation.layout.FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            if (forItem != null) AssistChip(
+                                onClick = {
+                                    newCategoryDialog = false; newCategoryFor = null
+                                    setCategory(forItem, null)
+                                    val at = items.indexOfFirst { it.id == forItem }
+                                    if (at > 0) items.add(0, items.removeAt(at))
+                                },
+                                label = { Text(stringResource(R.string.category_none)) },
+                            )
+                            earlier.forEach { old -> AssistChip(onClick = { newCategoryDialog = false; createCategory(old) }, label = { Text(old) }) }
+                        }
+                        OutlinedTextField(
+                            value = name, onValueChange = { name = it }, singleLine = true,
+                            placeholder = { Text(stringResource(R.string.category_name)) },
+                            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Done),
+                            keyboardActions = androidx.compose.foundation.text.KeyboardActions(onDone = { create() }),
+                            modifier = Modifier.focusRequester(nameFocus),
+                        )
+                    }
                 },
                 confirmButton = { TextButton(onClick = create, enabled = name.isNotBlank(), shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.add_category_confirm)) } },
                 dismissButton = { TextButton(onClick = cancel, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) } },

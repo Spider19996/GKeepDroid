@@ -67,6 +67,20 @@ object Categories {
     fun prefixed(name: String, text: String): Pair<String, Int> = "${name.trim()} ${text.trim()}" to name.trim().length
 }
 
+/** The categories a checklist has had on this device, also ones that are gone; offered again when an item goes into a new one. */
+object CategoryHistory {
+    private fun prefs(context: Context) = context.getSharedPreferences("category_history", Context.MODE_PRIVATE)
+
+    fun load(context: Context, account: String, noteId: String): List<String> =
+        runCatching { org.json.JSONArray(prefs(context).getString("$account|$noteId", "[]")) }.getOrNull()
+            ?.let { a -> (0 until a.length()).map { a.getString(it) } }.orEmpty()
+
+    fun add(context: Context, account: String, noteId: String, names: Collection<String>) {
+        val all = (load(context, account, noteId) + names.map { it.trim() }.filter { it.isNotEmpty() }).distinct()
+        prefs(context).edit { putString("$account|$noteId", org.json.JSONArray(all).toString()) }
+    }
+}
+
 /** Which categories of which checklists are folded on this device. */
 object CategoryFolds {
     private fun prefs(context: Context) = context.getSharedPreferences("folded_categories", Context.MODE_PRIVATE)

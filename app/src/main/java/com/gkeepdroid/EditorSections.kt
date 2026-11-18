@@ -17,10 +17,18 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.zIndex
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -402,22 +410,77 @@ internal fun quietToggleColors(
 @Composable
 internal fun EditorCategoryHeader(
     name: String, open: Int, folded: Boolean, canEdit: Boolean, onToggle: () -> Unit, onAdd: () -> Unit, modifier: Modifier = Modifier,
+    allChecked: Boolean = false, onCheckAll: () -> Unit = {}, dragged: Boolean = false,
+    onDragStart: () -> Unit = {}, onDragTo: (Float) -> Unit = {}, onDragEnd: () -> Unit = {},
 ) {
+    // Held, the header follows the finger (as an item does); the others make room.
+    var rowTop by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0f) }
+    var fingerY by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<Float?>(null) }
+    var grab by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0f) }
+    var handle by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<androidx.compose.ui.layout.LayoutCoordinates?>(null) }
+    if (!dragged && fingerY != null) fingerY = null
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     androidx.compose.foundation.layout.Row(
-        modifier.fillMaxWidth().padding(top = 8.dp),
+        modifier.fillMaxWidth().padding(top = 8.dp)
+            .onGloballyPositioned { rowTop = it.boundsInRoot().top }
+            .then(if (dragged) Modifier.zIndex(1f) else Modifier)
+            .graphicsLayer {
+                val y = fingerY
+                translationY = if (dragged && y != null) y - grab - rowTop else 0f
+                if (dragged) { shadowElevation = 12f; scaleX = 1.02f; scaleY = 1.02f }
+            }
+            .background(if (dragged) MaterialTheme.colorScheme.surfaceContainerHigh else androidx.compose.ui.graphics.Color.Transparent, MaterialTheme.shapes.medium),
         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
     ) {
+        // The same button as an item has: a tap ticks (or unticks) all items of the category, holding it moves the category
+        // with its items.
+        if (canEdit) Box(
+            Modifier.width(48.dp).height(56.dp)
+                .onGloballyPositioned { handle = it }
+                .pointerInput(name) { detectTapGestures(onTap = { onCheckAll() }) }
+                .pointerInput(name) {
+                    detectDragGesturesAfterLongPress(
+                        onDragStart = { start ->
+                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                            handle?.localToRoot(start)?.y?.let { fingerY = it; grab = it - rowTop }
+                            onDragStart()
+                        },
+                        onDrag = { change, _ -> change.consume(); handle?.localToRoot(change.position)?.y?.let { fingerY = it; onDragTo(it) } },
+                        onDragEnd = { fingerY = null; onDragEnd() },
+                        onDragCancel = { fingerY = null; onDragEnd() },
+                    )
+                },
+            contentAlignment = androidx.compose.ui.Alignment.CenterStart,
+        ) {
+            androidx.compose.foundation.layout.Column(
+                Modifier.padding(start = 11.dp).size(width = 26.dp, height = 40.dp)
+                    .border(1.5.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.extraSmall).padding(1.5.dp),
+            ) {
+                Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = androidx.compose.ui.Alignment.Center) {
+                    Icon(
+                        painterResource(if (allChecked) R.drawable.ic_done_all else R.drawable.ic_done), contentDescription = null,
+                        tint = if (allChecked) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(14.dp),
+                    )
+                }
+                Box(Modifier.fillMaxWidth().height(1.5.dp).background(MaterialTheme.colorScheme.outline))
+                Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = androidx.compose.ui.Alignment.Center) {
+                    androidx.compose.foundation.layout.Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        repeat(3) { Box(Modifier.size(width = 12.dp, height = 1.5.dp).background(MaterialTheme.colorScheme.onSurfaceVariant)) }
+                    }
+                }
+            }
+        }
         androidx.compose.foundation.layout.Row(
             Modifier.weight(1f).clip(MaterialTheme.shapes.medium).clickable(onClick = onToggle).padding(horizontal = 8.dp, vertical = 10.dp),
             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
         ) {
+            Text(name, style = MaterialTheme.typography.titleSmall.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), maxLines = 1)
+            if (open > 0) Text("  $open", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
             Icon(
                 painterResource(if (folded) R.drawable.ic_arrow_right else R.drawable.ic_arrow_down),
                 contentDescription = stringResource(if (folded) R.string.unfold_all else R.string.fold_all), modifier = Modifier.size(20.dp),
             )
-            androidx.compose.foundation.layout.Spacer(Modifier.size(8.dp))
-            Text(name, style = MaterialTheme.typography.titleSmall.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), maxLines = 1)
-            if (open > 0) Text("  $open", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         if (canEdit) IconButton(onClick = onAdd, shapes = IconButtonDefaults.shapes()) {
             Icon(painterResource(R.drawable.ic_add), contentDescription = stringResource(R.string.category_add_item, name))
