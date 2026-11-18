@@ -140,7 +140,7 @@ internal class EditorCategories(
      * The categories of this editing session: one that loses its last item (moved elsewhere) stays until the note is saved, so
      * items can be moved back into it, and a new one can be empty for a moment. Also the order of their headers.
      */
-    val session = androidx.compose.runtime.mutableStateListOf<String>().apply { add(NONE); addAll(Categories.names(items, rich())) }
+    val session = androidx.compose.runtime.mutableStateListOf<String>().apply { addAll(Categories.names(items, rich())); add(NONE) }
 
     init {
         // The categories this checklist had on this device before (also ones that are gone), for choosing one again.
@@ -169,8 +169,8 @@ internal class EditorCategories(
         val nameOf = items.associate { it.id to Categories.split(it, rich?.docs?.get(it.id))?.name }
         var order = session.toList() + nameOf.values.filterNotNull().filter { it !in session }.distinct()
         if (order.none { it != NONE }) return null
-        // The items without a category are a group of their own, at its place among the categories (first, unless it was moved).
-        if (NONE !in order) order = listOf(NONE) + order
+        // The items without a category are a group of their own, at its place among the categories (last, unless it was moved).
+        if (NONE !in order) order = order + NONE
         return order.map { key -> (key.ifEmpty { null }).let { name -> Categories.Group(name, items.filter { nameOf[it.id] == name }) } }
             .filter { it.name != null || it.items.isNotEmpty() || keepEmptyNone }
     }
