@@ -319,20 +319,51 @@ internal fun DropLine() {
 @Composable
 internal fun CategorySwipeBand(offset: Float, action: Int, frame: Int, topInset: androidx.compose.ui.unit.Dp, content: @Composable () -> Unit) {
     val (color, icon, tint) = swipeLook(action)
+    val surface = MaterialTheme.colorScheme.background
     val top = frame == FRAME_FIRST || frame == FRAME_ONLY
     val bottom = frame == FRAME_LAST || frame == FRAME_ONLY
-    val r = 18.dp
-    val shape = androidx.compose.foundation.shape.RoundedCornerShape(if (top) r else 0.dp, if (top) r else 0.dp, if (bottom) r else 0.dp, if (bottom) r else 0.dp)
     val active = offset != 0f && frame != FRAME_NONE
     // The same structure while swiping or not, so the rows (and the header's gesture) are not made anew when it starts.
-    Box {
-        if (active) Box(
-            Modifier.matchParentSize().padding(top = topInset).clip(shape).background(color).padding(horizontal = 20.dp, vertical = 12.dp),
-            contentAlignment = if (offset > 0f) androidx.compose.ui.Alignment.TopStart else androidx.compose.ui.Alignment.TopEnd,
-        ) { if (top) Icon(painterResource(icon), contentDescription = null, tint = tint) }
+    Box(
+        Modifier.then(
+            if (!active) Modifier else Modifier.drawBehind {
+                // The frame's own extent: 8 dp in from the sides, down over the 12 dp gap to the next piece, so the bands meet.
+                val side = 8.dp.toPx()
+                val r = 18.dp.toPx()
+                val from = if (top) topInset.toPx() else 0f
+                val to = if (bottom) size.height - 8.dp.toPx() else size.height + 12.dp.toPx()
+                val rr = androidx.compose.ui.geometry.RoundRect(
+                    side, from, size.width - side, to,
+                    topLeftCornerRadius = if (top) androidx.compose.ui.geometry.CornerRadius(r) else androidx.compose.ui.geometry.CornerRadius.Zero,
+                    topRightCornerRadius = if (top) androidx.compose.ui.geometry.CornerRadius(r) else androidx.compose.ui.geometry.CornerRadius.Zero,
+                    bottomLeftCornerRadius = if (bottom) androidx.compose.ui.geometry.CornerRadius(r) else androidx.compose.ui.geometry.CornerRadius.Zero,
+                    bottomRightCornerRadius = if (bottom) androidx.compose.ui.geometry.CornerRadius(r) else androidx.compose.ui.geometry.CornerRadius.Zero,
+                )
+                drawPath(androidx.compose.ui.graphics.Path().apply { addRoundRect(rr) }, color)
+            },
+        ),
+    ) {
+        // The symbol sits at the header, on the side the swipe comes from.
+        if (active && top) Box(
+            Modifier.matchParentSize().padding(top = topInset, start = 20.dp, end = 20.dp),
+            contentAlignment = if (offset > 0f) androidx.compose.ui.Alignment.CenterStart else androidx.compose.ui.Alignment.CenterEnd,
+        ) { Icon(painterResource(icon), contentDescription = null, tint = tint) }
         Box(
             Modifier.graphicsLayer { translationX = if (active) offset else 0f }
-                .then(if (active) Modifier.background(MaterialTheme.colorScheme.background, shape) else Modifier),
+                // What moves hides the band behind it, down over the gap to the next piece as the frame's line does.
+                .then(if (active) Modifier.drawBehind {
+                    val side = 8.dp.toPx(); val r = 18.dp.toPx()
+                    val from = if (top) topInset.toPx() else 0f
+                    val to = if (bottom) size.height - 8.dp.toPx() else size.height + 12.dp.toPx()
+                    val rr = androidx.compose.ui.geometry.RoundRect(
+                        side, from, size.width - side, to,
+                        topLeftCornerRadius = if (top) androidx.compose.ui.geometry.CornerRadius(r) else androidx.compose.ui.geometry.CornerRadius.Zero,
+                        topRightCornerRadius = if (top) androidx.compose.ui.geometry.CornerRadius(r) else androidx.compose.ui.geometry.CornerRadius.Zero,
+                        bottomLeftCornerRadius = if (bottom) androidx.compose.ui.geometry.CornerRadius(r) else androidx.compose.ui.geometry.CornerRadius.Zero,
+                        bottomRightCornerRadius = if (bottom) androidx.compose.ui.geometry.CornerRadius(r) else androidx.compose.ui.geometry.CornerRadius.Zero,
+                    )
+                    drawPath(androidx.compose.ui.graphics.Path().apply { addRoundRect(rr) }, surface)
+                } else Modifier),
         ) { content() }
     }
 }

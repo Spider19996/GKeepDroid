@@ -1,5 +1,7 @@
 package com.gkeepdroid
 
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.drawscope.clipRect
 import android.text.format.DateUtils
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
@@ -146,6 +148,28 @@ internal fun NoteTile(
             PendingToggles.add(context, PendingToggle(account, note.id, item.id, checked, delete))
             if (delete) NotesCache.removeItem(context, account, note.id, item.id)
             else NotesCache.setChecked(context, account, note.id, item.id, checked)
+            NotesCache.version.intValue++
+            scope.launch { WidgetRefresh.all(context) }
+            ToggleItemWorker.schedule(context, account)
+        }
+        if (AppLock.editAllowed(activity)) apply() else unlock?.invoke(R.string.lock_prompt_edit) { if (it) apply() }
+    }
+    // What swiping a category does (the editor's item swipe; moving to a category only works there).
+    val itemSwipe = remember(app) { (if (app.itemSwipeRight == ITEM_SWIPE_CATEGORY) ITEM_SWIPE_NONE else app.itemSwipeRight) to (if (app.itemSwipeLeft == ITEM_SWIPE_CATEGORY) ITEM_SWIPE_NONE else app.itemSwipeLeft) }
+    /** A swipe on a category acts on all its items: tick them (untick when all are), or remove them. */
+    fun swipeCategory(items: List<KeepItem>, action: Int) {
+        val all = items.filter { !it.isDivider() }
+        if (all.isEmpty() || (action != ITEM_SWIPE_TICK && action != ITEM_SWIPE_REMOVE)) return
+        fun apply() {
+            val tick = !all.all { it.checked }
+            all.forEach { item ->
+                val checked = if (action == ITEM_SWIPE_REMOVE) true else tick
+                val delete = action == ITEM_SWIPE_REMOVE || (app.listDeleteChecked && checked)
+                if (action == ITEM_SWIPE_TICK && item.checked == checked) return@forEach
+                PendingToggles.add(context, PendingToggle(account, note.id, item.id, checked, delete))
+                if (delete) NotesCache.removeItem(context, account, note.id, item.id)
+                else NotesCache.setChecked(context, account, note.id, item.id, checked)
+            }
             NotesCache.version.intValue++
             scope.launch { WidgetRefresh.all(context) }
             ToggleItemWorker.schedule(context, account)
@@ -367,7 +391,10 @@ internal fun NoteTile(
                     // The items without a category are framed too, only without a name.
                     if (group.name == null && rows.isEmpty()) return@forEach
                     // Each category in a frame of its own, rounded like the card around it.
-                    Column(
+                    CategorySwipe(
+                        enabled = app.listCheckInApp && groups.size >= 2, swipeRight = itemSwipe.first, swipeLeft = itemSwipe.second,
+                        onSwipe = { right -> swipeCategory(group.items, if (right) itemSwipe.first else itemSwipe.second) },
+                    ) { swipeModifier -> Column(
                         // Little room around it: a card in the grid is narrow, so the frame reaches into the card's own padding.
                         // It also takes 1 dp of the card's 6 dp between its parts above and below, so between two frames there is
                         // the 4 dp there is between a frame and the card's edge.
@@ -377,6 +404,7 @@ internal fun NoteTile(
                             val p = m.measure(c.copy(maxWidth = c.maxWidth + grow * 2, minWidth = (c.minWidth + grow * 2).coerceAtMost(c.maxWidth + grow * 2)))
                             layout(c.maxWidth, (p.height - lift * 2).coerceAtLeast(0)) { p.place(-grow, -lift) }
                         }
+                            .then(swipeModifier)
                             .border(1.dp, textColor.copy(alpha = 0.35f), MaterialTheme.shapes.medium)
                             .padding(start = 6.dp, end = 2.dp, bottom = 2.dp),
                     ) {
@@ -385,7 +413,7 @@ internal fun NoteTile(
                             CategoryFolds.set(context, account, note.id, group.name, !folded)
                         }
                         if (!folded) rows.forEach { item -> if (left > 0) { ItemLine(item, inCategory = group.name != null); left-- } else hidden++ }
-                    }
+                    } }
                 }
                 if (hidden > 0) {
                     Text(
@@ -483,5 +511,50 @@ internal fun CategoryHeader(name: String, progress: String?, folded: Boolean, co
                 tint = color, modifier = Modifier.padding(end = 6.dp).size(24.dp),
             )
         }
+    }
+}
+
+/**
+ * A category of a card that swipes as a whole: it moves by the finger, and the strip it leaves is a band in the swipe's color with
+ * its symbol, rounded like the frame. [content] gets the modifier that moves it.
+ */
+@Composable
+private fun CategorySwipe(
+    enabled: Boolean, swipeRight: Int, swipeLeft: Int, onSwipe: (Boolean) -> Unit,
+    content: @Composable (Modifier) -> Unit,
+) {
+    val maxPx = with(androidx.compose.ui.platform.LocalDensity.current) { 72.dp.toPx() }
+    var offsetX by remember { mutableStateOf(0f) }
+    val swipe by androidx.compose.runtime.rememberUpdatedState(onSwipe)
+    val canRight = enabled && swipeRight != ITEM_SWIPE_NONE
+    val canLeft = enabled && swipeLeft != ITEM_SWIPE_NONE
+    Box(Modifier.fillMaxWidth()) {
+        if (offsetX != 0f) {
+            val toRight = offsetX > 0f
+            val (bg, icon, tint) = swipeLook(if (toRight) swipeRight else swipeLeft)
+            // Only the strip the frame has left is painted, so what is under the frame needs no cover.
+            Box(
+                Modifier.matchParentSize().padding(vertical = 1.dp).clip(MaterialTheme.shapes.medium).drawBehind {
+                    val w = (kotlin.math.abs(offsetX) - 8.dp.toPx()).coerceAtLeast(0f)
+                    clipRect(left = if (toRight) 0f else size.width - w, right = if (toRight) w else size.width) { drawRect(bg) }
+                },
+                contentAlignment = if (toRight) Alignment.CenterStart else Alignment.CenterEnd,
+            ) { Icon(painterResource(icon), contentDescription = null, tint = tint, modifier = Modifier.padding(horizontal = 12.dp)) }
+        }
+        content(
+            Modifier.offset { androidx.compose.ui.unit.IntOffset(offsetX.toInt(), 0) }.draggable(
+                orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
+                enabled = canRight || canLeft,
+                state = androidx.compose.foundation.gestures.rememberDraggableState { delta ->
+                    offsetX = (offsetX + delta).coerceIn(if (canLeft) -maxPx else 0f, if (canRight) maxPx else 0f)
+                },
+                onDragStopped = {
+                    val passed = kotlin.math.abs(offsetX) >= maxPx * 0.75f
+                    val toRight = offsetX > 0f
+                    androidx.compose.animation.core.animate(offsetX, 0f) { value, _ -> offsetX = value }
+                    if (passed) swipe(toRight)
+                },
+            ),
+        )
     }
 }
