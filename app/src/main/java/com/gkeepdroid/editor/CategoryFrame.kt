@@ -341,7 +341,7 @@ internal fun CategorySwipeBand(
                 // The frame's own extent: 8 dp in from the sides, down over the 12 dp gap to the next piece, so the bands meet.
                 val side = 0f
                 val r = 18.dp.toPx()
-                val from = if (top) topInset.toPx() else 0f
+                val from = if (top) topInset.toPx() + 0.5.dp.toPx() else 0f
                 val to = if (bottom) size.height else size.height + 12.dp.toPx()
                 val rr = androidx.compose.ui.geometry.RoundRect(
                     side, from, size.width - side, to,
@@ -377,12 +377,12 @@ internal fun CategorySwipeBand(
             Modifier.graphicsLayer { translationX = if (active) offset else 0f }
                 // What moves hides the band behind it, down over the gap to the next piece as the frame's line does.
                 .then(if (active) Modifier.drawBehind {
-                    val half = 0.5.dp.toPx(); val r = 18.dp.toPx()
-                    // Exactly the line's own centre path, so no sliver is left between the line's arc and the band.
-                    val from = (if (top) topInset.toPx() else 0f) + (if (top) half else 0f)
-                    val to = if (bottom) size.height - half else size.height + 12.dp.toPx()
+                    val r = 18.5.dp.toPx()
+                    // The line's outer edge (its centre line is 18 dp round, the line 1 dp thick): no sliver between line and cover.
+                    val from = if (top) topInset.toPx() else 0f
+                    val to = if (bottom) size.height else size.height + 12.dp.toPx()
                     val rr = androidx.compose.ui.geometry.RoundRect(
-                        half, from, size.width - half, to,
+                        0f, from, size.width, to,
                         topLeftCornerRadius = if (top) androidx.compose.ui.geometry.CornerRadius(r) else androidx.compose.ui.geometry.CornerRadius.Zero,
                         topRightCornerRadius = if (top) androidx.compose.ui.geometry.CornerRadius(r) else androidx.compose.ui.geometry.CornerRadius.Zero,
                         bottomLeftCornerRadius = if (bottom) androidx.compose.ui.geometry.CornerRadius(r) else androidx.compose.ui.geometry.CornerRadius.Zero,
