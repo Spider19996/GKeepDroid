@@ -125,6 +125,9 @@ import kotlinx.coroutines.launch
  * their categories, moving an item to another one. A category is a bold word in front of an item's text (see [Categories]), so
  * every change here is a change of the items' texts and styles.
  */
+/** The place of the items without a category among the names of the categories of a session (a name is never empty). */
+internal const val NONE = ""
+
 internal class EditorCategories(
     private val context: android.content.Context,
     private val account: String,
@@ -137,7 +140,7 @@ internal class EditorCategories(
      * The categories of this editing session: one that loses its last item (moved elsewhere) stays until the note is saved, so
      * items can be moved back into it, and a new one can be empty for a moment. Also the order of their headers.
      */
-    val session = androidx.compose.runtime.mutableStateListOf<String>().apply { addAll(Categories.names(items, rich())) }
+    val session = androidx.compose.runtime.mutableStateListOf<String>().apply { add(NONE); addAll(Categories.names(items, rich())) }
 
     init {
         // The categories this checklist had on this device before (also ones that are gone), for choosing one again.
@@ -160,14 +163,16 @@ internal class EditorCategories(
      * header stays where it is while items move between categories; categories that lost their items stay as empty headers
      * until the note is saved. Null for a list without categories.
      */
-    fun groups(): List<Categories.Group>? {
+    fun groups(keepEmptyNone: Boolean = false): List<Categories.Group>? {
         if (!enabled) return null
         val rich = rich()
         val nameOf = items.associate { it.id to Categories.split(it, rich?.docs?.get(it.id))?.name }
-        val order = session.toList() + nameOf.values.filterNotNull().filter { it !in session }.distinct()
-        if (order.isEmpty()) return null
-        return (listOf<String?>(null) + order).map { name -> Categories.Group(name, items.filter { nameOf[it.id] == name }) }
-            .filter { it.name != null || it.items.isNotEmpty() }
+        var order = session.toList() + nameOf.values.filterNotNull().filter { it !in session }.distinct()
+        if (order.none { it != NONE }) return null
+        // The items without a category are a group of their own, at its place among the categories (first, unless it was moved).
+        if (NONE !in order) order = listOf(NONE) + order
+        return order.map { key -> (key.ifEmpty { null }).let { name -> Categories.Group(name, items.filter { nameOf[it.id] == name }) } }
+            .filter { it.name != null || it.items.isNotEmpty() || keepEmptyNone }
     }
 
     /** Moves an item to category [name] (null: none): the old name in front of it goes, the new one comes in bold. */

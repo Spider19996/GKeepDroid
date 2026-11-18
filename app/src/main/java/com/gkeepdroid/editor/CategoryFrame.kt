@@ -141,19 +141,22 @@ internal fun EditorCategoryHeader(
             ),
         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
     ) {
+        // The group of items without a category has no name (empty): only room to hold it by, and no gap in the line.
+        val unnamed = name.isEmpty()
         Text(
-            name, style = labelStyle, color = if (dragged) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface, maxLines = 1,
+            if (unnamed) "\u2007\u2007\u2007\u2007\u2007\u2007" else name, style = labelStyle,
+            color = if (dragged) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface, maxLines = 1,
             // A little further in than the label of the title field (16 dp), so the corner's arc is whole before it: 22 dp from the frame's
             // line (8 dp of the frame's padding, 10 here, 4 of the name's own).
             modifier = Modifier.padding(start = 10.dp)
                 .onGloballyPositioned { c ->
                     nameCoords = c
                     val x = c.positionInParent().x
-                    nameRange = x to x + c.size.width
+                    nameRange = if (unnamed) x to x else x to x + c.size.width
                 }
                 .clip(MaterialTheme.shapes.small)
                 .pointerInput(name, canEdit) {
-                    if (!canEdit) return@pointerInput
+                    if (!canEdit || unnamed) return@pointerInput
                     detectTapGestures(onTap = { rename() })
                 }
                 .pointerInput(name, canEdit) {

@@ -207,7 +207,7 @@ internal fun ColumnScope.EditorChecklist(
             }
             // With categories the items stand under their category's header (as on the cards); the header folds them and
             // its "+" adds an item to them. The list itself keeps its order.
-            val editorGroups = categoryGroups()
+            val editorGroups = categories.groups(keepEmptyNone = dragging != null)
             val groupOf = editorGroups?.flatMap { g -> g.items.map { it.id to g.name } }?.toMap().orEmpty()
             // One item of the list as it is edited. Under a category's header it shows without the category's name, which
             // stays in front of it in Keep; what is typed goes behind the name.
@@ -260,16 +260,13 @@ internal fun ColumnScope.EditorChecklist(
                             val over = items.firstOrNull { it.id != item.id && rowBounds[it.id]?.let { r -> y >= r.top && y < r.bottom } == true }
                             val header = headerBounds.entries.firstOrNull { (_, r) -> y >= r.top && y < r.bottom }?.key
                             val slot = slotBounds.entries.firstOrNull { (_, r) -> y >= r.top && y < r.bottom }?.key
-                            val firstHeader = headerBounds.values.minOfOrNull { it.top }
-                            // Where the item is meant to go: a drop place, a header, an item of another category, or above all
-                            // categories (no category).
-                            val found = slot != null || header != null || (over != null && groupOf[over.id] != groupOf[item.id]) ||
-                                (firstHeader != null && y < firstHeader && groupOf[item.id] != null)
+                            // Where the item is meant to go: a drop place, a header, or an item of another category.
+                            val found = slot != null || header != null || (over != null && groupOf[over.id] != groupOf[item.id])
                             hoverTarget = slot
                             if (from >= 0 && editorGroups != null && found) {
                                 val target = when {
                                     slot != null -> slot.ifEmpty { null }
-                                    header != null -> header
+                                    header != null -> header.ifEmpty { null }
                                     over != null && groupOf[over.id] != groupOf[item.id] -> groupOf[over.id]
                                     else -> null
                                 }
@@ -296,7 +293,7 @@ internal fun ColumnScope.EditorChecklist(
                             dragging = null
                         },
                         focusNow = focusItemId == item.id, onFocused = { focusItemId = null },
-                        carried = draggingCategory != null && groupOf[item.id] == draggingCategory,
+                        carried = draggingCategory != null && (groupOf[item.id] ?: NONE) == draggingCategory,
                         swipeRight = itemSwipe.first, swipeLeft = itemSwipe.second,
                         onSwipe = { right -> swipeItems(listOf(item.id), if (right) itemSwipe.first else itemSwipe.second) },
                     )
@@ -310,25 +307,25 @@ internal fun ColumnScope.EditorChecklist(
             // the size of a row to drop it into, so an empty category is as easy to hit as a full one.
             val holding = dragging
             val entries: List<Pair<String?, KeepItem?>> = if (editorGroups == null) items.map { null to it } else buildList {
-                if (holding != null && editorGroups.none { it.name == null && it.items.any { i -> i.id != holding } }) add(SLOT_PREFIX to null)
                 editorGroups.forEach { group ->
-                    if (group.name != null) add(group.name to null)
+                    val key = group.name ?: NONE
+                    add(key to null)
                     // While a category is held every category shows only its header, so they are quick to pass.
-                    val hidden = group.name != null && (CategoryFolds.key(account, noteKey, group.name) in folds || draggingCategory != null)
-                    if (!hidden) group.items.forEach { add(group.name to it) }
-                    if (holding != null && group.name != null && !hidden && group.items.none { it.id != holding }) add(SLOT_PREFIX + group.name to null)
+                    val hidden = CategoryFolds.key(account, noteKey, key) in folds || draggingCategory != null
+                    if (!hidden) group.items.forEach { add(key to it) }
+                    if (holding != null && !hidden && group.items.none { it.id != holding }) add(SLOT_PREFIX + key to null)
                 }
             }
             // Only what is shown can be dropped onto: rows of folded categories and headers that are gone are forgotten.
             val shownRows = entries.mapNotNull { it.second?.id }.toSet()
-            val shownHeaders = editorGroups?.mapNotNull { it.name }?.toSet().orEmpty()
+            val shownHeaders = editorGroups?.map { it.name ?: NONE }?.toSet().orEmpty()
             androidx.compose.runtime.SideEffect {
                 rowBounds.keys.retainAll(shownRows)
                 headerBounds.keys.retainAll(shownHeaders)
                 slotBounds.keys.retainAll(entries.mapNotNull { (n, i) -> if (i == null && n != null && n.startsWith(SLOT_PREFIX)) n.removePrefix(SLOT_PREFIX) else null }.toSet())
             }
             // One frame around each category: its header, its items and its drop place, each drawing its piece.
-            val categoryOf = entries.map { (n, i) -> if (i != null) n else n?.let { if (it.startsWith(SLOT_PREFIX)) it.removePrefix(SLOT_PREFIX).ifEmpty { null } else it } }
+            val categoryOf = entries.map { (n, i) -> if (i != null) n else n?.let { if (it.startsWith(SLOT_PREFIX)) it.removePrefix(SLOT_PREFIX) else it } }
             fun frameAt(index: Int): Int {
                 val c = categoryOf[index] ?: return FRAME_NONE
                 val first = index == 0 || categoryOf[index - 1] != c
@@ -340,20 +337,16 @@ internal fun ColumnScope.EditorChecklist(
                 if (item != null) {
                     // The items of a held category move with its header.
                     Box {
-                        ItemEditor(items.indexOfFirst { it.id == item.id }, item, inCategory = name != null, frame = frameAt(entryIndex))
+                        ItemEditor(items.indexOfFirst { it.id == item.id }, item, inCategory = name != null && name != NONE, frame = frameAt(entryIndex))
                     }
                 } else if (name != null && name.startsWith(SLOT_PREFIX)) {
                     val target = name.removePrefix(SLOT_PREFIX)
-                    if (target.isNotEmpty()) Box(Modifier.categoryFrame(frameAt(entryIndex))) { CategoryDropSlot(
+                    Box(Modifier.categoryFrame(frameAt(entryIndex))) { CategoryDropSlot(
                         null, active = hoverTarget == target,
                         modifier = Modifier.onGloballyPositioned { slotBounds[target] = it.boundsInRoot() }.animatePlacement(),
-                    ) } else CategoryDropSlot(
-                        if (target.isEmpty()) stringResource(R.string.category_none) else null,
-                        active = hoverTarget == target,
-                        modifier = Modifier.onGloballyPositioned { slotBounds[target] = it.boundsInRoot() }.animatePlacement(),
-                    )
+                    ) }
                 } else if (name != null) {
-                    val group = editorGroups!!.first { it.name == name }
+                    val group = editorGroups!!.first { (it.name ?: NONE) == name }
                     val folded = CategoryFolds.key(account, noteKey, name) in folds
                     val real = group.items.filter { !it.isDivider() }
                     val notches = headerNotches.getOrPut(name) { androidx.compose.runtime.mutableStateListOf() }
@@ -373,7 +366,7 @@ internal fun ColumnScope.EditorChecklist(
                     ) { EditorCategoryHeader(
                         name, Categories.progress(group.items), folded, canEdit,
                         onToggle = { CategoryFolds.set(context, account, noteKey, name, !folded) },
-                        onAdd = { addInCategory(name) },
+                        onAdd = { addInCategory(name.ifEmpty { null }) },
                         notches = notches,
                         modifier = Modifier.onGloballyPositioned { headerBounds[name] = it.boundsInRoot() },
                         onRename = { renameCategory = name },
