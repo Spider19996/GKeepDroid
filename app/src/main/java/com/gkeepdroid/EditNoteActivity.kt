@@ -435,62 +435,13 @@ class EditNoteActivity : ComponentActivity() {
         val format = remember { FormatState(canFormat, existing?.let { RichNotes.of(this@EditNoteActivity, account, it.id) }) }
         // Folded categories are remembered per note; a note that is being made has no id yet.
         val noteKey = existing?.id ?: "new"
-        /** The styles of the items as they are now in this editor, for finding their categories. */
-        fun editorRich(): RichNote? =
-            if (!canFormat) null else RichNote("", items.associate { it.id to RichDoc(it.text, format.flagsFor(it.id, it.text).runs()) })
-
-        // The categories of this editing session: one that loses its last item (moved elsewhere) stays until the note is
-        // saved, so items can be moved back into it, and a new one can be empty for a moment.
-        val sessionCategories = remember { androidx.compose.runtime.mutableStateListOf<String>().apply { addAll(Categories.names(items, editorRich())) } }
-        fun keepCategory(name: String?) {
-            if (name == null || name.trim().isEmpty()) return
-            if (name.trim() !in sessionCategories) sessionCategories.add(name.trim())
-            CategoryHistory.add(this@EditNoteActivity, account, noteKey, listOf(name))
-        }
-        // The categories this checklist had on this device before (also ones that are gone), for choosing one again.
-        remember { CategoryHistory.add(this@EditNoteActivity, account, noteKey, sessionCategories) }
-
-        /**
-         * The items in their categories, the categories in a fixed order (the order of this session, not of the items), so a
-         * header stays where it is while items move between categories; categories that lost their items stay as empty headers
-         * until the note is saved. Null for a list without categories.
-         */
-        fun categoryGroups(): List<Categories.Group>? {
-            if (!canFormat) return null
-            val rich = editorRich()
-            val nameOf = items.associate { it.id to Categories.split(it, rich?.docs?.get(it.id))?.name }
-            val order = sessionCategories.toList() + nameOf.values.filterNotNull().filter { it !in sessionCategories }.distinct()
-            if (order.isEmpty()) return null
-            return (listOf<String?>(null) + order).map { name -> Categories.Group(name, items.filter { nameOf[it.id] == name }) }
-                .filter { it.name != null || it.items.isNotEmpty() }
-        }
-
-        /** Moves an item to category [name] (null: none): the old name in front of it goes, the new one comes in bold. */
-        fun setCategory(id: String, name: String?) {
-            val i = items.indexOfFirst { it.id == id }
-            if (i < 0) return
-            val item = items[i]
-            val cut = Categories.split(item, editorRich()?.docs?.get(id))?.restStart ?: 0
-            val rest = item.text.substring(cut)
-            val old = format.flagsFor(id, item.text).flags
-            // The word is already in front (a category that was dissolved, or typed by hand): it only becomes bold again.
-            val clean = name?.trim()
-            if (clean != null && cut == 0 && rest.startsWith("$clean ", ignoreCase = true)) {
-                val flags = old.copyOf()
-                for (k in clean.indices) flags[k] = flags[k] or RichNotes.BOLD
-                format.replaceFlags(id, flags)
-                items[i] = item.copy(text = rest.substring(0, clean.length) + rest.substring(clean.length))
-                keepCategory(rest.substring(0, clean.length))
-                return
-            }
-            val front = if (name == null) "" else "${name.trim()} "
-            val flags = IntArray(front.length + rest.length)
-            for (k in 0 until (name?.trim()?.length ?: 0)) flags[k] = RichNotes.BOLD
-            for (k in rest.indices) flags[front.length + k] = old.getOrElse(cut + k) { 0 } and TEXT_STYLE_MASK
-            format.replaceFlags(id, flags)
-            items[i] = item.copy(text = front + rest)
-            keepCategory(name)
-        }
+        // The categories of this checklist while it is edited (see EditorCategories).
+        val categories = remember { EditorCategories(this@EditNoteActivity, account, noteKey, items, format, canFormat) }
+        fun editorRich(): RichNote? = categories.rich()
+        val sessionCategories = categories.session
+        fun keepCategory(name: String?) = categories.keep(name)
+        fun categoryGroups(): List<Categories.Group>? = categories.groups()
+        fun setCategory(id: String, name: String?) = categories.set(id, name)
 
         // What a swipe does to items in this editor, from the settings.
         val itemSwipe = remember(layoutKey) { AppSettingsStore.load(this@EditNoteActivity).let { it.itemSwipeRight to it.itemSwipeLeft } }
@@ -515,39 +466,16 @@ class EditNoteActivity : ComponentActivity() {
             }
         }
 
-        /**
-         * Makes the list an ordinary checklist again: the words of the categories stay in front of the items, only no longer in
-         * bold, so they are no categories any more.
-         */
-        fun dissolveCategories() {
-            val rich = editorRich()
-            items.toList().forEach { item ->
-                val split = Categories.split(item, rich?.docs?.get(item.id)) ?: return@forEach
-                val flags = format.flagsFor(item.id, item.text).flags.copyOf()
-                for (k in 0 until minOf(split.restStart, flags.size)) flags[k] = flags[k] and RichNotes.BOLD.inv()
-                format.replaceFlags(item.id, flags)
-            }
-            sessionCategories.clear()
-        }
-
+        /** Makes the list an ordinary checklist again: the words of the categories stay, no longer in bold. */
+        fun dissolveCategories() = categories.dissolve()
 
         /** A new item at the end of category [name] (a new category at the end of the list), its name in bold; null: no category. */
         fun addInCategory(name: String?) {
-            val id = UUID.randomUUID().toString()
             if (name == null) {
+                val id = UUID.randomUUID().toString()
                 items.add(KeepItem(id, "", false))
                 focusItemId = id
-                return
-            }
-            val clean = name.trim()
-            keepCategory(clean)
-            val text = "$clean "
-            val last = Categories.groups(items, editorRich())?.firstOrNull { it.name == clean }?.items?.lastOrNull()
-            val at = last?.let { l -> items.indexOfFirst { it.id == l.id } + 1 }?.takeIf { it > 0 } ?: items.size
-            items.add(at, KeepItem(id, text, false))
-            format.setStyle(id, text, 0, clean.length, RichNotes.BOLD)
-            CategoryFolds.set(this@EditNoteActivity, account, noteKey, clean, false)
-            focusItemId = id
+            } else focusItemId = categories.addIn(name)
         }
 
         /** The name for a new category was given: for an item dropped onto "New category", as a first empty one, or with a new item. */
@@ -1639,100 +1567,50 @@ class EditNoteActivity : ComponentActivity() {
             LabelsSection(account = targetAccount, labels = labels, onLabels = { labels = it }, canEdit = canEdit)
         }
         renameCategory?.let { old ->
-            // The whole name is selected, so typing replaces it and a tap places the cursor.
-            var field by remember(old) { mutableStateOf(androidx.compose.ui.text.input.TextFieldValue(old, androidx.compose.ui.text.TextRange(0, old.length))) }
-            val name = field.text
-            val renameFocus = remember { androidx.compose.ui.focus.FocusRequester() }
-            LaunchedEffect(old) { kotlinx.coroutines.delay(100); runCatching { renameFocus.requestFocus() } }
-            val done = {
-                val clean = name.trim()
-                if (clean.isNotEmpty() && clean != old) {
-                    // Every item of the category gets the new name in front; the category keeps its place.
-                    val at = sessionCategories.indexOf(old)
-                    categoryGroups()?.firstOrNull { it.name == old }?.items?.forEach { setCategory(it.id, clean) }
-                    sessionCategories.remove(clean)
-                    if (at >= 0 && at <= sessionCategories.size) { sessionCategories.remove(old); sessionCategories.add(at.coerceAtMost(sessionCategories.size), clean) }
-                }
-                renameCategory = null
-            }
-            AlertDialog(
-                onDismissRequest = { renameCategory = null },
-                title = { Text(stringResource(R.string.category_rename)) },
-                text = {
-                    OutlinedTextField(
-                        value = field, onValueChange = { field = it }, singleLine = true, shape = MaterialTheme.shapes.medium,
-                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Done),
-                        keyboardActions = androidx.compose.foundation.text.KeyboardActions(onDone = { done() }),
-                        modifier = Modifier.focusRequester(renameFocus),
-                    )
+            RenameCategoryDialog(
+                old,
+                onDone = { clean ->
+                    if (clean.isNotEmpty() && clean != old) {
+                        // Every item of the category gets the new name in front; the category keeps its place.
+                        val at = sessionCategories.indexOf(old)
+                        categoryGroups()?.firstOrNull { it.name == old }?.items?.forEach { setCategory(it.id, clean) }
+                        sessionCategories.remove(clean)
+                        if (at >= 0 && at <= sessionCategories.size) { sessionCategories.remove(old); sessionCategories.add(at.coerceAtMost(sessionCategories.size), clean) }
+                    }
+                    renameCategory = null
                 },
-                confirmButton = { TextButton(onClick = done, enabled = name.isNotBlank(), shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.save)) } },
-                dismissButton = { TextButton(onClick = { renameCategory = null }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) } },
+                onDismiss = { renameCategory = null },
             )
         }
         if (newCategoryDialog) {
-            var name by remember { mutableStateOf("") }
-            // The name is typed at once.
-            val nameFocus = remember { androidx.compose.ui.focus.FocusRequester() }
-            LaunchedEffect(Unit) { kotlinx.coroutines.delay(100); runCatching { nameFocus.requestFocus() } }
-            val create = {
-                if (name.isNotBlank()) {
-                    if (moveItems != null) { val n = name.trim(); val m = moveItems; newCategoryDialog = false; moveItems = null; m?.forEach { setCategory(it, n) }; keepCategory(n) }
-                    else { newCategoryDialog = false; createCategory(name) }
-                }
-            }
-            val cancel = { newCategoryDialog = false; newCategoryFor = null; newCategoryEmpty = false; moveItems = null; armedForget = null }
-            // Moving items by a swipe: every category, the ones they are in too, and "no category".
             val moving = moveItems
-            fun moveTo(target: String?) {
-                newCategoryDialog = false; moveItems = null; armedForget = null
-                moving?.forEach { setCategory(it, target) }
-                if (target != null) keepCategory(target)
-            }
-            AlertDialog(
-                onDismissRequest = cancel,
-                title = { Text(stringResource(if (moving != null) R.string.category_move else R.string.add_category)) },
-                text = {
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        // An item dropped here can also leave its category, or go into one this list had before (also one that
-                        // is gone since it was last saved); the ones it has now are its own headers.
-                        val current = categoryGroups()?.mapNotNull { it.name }.orEmpty()
-                        val earlier = historyVersion.let { CategoryHistory.load(this@EditNoteActivity, account, noteKey) }.filter { it !in current }
-                        if (moving != null || earlier.isNotEmpty()) androidx.compose.foundation.layout.FlowRow(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp),
-                        ) {
-                            if (moving != null) {
-                                CategoryChip(stringResource(R.string.category_none)) { moveTo(null) }
-                                current.forEach { CategoryChip(it) { moveTo(it) } }
-                            }
-                            earlier.forEach { old ->
-                                CategoryChip(
-                                    old, armed = armedForget == old,
-                                    onLongClick = {
-                                        if (armedForget == old) {
-                                            CategoryHistory.remove(this@EditNoteActivity, account, noteKey, old)
-                                            armedForget = null
-                                            historyVersion++
-                                        } else armedForget = old
-                                    },
-                                ) { if (moving != null) moveTo(old) else { newCategoryDialog = false; createCategory(old) } }
-                            }
-                        }
-                        if (earlier.isNotEmpty()) Text(
-                            stringResource(R.string.category_forget_hint), style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        OutlinedTextField(
-                            value = name, onValueChange = { name = it }, singleLine = true,
-                            placeholder = { Text(stringResource(R.string.category_name)) },
-                            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Done),
-                            keyboardActions = androidx.compose.foundation.text.KeyboardActions(onDone = { create() }),
-                            modifier = Modifier.focusRequester(nameFocus),
-                        )
-                    }
+            val current = categoryGroups()?.mapNotNull { it.name }.orEmpty()
+            // The categories this list had before (also ones that are gone since it was last saved), less the ones it has now.
+            val earlier = historyVersion.let { CategoryHistory.load(this@EditNoteActivity, account, noteKey) }.filter { it !in current }
+            val close = { newCategoryDialog = false; newCategoryFor = null; newCategoryEmpty = false; moveItems = null; armedForget = null }
+            CategoryChoiceDialog(
+                moving = moving != null, current = current, earlier = earlier, armed = armedForget,
+                onLongPress = { old ->
+                    // Held once an earlier category turns red, held again it is forgotten.
+                    if (armedForget == old) {
+                        CategoryHistory.remove(this@EditNoteActivity, account, noteKey, old)
+                        armedForget = null
+                        historyVersion++
+                    } else armedForget = old
                 },
-                confirmButton = { TextButton(onClick = create, enabled = name.isNotBlank(), shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.add_category_confirm)) } },
-                dismissButton = { TextButton(onClick = cancel, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) } },
+                onChoose = { target ->
+                    if (moving != null) {
+                        // Moving items by a swipe: every category, the ones they are in too, and "no category".
+                        close()
+                        moving.forEach { setCategory(it, target) }
+                        if (target != null) keepCategory(target)
+                    } else if (target != null) { newCategoryDialog = false; createCategory(target) }
+                },
+                onCreate = { typed ->
+                    if (moving != null) { val n = typed.trim(); close(); moving.forEach { setCategory(it, n) }; keepCategory(n) }
+                    else { newCategoryDialog = false; createCategory(typed) }
+                },
+                onDismiss = close,
             )
         }
         if (confirmDiscard) AlertDialog(
