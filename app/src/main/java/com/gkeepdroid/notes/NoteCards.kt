@@ -134,6 +134,8 @@ internal fun NoteTile(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    // What swiping a category's header does (the settings of the editor's item swipe; moving to a category only works there).
+    val itemSwipe = remember(app) { (if (app.itemSwipeRight == ITEM_SWIPE_CATEGORY) ITEM_SWIPE_NONE else app.itemSwipeRight) to (if (app.itemSwipeLeft == ITEM_SWIPE_CATEGORY) ITEM_SWIPE_NONE else app.itemSwipeLeft) }
     val foldedKeys = remember(FoldStore.version.intValue) { FoldStore.load(context) }
     // A note that is only a title has no arrow: there is nothing to fold.
     val foldable = app.foldNotes && note.canFold()
@@ -146,6 +148,26 @@ internal fun NoteTile(
             PendingToggles.add(context, PendingToggle(account, note.id, item.id, checked, delete))
             if (delete) NotesCache.removeItem(context, account, note.id, item.id)
             else NotesCache.setChecked(context, account, note.id, item.id, checked)
+            NotesCache.version.intValue++
+            scope.launch { WidgetRefresh.all(context) }
+            ToggleItemWorker.schedule(context, account)
+        }
+        if (AppLock.editAllowed(activity)) apply() else unlock?.invoke(R.string.lock_prompt_edit) { if (it) apply() }
+    }
+    /** A swipe on a category's header acts on all its items: tick them (untick when all are), or remove them. */
+    fun swipeCategory(items: List<KeepItem>, action: Int) {
+        val all = items.filter { !it.isDivider() }
+        if (all.isEmpty() || (action != ITEM_SWIPE_TICK && action != ITEM_SWIPE_REMOVE)) return
+        fun apply() {
+            val tick = !all.all { it.checked }
+            all.forEach { item ->
+                val checked = if (action == ITEM_SWIPE_REMOVE) true else tick
+                val delete = action == ITEM_SWIPE_REMOVE || (app.listDeleteChecked && checked)
+                if (action == ITEM_SWIPE_TICK && item.checked == checked) return@forEach
+                PendingToggles.add(context, PendingToggle(account, note.id, item.id, checked, delete))
+                if (delete) NotesCache.removeItem(context, account, note.id, item.id)
+                else NotesCache.setChecked(context, account, note.id, item.id, checked)
+            }
             NotesCache.version.intValue++
             scope.launch { WidgetRefresh.all(context) }
             ToggleItemWorker.schedule(context, account)
@@ -383,7 +405,12 @@ internal fun NoteTile(
                             .padding(start = 6.dp, end = 2.dp, bottom = 2.dp),
                     ) {
                         val folded = CategoryFolds.key(account, note.id, group.name) in folds
-                        CategoryHeader(group.name, if (app.showProgress) Categories.progress(group.items) else null, folded, textColor) {
+                        CategoryHeader(
+                            group.name, if (app.showProgress) Categories.progress(group.items) else null, folded, textColor,
+                            swipeRight = if (app.listCheckInApp) itemSwipe.first else ITEM_SWIPE_NONE,
+                            swipeLeft = if (app.listCheckInApp) itemSwipe.second else ITEM_SWIPE_NONE,
+                            onSwipe = { right -> swipeCategory(group.items, if (right) itemSwipe.first else itemSwipe.second) },
+                        ) {
                             CategoryFolds.set(context, account, note.id, group.name, !folded)
                         }
                         if (!folded) rows.forEach { item -> if (left > 0) { ItemLine(item, inCategory = true); left-- } else hidden++ }
@@ -465,25 +492,57 @@ internal fun NoteTile(
     }
 }
 
-/** The header of a category in a checklist: its name, how many of its items are open, and the arrow that folds it. */
+/** The header of a category in a checklist: its name, how many of its items are open, and the arrow that folds it. Swipes like an item. */
 @Composable
-internal fun CategoryHeader(name: String, progress: String?, folded: Boolean, color: Color, onToggle: () -> Unit) {
-    Row(
-        Modifier.fillMaxWidth().clickable(onClick = onToggle).padding(top = 2.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            name, color = color, style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
-            maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
-        )
-        // The progress and the arrow as the note's own: the same style and size, the arrow exactly below the note's.
-        if (progress != null) Text(progress, color = color.copy(alpha = 0.7f), style = MaterialTheme.typography.labelMedium)
-        Box(Modifier.size(width = 36.dp, height = 28.dp), contentAlignment = Alignment.CenterEnd) {
-            Icon(
-                painterResource(if (folded) R.drawable.ic_arrow_left else R.drawable.ic_arrow_down),
-                contentDescription = stringResource(if (folded) R.string.unfold_all else R.string.fold_all),
-                tint = color, modifier = Modifier.padding(end = 6.dp).size(24.dp),
+internal fun CategoryHeader(
+    name: String, progress: String?, folded: Boolean, color: Color,
+    swipeRight: Int = ITEM_SWIPE_NONE, swipeLeft: Int = ITEM_SWIPE_NONE, onSwipe: (Boolean) -> Unit = {}, onToggle: () -> Unit,
+) {
+    val maxPx = with(androidx.compose.ui.platform.LocalDensity.current) { 72.dp.toPx() }
+    var offsetX by remember { mutableStateOf(0f) }
+    val swipe by androidx.compose.runtime.rememberUpdatedState(onSwipe)
+    Box(Modifier.fillMaxWidth()) {
+        if (offsetX != 0f) {
+            val toRight = offsetX > 0f
+            val (bg, icon, tint) = swipeLook(if (toRight) swipeRight else swipeLeft)
+            Box(
+                Modifier.matchParentSize().clip(MaterialTheme.shapes.small).background(bg).padding(horizontal = 12.dp),
+                contentAlignment = if (toRight) Alignment.CenterStart else Alignment.CenterEnd,
+            ) { Icon(painterResource(icon), contentDescription = null, tint = tint) }
+        }
+        Row(
+            Modifier.fillMaxWidth()
+                .offset { androidx.compose.ui.unit.IntOffset(offsetX.toInt(), 0) }
+                .then(if (offsetX != 0f) Modifier.background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.small) else Modifier)
+                .draggable(
+                    orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
+                    enabled = swipeRight != ITEM_SWIPE_NONE || swipeLeft != ITEM_SWIPE_NONE,
+                    state = androidx.compose.foundation.gestures.rememberDraggableState { delta ->
+                        offsetX = (offsetX + delta).coerceIn(if (swipeLeft != ITEM_SWIPE_NONE) -maxPx else 0f, if (swipeRight != ITEM_SWIPE_NONE) maxPx else 0f)
+                    },
+                    onDragStopped = {
+                        val passed = kotlin.math.abs(offsetX) >= maxPx * 0.75f
+                        val toRight = offsetX > 0f
+                        androidx.compose.animation.core.animate(offsetX, 0f) { value, _ -> offsetX = value }
+                        if (passed) swipe(toRight)
+                    },
+                )
+                .clickable(onClick = onToggle).padding(top = 2.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                name, color = color, style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
+                maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
             )
+            // The progress and the arrow as the note's own: the same style and size, the arrow exactly below the note's.
+            if (progress != null) Text(progress, color = color.copy(alpha = 0.7f), style = MaterialTheme.typography.labelMedium)
+            Box(Modifier.size(width = 36.dp, height = 28.dp), contentAlignment = Alignment.CenterEnd) {
+                Icon(
+                    painterResource(if (folded) R.drawable.ic_arrow_left else R.drawable.ic_arrow_down),
+                    contentDescription = stringResource(if (folded) R.string.unfold_all else R.string.fold_all),
+                    tint = color, modifier = Modifier.padding(end = 6.dp).size(24.dp),
+                )
+            }
         }
     }
 }

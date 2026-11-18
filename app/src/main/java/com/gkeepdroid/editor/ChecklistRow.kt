@@ -162,6 +162,8 @@ internal fun ChecklistRow(
                         MaterialTheme.colorScheme.background.let { if (LocalOnNote.current) it.copy(alpha = 0f) else it },
                         androidx.compose.animation.core.tween(450), label = "row",
                     ).value,
+                    // Rounded like the frame, so a swipe's color is not covered at the corners behind the line.
+                    MaterialTheme.shapes.medium,
                 )
                 .draggable(
                     orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,

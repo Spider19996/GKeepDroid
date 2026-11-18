@@ -117,7 +117,7 @@ internal fun EditorCategoryHeader(
         if (notches.toList() != wanted) { notches.clear(); notches.addAll(wanted) }
     }
     val labelStyle = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
-    androidx.compose.foundation.layout.Row(
+    Box(
         modifier.fillMaxWidth()
             .onGloballyPositioned { rowTop = it.boundsInRoot().top }
             // Its middle lies on the frame's top line: half of it above the frame, half inside.
@@ -127,7 +127,20 @@ internal fun EditorCategoryHeader(
                 val below = if (alone) 36.dp.roundToPx() else (p.height / 2 - 14.dp.roundToPx()).coerceAtLeast(0)
                 layout(p.width, below) { p.place(0, -p.height / 2 + (if (alone) 4.dp.roundToPx() else 0)) }
             }
+    ) {
+    Box {
+        if (offsetX != 0f) {
+            val toRight = offsetX > 0f
+            val (color, icon, tint) = swipeLook(if (toRight) swipeRight else swipeLeft)
+            Box(
+                Modifier.matchParentSize().clip(MaterialTheme.shapes.medium).background(color).padding(horizontal = 20.dp),
+                contentAlignment = if (toRight) androidx.compose.ui.Alignment.CenterStart else androidx.compose.ui.Alignment.CenterEnd,
+            ) { Icon(painterResource(icon), contentDescription = null, tint = tint) }
+        }
+    androidx.compose.foundation.layout.Row(
+        Modifier.fillMaxWidth()
             .offset { androidx.compose.ui.unit.IntOffset(offsetX.toInt(), 0) }
+            .then(if (offsetX != 0f) Modifier.background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.medium) else Modifier)
             .draggable(
                 orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
                 enabled = canEdit && (swipeRight != ITEM_SWIPE_NONE || swipeLeft != ITEM_SWIPE_NONE),
@@ -207,6 +220,8 @@ internal fun EditorCategoryHeader(
                 Icon(painterResource(R.drawable.ic_add), contentDescription = stringResource(R.string.category_add_item, name), modifier = Modifier.size(24.dp))
             }
         }
+    }
+    }
     }
 }
 
