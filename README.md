@@ -12,7 +12,7 @@ An unofficial Android app for your Google Keep notes: home screen widgets with a
 
 - **Two widgets**: *Keep Notes* lists all notes of an account (optionally only one label), *Keep Note* shows a single note or checklist, such as a shopping list
 - **Widget look**: background opacity from 0 to 100 %, text size and color, Keep's note colors, cards for notes without a color (transparent, gray or with a border)
-- **Button bar**: every button (refresh, new note, search, ...) can be hidden or dragged to any side of the widget, in any order, with an adjustable size; the settings page shows a live preview of the bar
+- **Button bar**: every button (refresh, new note, search, ...) can be hidden or dragged to any side of the widget, in any order, with an adjustable size; a bar with more buttons than fit shows them page by page with arrows; the settings page shows a live preview of the bar
 - **Reminders**: several per note, each with its own sound, vibration and silent-mode setting, snooze, quick times you define, shown on the cards and in the widgets. They live on the phone only, Keep's own reminders are not synced
 - **Checklists**: tick items right in the widget or on the cards of the app, checked items move to the end (or are hidden), "3/7" progress, drag items to re-order them, check/uncheck all, sort A–Z, delete checked, dividers (a line of dashes, also an item of its own in Keep), convert between note and checklist (also from lines starting with "-" or "1."), numbered checklists (the numbers are part of the text, so Keep shows them too), automatic list numbering while typing
 - **Folding**: a small arrow folds a note to its title in the app and, optionally, in the widgets (a note that is only a title has none)

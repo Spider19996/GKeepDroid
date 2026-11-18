@@ -15,6 +15,11 @@ import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.ColumnScope
 import androidx.glance.layout.Row
+import androidx.glance.layout.Spacer
+import androidx.glance.LocalSize
+import androidx.glance.currentState
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
@@ -141,6 +146,54 @@ internal fun HeaderBar(
     // The buttons sit at the start, in the middle or at the end of the bar.
     fun group(slot: Int) = buttons.filter { barSlot(settings.buttons.zoneOf(it.id)) == slot }
 
+    // More buttons than the bar has room for: they are shown page by page, with arrows at the ends to turn the pages
+    // (a widget cannot scroll sideways). The page is kept in the widget's own state.
+    val slot = (size + 16).dp
+    val full = LocalSize.current
+    val room = if (vertical) {
+        full.height - 16.dp - slot * listOf(POS_TOP, POS_BOTTOM).count { hasBarAt(settings, it, withNewButtons, addItemNoteId != null) }
+    } else {
+        full.width - 16.dp
+    }
+    val fitting = (room / slot).toInt()
+    if (buttons.size > fitting && fitting >= 3) {
+        val ordered = group(ALIGN_START) + group(ALIGN_CENTER) + group(ALIGN_END)
+        val pages = ordered.chunked(fitting - 2)
+        val page = (currentState<Preferences>()[barPageKey(side)] ?: 0).coerceIn(0, pages.lastIndex)
+        fun turn(to: Int) = actionRunCallback<BarPageAction>(actionParametersOf(SideKey to side, PageKey to to))
+        val back: @Composable () -> Unit = {
+            if (page > 0) HeaderIcon(
+                GlanceModifier, if (vertical) R.drawable.ic_arrow_up else R.drawable.ic_arrow_left, textColor, size, turn(page - 1),
+                context.getString(R.string.bar_page_back),
+            ) else Spacer(GlanceModifier.size(slot))
+        }
+        val forward: @Composable () -> Unit = {
+            if (page < pages.lastIndex) HeaderIcon(
+                GlanceModifier, if (vertical) R.drawable.ic_arrow_down else R.drawable.ic_chevron_right, textColor, size, turn(page + 1),
+                context.getString(R.string.bar_page_forward),
+            ) else Spacer(GlanceModifier.size(slot))
+        }
+        // The buttons of a page spread over the room between the arrows.
+        if (vertical) Column(GlanceModifier.fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {
+            back()
+            pages[page].forEach {
+                Spacer(GlanceModifier.defaultWeight())
+                HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action, context.getString(buttonLabelRes(it.id)))
+            }
+            Spacer(GlanceModifier.defaultWeight())
+            forward()
+        } else Row(GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            back()
+            pages[page].forEach {
+                Spacer(GlanceModifier.defaultWeight())
+                HeaderIcon(GlanceModifier, it.icon, textColor, size, it.action, context.getString(buttonLabelRes(it.id)))
+            }
+            Spacer(GlanceModifier.defaultWeight())
+            forward()
+        }
+        return
+    }
+
     if (vertical) {
         Column(GlanceModifier.fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {
             run {
@@ -188,5 +241,24 @@ internal fun WithHeaderBar(
             bar(POS_RIGHT)
         }
         bar(POS_BOTTOM)
+    }
+}
+
+/** The page the bar of [side] shows when its buttons do not fit (kept in the widget's state). */
+internal fun barPageKey(side: Int) = intPreferencesKey("bar_page_$side")
+
+internal val SideKey = androidx.glance.action.ActionParameters.Key<Int>("side")
+internal val PageKey = androidx.glance.action.ActionParameters.Key<Int>("page")
+
+/** Turns the bar of a widget to another page of its buttons. */
+class BarPageAction : androidx.glance.appwidget.action.ActionCallback {
+    override suspend fun onAction(context: android.content.Context, glanceId: androidx.glance.GlanceId, parameters: androidx.glance.action.ActionParameters) {
+        val side = parameters[SideKey] ?: return
+        val page = parameters[PageKey] ?: return
+        androidx.glance.appwidget.state.updateAppWidgetState(context, glanceId) { it[barPageKey(side)] = page }
+        // Only the widget whose bar was turned is drawn again.
+        val manager = androidx.glance.appwidget.GlanceAppWidgetManager(context)
+        if (glanceId in manager.getGlanceIds(NotesWidget::class.java)) NotesWidget().update(context, glanceId)
+        else SingleNoteWidget().update(context, glanceId)
     }
 }
