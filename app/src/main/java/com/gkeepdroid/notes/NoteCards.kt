@@ -532,11 +532,22 @@ private fun CategorySwipe(
         if (offsetX != 0f) {
             val toRight = offsetX > 0f
             val (bg, icon, tint) = swipeLook(if (toRight) swipeRight else swipeLeft)
-            // Only the strip the frame has left is painted, so what is under the frame needs no cover.
+            // The band is what the frame has left of its place: the frame's shape where it was, less the frame where it is now,
+            // so the band's inner corners follow the frame's arcs and nothing has to be covered.
+            val shape = MaterialTheme.shapes.medium
             Box(
-                Modifier.matchParentSize().padding(vertical = 1.dp).clip(MaterialTheme.shapes.medium).drawBehind {
-                    val w = (kotlin.math.abs(offsetX) - 8.dp.toPx()).coerceAtLeast(0f)
-                    clipRect(left = if (toRight) 0f else size.width - w, right = if (toRight) w else size.width) { drawRect(bg) }
+                Modifier.matchParentSize().drawBehind {
+                    val grow = 8.dp.toPx()
+                    val lift = 1.dp.toPx()
+                    val frameSize = androidx.compose.ui.geometry.Size(size.width + grow * 2, size.height + lift * 2)
+                    val outline = shape.createOutline(frameSize, layoutDirection, this)
+                    fun frameAt(dx: Float) = androidx.compose.ui.graphics.Path().apply {
+                        (outline as? androidx.compose.ui.graphics.Outline.Rounded)?.let { addRoundRect(it.roundRect) }
+                        (outline as? androidx.compose.ui.graphics.Outline.Generic)?.let { addPath(it.path) }
+                        translate(androidx.compose.ui.geometry.Offset(-grow + dx, -lift))
+                    }
+                    val band = androidx.compose.ui.graphics.Path.combine(androidx.compose.ui.graphics.PathOperation.Difference, frameAt(0f), frameAt(offsetX))
+                    drawPath(band, bg)
                 },
                 contentAlignment = if (toRight) Alignment.CenterStart else Alignment.CenterEnd,
             ) { Icon(painterResource(icon), contentDescription = null, tint = tint, modifier = Modifier.padding(horizontal = 12.dp)) }

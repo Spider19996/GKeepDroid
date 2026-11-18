@@ -1,5 +1,6 @@
 package com.gkeepdroid
 
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -328,10 +329,10 @@ internal fun CategorySwipeBand(offset: Float, action: Int, frame: Int, topInset:
         Modifier.then(
             if (!active) Modifier else Modifier.drawBehind {
                 // The frame's own extent: 8 dp in from the sides, down over the 12 dp gap to the next piece, so the bands meet.
-                val side = 8.dp.toPx()
+                val side = 0f
                 val r = 18.dp.toPx()
                 val from = if (top) topInset.toPx() else 0f
-                val to = if (bottom) size.height - 8.dp.toPx() else size.height + 12.dp.toPx()
+                val to = if (bottom) size.height else size.height + 12.dp.toPx()
                 val rr = androidx.compose.ui.geometry.RoundRect(
                     side, from, size.width - side, to,
                     topLeftCornerRadius = if (top) androidx.compose.ui.geometry.CornerRadius(r) else androidx.compose.ui.geometry.CornerRadius.Zero,
@@ -345,16 +346,16 @@ internal fun CategorySwipeBand(offset: Float, action: Int, frame: Int, topInset:
     ) {
         // The symbol sits at the header, on the side the swipe comes from.
         if (active && top) Box(
-            Modifier.matchParentSize().padding(top = topInset, start = 20.dp, end = 20.dp),
-            contentAlignment = if (offset > 0f) androidx.compose.ui.Alignment.CenterStart else androidx.compose.ui.Alignment.CenterEnd,
-        ) { Icon(painterResource(icon), contentDescription = null, tint = tint) }
+            Modifier.matchParentSize().padding(top = topInset + 4.dp, start = 20.dp, end = 20.dp),
+            contentAlignment = if (offset > 0f) androidx.compose.ui.Alignment.TopStart else androidx.compose.ui.Alignment.TopEnd,
+        ) { Icon(painterResource(icon), contentDescription = null, tint = tint, modifier = Modifier.requiredSize(24.dp)) }
         Box(
             Modifier.graphicsLayer { translationX = if (active) offset else 0f }
                 // What moves hides the band behind it, down over the gap to the next piece as the frame's line does.
                 .then(if (active) Modifier.drawBehind {
-                    val side = 8.dp.toPx(); val r = 18.dp.toPx()
+                    val side = 0f; val r = 18.dp.toPx()
                     val from = if (top) topInset.toPx() else 0f
-                    val to = if (bottom) size.height - 8.dp.toPx() else size.height + 12.dp.toPx()
+                    val to = if (bottom) size.height else size.height + 12.dp.toPx()
                     val rr = androidx.compose.ui.geometry.RoundRect(
                         side, from, size.width - side, to,
                         topLeftCornerRadius = if (top) androidx.compose.ui.geometry.CornerRadius(r) else androidx.compose.ui.geometry.CornerRadius.Zero,
