@@ -467,7 +467,7 @@ internal fun EditorCategoryHeader(
                 translationY = if (dragged && y != null) y - grab - rowTop else 0f
                 if (dragged) { shadowElevation = 12f; scaleX = 1.02f; scaleY = 1.02f }
             }
-            .background(if (dragged) MaterialTheme.colorScheme.surfaceContainerHigh else androidx.compose.ui.graphics.Color.Transparent, MaterialTheme.shapes.extraSmall),
+            .background(if (dragged) MaterialTheme.colorScheme.surfaceContainerHigh else androidx.compose.ui.graphics.Color.Transparent, MaterialTheme.shapes.medium),
         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
     ) {
         // The same button as an item has: a tap ticks (or unticks) all items of the category, holding it moves the category
@@ -492,7 +492,9 @@ internal fun EditorCategoryHeader(
         ) {
             androidx.compose.foundation.layout.Column(
                 Modifier.padding(start = 11.dp).size(width = 26.dp, height = 40.dp)
-                    .border(1.5.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.extraSmall).padding(1.5.dp),
+                    .clip(androidx.compose.foundation.shape.CircleShape)
+                    .background(if (allChecked) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.surfaceContainerHighest)
+                    .padding(vertical = 2.dp),
             ) {
                 Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = androidx.compose.ui.Alignment.Center) {
                     Icon(
@@ -500,7 +502,7 @@ internal fun EditorCategoryHeader(
                         tint = if (allChecked) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(14.dp),
                     )
                 }
-                Box(Modifier.fillMaxWidth().height(1.5.dp).background(MaterialTheme.colorScheme.outline))
+                Box(Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outlineVariant))
                 Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = androidx.compose.ui.Alignment.Center) {
                     androidx.compose.foundation.layout.Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         repeat(3) { Box(Modifier.size(width = 12.dp, height = 1.5.dp).background(MaterialTheme.colorScheme.onSurfaceVariant)) }
@@ -532,9 +534,9 @@ internal fun EditorCategoryHeader(
 internal fun NewCategoryDropZone(active: Boolean, modifier: Modifier = Modifier) {
     val color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
     androidx.compose.foundation.layout.Row(
-        modifier.fillMaxWidth().padding(top = 8.dp).clip(MaterialTheme.shapes.extraSmall)
+        modifier.fillMaxWidth().padding(top = 8.dp).clip(MaterialTheme.shapes.medium)
             .background(if (active) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else androidx.compose.ui.graphics.Color.Transparent)
-            .border(if (active) 2.dp else 1.dp, color, MaterialTheme.shapes.extraSmall)
+            .border(if (active) 2.dp else 1.dp, color, MaterialTheme.shapes.medium)
             .padding(horizontal = 16.dp, vertical = 18.dp),
         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
@@ -566,9 +568,9 @@ internal fun CategoryChip(name: String, armed: Boolean = false, onLongClick: (()
 internal fun CategoryDropSlot(label: String?, active: Boolean, modifier: Modifier = Modifier) {
     val color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
     Box(
-        modifier.fillMaxWidth().padding(top = 4.dp).height(56.dp).clip(MaterialTheme.shapes.extraSmall)
+        modifier.fillMaxWidth().padding(top = 4.dp).height(56.dp).clip(MaterialTheme.shapes.medium)
             .background(if (active) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else androidx.compose.ui.graphics.Color.Transparent)
-            .border(if (active) 2.dp else 1.dp, color, MaterialTheme.shapes.extraSmall),
+            .border(if (active) 2.dp else 1.dp, color, MaterialTheme.shapes.medium),
         contentAlignment = androidx.compose.ui.Alignment.Center,
     ) {
         if (label != null) Text(label, color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.titleSmall)
@@ -591,8 +593,8 @@ internal fun Modifier.categoryFrame(position: Int): Modifier {
     val color = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
     return this.drawBehind {
         val stroke = 1.5.dp.toPx()
-        // The rounding of the fields inside (Material's small shape), so the frame and the fields have the same corners.
-        val radius = 4.dp.toPx()
+        // Concentric with the fields inside: their rounding (12 dp, Material's medium shape) plus the 8 dp between them and the frame.
+        val radius = 20.dp.toPx()
         val gap = 12.dp.toPx()
         val top = if (position == FRAME_FIRST || position == FRAME_ONLY) stroke / 2 else -gap / 2 - 1f
         val bottom = if (position == FRAME_LAST || position == FRAME_ONLY) size.height + 6.dp.toPx() else size.height + gap / 2 + 1f

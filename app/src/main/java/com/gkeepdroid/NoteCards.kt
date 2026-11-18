@@ -366,9 +366,10 @@ internal fun NoteTile(
                     }
                     // Each category in a frame of its own, rounded like the card around it.
                     Column(
-                        Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                        // Little room around it: a card in the grid is narrow.
+                        Modifier.fillMaxWidth().padding(vertical = 2.dp)
                             .border(1.dp, textColor.copy(alpha = 0.35f), MaterialTheme.shapes.medium)
-                            .padding(start = 8.dp, end = 8.dp, bottom = 4.dp),
+                            .padding(start = 6.dp, end = 2.dp, bottom = 2.dp),
                     ) {
                         val folded = CategoryFolds.key(account, note.id, group.name) in folds
                         CategoryHeader(group.name, open.size, folded, textColor) {
@@ -454,7 +455,7 @@ internal fun NoteTile(
 @Composable
 internal fun CategoryHeader(name: String, open: Int, folded: Boolean, color: Color, onToggle: () -> Unit) {
     Row(
-        Modifier.fillMaxWidth().clickable(onClick = onToggle).padding(top = 6.dp, bottom = 2.dp),
+        Modifier.fillMaxWidth().clickable(onClick = onToggle).padding(top = 4.dp, bottom = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(

@@ -380,8 +380,9 @@ internal fun ChecklistBody(
             }
             // Each category in a frame of its own, with the line and rounding of the cards' border.
             Column(
-                GlanceModifier.fillMaxWidth().padding(vertical = 2.dp).background(ImageProvider(R.drawable.card_border))
-                    .padding(start = 6.dp, end = 4.dp, bottom = 4.dp),
+                // As much room above and below the frame's content as at its sides, and a gap between two frames.
+                GlanceModifier.fillMaxWidth().padding(vertical = 3.dp).background(ImageProvider(R.drawable.card_border))
+                    .padding(horizontal = 6.dp, vertical = 6.dp),
             ) {
                 val folded = CategoryFolds.key(account, note.id, group.name) in folds
                 CategoryHeaderRow(note, account, group.name, group.items.count { !it.checked }, folded, settings, palette)
@@ -423,7 +424,9 @@ internal fun ChecklistBody(
  * The piece of a category's frame for one of its rows in a list where every row is a view of its own: [index] of [count] rows
  * (the header is the first).
  */
-internal fun GlanceModifier.categoryFramePiece(index: Int, count: Int): GlanceModifier = background(
+internal fun GlanceModifier.categoryFramePiece(index: Int, count: Int): GlanceModifier =
+    // A gap above the first piece and below the last, between two frames as in the list widget.
+    padding(top = if (index == 0) 3.dp else 0.dp, bottom = if (index == count - 1) 3.dp else 0.dp).background(
     ImageProvider(
         when {
             count == 1 -> R.drawable.card_border
@@ -432,7 +435,7 @@ internal fun GlanceModifier.categoryFramePiece(index: Int, count: Int): GlanceMo
             else -> R.drawable.category_frame_middle
         },
     ),
-).padding(start = 6.dp, end = 4.dp, bottom = if (index == count - 1) 4.dp else 0.dp)
+).padding(start = 6.dp, end = 6.dp, top = if (index == 0) 6.dp else 0.dp, bottom = if (index == count - 1) 6.dp else 0.dp)
 
 /** The items of a category in a widget: open ones first when the widget moves checked items to the end, checked ones after. */
 internal fun Categories.Group.rows(settings: WidgetSettings): List<KeepItem> =
@@ -447,7 +450,7 @@ internal fun CategoryHeaderRow(
     note: KeepNote, account: String, name: String, open: Int, folded: Boolean, settings: WidgetSettings, palette: TextPalette,
 ) {
     val context = LocalContext.current
-    Row(GlanceModifier.fillMaxWidth().padding(top = settings.listSpacingDp.dp + 4.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(GlanceModifier.fillMaxWidth().padding(top = settings.listSpacingDp.dp), verticalAlignment = Alignment.CenterVertically) {
         Row(
             GlanceModifier.defaultWeight().clickable(
                 actionRunCallback<ToggleCategoryAction>(

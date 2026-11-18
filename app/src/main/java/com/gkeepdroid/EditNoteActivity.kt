@@ -1237,6 +1237,8 @@ class EditNoteActivity : ComponentActivity() {
             val noteAt = noteZone.indexOfFirst { it.id == NOTE_ID }.coerceAtLeast(0)
             NoteActionButtons(noteZone.take(noteAt), states, inline = inlineBlocks)
             OutlinedTextField(
+                // The rounder fields of Material 3 Expressive; the frame of a category is rounded to match (see categoryFrame).
+                shape = MaterialTheme.shapes.medium,
                 value = title, onValueChange = { title = it }, readOnly = !canEdit,
                 label = { Text(stringResource(R.string.title_hint)) },
                 textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
@@ -1501,6 +1503,7 @@ class EditNoteActivity : ComponentActivity() {
                     }
                 }
                 OutlinedTextField(
+                    shape = MaterialTheme.shapes.medium,
                     // Enter after "1. ..." (or "- ...") starts the next line with "2. " (or "- "); Enter on an empty one ends the list.
                     value = androidx.compose.ui.text.input.TextFieldValue(text, textSel, textComp),
                     onValueChange = { typed ->

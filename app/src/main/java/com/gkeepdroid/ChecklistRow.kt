@@ -186,6 +186,7 @@ internal fun ChecklistRow(
             if (item.isDivider()) Box(Modifier.fillMaxWidth().height(56.dp).padding(start = 56.dp, end = 16.dp), contentAlignment = Alignment.Center) {
                 androidx.compose.material3.HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.outline)
             } else OutlinedTextField(
+                shape = MaterialTheme.shapes.medium,
                 value = shownField, readOnly = !editable,
                 onValueChange = { typed ->
                     field = typed
@@ -249,9 +250,15 @@ internal fun ChecklistRow(
                 Column(
                     Modifier
                         .padding(start = 11.dp).size(width = 26.dp, height = if (item.isDivider()) 22.dp else 40.dp)
-                        .border(1.5.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.extraSmall)
-                        // The border is drawn inside the size, so the halves are measured inside it.
-                        .padding(1.5.dp),
+                        // A filled capsule as Material 3 Expressive has it: tonal while open, in the check's color once done.
+                        .clip(androidx.compose.foundation.shape.CircleShape)
+                        .background(
+                            androidx.compose.animation.animateColorAsState(
+                                if (item.checked && !item.isDivider()) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.surfaceContainerHighest,
+                                label = "capsule",
+                            ).value,
+                        )
+                        .padding(vertical = 2.dp),
                 ) {
                     // A divider has no check, only the grip to move it.
                     if (!item.isDivider()) {
@@ -262,7 +269,7 @@ internal fun ChecklistRow(
                         )
                     }
                     // The line between the check and the grip.
-                    Box(Modifier.fillMaxWidth().height(1.5.dp).background(MaterialTheme.colorScheme.outline))
+                    Box(Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outlineVariant))
                     }
                     Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
