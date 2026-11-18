@@ -130,32 +130,34 @@ class MainActivity : ComponentActivity() {
     private fun NotesApp() {
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
-        var screen by remember { mutableStateOf(AppScreen.Notes) }
-        var query by remember { mutableStateOf("") }
-        var filterAccount by remember { mutableStateOf<String?>(null) }
-        var filterLabel by remember { mutableStateOf<String?>(null) }
+        val model = remember { NotesModel() }
+        var screen by model::screen
+        var query by model::query
+        var filterAccount by model::filterAccount
+        var filterLabel by model::filterLabel
         // More filters for the search: kind of note, with a reminder, edited lately.
-        var filterKind by remember { mutableStateOf(0) } // 0 all, 1 notes, 2 checklists
-        var filterReminder by remember { mutableStateOf(false) }
-        var filterRecent by remember { mutableStateOf(false) }
-        var filterImage by remember { mutableStateOf(false) }
-        var filterPinned by remember { mutableStateOf(false) }
-        var filterDialog by remember { mutableStateOf(false) }
-        var undoKey by remember { mutableStateOf(0) }
-        var syncing by remember { mutableStateOf(false) }
-        var pulling by remember { mutableStateOf(false) }
+        var filterKind by model::filterKind
+        var filterReminder by model::filterReminder
+        var filterRecent by model::filterRecent
+        var filterImage by model::filterImage
+        var filterPinned by model::filterPinned
+        var filterDialog by model::filterDialog
+        var undoKey by model::undoKey
+        var syncing by model::syncing
+        var pulling by model::pulling
         // Several notes chosen at once (keys are account|id); while any is chosen, the bar above the list turns into their actions.
-        var selected by remember { mutableStateOf(emptySet<String>()) }
-        var selectionMenu by remember { mutableStateOf(false) }
-        var colorDialog by remember { mutableStateOf(false) }
-        var labelDialog by remember { mutableStateOf(false) }
-        var emptyTrashDialog by remember { mutableStateOf(false) }
-        var deleteSelected by remember { mutableStateOf<List<Pair<KeepNote, String>>?>(null) }
-        var searchFocused by remember { mutableStateOf(false) }
-        var history by remember { mutableStateOf(SearchHistory.load(context)) }
-        var menuOpen by remember { mutableStateOf(false) }
-        var newMenuOpen by remember { mutableStateOf(false) }
-        var deleteTarget by remember { mutableStateOf<Pair<KeepNote, String>?>(null) }
+        var selected by model::selected
+        var selectionMenu by model::selectionMenu
+        var colorDialog by model::colorDialog
+        var labelDialog by model::labelDialog
+        var emptyTrashDialog by model::emptyTrashDialog
+        var deleteSelected by model::deleteSelected
+        var searchFocused by model::searchFocused
+        remember { model.history = SearchHistory.load(context) }
+        var history by model::history
+        var menuOpen by model::menuOpen
+        var newMenuOpen by model::newMenuOpen
+        var deleteTarget by model::deleteTarget
         val accounts = remember(reloadKey) { CredentialStore.accounts(context) }
         val app = remember(reloadKey) { AppSettingsStore.load(context) }
 
@@ -349,80 +351,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        deleteTarget?.let { (note, account) ->
-            AlertDialog(
-                onDismissRequest = { deleteTarget = null },
-                text = { Text(stringResource(R.string.delete_local_confirm)) },
-                confirmButton = {
-                    TextButton(onClick = {
-                        deleteTarget = null
-                        act { KeepRepository.deleteForever(context, account, note.id) }
-                    }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.delete_forever)) }
-                },
-                dismissButton = {
-                    TextButton(onClick = { deleteTarget = null }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) }
-                },
-            )
-        }
-
-        deleteSelected?.let { targets ->
-            AlertDialog(
-                onDismissRequest = { deleteSelected = null },
-                text = { Text(stringResource(R.string.delete_selected_confirm)) },
-                confirmButton = {
-                    TextButton(onClick = {
-                        deleteSelected = null
-                        act { targets.forEach { (note, account) -> KeepRepository.deleteForever(context, account, note.id) } }
-                    }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.delete_forever)) }
-                },
-                dismissButton = {
-                    TextButton(onClick = { deleteSelected = null }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) }
-                },
-            )
-        }
-        if (emptyTrashDialog) {
-            AlertDialog(
-                onDismissRequest = { emptyTrashDialog = false },
-                text = { Text(stringResource(R.string.empty_trash_confirm)) },
-                confirmButton = {
-                    TextButton(onClick = {
-                        emptyTrashDialog = false
-                        // Everything in the trash of the accounts on screen, whatever the search says.
-                        val trashed = accounts.filter { filterAccount == null || it == filterAccount }.flatMap { account ->
-                            NotesCache.readOther(context, account).filter { it.state == "trashed" }.map { it to account }
-                        }
-                        act { trashed.forEach { (note, account) -> KeepRepository.deleteForever(context, account, note.id) } }
-                    }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.empty_trash)) }
-                },
-                dismissButton = {
-                    TextButton(onClick = { emptyTrashDialog = false }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) }
-                },
-            )
-        }
-        if (colorDialog) {
-            ColorChoiceDialog(
-                onPick = { name -> colorDialog = false; editSelected { note, _ -> note.copy(color = name) } },
-                onDismiss = { colorDialog = false },
-            )
-        }
-        if (labelDialog) {
-            val accountsOfSelection = selectedEntries.map { it.second }.distinct()
-            val labelOptions = accountsOfSelection.flatMap { NotesCache.labels(context, it) }.distinct().sortedBy { it.lowercase() }
-            val allHave = labelOptions.filter { label -> selectedEntries.all { label in it.first.labels } }.toSet()
-            LabelChoiceDialog(
-                labels = labelOptions,
-                allHave = allHave,
-                onApply = { added, removed ->
-                    labelDialog = false
-                    editSelected { note, account ->
-                        // A label is only added where the account knows it.
-                        val known = NotesCache.labels(context, account)
-                        note.copy(labels = ((note.labels + added.filter { it in known }) - removed).distinct())
-                    }
-                },
-                onDismiss = { labelDialog = false },
-            )
-        }
+        NotesDialogs(this@MainActivity, model, app, selectedEntries, scope, { sync() }, { editSelected(it) }, { moveSelected(it) }, { denied, block -> act(denied, block) }, accounts)
 
         Scaffold(
             containerColor = Color.Transparent,
@@ -469,142 +398,10 @@ class MainActivity : ComponentActivity() {
             },
         ) { padding ->
             Column(Modifier.fillMaxSize().padding(padding)) {
-                // Search field and the menu. A running sync shows as a thin line on the row's lower edge, which takes no room.
-                Box {
-                if (selected.isEmpty()) Row(
-                    Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    if (screen != AppScreen.Notes) {
-                        BackButton { screen = AppScreen.Notes }
-                    }
-                    AppSearchField(
-                        query = query,
-                        onQueryChange = { query = it },
-                        onSearch = { history = SearchHistory.add(context, query) },
-                        onFocusChange = {
-                            searchFocused = it
-                            if (!it) history = SearchHistory.add(context, query)
-                        },
-                        // The field names how many notes it searches (the ones the filters leave).
-                        placeholder = when {
-                            else -> androidx.compose.ui.res.pluralStringResource(
-                                when (screen) {
-                                    AppScreen.Notes -> R.plurals.search_count_notes
-                                    AppScreen.Archive -> R.plurals.search_count_archive
-                                    AppScreen.Trash -> R.plurals.search_count_trash
-                                },
-                                shown.size, shown.size,
-                            )
-                        },
-                        modifier = Modifier.weight(1f),
-                    )
-                    Box {
-                        IconButton(onClick = { menuOpen = true }, shapes = IconButtonDefaults.shapes()) {
-                            Icon(painterResource(R.drawable.ic_more_vert), contentDescription = stringResource(R.string.more_actions))
-                        }
-                        GroupedMenu(
-                            expanded = menuOpen,
-                            onDismissRequest = { menuOpen = false },
-                            groups = listOf(
-                                listOf(MenuEntry(stringResource(R.string.refresh_action), R.drawable.ic_refresh) { menuOpen = false; sync() }),
-                                if (screen == AppScreen.Trash && shown.isNotEmpty()) listOf(
-                                    MenuEntry(stringResource(R.string.empty_trash), R.drawable.ic_delete) { menuOpen = false; emptyTrashDialog = true },
-                                ) else emptyList(),
-                                listOf(
-                                    MenuEntry(stringResource(R.string.archive_note), R.drawable.ic_archive) { menuOpen = false; screen = AppScreen.Archive },
-                                    MenuEntry(stringResource(R.string.trash_title), R.drawable.ic_delete) { menuOpen = false; screen = AppScreen.Trash },
-                                ),
-                                if (screen == AppScreen.Notes && app.foldNotes) listOf(
-                                    MenuEntry(stringResource(R.string.fold_all), R.drawable.ic_fold) {
-                                        menuOpen = false
-                                        FoldStore.setAll(context, shown.map { FoldStore.key(it.second, it.first.id) }, true)
-                                        scope.launch { WidgetRefresh.all(context) }
-                                    },
-                                    MenuEntry(stringResource(R.string.unfold_all), R.drawable.ic_unfold) {
-                                        menuOpen = false
-                                        FoldStore.setAll(context, shown.map { FoldStore.key(it.second, it.first.id) }, false)
-                                        scope.launch { WidgetRefresh.all(context) }
-                                    },
-                                ) else emptyList(),
-                                buildList {
-                                    if (app.lockApp && AppLock.enabled(this@MainActivity)) {
-                                        add(MenuEntry(stringResource(R.string.app_lock_title), R.drawable.ic_lock) { menuOpen = false; AppLock.lockNow() })
-                                    }
-                                    add(
-                                        MenuEntry(stringResource(R.string.menu_settings), R.drawable.ic_settings) {
-                                            menuOpen = false
-                                            startActivity(Intent(context, SettingsActivity::class.java))
-                                        },
-                                    )
-                                },
-                            ),
-                        )
-                    }
-                }
-                else Row(
-                    Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp).height(SearchBarDefaults.InputFieldHeight),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    IconButton(onClick = { selected = emptySet() }, shapes = IconButtonDefaults.shapes()) {
-                        Icon(painterResource(R.drawable.ic_close), contentDescription = stringResource(android.R.string.cancel))
-                    }
-                    Text(
-                        androidx.compose.ui.res.pluralStringResource(R.plurals.selected_count, selected.size, selected.size),
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.weight(1f),
-                    )
-                    if (screen == AppScreen.Notes) IconButton(onClick = {
-                        val pin = selectedEntries.any { !it.first.pinned }
-                        editSelected { note, _ -> note.copy(pinned = pin) }
-                    }, shapes = IconButtonDefaults.shapes()) {
-                        Icon(painterResource(R.drawable.ic_push_pin), contentDescription = stringResource(R.string.pinned_section))
-                    }
-                    if (screen != AppScreen.Trash) IconButton(onClick = {
-                        if (screen == AppScreen.Archive) moveSelected { note, account -> KeepRepository.unarchiveNote(context, account, note.id) }
-                        else moveSelected { note, account -> if (!CredentialStore.isLocal(account)) KeepRepository.archiveNote(context, account, note.id) }
-                    }, shapes = IconButtonDefaults.shapes()) {
-                        Icon(
-                            painterResource(R.drawable.ic_archive),
-                            contentDescription = stringResource(if (screen == AppScreen.Archive) R.string.unarchive_note else R.string.archive_note),
-                        )
-                    }
-                    IconButton(onClick = {
-                        if (screen == AppScreen.Trash) deleteSelected = selectedEntries else trashSelected()
-                    }, shapes = IconButtonDefaults.shapes()) {
-                        Icon(
-                            painterResource(R.drawable.ic_delete),
-                            contentDescription = stringResource(if (screen == AppScreen.Trash) R.string.delete_forever else R.string.trash_title),
-                        )
-                    }
-                    Box {
-                        IconButton(onClick = { selectionMenu = true }, shapes = IconButtonDefaults.shapes()) {
-                            Icon(painterResource(R.drawable.ic_more_vert), contentDescription = stringResource(R.string.more_actions))
-                        }
-                        GroupedMenu(
-                            expanded = selectionMenu,
-                            onDismissRequest = { selectionMenu = false },
-                            groups = listOf(
-                                if (screen == AppScreen.Trash) listOf(
-                                    MenuEntry(stringResource(R.string.restore_note), R.drawable.ic_refresh) {
-                                        selectionMenu = false
-                                        moveSelected { note, account -> KeepRepository.untrashNote(context, account, note.id) }
-                                    },
-                                ) else listOf(
-                                    MenuEntry(stringResource(R.string.color), R.drawable.ic_color_none) { selectionMenu = false; colorDialog = true },
-                                    MenuEntry(stringResource(R.string.labels_title), R.drawable.ic_checklist) { selectionMenu = false; labelDialog = true },
-                                    MenuEntry(stringResource(R.string.duplicate_note), R.drawable.ic_open_new) { selectionMenu = false; duplicateSelected() },
-                                ),
-                                listOf(MenuEntry(stringResource(R.string.select_all), R.drawable.ic_done) {
-                                    selectionMenu = false
-                                    selected = shown.map(::keyOf).toSet()
-                                }),
-                            ),
-                        )
-                    }
-                }
-                if (syncing) LinearProgressIndicator(Modifier.fillMaxWidth().align(Alignment.BottomCenter).height(2.dp))
-                }
+                NotesTopBar(
+                    this@MainActivity, model, app, shown, selectedEntries, scope, { sync() }, ::keyOf,
+                    { moveSelected(it) }, { editSelected(it) }, { trashSelected() }, { duplicateSelected() },
+                )
 
                 if (searchFocused && query.isBlank() && history.isNotEmpty() && selected.isEmpty()) {
                     Row(
@@ -692,65 +489,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 // Without the right to notify, a failed sync or save can only be told here, at the top.
-                val notificationsOn = rememberNotificationsOn(this@MainActivity)
-                val hintPrefs = remember { context.getSharedPreferences("reminder_hints", android.content.Context.MODE_PRIVATE) }
-                var notifHintHidden by remember { mutableStateOf(hintPrefs.getBoolean("notif_hint_dismissed", false)) }
-                if (!notificationsOn && !notifHintHidden) {
-                    Column(
-                        Modifier.fillMaxWidth().padding(top = 4.dp)
-                            .background(MaterialTheme.colorScheme.errorContainer, MaterialTheme.shapes.medium).padding(12.dp),
-                    ) {
-                        Text(
-                            stringResource(R.string.notif_off_main),
-                            color = MaterialTheme.colorScheme.onErrorContainer, fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                            TextButton(onClick = { context.startActivity(Reminders.notificationSettings(context)) }, shapes = ButtonDefaults.shapes()) {
-                                Text(stringResource(R.string.reminder_open_settings))
-                            }
-                            TextButton(onClick = {
-                                hintPrefs.edit { putBoolean("notif_hint_dismissed", true) }
-                                notifHintHidden = true
-                            }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.notif_hint_dismiss)) }
-                        }
-                    }
-                }
-                val failedEdits = remember(reloadKey, syncing) { PendingEdits.all(context).filter { it.error.isNotBlank() } }
-                if (!notificationsOn) failedEdits.forEach { edit ->
-                    Text(
-                        SaveFailures.message(context, edit, edit.error),
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(top = 4.dp),
-                    )
-                }
-                // A failed sync stays visible until the next one works.
-                val syncError = remember(reloadKey, syncing) { SyncPolicy.lastError(context) }
-                val expired = remember(reloadKey, syncing) { SyncPolicy.expiredAccount(context) }
-                if (expired != null && !syncing) {
-                    // The login is refused: one tap leads to the accounts to sign in again.
-                    Row(Modifier.fillMaxWidth().padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            stringResource(R.string.sign_in_expired, CredentialStore.displayName(context, expired)),
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.weight(1f),
-                        )
-                        TextButton(onClick = {
-                            context.startActivity(
-                                Intent(context, SettingsActivity::class.java).putExtra(SettingsActivity.EXTRA_PAGE, "accounts")
-                            )
-                        }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.sign_in_again)) }
-                    }
-                } else if (syncError != null && !syncing) {
-                    Text(
-                        stringResource(R.string.sync_last_error, syncError),
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(top = 4.dp),
-                    )
-                }
+                NotesBanners(this@MainActivity, model, reloadKey, accounts, scope, { sync() })
 
                 if (accounts.isEmpty()) {
                     // First start: nothing to show before an account (or local mode) exists.

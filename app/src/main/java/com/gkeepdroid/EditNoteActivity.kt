@@ -404,8 +404,6 @@ class EditNoteActivity : ComponentActivity() {
                 addAll(if (startNumbered) ListNumbering.strip(start) else start)
             }
         }
-        /** The items as they are saved: with their numbers in the text when the list is numbered. */
-        fun outItems(): List<KeepItem> = if (numbered) ListNumbering.apply(items.toList()) else items.toList()
         // The item that takes the focus once it is shown (one just made in a category).
         var focusItemId by model::focusItemId
         var addMenuOpen by model::addMenuOpen
@@ -503,7 +501,6 @@ class EditNoteActivity : ComponentActivity() {
             newCategoryFor = null
             newCategoryEmpty = false
         }
-        fun formatTextOf(key: String): String = if (key == "text") text else items.firstOrNull { it.id == key }?.text.orEmpty()
         // A change that Keep does not have yet (and why, if sending it failed).
         val unsent = remember {
             existing?.let { note ->
@@ -546,210 +543,29 @@ class EditNoteActivity : ComponentActivity() {
         var error by model::error
         val failedTemplate = stringResource(R.string.save_failed, "%s")
 
-        /** Runs an action that ends the editing of this note (archive, trash) and closes the editor. */
-        fun leaveNote(action: suspend () -> Unit) {
-            if (!canEdit) return askEdit()
-            saving = true
-            error = ""
-            scope.launch {
-                try {
-                    action()
-                    finish()
-                } catch (e: Exception) {
-                    saving = false
-                    error = failedTemplate.format(e.message ?: e.javaClass.simpleName)
-                }
-            }
+        // What the editor does with its content: saving, converting, history, leaving (see EditorController).
+        val notificationsNow = rememberUpdatedState(notificationsOn)
+        val controller = remember {
+            EditorController(
+                this@EditNoteActivity, model, categories, format, existing, account, noteKey, isLocal, canFormat, scope,
+                originalGallery, originalCustom, originalLook, wasHidden, failedTemplate, { askEdit() }, { askAfterSave.launch(android.Manifest.permission.POST_NOTIFICATIONS) }, { notificationsNow.value },
+            )
         }
-
-        /**
-         * The changed formatting as the Python bridge wants it; a note made from the other kind, and items made in this editor,
-         * address their items by their place.
-         */
-        fun formatJson(): String? = format.toJson(
-            ::formatTextOf, if (isList) outItems().filter { it.text.isNotBlank() }.map { it.id } else null, convertFrom != null || existing == null,
-            known = if (convertFrom == null) existing?.items?.map { it.id }?.toSet().orEmpty() else emptySet(),
-        )
-
-        fun save(fromHome: Boolean = false) {
-            if (saving || !canEdit) return
-            saving = true
-            error = ""
-            // An item made in a category but left without text would become a bold word of its own in Keep.
-            if (isList && canFormat) {
-                val rich = editorRich()
-                items.removeAll { item -> Categories.split(item, rich?.docs?.get(item.id))?.let { item.text.substring(it.restStart).isBlank() } == true }
-                if (items.isEmpty()) items.add(KeepItem(UUID.randomUUID().toString(), "", false))
-                // Kept in Keep in the order shown here: the items without a category, then each category with its items.
-                categoryGroups()?.flatMap { it.items }?.let { grouped ->
-                    if (grouped.size == items.size && grouped.map { it.id } != items.map { it.id }) { items.clear(); items.addAll(grouped) }
-                }
-                CategoryHistory.add(this@EditNoteActivity, account, noteKey, sessionCategories)
-            }
-            if (AppSettingsStore.load(this@EditNoteActivity).trimEmptyEdges) {
-                if (isList) {
-                    // Only if something stays: an all-empty list is left as it is.
-                    if (items.any { it.text.isNotBlank() }) {
-                        while (items.first().text.isBlank()) items.removeAt(0)
-                        while (items.last().text.isBlank()) items.removeAt(items.lastIndex)
-                    }
-                } else {
-                    val lines = text.split("\n")
-                    val first = lines.indexOfFirst { it.isNotBlank() }
-                    if (first >= 0) {
-                        val last = lines.indexOfLast { it.isNotBlank() }
-                        val trimmed = lines.subList(first, last + 1).joinToString("\n")
-                        // The styles stay with their characters.
-                        format.edited("text", text, trimmed)
-                        text = trimmed
-                    }
-                }
-            }
-            val target = if (existing != null) account else targetAccount
-            val galleryNow = if (background == CUSTOM_BACKGROUND) "" else background
-            if (existing != null) NoteLook.save(this@EditNoteActivity, account, existing.id, ownText, variantDark)
-            if (existing != null) scope.launch { WidgetRefresh.all(this@EditNoteActivity) }
-            // The photo of one's own stays on this phone; the widgets learn of a change right away.
-            if (existing != null && (background == CUSTOM_BACKGROUND && picked != null || background != CUSTOM_BACKGROUND && originalCustom)) {
-                if (background == CUSTOM_BACKGROUND) CustomBackgrounds.save(this@EditNoteActivity, account, existing.id, picked!!)
-                else CustomBackgrounds.remove(this@EditNoteActivity, account, existing.id)
-                pickedBackground = null
-                scope.launch { WidgetRefresh.all(this@EditNoteActivity) }
-            }
-            val converting = convertFrom != null
-            val function = if (existing != null && !converting) "update_note" else "create_note"
-            val args = if (existing != null && !converting) {
-                KeepRepository.updateNoteArgs(
-                    existing.id, title, text, outItems(), color, pinned, removedImages.toList(), withHiddenLabel(labels, hiddenInWidgets),
-                    // Only a changed picture of Keep's is sent; "default" takes it away.
-                    if (isLocal || galleryNow == originalGallery) "" else galleryNow.ifEmpty { "default" },
-                )
-            } else {
-                KeepRepository.createNoteArgs(title, text, isList, outItems(), color, pinned, withHiddenLabel(labels, hiddenInWidgets), galleryNow, formatJson().orEmpty())
-            }
-            // The mark in Keep replaces the older one that only this phone knew.
-            if (existing != null) PrivateNotes.set(this@EditNoteActivity, account, existing.id, false)
-            if (!CredentialStore.isLocal(target) || converting) {
-                // The change is stored and sent in the background: the editor closes at once, and a failure
-                // shows up as a notification instead of losing the change.
-                KeepRepository.queueEdit(
-                    this@EditNoteActivity,
-                    if (converting) {
-                        val old = convertFrom!!
-                        val moved = Reminders.list(this@EditNoteActivity, account, old.id)
-                        moved.forEach { Reminders.remove(this@EditNoteActivity, account, old.id, it.id) }
-                        PendingEdit(target, function, args, reminders = moved, trashAfter = old.id)
-                    } else {
-                        PendingEdit(target, function, args, reminders = if (existing == null) draftReminders else emptyList())
-                    },
-                )
-                // Sent after the change of the text, so the styles meet the text Keep has by then.
-                if (!converting && existing != null) formatJson()?.let { KeepRepository.queueEdit(this@EditNoteActivity, PendingEdit(target, "format_note", listOf(existing.id, it))) }
-                Toast.makeText(applicationContext, R.string.note_saved, Toast.LENGTH_SHORT).show()
-                val prefs = getSharedPreferences("reminder_hints", MODE_PRIVATE)
-                if (!fromHome && !CredentialStore.isLocal(target) && android.os.Build.VERSION.SDK_INT >= 33 && !notificationsOn && !prefs.getBoolean("save_asked", false)) {
-                    prefs.edit { putBoolean("save_asked", true) }
-                    askAfterSave.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-                } else {
-                    finish()
-                }
-                return
-            }
-            scope.launch {
-                try {
-                    val before = Reminders.noteIds(this@EditNoteActivity, target)
-                    // Taken before the note is written, while the items are still the ones the styles belong to.
-                    val styles = if (existing != null) formatJson() else null
-                    KeepRepository.run(this@EditNoteActivity, target, function, args)
-                    if (styles != null) KeepRepository.run(this@EditNoteActivity, target, "format_note", listOf(existing!!.id, styles))
-                    if (existing == null) Reminders.attachToNew(this@EditNoteActivity, PendingEdit(target, function, args, reminders = draftReminders), before)
-                    Toast.makeText(applicationContext, R.string.note_saved, Toast.LENGTH_SHORT).show()
-                    finish()
-                } catch (e: Exception) {
-                    saving = false
-                    error = failedTemplate.format(e.message ?: e.javaClass.simpleName)
-                }
-            }
-        }
-
-        /** Content of the editor as the other kind of note: checklist items become lines, lines become items. */
-        fun convertedContent(toList: Boolean): Pair<String, List<KeepItem>> =
-            if (toList) {
-                "" to ChecklistText.items(text).ifEmpty { listOf(KeepItem(UUID.randomUUID().toString(), "", false)) }
-            } else if (numbered) {
-                // A numbered list becomes lines that start with their numbers.
-                outItems().filter { it.text.isNotBlank() }.joinToString("\n") { it.text } to emptyList()
-            } else {
-                // The chosen prefix keeps a trace of the list: "- ", "* ", "[ ] / [x] " or numbers.
-                val prefix = AppSettingsStore.load(this@EditNoteActivity).convertPrefix
-                items.filter { it.text.isNotBlank() }.mapIndexed { i, item ->
-                    when (prefix) {
-                        PREFIX_DASH -> "- "
-                        PREFIX_STAR -> "* "
-                        PREFIX_BOX -> if (item.checked) "[x] " else "[ ] "
-                        PREFIX_NUMBER -> "${i + 1}. "
-                        else -> ""
-                    } + item.text
-                }.joinToString("\n") to emptyList()
-            }
-
-        /** A new note changes its kind right here; an existing one is saved as a new note and the old one goes to the trash. */
-        /** After text became items: lines that all start with numbers make a numbered list. */
-        fun adoptNumbering() {
-            numbered = ListNumbering.isNumbered(items.toList())
-            if (numbered) {
-                val stripped = ListNumbering.strip(items.toList())
-                items.clear()
-                items.addAll(stripped)
-            }
-        }
-
-        fun requestConvert() {
-            if (!canEdit) {
-                askEdit()
-            } else if (existing == null) {
-                val (newText, newItems) = convertedContent(!isList)
-                val (oldText, oldItems) = text to items.toList()
-                items.clear()
-                items.addAll(newItems)
-                text = newText
-                isList = !isList
-                if (isList) adoptNumbering() else numbered = false
-            } else if (existing.images.isNotEmpty()) {
-                Toast.makeText(this@EditNoteActivity, R.string.convert_images_blocked, Toast.LENGTH_LONG).show()
-            } else {
-                val (newText, newItems) = convertedContent(!isList)
-                val (oldText, oldItems) = text to items.toList()
-                val toList = !isList
-                items.clear()
-                items.addAll(newItems)
-                text = newText
-                isList = !isList
-                if (isList) adoptNumbering() else numbered = false
-                convertFrom = if (isList != existing.isList) existing else null
-                // The styles travel with the text (a numbered list also keeps them: the numbers are not part of the items).
-                if (convertFrom != null) format.carry(toList, oldText, oldItems, newText, items.toList())
-            }
-        }
+        fun outItems() = controller.outItems()
+        fun formatTextOf(key: String) = controller.formatTextOf(key)
+        fun leaveNote(action: suspend () -> Unit) = controller.leaveNote(action)
+        fun formatJson() = controller.formatJson()
+        fun save(fromHome: Boolean = false) = controller.save(fromHome)
+        fun requestConvert() = controller.requestConvert()
+        fun hasChanges() = controller.hasChanges()
+        fun capture() = controller.capture()
+        fun restore(step: EditSnapshot) = controller.restore(step)
+        fun discard() = controller.discard()
 
         var confirmDiscard by model::confirmDiscard
         var paletteOpen by model::paletteOpen
         var labelsOpen by model::labelsOpen
 
-        fun hasChanges() = if (existing != null) {
-            title != existing.title || text != existing.text || outItems() != existing.items || color != existing.color ||
-                pinned != existing.pinned || labels != existing.labels || removedImages.isNotEmpty() || convertFrom != null || hiddenInWidgets != wasHidden ||
-                background != (if (originalCustom) CUSTOM_BACKGROUND else originalGallery) || picked != null ||
-                variantDark != originalLook.dark || ownText != originalLook.textColor || format.touched.isNotEmpty()
-        } else {
-            title.isNotBlank() || text.isNotBlank() || items.any { it.text.isNotBlank() }
-        }
-
-        // Undo and Redo: a step for each change, and for a burst of typing once it pauses. A few minutes after closing, the steps are still there.
-        fun capture(): EditSnapshot {
-            val (styles, touched) = format.snapshot()
-            return EditSnapshot(title, text, textSel, isList, color, background, labels, numbered, items.toList(), ownText, variantDark, styles, touched)
-        }
         val historyKey = existing?.let { account + "|" + it.id }
         val history = remember { capture().let { first -> historyKey?.let { EditHistoryKeep.take(it, first) } ?: EditHistory() } }
         LaunchedEffect(title, text, isList, color, background, labels, numbered, items.toList(), ownText, variantDark, format.version) {
@@ -765,24 +581,6 @@ class EditNoteActivity : ComponentActivity() {
                 }
             }
         }
-        fun restore(step: EditSnapshot) {
-            title = step.title
-            text = step.text
-            textSel = androidx.compose.ui.text.TextRange(step.selection.start.coerceAtMost(step.text.length), step.selection.end.coerceAtMost(step.text.length))
-            textComp = null
-            isList = step.isList
-            color = step.color
-            background = step.background
-            labels = step.labels
-            numbered = step.numbered
-            items.clear()
-            items.addAll(step.items)
-            ownText = step.ownText
-            variantDark = step.variantDark
-            format.restore(step.styles, step.touched)
-            format.selection["text"] = textSel
-            convertFrom = if (existing != null && isList != existing.isList) existing else null
-        }
         val undo = {
             history.record(capture())
             history.undo()?.let { restore(it) }
@@ -790,11 +588,6 @@ class EditNoteActivity : ComponentActivity() {
         }
         val redo = { history.redo()?.let { restore(it) }; Unit }
 
-        /** Closes the editor without saving; a note that was changed is reported as discarded. */
-        fun discard() {
-            if (hasChanges()) Toast.makeText(this@EditNoteActivity, R.string.note_discarded, Toast.LENGTH_SHORT).show()
-            finish()
-        }
         androidx.activity.compose.BackHandler(enabled = !saving) { discard() }
 
         // Home keeps what was typed: a changed note is saved, not thrown away. Back still discards.
