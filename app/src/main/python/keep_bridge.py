@@ -3,6 +3,7 @@
 Every public function returns the full list of active notes as a JSON string,
 so the Kotlin side only has to parse text and refresh its cache.
 """
+import hashlib
 import json
 import os
 import random
@@ -339,6 +340,29 @@ def _send_background(keep, state_path, note, name):
         pass
 
 
+def _stale_notes(keep, model):
+    """Notes whose kept model has a text that is not the note's text any more, with a fingerprint of the note's texts.
+
+    Keep's change log can miss a change (the model of an item then keeps an old or empty text), and the styles of such a
+    text are not shown. Only texts that the model has are compared: an item the model does not know yet is no sign of it.
+    """
+    stale = {}
+    for node_id, entry in model["n"].items():
+        note = keep.get(node_id)
+        if note is None or not entry.get("m"):
+            continue
+        texts = {key: doc["t"].rstrip("\n") for key, doc in entry["m"].items()}
+        if isinstance(note, KeepList):
+            real = {item.id: item.text.rstrip("\n") for item in note.items if not item.deleted}
+            wrong = any(key in texts and texts[key] != text for key, text in real.items())
+        else:
+            real = {"text": note.text.rstrip("\n")}
+            wrong = len(texts) == 1 and next(iter(texts.values())) != real["text"]
+        if wrong:
+            stale[node_id] = hashlib.sha1(json.dumps(real, sort_keys=True).encode()).hexdigest()
+    return stale
+
+
 def _fetch_rich(keep, state_path, full=False):
     """Formatting and background of the notes, which gkeepapi does not know, into files of their own.
 
@@ -403,6 +427,17 @@ def _fetch_rich(keep, state_path, full=False):
         model["v"] = version
     finally:
         api.send = send
+    if not full:
+        # A model that went wrong is pulled again in full, once for each state of the note's texts (a note whose model
+        # stays different after that is not pulled again until it changes).
+        stale = {node_id: mark for node_id, mark in _stale_notes(keep, model).items() if model["n"][node_id].get("stale") != mark}
+        if stale:
+            for node_id, mark in stale.items():
+                model["n"][node_id]["stale"] = mark
+            with open(base + "_richmodel.json", "w") as f:
+                json.dump(model, f)
+            _fetch_rich(keep, state_path, full=True)
+            return
     # Nothing new from Keep: the files stay as they are.
     if not changed:
         return

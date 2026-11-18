@@ -184,6 +184,7 @@
     <string name="format_underline">Podkreślenie</string>
     <string name="format_strike">Przekreślenie</string>
     <string name="format_title">Formatowanie</string>
+    <string name="editor_title">Edytor</string>
     <string name="editor_in_recents">Zachowuj notatki w ostatnich aplikacjach</string>
     <string name="editor_in_recents_hint">Notatka otwarta z widżetu lub skrótu zostaje po wyjściu na liście ostatnich aplikacji pod swoim tytułem.</string>
     <string name="note_text_color">Kolor tekstu</string>

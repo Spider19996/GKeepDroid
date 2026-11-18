@@ -453,6 +453,14 @@ internal fun ColumnScope.EditorButtonsPage(s: SettingsState) {
             onReset = { appEditorLayout = EDITOR_CATALOG.layout() },
             onStatus = { status = it },
         )
+    }
+}
+
+/** How the note editor behaves: its buttons (a page of their own) and what happens when it is left. */
+@Composable
+internal fun ColumnScope.EditorPage(s: SettingsState) {
+    with(s) {
+        MenuRow(stringResource(R.string.editor_buttons_title), null) { page = Page.EditorButtons }
         SwitchRow(R.string.editor_in_recents, appEditorInRecents) { appEditorInRecents = it }
         Hint(R.string.editor_in_recents_hint)
     }

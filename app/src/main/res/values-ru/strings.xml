@@ -184,6 +184,7 @@
     <string name="format_underline">Подчёркнутый</string>
     <string name="format_strike">Зачёркнутый</string>
     <string name="format_title">Форматирование</string>
+    <string name="editor_title">Редактор</string>
     <string name="editor_in_recents">Оставлять заметки в недавних приложениях</string>
     <string name="editor_in_recents_hint">Заметка, открытая из виджета или ярлыка, после выхода остаётся в списке недавних приложений под своим заголовком.</string>
     <string name="note_text_color">Цвет текста</string>

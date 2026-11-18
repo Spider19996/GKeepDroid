@@ -181,6 +181,7 @@
     <string name="format_underline">Sottolineato</string>
     <string name="format_strike">Barrato</string>
     <string name="format_title">Formattazione</string>
+    <string name="editor_title">Editor</string>
     <string name="editor_in_recents">Tieni le note nelle app recenti</string>
     <string name="editor_in_recents_hint">Una nota aperta da un widget o da una scorciatoia resta nell’elenco delle app recenti, con il suo titolo, dopo averla lasciata.</string>
     <string name="note_text_color">Colore del testo</string>

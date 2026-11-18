@@ -175,6 +175,7 @@
     <string name="format_underline">下線</string>
     <string name="format_strike">取り消し線</string>
     <string name="format_title">書式</string>
+    <string name="editor_title">エディタ</string>
     <string name="editor_in_recents">メモを最近のアプリに残す</string>
     <string name="editor_in_recents_hint">ウィジェットやショートカットから開いたメモは、閉じた後もタイトル付きで最近のアプリの一覧に残ります。</string>
     <string name="note_text_color">文字色</string>

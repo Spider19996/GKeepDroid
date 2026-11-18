@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,7 +32,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -128,72 +130,43 @@ class EditorActionState(
     val popup: (@Composable () -> Unit)? = null,
 )
 
-/** Buttons that always stay in their bar: closing, saving and the menu the others move into. */
-private val NEVER_OVERFLOW = setOf("close", "save", "more")
-
 /**
  * One bar of the editor: the actions of its left zone at the left edge, those of its right zone at the right edge. When they
- * do not fit in one line, the buttons move closer and get narrower; when they would get too small to hit, the ones nearest the
- * middle of the bar move into the menu (they are given to [onOverflow]), so the bar always stays one line. [withMore] is the
- * menu button, for a bar that has to show it when something moves out of it (the menu button is not in a bar of its own).
- * Without [onOverflow] (the preview of the settings) every button stays, as narrow as it has to be.
+ * do not fit in one line, the buttons move closer and get narrower; when they would get too small to hit, the bar keeps them
+ * at their size and scrolls sideways instead, so it always stays one line.
  */
 @Composable
 internal fun EditorBar(
     left: List<ButtonSpec>, right: List<ButtonSpec>, states: Map<String, EditorActionState>, sidePadding: Dp = 12.dp,
-    highlightId: String? = null, onOverflow: ((List<String>) -> Unit)? = null, withMore: ButtonSpec? = null,
+    highlightId: String? = null,
 ) {
-    val visibleLeft = left.filter { states[it.id]?.visible == true }
-    val visibleRight = right.filter { states[it.id]?.visible == true }
-    val shown = visibleLeft.size + visibleRight.size
-    if (shown == 0) {
-        if (onOverflow != null) SideEffect { onOverflow(emptyList()) }
-        return
-    }
+    val shown = (left + right).count { states[it.id]?.visible == true }
+    if (shown == 0) return
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         // A button is 40 dp wide with 2 dp between (the save button a little more); squeezed, down to 32 dp with nothing between.
-        val room = maxWidth - sidePadding * 2
-        val fitting = (room / 32.dp).toInt().coerceAtLeast(1)
-        var keepLeft = visibleLeft
-        var keepRight = visibleRight
-        val moved = mutableListOf<String>()
-        if (onOverflow != null && shown > fitting) {
-            val addMore = withMore != null && withMore !in visibleLeft && withMore !in visibleRight
-            val limit = fitting - (if (addMore) 1 else 0)
-            // From the middle outwards: the end of the left side first, then the start of the right side.
-            val candidates = (visibleLeft.reversed() + visibleRight).filter { it.id !in NEVER_OVERFLOW }
-            for (spec in candidates) {
-                if (keepLeft.size + keepRight.size <= limit) break
-                moved += spec.id
-                keepLeft = keepLeft - spec
-                keepRight = keepRight - spec
+        val slot = (maxWidth - sidePadding * 2) / shown
+        if (slot >= 32.dp) {
+            val width = if (slot >= 44.dp) 40.dp else slot
+            val gap = if (slot >= 44.dp) 2.dp else 0.dp
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = sidePadding, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(gap),
+            ) {
+                left.forEach { EditorActionButton(it, states[it.id], it.id == highlightId, width) }
+                Spacer(Modifier.weight(1f))
+                right.forEach { EditorActionButton(it, states[it.id], it.id == highlightId, width) }
             }
-            if (addMore && moved.isNotEmpty()) keepRight = keepRight + withMore!!
-        }
-        if (onOverflow != null) SideEffect { onOverflow(moved.toList()) }
-        val count = keepLeft.size + keepRight.size
-        val slot = room / count.coerceAtLeast(1)
-        val width = if (slot >= 44.dp) 40.dp else slot
-        val gap = if (slot >= 44.dp) 2.dp else 0.dp
-        Row(
-            Modifier.fillMaxWidth().padding(horizontal = sidePadding, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(gap),
+        } else Row(
+            Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = sidePadding, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            keepLeft.forEach { EditorActionButton(it, states[it.id], it.id == highlightId, width) }
-            Spacer(Modifier.weight(1f))
-            keepRight.forEach { spec ->
-                // The menu button can be here only because something moved into the menu.
-                val state = states[spec.id]?.let { if (spec == withMore) forceVisible(it) else it }
-                EditorActionButton(spec, state, spec.id == highlightId, width)
-            }
+            // Too many for one line: the left and the right ones in a row that is pushed sideways, a gap between the two sides.
+            left.forEach { EditorActionButton(it, states[it.id], it.id == highlightId) }
+            Spacer(Modifier.width(16.dp))
+            right.forEach { EditorActionButton(it, states[it.id], it.id == highlightId) }
         }
     }
 }
-
-private fun forceVisible(state: EditorActionState) = EditorActionState(
-    state.icon, state.label, state.onClick, visible = true, enabled = state.enabled, checked = state.checked, dimmed = state.dimmed,
-    tint = state.tint, popup = state.popup,
-)
 
 @Composable
 private fun EditorActionButton(spec: ButtonSpec, state: EditorActionState?, highlighted: Boolean = false, width: Dp = 40.dp) {
@@ -227,9 +200,9 @@ private fun EditorActionButton(spec: ButtonSpec, state: EditorActionState?, high
 /** The groups of the overflow menu: the actions of the menu zone that are possible now, checklist tools under one entry. */
 internal fun menuGroups(
     layout: ButtonLayout, states: Map<String, EditorActionState>, page: Int, toPage: (Int) -> Unit, listToolsLabel: String, backIcon: Int, forwardIcon: @Composable () -> Unit,
-    closeMenu: () -> Unit, overflow: List<String> = emptyList(), formatEntries: List<MenuEntry> = emptyList(),
+    closeMenu: () -> Unit, formatEntries: List<MenuEntry> = emptyList(),
 ): List<List<MenuEntry>> {
-    val shown = layout.inZone(ZONE_MENU).filter { states[it.id]?.visible == true && it.id !in overflow }
+    val shown = layout.inZone(ZONE_MENU).filter { states[it.id]?.visible == true }
     val formatLabel = states["format"]?.label.orEmpty()
     fun entry(spec: ButtonSpec): MenuEntry {
         val state = states.getValue(spec.id)
@@ -243,9 +216,6 @@ internal fun menuGroups(
     }
     if (page == 2) return listOf(listOf(MenuEntry(formatLabel, backIcon) { toPage(0) }), formatEntries)
     val groups = mutableListOf<MutableList<MenuEntry>>()
-    // What did not fit into its bar comes first, each as itself (a checklist tool too), in the order of the bars.
-    val moved = overflow.mapNotNull { id -> layout.catalog.byId[id]?.takeIf { states[id]?.visible == true } }
-    if (moved.isNotEmpty()) groups.add(moved.map(::entry).toMutableList())
     var lastGroup = -1
     var toolsAdded = false
     shown.forEach { spec ->
@@ -254,7 +224,7 @@ internal fun menuGroups(
             toolsAdded = true
             MenuEntry(listToolsLabel, R.drawable.ic_list_tools, trailing = forwardIcon) { toPage(1) }
         } else entry(spec)
-        if (spec.group != lastGroup || groups.size == (if (moved.isNotEmpty()) 1 else 0)) groups.add(mutableListOf())
+        if (spec.group != lastGroup || groups.isEmpty()) groups.add(mutableListOf())
         lastGroup = spec.group
         groups.last().add(entry)
     }

@@ -20,6 +20,7 @@ internal enum class Page(val title: Int) {
     AppCards(R.string.app_cards),
     AppSwipe(R.string.swipe_title),
     AppFilters(R.string.filter_bar_title),
+    Editor(R.string.editor_title),
     EditorButtons(R.string.editor_buttons_title),
     AppCheckbox(R.string.checkbox_style),
     Backup(R.string.tab_backup),
@@ -47,7 +48,8 @@ internal fun settingEntries(isSingleNote: Boolean): List<SettingEntry> = buildLi
     add(SettingEntry(R.string.pull_to_refresh_switch, Page.AppLayout))
     add(SettingEntry(R.string.preview_length, Page.AppLayout))
     add(SettingEntry(R.string.editor_buttons_title, Page.EditorButtons))
-    add(SettingEntry(R.string.editor_in_recents, Page.EditorButtons))
+    add(SettingEntry(R.string.editor_title, Page.Editor))
+    add(SettingEntry(R.string.editor_in_recents, Page.Editor))
     add(SettingEntry(R.string.app_cards, Page.AppCards))
     add(SettingEntry(R.string.fold_notes_app, Page.AppCards))
     add(SettingEntry(R.string.filter_bar_title, Page.AppFilters))

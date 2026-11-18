@@ -396,9 +396,6 @@ class EditNoteActivity : ComponentActivity() {
         var saving by remember { mutableStateOf(false) }
         var menuOpen by remember { mutableStateOf(false) }
         var formatMenuOpen by remember { mutableStateOf(false) }
-        // The buttons that did not fit into the top and the bottom bar; they are shown in the menu.
-        var overflowTop by remember { mutableStateOf(emptyList<String>()) }
-        var overflowBottom by remember { mutableStateOf(emptyList<String>()) }
         var menuPage by remember { mutableStateOf(0) }
         LaunchedEffect(menuOpen) { if (!menuOpen) menuPage = 0 }
         val isLocal = CredentialStore.isLocal(account)
@@ -880,7 +877,7 @@ class EditNoteActivity : ComponentActivity() {
         val listToolsLabel = stringResource(R.string.list_tools)
         states["more"] = EditorActionState(
             R.drawable.ic_more_vert, stringResource(R.string.more_actions), { if (canEdit) menuOpen = true else toastUnlockFirst() },
-            visible = editorLayout.inZone(ZONE_MENU).any { states[it.id]?.visible == true } || (overflowTop + overflowBottom).isNotEmpty(), dimmed = !canEdit,
+            visible = editorLayout.inZone(ZONE_MENU).any { states[it.id]?.visible == true }, dimmed = !canEdit,
             popup = {
                 GroupedMenu(
                     expanded = menuOpen && canEdit,
@@ -888,14 +885,11 @@ class EditNoteActivity : ComponentActivity() {
                     groups = menuGroups(
                         editorLayout, states, menuPage, { menuPage = it }, listToolsLabel, R.drawable.ic_arrow_left,
                         { Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null) }, { menuOpen = false },
-                        overflow = overflowTop + overflowBottom, formatEntries = formatEntries,
+                        formatEntries = formatEntries,
                     ),
                 )
             },
         )
-        // The menu button for a bar whose buttons move into the menu, when the menu button is switched off (anywhere else it shows).
-        val moreInBars = editorLayout.zoneOf("more") != ZONE_HIDDEN
-        val moreSpec = EDITOR_CATALOG.byId.getValue("more")
         val scroll = rememberScrollState()
         // The editor opens in its final look; only changes made while it is open fade.
         LaunchedEffect(Unit) { kotlinx.coroutines.delay(500); screenTint.instant = false }
@@ -914,10 +908,7 @@ class EditNoteActivity : ComponentActivity() {
         }) {
         Column(Modifier.fillMaxSize()) {
         // The bar stays on screen while the note scrolls: discard, the note's switches, save.
-            EditorBar(
-                editorLayout.inZone(ZONE_TOP_LEFT), editorLayout.inZone(ZONE_TOP_RIGHT), states,
-                onOverflow = { if (it != overflowTop) overflowTop = it }, withMore = if (moreInBars) null else moreSpec,
-            )
+            EditorBar(editorLayout.inZone(ZONE_TOP_LEFT), editorLayout.inZone(ZONE_TOP_RIGHT), states)
         // A short note sits in the middle of the screen between the bars; with the keyboard open, at the top, where one types.
         val imeVisible = WindowInsets.isImeVisible
         BoxWithConstraints(Modifier.weight(1f)) {
@@ -1225,11 +1216,7 @@ class EditNoteActivity : ComponentActivity() {
         }
         }
         // The bottom bar sits above the keyboard, where the thumb is while typing, and stays when the note scrolls.
-        EditorBar(
-            editorLayout.inZone(ZONE_BOTTOM_LEFT), editorLayout.inZone(ZONE_BOTTOM_RIGHT), states,
-            onOverflow = { if (it != overflowBottom) overflowBottom = it },
-            withMore = if (moreInBars || overflowTop.isNotEmpty()) null else moreSpec,
-        )
+        EditorBar(editorLayout.inZone(ZONE_BOTTOM_LEFT), editorLayout.inZone(ZONE_BOTTOM_RIGHT), states)
         }
         if (paletteOpen) EditorSheet({ paletteOpen = false }) {
             AppearanceSection(

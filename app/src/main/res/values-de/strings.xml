@@ -178,6 +178,7 @@
     <string name="format_underline">Unterstrichen</string>
     <string name="format_strike">Durchgestrichen</string>
     <string name="format_title">Formatierung</string>
+    <string name="editor_title">Editor</string>
     <string name="editor_in_recents">Notizen im App-Verlauf behalten</string>
     <string name="editor_in_recents_hint">Eine aus einem Widget oder einer Verknüpfung geöffnete Notiz bleibt nach dem Verlassen mit ihrem Titel im Verlauf der letzten Apps.</string>
     <string name="note_text_color">Textfarbe</string>
