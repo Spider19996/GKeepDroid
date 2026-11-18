@@ -77,7 +77,7 @@ class ToggleFoldAllAction : ActionCallback {
         val settings = SettingsStore.loadWidget(context, widgetId)
         val account = CredentialStore.resolve(context, settings.account) ?: return
         val keys = NotesCache.read(context, account)
-            .filter { settings.labelFilter.isEmpty() || settings.labelFilter in it.labels }
+            .filter { (settings.labelFilter.isEmpty() || settings.labelFilter in it.labels) && it.canFold() }
             .map { FoldStore.key(account, it.id) }
         val folded = FoldStore.load(context)
         FoldStore.setAll(context, keys, !keys.all { it in folded })

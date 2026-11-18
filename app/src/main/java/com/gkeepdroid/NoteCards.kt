@@ -134,7 +134,9 @@ internal fun NoteTile(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val foldedKeys = remember(FoldStore.version.intValue) { FoldStore.load(context) }
-    val folded = app.foldNotes && FoldStore.key(account, note.id) in foldedKeys
+    // A note that is only a title has no arrow: there is nothing to fold.
+    val foldable = app.foldNotes && note.canFold()
+    val folded = foldable && FoldStore.key(account, note.id) in foldedKeys
     /** Ticks the item right on the card (or removes it): shown at once, sent to Keep a few seconds later. */
     fun toggleItem(item: KeepItem) {
         fun apply() {
@@ -227,9 +229,9 @@ internal fun NoteTile(
             )
             .clickable(onClick = onClick)
             // Tall enough for the fold arrow, also when a folded note has nothing else to show.
-            .then(if (app.foldNotes) Modifier.heightIn(min = 44.dp) else Modifier)
+            .then(if (foldable) Modifier.heightIn(min = 44.dp) else Modifier)
             // Without a title row the arrow floats over the first line, so that line stops short of it.
-            .padding(start = 12.dp, top = 12.dp, bottom = 12.dp, end = if (!hasTitleRow && (app.foldNotes || cornerExtra > 0)) ((if (app.foldNotes) 36 else 0) + cornerExtra).dp else 12.dp),
+            .padding(start = 12.dp, top = 12.dp, bottom = 12.dp, end = if (!hasTitleRow && (foldable || cornerExtra > 0)) ((if (foldable) 36 else 0) + cornerExtra).dp else 12.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         if (thumb != null) {
@@ -261,7 +263,7 @@ internal fun NoteTile(
                     )
                 }
                 // Room for the arrow that floats over the corner; its height is only the title's.
-                if (app.foldNotes) Spacer(Modifier.size(width = 30.dp, height = 20.dp))
+                if (foldable) Spacer(Modifier.size(width = 30.dp, height = 20.dp))
             }
         }
         // Read again whenever the screen comes back, as reminders are changed in the editor.
@@ -373,8 +375,8 @@ internal fun NoteTile(
         }
         actions?.let { Column { it() } }
     }
-    if (app.foldNotes || cornerExtra > 0) {
-        Row(Modifier.align(Alignment.TopEnd).padding(end = if (app.foldNotes) 0.dp else 12.dp, top = if (app.foldNotes) 0.dp else 12.dp), verticalAlignment = Alignment.CenterVertically) {
+    if (foldable || cornerExtra > 0) {
+        Row(Modifier.align(Alignment.TopEnd).padding(end = if (foldable) 0.dp else 12.dp, top = if (foldable) 0.dp else 12.dp), verticalAlignment = Alignment.CenterVertically) {
             if (!hasTitleRow) {
                 if (progress != null) Text(progress, color = textColor.copy(alpha = 0.7f), style = MaterialTheme.typography.labelMedium)
                 if (note.pinned) {
@@ -384,7 +386,7 @@ internal fun NoteTile(
                     )
                 }
             }
-            if (app.foldNotes) Box(
+            if (foldable) Box(
                 Modifier.size(48.dp).clickable(
                     interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
                     indication = null,

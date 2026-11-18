@@ -322,6 +322,10 @@ internal fun ItemRow(note: KeepNote, item: KeepItem, account: String, settings: 
 internal fun KeepNote.hasNoContent(): Boolean =
     title.isBlank() && (if (isList) items.isEmpty() else text.isBlank())
 
+/** Whether folding would hide anything: a note that is only a title (no text, items or picture) has nothing to fold away. */
+internal fun KeepNote.canFold(): Boolean =
+    images.isNotEmpty() || (if (isList) items.any { it.text.isNotBlank() } else text.isNotBlank()) || title.isBlank()
+
 /** Italic hint for notes without title and text, so an empty card does not look broken. */
 @Composable
 internal fun EmptyNoteHint(settings: WidgetSettings, palette: TextPalette) {

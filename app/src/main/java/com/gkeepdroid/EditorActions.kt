@@ -64,18 +64,23 @@ val EDITOR_ACTIONS = listOf(
     ButtonSpec("palette", R.drawable.ic_palette, R.string.color_and_background, 3, ZONE_BOTTOM_LEFT),
     ButtonSpec("labels", R.drawable.ic_label, R.string.labels_title, 3, ZONE_BOTTOM_LEFT),
     ButtonSpec("image", R.drawable.ic_image, R.string.image_add_keep, 3, ZONE_BOTTOM_LEFT),
+    // The text styles of the selected text (or of what is typed next); the same as in the selection menu of Android.
+    ButtonSpec("format_bold", R.drawable.ic_format_bold, R.string.format_bold, 3, ZONE_BOTTOM_LEFT),
+    ButtonSpec("format_italic", R.drawable.ic_format_italic, R.string.format_italic, 3, ZONE_BOTTOM_LEFT),
+    ButtonSpec("format_underline", R.drawable.ic_format_underlined, R.string.format_underline, 3, ZONE_BOTTOM_LEFT),
+    ButtonSpec("format_strike", R.drawable.ic_format_strike, R.string.format_strike, 3, ZONE_BOTTOM_LEFT),
     // Next to undo: a delete that was not meant can be taken back at once.
-    ButtonSpec("list_delete_checked", R.drawable.ic_delete, R.string.list_delete_checked, 3, ZONE_BOTTOM_RIGHT),
+    ButtonSpec("list_delete_checked", R.drawable.ic_delete_sweep, R.string.list_delete_checked, 3, ZONE_BOTTOM_RIGHT),
     ButtonSpec("undo", R.drawable.ic_undo, R.string.undo, 3, ZONE_BOTTOM_RIGHT),
     ButtonSpec("redo", R.drawable.ic_redo, R.string.redo, 3, ZONE_BOTTOM_RIGHT),
     ButtonSpec("convert", R.drawable.ic_checklist, R.string.editor_convert, 0, ZONE_MENU),
-    ButtonSpec("list_number", R.drawable.ic_checklist, R.string.list_number, 0, ZONE_MENU),
-    ButtonSpec("list_check_all", R.drawable.ic_done, R.string.list_check_all, 0, ZONE_MENU),
-    ButtonSpec("list_uncheck_all", R.drawable.ic_close, R.string.list_uncheck_all, 0, ZONE_MENU),
+    ButtonSpec("list_number", R.drawable.ic_list_numbered, R.string.list_number, 0, ZONE_MENU),
+    ButtonSpec("list_check_all", R.drawable.ic_done_all, R.string.list_check_all, 0, ZONE_MENU),
+    ButtonSpec("list_uncheck_all", R.drawable.ic_remove_done, R.string.list_uncheck_all, 0, ZONE_MENU),
     ButtonSpec("list_sort", R.drawable.ic_sort, R.string.list_sort_alpha, 0, ZONE_MENU),
     ButtonSpec("open_in_keep", R.drawable.ic_open_new, R.string.open_in_keep, 1, ZONE_MENU),
     ButtonSpec("share", R.drawable.ic_share, R.string.share_note, 1, ZONE_MENU),
-    ButtonSpec("hide_content", R.drawable.ic_lock, R.string.hide_content, 1, ZONE_MENU),
+    ButtonSpec("hide_content", R.drawable.ic_visibility_off, R.string.hide_content, 1, ZONE_MENU),
     ButtonSpec("archive", R.drawable.ic_archive, R.string.archive_note, 2, ZONE_MENU),
     ButtonSpec("delete", R.drawable.ic_delete, R.string.move_to_trash, 2, ZONE_MENU),
     // A shortcut to the settings of these buttons; the last entry of the menu, apart from the others.
@@ -127,7 +132,8 @@ class EditorActionState(
 
 /**
  * One bar of the editor: the actions of its left zone at the left edge, those of its right zone at the right edge. When they
- * do not fit in one line, the bar grows: the left ones stay in the first line, the right ones follow below at the right edge.
+ * do not fit in one line, the buttons move closer and get narrower, so the bar stays one line; only when they would get too
+ * small to hit does the bar grow: the left ones stay in the first line, the right ones follow below at the right edge.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -138,13 +144,18 @@ internal fun EditorBar(
     val shown = (left + right).count { states[it.id]?.visible == true }
     if (shown == 0) return
     BoxWithConstraints(Modifier.fillMaxWidth()) {
-        // A button is 40 dp wide with 2 dp between (the save button a little more).
-        val fits = (maxWidth - sidePadding * 2) / 44.dp >= shown
+        // A button is 40 dp wide with 2 dp between (the save button a little more); squeezed, down to 32 dp with nothing between.
+        val room = maxWidth - sidePadding * 2
+        val slot = room / shown
         val padding = Modifier.fillMaxWidth().padding(horizontal = sidePadding, vertical = 4.dp)
-        if (fits) Row(padding, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-            left.forEach { EditorActionButton(it, states[it.id], it.id == highlightId) }
-            Spacer(Modifier.weight(1f))
-            right.forEach { EditorActionButton(it, states[it.id], it.id == highlightId) }
+        if (slot >= 32.dp) {
+            val width = if (slot >= 44.dp) 40.dp else slot
+            val gap = if (slot >= 44.dp) 2.dp else 0.dp
+            Row(padding, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(gap)) {
+                left.forEach { EditorActionButton(it, states[it.id], it.id == highlightId, width) }
+                Spacer(Modifier.weight(1f))
+                right.forEach { EditorActionButton(it, states[it.id], it.id == highlightId, width) }
+            }
         } else Column(padding) {
             FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 left.forEach { EditorActionButton(it, states[it.id], it.id == highlightId) }
@@ -157,9 +168,9 @@ internal fun EditorBar(
 }
 
 @Composable
-private fun EditorActionButton(spec: ButtonSpec, state: EditorActionState?, highlighted: Boolean = false) {
+private fun EditorActionButton(spec: ButtonSpec, state: EditorActionState?, highlighted: Boolean = false, width: Dp = 40.dp) {
     if (state == null || !state.visible) return
-    val modifier = Modifier.size(40.dp)
+    val modifier = Modifier.size(width, 40.dp)
     val icon: @Composable () -> Unit = {
         // Read inside the button: its content color is the grayed one while it is disabled.
         val tint = state.tint ?: LocalContentColor.current
@@ -171,7 +182,8 @@ private fun EditorActionButton(spec: ButtonSpec, state: EditorActionState?, high
     Box(if (highlighted) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(14.dp)) else Modifier) {
         when {
             spec.id == "save" -> FilledIconButton(
-                onClick = state.onClick, enabled = state.enabled, shapes = IconButtonDefaults.shapes(), modifier = Modifier.padding(horizontal = 4.dp).size(40.dp),
+                onClick = state.onClick, enabled = state.enabled, shapes = IconButtonDefaults.shapes(),
+                modifier = Modifier.padding(horizontal = if (width < 40.dp) 0.dp else 4.dp).size(width, 40.dp),
             ) { Icon(painterResource(state.icon), contentDescription = state.label) }
             state.checked != null -> FilledTonalIconToggleButton(
                 checked = state.checked, onCheckedChange = { state.onClick() }, enabled = state.enabled, shapes = IconButtonDefaults.toggleableShapes(),
@@ -205,7 +217,7 @@ internal fun menuGroups(
         val entry = if (isListTool(spec.id)) {
             if (toolsAdded) return@forEach
             toolsAdded = true
-            MenuEntry(listToolsLabel, R.drawable.ic_done, trailing = forwardIcon) { toPage(1) }
+            MenuEntry(listToolsLabel, R.drawable.ic_list_tools, trailing = forwardIcon) { toPage(1) }
         } else entry(spec)
         if (spec.group != lastGroup || groups.isEmpty()) groups.add(mutableListOf())
         lastGroup = spec.group
@@ -296,6 +308,7 @@ private fun noteButtonTint(id: String): Color? {
         "list_uncheck_all", "archive" -> tone(0xFFFFCC80, 0xFFE65100)
         "open_in_keep", "share" -> tone(0xFF80CBC4, 0xFF00695C)
         "hide_content" -> tone(0xFFCE93D8, 0xFF6A1B9A)
+        "format_bold", "format_italic", "format_underline", "format_strike" -> tone(0xFF90CAF9, 0xFF1565C0)
         "save" -> tone(0xFF81C784, 0xFF2E7D32)
         "close" -> tone(0xFFEF9A9A, 0xFFC62828)
         "undo", "redo" -> tone(0xFF90CAF9, 0xFF1565C0)

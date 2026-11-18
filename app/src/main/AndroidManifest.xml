@@ -118,7 +118,6 @@
         <activity
             android:name=".EditNoteActivity"
             android:exported="false"
-            android:excludeFromRecents="true"
             android:taskAffinity=""
             android:windowSoftInputMode="adjustResize" />
 

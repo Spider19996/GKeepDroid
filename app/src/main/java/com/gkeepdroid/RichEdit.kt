@@ -28,15 +28,18 @@ class DocFlags(var flags: IntArray) {
         }
     })
 
-    /** Keeps the styles with their characters when the text changes; new characters take the style of the one before them. */
-    fun edit(old: String, new: String) {
+    /**
+     * Keeps the styles with their characters when the text changes; new characters take the style of the one before them, or
+     * [typing] if it is given (a style switched at the cursor before typing).
+     */
+    fun edit(old: String, new: String, typing: Int? = null) {
         if (old == new) return
         val limit = minOf(old.length, new.length)
         var prefix = 0
         while (prefix < limit && old[prefix] == new[prefix]) prefix++
         var suffix = 0
         while (suffix < limit - prefix && old[old.length - 1 - suffix] == new[new.length - 1 - suffix]) suffix++
-        val inherited = (if (prefix > 0) flags.getOrElse(prefix - 1) { 0 } else 0) and TEXT_STYLE_MASK
+        val inherited = typing ?: ((if (prefix > 0) flags.getOrElse(prefix - 1) { 0 } else 0) and TEXT_STYLE_MASK)
         val inserted = new.length - prefix - suffix
         val out = IntArray(new.length)
         for (i in 0 until prefix) out[i] = flags.getOrElse(i) { 0 }
@@ -113,6 +116,9 @@ class FormatState(private val enabled: Boolean, private val rich: RichNote?) {
     var focus by mutableStateOf<String?>(null)
     val selection = mutableStateMapOf<String, TextRange>()
 
+    /** A style switched with nothing selected: what is typed next at that cursor gets it (field, cursor, styles). */
+    private var typing by mutableStateOf<Triple<String, Int, Int>?>(null)
+
     fun flagsFor(key: String, current: String): DocFlags {
         val have = docs[key]
         if (have != null && have.flags.size == current.length) return have
@@ -135,14 +141,35 @@ class FormatState(private val enabled: Boolean, private val rich: RichNote?) {
 
     /** The text of [key] changed; the styles stay with their characters. */
     fun edited(key: String, old: String, new: String) {
-        if (enabled) docs[key]?.edit(old, new)
+        if (!enabled) return
+        val pending = typing?.takeIf { (k, at) -> k == key && new.length > old.length && new.startsWith(old.take(at)) && new.endsWith(old.drop(at)) }
+        typing = null
+        docs[key]?.edit(old, new, pending?.third)
+    }
+
+    /** The styles the text typed at the cursor would get now. */
+    private fun cursorStyles(key: String, text: String, at: Int): Int =
+        typing?.takeIf { it.first == key && it.second == at }?.third
+            ?: (flagsFor(key, text).flags.getOrElse(at - 1) { 0 } and TEXT_STYLE_MASK)
+
+    /** Whether the style is on for the selection of the focused field (or for what is typed next at its cursor), for the buttons. */
+    fun isActive(textOf: (String) -> String, bit: Int): Boolean {
+        val key = focus ?: return false
+        val range = selection[key] ?: return false
+        val text = textOf(key)
+        return if (range.collapsed) cursorStyles(key, text, range.min) and bit != 0 else flagsFor(key, text).has(range.min, range.max, bit)
     }
 
     /** Switches the style [bit] on for the selected text of the focused field (or off, if all of it has it). */
     fun toggleSelected(textOf: (String) -> String, bit: Int) {
         val key = focus ?: return
         val range = selection[key] ?: return
-        if (range.collapsed) return
+        if (range.collapsed) {
+            // Nothing selected: the style is for what is typed next here.
+            typing = Triple(key, range.min, cursorStyles(key, textOf(key), range.min) xor bit)
+            version++
+            return
+        }
         flagsFor(key, textOf(key)).toggle(range.min, range.max, bit)
         if (key !in touched) touched.add(key)
         version++

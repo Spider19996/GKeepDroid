@@ -268,6 +268,17 @@ class EditNoteActivity : ComponentActivity() {
         // Text shared from another app arrives as a prefill for a new note.
         var title by remember { mutableStateOf(existing?.title ?: intent.getStringExtra(EXTRA_PREFILL_TITLE).orEmpty()) }
         var text by remember { mutableStateOf(existing?.text ?: intent.getStringExtra(EXTRA_PREFILL_TEXT).orEmpty()) }
+        // The editor stays in the list of recent apps under the note's title, so it can be found again after leaving it.
+        val untitled = stringResource(if (existing != null) R.string.app_name else if (isList) R.string.new_list else R.string.new_note)
+        val firstLine = if (title.isBlank() && !isList) text.lineSequence().firstOrNull { it.isNotBlank() }?.take(40) else null
+        LaunchedEffect(title, firstLine, untitled) {
+            val label = title.ifBlank { firstLine ?: untitled }
+            @Suppress("DEPRECATION")
+            setTaskDescription(
+                if (android.os.Build.VERSION.SDK_INT >= 33) android.app.ActivityManager.TaskDescription.Builder().setLabel(label).build()
+                else android.app.ActivityManager.TaskDescription(label),
+            )
+        }
         var textSel by remember { mutableStateOf(androidx.compose.ui.text.TextRange(text.length)) }
         // The keyboard's composing region; dropping it on every keystroke makes the word suggestions flicker.
         var textComp by remember { mutableStateOf<androidx.compose.ui.text.TextRange?>(null) }
@@ -729,13 +740,24 @@ class EditNoteActivity : ComponentActivity() {
                 }
             },
         )
+        // The text styles as buttons: they work on the selection of the focused field, or on what is typed next at the cursor.
+        listOf(
+            "format_bold" to RichNotes.BOLD, "format_italic" to RichNotes.ITALIC,
+            "format_underline" to RichNotes.UNDERLINE, "format_strike" to RichNotes.STRIKE,
+        ).forEachIndexed { i, (id, bit) ->
+            states[id] = EditorActionState(
+                EDITOR_CATALOG.byId.getValue(id).icon, styleLabels[i], { applyStyle(bit) },
+                visible = canFormat && canEdit,
+                checked = format.version.let { format.isActive(::formatTextOf, bit) },
+            )
+        }
         states["undo"] = EditorActionState(R.drawable.ic_undo, stringResource(R.string.undo), undo, visible = canEdit, enabled = history.canUndo)
         states["redo"] = EditorActionState(R.drawable.ic_redo, stringResource(R.string.redo), redo, visible = canEdit, enabled = history.canRedo)
         states["convert"] = EditorActionState(
-            R.drawable.ic_checklist, stringResource(if (isList) R.string.convert_to_note else R.string.convert_to_list), { requestConvert() },
+            if (isList) R.drawable.ic_subject else R.drawable.ic_checklist, stringResource(if (isList) R.string.convert_to_note else R.string.convert_to_list), { requestConvert() },
         )
         states["list_number"] = EditorActionState(
-            R.drawable.ic_checklist, stringResource(if (numbered) R.string.list_unnumber else R.string.list_number),
+            R.drawable.ic_list_numbered, stringResource(if (numbered) R.string.list_unnumber else R.string.list_number),
             {
                 // Numbers are shown from the position; an old "1. " typed by hand is not counted twice.
                 val stripped = ListNumbering.strip(items.toList())
@@ -746,10 +768,10 @@ class EditNoteActivity : ComponentActivity() {
             visible = isList,
         )
         states["list_check_all"] = EditorActionState(
-            R.drawable.ic_done, stringResource(R.string.list_check_all), { for (i in items.indices) if (!items[i].isDivider()) items[i] = items[i].copy(checked = true) }, visible = isList,
+            R.drawable.ic_done_all, stringResource(R.string.list_check_all), { for (i in items.indices) if (!items[i].isDivider()) items[i] = items[i].copy(checked = true) }, visible = isList,
         )
         states["list_uncheck_all"] = EditorActionState(
-            R.drawable.ic_close, stringResource(R.string.list_uncheck_all), { for (i in items.indices) items[i] = items[i].copy(checked = false) }, visible = isList,
+            R.drawable.ic_remove_done, stringResource(R.string.list_uncheck_all), { for (i in items.indices) items[i] = items[i].copy(checked = false) }, visible = isList,
         )
         states["list_sort"] = EditorActionState(
             R.drawable.ic_sort, stringResource(R.string.list_sort_alpha),
@@ -768,7 +790,7 @@ class EditNoteActivity : ComponentActivity() {
             visible = isList,
         )
         states["list_delete_checked"] = EditorActionState(
-            R.drawable.ic_delete, stringResource(R.string.list_delete_checked),
+            R.drawable.ic_delete_sweep, stringResource(R.string.list_delete_checked),
             {
                 items.removeAll { it.checked }
                 if (items.isEmpty()) items.add(KeepItem(UUID.randomUUID().toString(), "", false))
@@ -800,7 +822,8 @@ class EditNoteActivity : ComponentActivity() {
         )
         states["share"] = EditorActionState(R.drawable.ic_share, stringResource(R.string.share_note), { shareNote(title, text, isList, outItems()) }, visible = existing != null)
         states["hide_content"] = EditorActionState(
-            R.drawable.ic_lock, stringResource(if (hiddenInWidgets) R.string.show_content else R.string.hide_content),
+            if (hiddenInWidgets) R.drawable.ic_visibility else R.drawable.ic_visibility_off,
+            stringResource(if (hiddenInWidgets) R.string.show_content else R.string.hide_content),
             {
                 if (canEdit) {
                     hiddenInWidgets = !hiddenInWidgets

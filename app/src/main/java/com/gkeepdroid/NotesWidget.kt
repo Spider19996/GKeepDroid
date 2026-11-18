@@ -138,7 +138,7 @@ class NotesWidget : GlanceAppWidget() {
             bar = { side ->
                 HeaderBar(
                     side, appWidgetId, account, settings, textColor, withNewButtons = true, reordering = reordering,
-                    allFolded = notes.isNotEmpty() && notes.all { FoldStore.key(account.orEmpty(), it.id) in foldedKeys },
+                    allFolded = notes.any { it.canFold() } && notes.filter { it.canFold() }.all { FoldStore.key(account.orEmpty(), it.id) in foldedKeys },
                 )
             },
         ) {
@@ -200,7 +200,9 @@ class NotesWidget : GlanceAppWidget() {
         } else {
             GlanceModifier.fillMaxWidth()
         }
-        val folded = settings.foldable && FoldStore.key(account, note.id) in foldedKeys
+        // A note that is only a title has no arrow: there is nothing to fold.
+        val foldable = settings.foldable && note.canFold()
+        val folded = foldable && FoldStore.key(account, note.id) in foldedKeys
 
         // A small pin shows that the note is pinned in Keep or shown at the widget's bottom.
         val pinned = note.pinned || note.id in settings.pinBottom
@@ -222,7 +224,7 @@ class NotesWidget : GlanceAppWidget() {
                 Column(
                     GlanceModifier.fillMaxWidth().padding(
                         start = 8.dp, top = 8.dp, bottom = 8.dp,
-                        end = if (!hasTitleRow && (settings.foldable || cornerExtra > 0)) ((if (settings.foldable) 40 else 0) + cornerExtra).dp else 8.dp,
+                        end = if (!hasTitleRow && (foldable || cornerExtra > 0)) ((if (foldable) 40 else 0) + cornerExtra).dp else 8.dp,
                     )
                 ) {
                     // Inside the padding, so the image stays within the note and its border stays visible.
@@ -245,7 +247,7 @@ class NotesWidget : GlanceAppWidget() {
                             if (isPrivate) LockIndicator(settings, palette) else ProgressIndicator(note, settings, palette)
                             if (pinned) PinIndicator(settings, palette)
                             // Room for the arrow that floats over the corner.
-                            if (settings.foldable) androidx.glance.layout.Spacer(GlanceModifier.width(32.dp))
+                            if (foldable) androidx.glance.layout.Spacer(GlanceModifier.width(32.dp))
                             if (reordering) {
                                 // Arrows to move this note; the top note cannot go up, the last cannot go down.
                                 if (canMoveUp) {
@@ -295,14 +297,14 @@ class NotesWidget : GlanceAppWidget() {
                         EditedTime(note, settings, palette)
                     }
                 }
-                if (settings.foldable || cornerExtra > 0) {
+                if (foldable || cornerExtra > 0) {
                     Box(GlanceModifier.fillMaxWidth().padding(top = 2.dp, end = 2.dp), contentAlignment = Alignment.TopEnd) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (!hasTitleRow) {
                                 if (!isPrivate) ProgressIndicator(note, settings, palette)
                                 if (pinned) PinIndicator(settings, palette)
                             }
-                            if (settings.foldable) {
+                            if (foldable) {
                                 // The same arrows as in the app: down when open, left when folded.
                                 ArrowButton(
                                     if (folded) R.drawable.ic_arrow_left else R.drawable.ic_arrow_down, textColor,

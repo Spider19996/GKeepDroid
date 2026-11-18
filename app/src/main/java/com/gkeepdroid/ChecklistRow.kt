@@ -10,6 +10,8 @@ import androidx.compose.foundation.gestures.draggable
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
+import kotlinx.coroutines.launch
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.geometry.Rect
@@ -62,6 +64,12 @@ internal fun ChecklistRow(
     val trigger = maxPx * 0.75f
     var offsetX by remember { mutableStateOf(0f) }
     var handle by remember { mutableStateOf<LayoutCoordinates?>(null) }
+    // The handle stays in the middle of the row; when the text wraps to another line (or loses one) it glides there instead of
+    // jumping. The first height is taken as it is, so a long item does not slide into place when the editor opens.
+    val handleTop = remember { androidx.compose.animation.core.Animatable(0f) }
+    var measured by remember { mutableStateOf(false) }
+    val handleHeightPx = with(androidx.compose.ui.platform.LocalDensity.current) { 56.dp.toPx() }
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
     val green = MaterialTheme.colorScheme.tertiary
     val red = MaterialTheme.colorScheme.error
     Box(Modifier.fillMaxWidth().onGloballyPositioned { onBounds(it.boundsInRoot()) }.alpha(if (dragged) 0.5f else 1f)) {
@@ -82,6 +90,15 @@ internal fun ChecklistRow(
         Box(
             Modifier
                 .offset { androidx.compose.ui.unit.IntOffset(offsetX.toInt(), 0) }
+                .onSizeChanged { size ->
+                    val target = ((size.height - handleHeightPx) / 2f).coerceAtLeast(0f)
+                    if (!measured) {
+                        measured = true
+                        scope.launch { handleTop.snapTo(target) }
+                    } else if (target != handleTop.targetValue) {
+                        scope.launch { handleTop.animateTo(target, androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 500f)) }
+                    }
+                }
                 // On a note's own color or picture the rows show it instead of covering it; the change fades like the rest.
                 .background(
                     androidx.compose.animation.animateColorAsState(
@@ -147,7 +164,7 @@ internal fun ChecklistRow(
             val dragDescription = stringResource(R.string.drag_handle)
             Box(
                 Modifier
-                    .align(Alignment.CenterStart).width(48.dp).height(56.dp)
+                    .align(Alignment.TopStart).offset { androidx.compose.ui.unit.IntOffset(0, handleTop.value.toInt()) }.width(48.dp).height(56.dp)
                     .onGloballyPositioned { handle = it }
                     .pointerInput(item.id, editable) {
                         if (!editable) return@pointerInput
