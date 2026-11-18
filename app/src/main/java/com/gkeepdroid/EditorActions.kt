@@ -35,6 +35,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
@@ -156,14 +161,43 @@ internal fun EditorBar(
                 Spacer(Modifier.weight(1f))
                 right.forEach { EditorActionButton(it, states[it.id], it.id == highlightId, width) }
             }
-        } else Row(
-            Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = sidePadding, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
+        } else {
             // Too many for one line: the left and the right ones in a row that is pushed sideways, a gap between the two sides.
-            left.forEach { EditorActionButton(it, states[it.id], it.id == highlightId) }
-            Spacer(Modifier.width(16.dp))
-            right.forEach { EditorActionButton(it, states[it.id], it.id == highlightId) }
+            // Where more buttons wait, the row fades out and a small arrow points there.
+            val scroll = rememberScrollState()
+            val fade = 32.dp
+            Box(Modifier.fillMaxWidth()) {
+                Row(
+                    Modifier.fillMaxWidth()
+                        .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                        .drawWithContent {
+                            drawContent()
+                            val edge = fade.toPx()
+                            if (scroll.canScrollBackward) drawRect(
+                                Brush.horizontalGradient(listOf(Color.Transparent, Color.Black), startX = 0f, endX = edge), blendMode = BlendMode.DstIn,
+                            )
+                            if (scroll.canScrollForward) drawRect(
+                                Brush.horizontalGradient(listOf(Color.Black, Color.Transparent), startX = size.width - edge, endX = size.width),
+                                blendMode = BlendMode.DstIn,
+                            )
+                        }
+                        .horizontalScroll(scroll).padding(horizontal = sidePadding, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    left.forEach { EditorActionButton(it, states[it.id], it.id == highlightId) }
+                    Spacer(Modifier.width(16.dp))
+                    right.forEach { EditorActionButton(it, states[it.id], it.id == highlightId) }
+                }
+                val hint = MaterialTheme.colorScheme.onSurfaceVariant
+                if (scroll.canScrollBackward) Icon(
+                    painterResource(R.drawable.ic_chevron_right), contentDescription = null, tint = hint,
+                    modifier = Modifier.align(Alignment.CenterStart).size(16.dp).graphicsLayer { rotationZ = 180f },
+                )
+                if (scroll.canScrollForward) Icon(
+                    painterResource(R.drawable.ic_chevron_right), contentDescription = null, tint = hint,
+                    modifier = Modifier.align(Alignment.CenterEnd).size(16.dp),
+                )
+            }
         }
     }
 }

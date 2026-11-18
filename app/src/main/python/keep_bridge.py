@@ -221,11 +221,22 @@ def fetch_notes(email, master_token, state_path):
 # Text styles of Keep's rich text, as bits of the flags that go to the app.
 _STYLE_BITS = {"ts_bd": 1, "ts_it": 2, "ts_un": 4, "ts_st": 8}
 _HEADING_BIT = 16
+# Raised when the way the kept models are read changes, so they are pulled again in full.
+_RICH_MODEL_FORMAT = 2
 
 
 def _utf16(text):
     raw = text.encode("utf-16-le", "surrogatepass")
     return [raw[i] | (raw[i + 1] << 8) for i in range(0, len(raw), 2)]
+
+
+def _mark(marks, key):
+    """Whether a style of Keep's text model is on. Next to each style Keep keeps "<style>_i": true means the style is not set
+    there (it is inherited, so off), whatever the style's own value says; Keep's web editor switches a style off that way.
+    """
+    if marks.get(key + "_i"):
+        return False
+    return bool(marks.get(key))
 
 
 def _apply_ops(docs, ops):
@@ -256,20 +267,21 @@ def _apply_ops(docs, ops):
         elif kind == "as":
             marks = body.get("sm") or {}
             if body.get("st") == "paragraph":
-                if "ps_hd" not in marks:
+                if "ps_hd" not in marks and not marks.get("ps_hd_i"):
                     continue
+                heading = _mark(marks, "ps_hd")
                 # The position is that of the paragraph's line break; the heading covers the line before it.
                 end = min(body["si"] - 1, len(units))
                 start = end
                 while start > 0 and units[start - 1] != 10:
                     start -= 1
                 for i in range(start, end):
-                    flags[i] = flags[i] | _HEADING_BIT if marks["ps_hd"] else flags[i] & ~_HEADING_BIT
+                    flags[i] = flags[i] | _HEADING_BIT if heading else flags[i] & ~_HEADING_BIT
             else:
                 for i in range(body["si"] - 1, min(body["ei"], len(units))):
                     for key, bit in _STYLE_BITS.items():
-                        if key in marks:
-                            flags[i] = flags[i] | bit if marks[key] else flags[i] & ~bit
+                        if key in marks or marks.get(key + "_i"):
+                            flags[i] = flags[i] | bit if _mark(marks, key) else flags[i] & ~bit
 
 
 def _text(units):
@@ -378,6 +390,9 @@ def _fetch_rich(keep, state_path, full=False):
                 model = json.load(f)
         except (OSError, ValueError):
             pass
+    # Models read before styles that Keep marks as "not set" were understood are pulled again once in full.
+    if model.get("fmt") != _RICH_MODEL_FORMAT:
+        full = True
     api = keep._keep_api
     send = api.send
 
@@ -425,6 +440,8 @@ def _fetch_rich(keep, state_path, full=False):
             if not changes.get("truncated"):
                 break
         model["v"] = version
+        if full:
+            model["fmt"] = _RICH_MODEL_FORMAT
     finally:
         api.send = send
     if not full:
