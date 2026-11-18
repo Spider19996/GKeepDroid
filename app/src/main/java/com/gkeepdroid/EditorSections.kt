@@ -479,8 +479,8 @@ internal fun EditorCategoryHeader(
     ) {
         Text(
             name, style = labelStyle, color = if (dragged) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface, maxLines = 1,
-            // After the rounding of the frame's corner, as a text field's label sits after its corner.
-            modifier = Modifier.padding(start = 24.dp)
+            // Where the label of the title field sits: 16 dp in from the frame's line (8 dp of the frame's padding, 4 here, 4 of the name's own).
+            modifier = Modifier.padding(start = 4.dp)
                 .onGloballyPositioned { c ->
                     nameCoords = c
                     val x = c.positionInParent().x
@@ -513,7 +513,8 @@ internal fun EditorCategoryHeader(
         )
         androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
         androidx.compose.foundation.layout.Row(
-            Modifier.padding(end = 24.dp).onGloballyPositioned { c ->
+            // The last symbol ends 16 dp from the frame's line, as the title field's content does (its box is 4 dp wider than the symbol).
+            Modifier.padding(end = 4.dp).onGloballyPositioned { c ->
                 val x = c.positionInParent().x
                 toolsRange = x to x + c.size.width
             },

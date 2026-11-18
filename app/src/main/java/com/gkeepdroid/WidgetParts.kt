@@ -386,7 +386,7 @@ internal fun ChecklistBody(
                 GlanceModifier.fillMaxWidth().background(ImageProvider(R.drawable.card_border))
                     // The name as far below the frame's top as the note's title is below the card's top (8 dp, of which the
                     // header row's own top padding is the list spacing).
-                    .padding(start = 10.dp, end = 4.dp, top = (8 - settings.listSpacingDp).coerceAtLeast(0).dp, bottom = 6.dp),
+                    .padding(start = 12.dp, end = 4.dp, top = (8 - settings.listSpacingDp).coerceAtLeast(0).dp, bottom = 6.dp),
             ) {
                 val folded = CategoryFolds.key(account, note.id, group.name) in folds
                 CategoryHeaderRow(note, account, group.name, Categories.progress(group.items), folded, settings, palette)
@@ -437,7 +437,7 @@ internal fun GlanceModifier.categoryFramePiece(index: Int, count: Int): GlanceMo
             else -> R.drawable.category_frame_middle
         },
     ),
-).padding(start = 6.dp, end = 6.dp, top = if (index == 0) 6.dp else 0.dp, bottom = if (index == count - 1) 6.dp else 0.dp)
+).padding(start = 8.dp, end = 6.dp, top = if (index == 0) 6.dp else 0.dp, bottom = if (index == count - 1) 6.dp else 0.dp)
 
 /** The items of a category in a widget: open ones first when the widget moves checked items to the end, checked ones after. */
 internal fun Categories.Group.rows(settings: WidgetSettings): List<KeepItem> =
