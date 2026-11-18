@@ -54,16 +54,25 @@ class AddItemActivity : ComponentActivity() {
             return
         }
         val themeMode = SettingsStore.loadGlobal(this).themeMode
-        setContent { KeepTheme(themeMode, opaque = false) { AddItemDialog(account, noteId) } }
+        // The categories of the checklist (bold words at the start of its items); the "+" of a category's header chooses one.
+        val note = NotesCache.read(this, account).firstOrNull { it.id == noteId }
+        val categories = note?.let { Categories.names(it.items, RichNotes.of(this, account, noteId)) }.orEmpty()
+        val preset = intent.getStringExtra(CategoryKey.name)
+        setContent { KeepTheme(themeMode, opaque = false) { AddItemDialog(account, noteId, categories, preset) } }
     }
 
+    @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
     @Composable
-    private fun AddItemDialog(account: String, noteId: String) {
+    private fun AddItemDialog(account: String, noteId: String, categories: List<String>, preset: String?) {
         val scope = rememberCoroutineScope()
         val focus = remember { FocusRequester() }
         var text by remember { mutableStateOf("") }
         var busy by remember { mutableStateOf(false) }
         var added by remember { mutableStateOf(0) }
+        // The category the next item goes into (null: none), the ones to choose from, and the name of a new one being typed.
+        var category by remember { mutableStateOf(preset) }
+        val known = remember { androidx.compose.runtime.mutableStateListOf<String>().apply { addAll(categories); if (preset != null && preset !in this) add(preset) } }
+        var newCategory by remember { mutableStateOf<String?>(null) }
 
         LaunchedEffect(Unit) { focus.requestFocus() }
 
@@ -71,8 +80,19 @@ class AddItemActivity : ComponentActivity() {
             val item = text.trim()
             if (item.isEmpty() || busy) return
             busy = true
+            val name = (newCategory?.trim()?.takeIf { it.isNotEmpty() } ?: category)
+            if (newCategory != null && name != null) {
+                if (name !in known) known.add(name)
+                category = name
+                newCategory = null
+            }
+            // In a category the item starts with the category's name in bold, the way Keep shows it too.
+            val (full, boldLength) = if (name != null) Categories.prefixed(name, item) else item to 0
             // Stored and sent in the background, so the dialog is ready for the next item at once.
-            KeepRepository.queueEdit(this@AddItemActivity, PendingEdit(account, "add_list_item", listOf(noteId, item)))
+            KeepRepository.queueEdit(
+                this@AddItemActivity,
+                PendingEdit(account, "add_list_item", if (boldLength > 0) listOf(noteId, full, boldLength.toString()) else listOf(noteId, full)),
+            )
             text = ""
             added++
             busy = false
@@ -87,6 +107,31 @@ class AddItemActivity : ComponentActivity() {
             ) {
                 Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(stringResource(R.string.add_item), style = MaterialTheme.typography.titleLarge)
+                    // Where the item goes: no category, one of the list's, or a new one.
+                    androidx.compose.foundation.layout.FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        androidx.compose.material3.FilterChip(
+                            selected = category == null && newCategory == null, onClick = { category = null; newCategory = null },
+                            label = { Text(stringResource(R.string.category_none)) },
+                        )
+                        known.forEach { name ->
+                            androidx.compose.material3.FilterChip(
+                                selected = category == name && newCategory == null, onClick = { category = name; newCategory = null },
+                                label = { Text(name) },
+                            )
+                        }
+                        androidx.compose.material3.FilterChip(
+                            selected = newCategory != null, onClick = { newCategory = newCategory ?: "" },
+                            label = { Text(stringResource(R.string.category_new)) },
+                            leadingIcon = { androidx.compose.material3.Icon(androidx.compose.ui.res.painterResource(R.drawable.ic_add), contentDescription = null) },
+                        )
+                    }
+                    if (newCategory != null) OutlinedTextField(
+                        value = newCategory.orEmpty(), onValueChange = { newCategory = it },
+                        placeholder = { Text(stringResource(R.string.category_name)) }, singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                     OutlinedTextField(
                         value = text,
                         onValueChange = { text = it },

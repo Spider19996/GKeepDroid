@@ -449,4 +449,10 @@
     <string name="trim_empty_edges">सहेजते समय खाली पहली और आख़िरी पंक्ति हटाएँ</string>
     <string name="trim_empty_edges_hint">नोट की खाली पहली या आख़िरी पंक्ति और चेकलिस्ट का खाली पहला या आख़िरी आइटम हट जाता है।</string>
     <string name="add_divider">विभाजक जोड़ें</string>
+    <string name="add_category">श्रेणी जोड़ें</string>
+    <string name="add_category_confirm">जोड़ें</string>
+    <string name="category_name">श्रेणी का नाम</string>
+    <string name="category_new">नई श्रेणी</string>
+    <string name="category_none">बिना श्रेणी</string>
+    <string name="category_add_item">%1$s में आइटम जोड़ें</string>
 </resources>

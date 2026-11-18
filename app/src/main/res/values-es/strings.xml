@@ -458,4 +458,10 @@
     <string name="trim_empty_edges">Quitar la primera y la última línea vacías al guardar</string>
     <string name="trim_empty_edges_hint">Las notas pierden una primera o última línea vacía; las listas, un primer o último elemento vacío.</string>
     <string name="add_divider">Añadir separador</string>
+    <string name="add_category">Añadir categoría</string>
+    <string name="add_category_confirm">Añadir</string>
+    <string name="category_name">Nombre de la categoría</string>
+    <string name="category_new">Nueva categoría</string>
+    <string name="category_none">Sin categoría</string>
+    <string name="category_add_item">Añadir elemento a %1$s</string>
 </resources>

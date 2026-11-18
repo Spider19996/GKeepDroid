@@ -15,6 +15,7 @@ import androidx.glance.ColorFilter
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.text.FontWeight
 import androidx.glance.LocalContext
 import androidx.glance.action.Action
 import androidx.glance.action.actionParametersOf
@@ -260,7 +261,7 @@ private fun checkboxRes(style: Int, checked: Boolean): Int? = when (style) {
  * area to hit is larger than the drawn box; the whole row can be made tappable instead.
  */
 @Composable
-internal fun ItemRow(note: KeepNote, item: KeepItem, account: String, settings: WidgetSettings, palette: TextPalette) {
+internal fun ItemRow(note: KeepNote, item: KeepItem, account: String, settings: WidgetSettings, palette: TextPalette, inCategory: Boolean = false) {
     val context = androidx.glance.LocalContext.current
     val pad = settings.listSpacingDp.dp
     if (item.isDivider()) {
@@ -305,9 +306,10 @@ internal fun ItemRow(note: KeepNote, item: KeepItem, account: String, settings: 
                 )
             }
         }
-        val doc = RichNotes.of(context, account, note.id)?.docs?.get(item.id)
+        // Under a category's header the item shows without its category.
+        val (shownText, doc) = RichNotes.of(context, account, note.id)?.docs?.get(item.id).let { if (inCategory) Categories.rest(item, it) else item.text to it }
         // Styles inside the item (a bold word) need a text view of their own; a plain item stays a plain text.
-        val spanned = RichNotes.spanned(item.text, doc, if (item.checked) RichNotes.STRIKE else 0)
+        val spanned = RichNotes.spanned(shownText, doc, if (item.checked) RichNotes.STRIKE else 0)
         if (spanned != null) {
             StyledText(
                 spanned, palette, settings.textSizeSp.toFloat(), alpha = if (item.checked) 0.55f else 1f,
@@ -315,9 +317,9 @@ internal fun ItemRow(note: KeepNote, item: KeepItem, account: String, settings: 
             )
             return@Row
         }
-        val flags = RichNotes.uniformFlags(doc, item.text)
+        val flags = RichNotes.uniformFlags(doc, shownText)
         Text(
-            item.text,
+            shownText,
             style = TextStyle(
                 color = itemColor,
                 fontSize = settings.textSizeSp.sp,
@@ -364,6 +366,30 @@ internal fun ChecklistBody(
     rowLimit: Int = 0,
 ) {
     val context = LocalContext.current
+    val groups = Categories.groups(note.items, RichNotes.of(context, account, note.id))
+    if (groups != null) {
+        // A checklist with categories: each under its header; checked items stay in their category.
+        val folds = CategoryFolds.load(context)
+        var left = if (rowLimit > 0) rowLimit else Int.MAX_VALUE
+        var hidden = 0
+        groups.forEach { group ->
+            if (group.name != null) {
+                val folded = CategoryFolds.key(account, note.id, group.name) in folds
+                CategoryHeaderRow(note, account, group.name, group.items.count { !it.checked }, folded, settings, palette)
+                if (folded) return@forEach
+            }
+            group.rows(settings).forEach { item -> if (left > 0) { ItemRow(note, item, account, settings, palette, inCategory = group.name != null); left-- } else hidden++ }
+        }
+        if (hidden > 0) {
+            Text(
+                context.resources.getQuantityString(R.plurals.items_more, hidden, hidden),
+                style = TextStyle(color = palette.provider(0.65f), fontSize = settings.textSizeSp.sp),
+                modifier = GlanceModifier.padding(vertical = settings.listSpacingDp.dp),
+            )
+        }
+        AddItemRow(note, account, settings, palette)
+        return
+    }
     val unchecked = if (settings.checkedToEnd) note.items.filter { !it.checked } else note.items
     val checked = if (settings.checkedToEnd) note.items.filter { it.checked } else emptyList()
     val shown = if (rowLimit > 0) unchecked.take(rowLimit) else unchecked
@@ -382,6 +408,51 @@ internal fun ChecklistBody(
     if (checked.isNotEmpty()) {
         CheckedHeader(note, account, settings, palette, collapsed, checked.size)
         if (!collapsed) ListNumbering.display(note.items, checked, renumber, startAt = shown.size + 1).forEach { ItemRow(note, it, account, settings, palette) }
+    }
+}
+
+/** The items of a category in a widget: open ones first when the widget moves checked items to the end, checked ones after. */
+internal fun Categories.Group.rows(settings: WidgetSettings): List<KeepItem> =
+    if (settings.checkedToEnd) items.filter { !it.checked } + items.filter { it.checked } else items
+
+/**
+ * The header of a category in a widget's checklist: its name and number of open items fold it, the "+" beside it adds an item
+ * to it (the add-item dialog opens with the category chosen).
+ */
+@Composable
+internal fun CategoryHeaderRow(
+    note: KeepNote, account: String, name: String, open: Int, folded: Boolean, settings: WidgetSettings, palette: TextPalette,
+) {
+    val context = LocalContext.current
+    Row(GlanceModifier.fillMaxWidth().padding(top = settings.listSpacingDp.dp + 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            GlanceModifier.defaultWeight().clickable(
+                actionRunCallback<ToggleCategoryAction>(
+                    actionParametersOf(NoteIdKey to note.id, AccountKey to account, CategoryKey to name, CollapsedKey to !folded),
+                ),
+            ),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                (if (folded) "▸ " else "▾ ") + name + (if (open > 0) "  $open" else ""),
+                maxLines = 1,
+                style = TextStyle(color = palette.provider(0.85f), fontSize = settings.textSizeSp.sp, fontWeight = FontWeight.Bold),
+                modifier = GlanceModifier.defaultWeight(),
+            )
+        }
+        // The padding belongs to the box around the symbol, so the area to tap is larger than the symbol.
+        Box(
+            GlanceModifier.padding(horizontal = 8.dp, vertical = 2.dp).clickable(
+                actionStartActivity<AddItemActivity>(actionParametersOf(AccountKey to account, NoteIdKey to note.id, CategoryKey to name)),
+            ),
+        ) {
+            Image(
+                provider = ImageProvider(R.drawable.ic_add),
+                contentDescription = context.getString(R.string.category_add_item, name),
+                colorFilter = ColorFilter.tint(palette.provider(0.85f)),
+                modifier = GlanceModifier.size(settings.textSizeSp.dp + 4.dp),
+            )
+        }
     }
 }
 

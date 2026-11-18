@@ -458,4 +458,10 @@
     <string name="trim_empty_edges">Supprimer la première et la dernière ligne vides à l\'enregistrement</string>
     <string name="trim_empty_edges_hint">Les notes perdent une première ou dernière ligne vide, les listes un premier ou dernier élément vide.</string>
     <string name="add_divider">Ajouter un séparateur</string>
+    <string name="add_category">Ajouter une catégorie</string>
+    <string name="add_category_confirm">Ajouter</string>
+    <string name="category_name">Nom de la catégorie</string>
+    <string name="category_new">Nouvelle catégorie</string>
+    <string name="category_none">Sans catégorie</string>
+    <string name="category_add_item">Ajouter un élément à %1$s</string>
 </resources>

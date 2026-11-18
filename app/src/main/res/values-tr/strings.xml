@@ -449,4 +449,10 @@
     <string name="trim_empty_edges">Kaydederken boş ilk ve son satırı kaldır</string>
     <string name="trim_empty_edges_hint">Notlar boş ilk veya son satırı, kontrol listeleri boş ilk veya son öğeyi kaybeder.</string>
     <string name="add_divider">Ayırıcı ekle</string>
+    <string name="add_category">Kategori ekle</string>
+    <string name="add_category_confirm">Ekle</string>
+    <string name="category_name">Kategorinin adı</string>
+    <string name="category_new">Yeni kategori</string>
+    <string name="category_none">Kategorisiz</string>
+    <string name="category_add_item">%1$s kategorisine öğe ekle</string>
 </resources>

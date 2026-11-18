@@ -440,4 +440,10 @@
     <string name="trim_empty_edges">保存时删除首尾空行</string>
     <string name="trim_empty_edges_hint">便笺会删除空的首行或末行，清单会删除空的首项或末项。</string>
     <string name="add_divider">添加分隔线</string>
+    <string name="add_category">添加类别</string>
+    <string name="add_category_confirm">添加</string>
+    <string name="category_name">类别名称</string>
+    <string name="category_new">新类别</string>
+    <string name="category_none">无类别</string>
+    <string name="category_add_item">向 %1$s 添加项目</string>
 </resources>

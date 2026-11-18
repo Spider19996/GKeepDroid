@@ -99,10 +99,12 @@ val EDITOR_ACTIONS = listOf(
     ButtonSpec("add_item", R.drawable.ic_add, R.string.add_item, 0, ZONE_NOTE),
     // Beside the add button, under the items.
     ButtonSpec("add_divider", R.drawable.ic_divider, R.string.add_divider, 0, ZONE_NOTE),
+    // A new category of the checklist (a bold word at the start of its items), with its first item.
+    ButtonSpec("add_category", R.drawable.ic_category, R.string.add_category, 0, ZONE_NOTE),
 )
 
 /** The checklist tools; in the menu they share one entry that opens a page of their own. */
-private val LIST_TOOLS = setOf("list_number", "list_check_all", "list_uncheck_all", "list_sort", "list_delete_checked", "add_item", "add_divider")
+private val LIST_TOOLS = setOf("list_number", "list_check_all", "list_uncheck_all", "list_sort", "list_delete_checked", "add_item", "add_divider", "add_category")
 
 fun isListTool(id: String) = id in LIST_TOOLS
 
@@ -362,7 +364,7 @@ private fun noteButtonTint(id: String): Color? {
     val dark = MaterialTheme.colorScheme.background.luminance() < 0.5f
     fun tone(onDark: Long, onLight: Long) = Color(if (dark) onDark else onLight)
     return when (id) {
-        "add_item", "add_divider", "list_check_all" -> tone(0xFF81C784, 0xFF2E7D32)
+        "add_item", "add_divider", "add_category", "list_check_all" -> tone(0xFF81C784, 0xFF2E7D32)
         "more" -> null
         "list_delete_checked", "delete" -> tone(0xFFEF9A9A, 0xFFC62828)
         "convert", "list_number", "list_sort" -> tone(0xFF90CAF9, 0xFF1565C0)

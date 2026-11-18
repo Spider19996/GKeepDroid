@@ -151,6 +151,8 @@ class SingleNoteWidget : GlanceAppWidget() {
         val imageWidth = (LocalSize.current.width - 16.dp - sideBarWidth(settings, withNewButtons = false, hasAddItem = note.isList)).coerceAtLeast(0.dp)
         val unchecked = if (settings.checkedToEnd) note.items.filter { !it.checked } else note.items
         val checked = if (settings.checkedToEnd) note.items.filter { it.checked } else emptyList()
+        val groups = if (note.isList && !isPrivate) Categories.groups(note.items, RichNotes.of(LocalContext.current, account, note.id)) else null
+        val folds = if (groups != null) CategoryFolds.load(LocalContext.current) else emptySet()
 
         // Every row is its own list item, so a long shopping list scrolls inside the widget.
         LazyColumn(GlanceModifier.defaultWeight()) {
@@ -185,7 +187,19 @@ class SingleNoteWidget : GlanceAppWidget() {
                 item(itemId = 9L) { LabelsLine(note, settings, palette) }
                 item(itemId = 10L) { ReminderLine(note, account, settings, palette) }
                 if (thumb == null && note.hasNoContent()) item(itemId = 5L) { EmptyNoteHint(settings, palette) }
-                if (note.isList) {
+                if (groups != null) {
+                    // A checklist with categories: each under its header, which folds it; checked items stay in their category.
+                    groups.forEach { group ->
+                        val folded = group.name != null && CategoryFolds.key(account, note.id, group.name) in folds
+                        if (group.name != null) item(itemId = stableId("c", group.name)) {
+                            CategoryHeaderRow(note, account, group.name, group.items.count { !it.checked }, folded, settings, palette)
+                        }
+                        if (!folded) items(group.rows(settings), itemId = { stableId("i", it.id) }) {
+                            ItemRow(note, it, account, settings, palette, inCategory = group.name != null)
+                        }
+                    }
+                    item(itemId = 8L) { AddItemRow(note, account, settings, palette) }
+                } else if (note.isList) {
                     items(unchecked, itemId = { stableId("i", it.id) }) { ItemRow(note, it, account, settings, palette) }
                     item(itemId = 8L) { AddItemRow(note, account, settings, palette) }
                     if (checked.isNotEmpty()) {

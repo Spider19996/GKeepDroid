@@ -508,10 +508,16 @@ def _send_format(keep, state_path, note, wanted):
     if (not entry or not entry.get("m")) and any(want.get("r") for want in wanted.values()):
         _fetch_rich(keep, state_path, full=True)
         entry = model_entry()
+    ids = [item.id for item in note.items] if isinstance(note, KeepList) else []
+    # Items made through the plain notes API (a widget's add button, gkeepapi) come into the text model only with a full pull,
+    # not with the changes since the last one: an item that is wanted but missing has the model pulled in full.
+    wanted_items = {ids[int(k[1:])] if int(k[1:]) < len(ids) else None for k in wanted if k.startswith("#")} | {k for k in wanted if k != "text" and not k.startswith("#")}
+    if entry and entry.get("m") and any(k and k not in entry["m"] for k in wanted_items):
+        _fetch_rich(keep, state_path, full=True)
+        entry = model_entry()
     if not entry or not entry.get("rev"):
         raise ValueError("The formatting of this note is not known yet")
     docs = _unpack(entry["m"])
-    ids = [item.id for item in note.items] if isinstance(note, KeepList) else []
     commands = []
     for key, want in wanted.items():
         if key.startswith("#"):
@@ -638,14 +644,19 @@ def update_note(email, master_token, state_path, note_id, title, text, items_jso
     return _finish(keep, state_path, images=bool(removed))
 
 
-def add_list_item(email, master_token, state_path, note_id, text):
-    """Add an unchecked item to a checklist."""
+def add_list_item(email, master_token, state_path, note_id, text, bold_length=0):
+    """Add an unchecked item to a checklist; the first [bold_length] characters are made bold (the item's category)."""
     keep = _login(email, master_token, state_path)
     note = keep.get(note_id)
     if note is None or not isinstance(note, KeepList):
         raise ValueError("Checklist not found")
-    note.add(text.strip(), checked=False)
+    text = text.strip()
+    item = note.add(text, checked=False)
+    bold_length = int(bold_length or 0)
     keep.sync()
+    if bold_length > 0:
+        # Keep's text model learns of the new item with the sync above; its category is sent as formatting on top.
+        _send_format(keep, state_path, note, {item.id: {"t": text, "r": [[0, min(bold_length, len(text)), 1]]}})
     return _finish(keep, state_path)
 
 

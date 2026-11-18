@@ -307,17 +307,18 @@ internal fun NoteTile(
             // Checked items go last, and can be left out altogether.
             val ordered = if (app.listCheckedToEnd) open + done else note.items
             val visible = if (app.listCheckedToEnd && app.listCollapseChecked) open else ordered
-            // With the setting on, a numbered list counts again in the order shown here.
-            val shownItems = ListNumbering.display(note.items, visible.take(lines), app.renumberDisplay)
             // The spacing between the rows belongs to the rows themselves, so the check box taps over the whole height of its
             // row, and a little further to the right than it is drawn. 48 dp would make every row taller than the spacing
             // setting says.
             val rowGap = (app.listSpacingDp / 2f).dp
-            shownItems.forEach { item ->
+            // Under a category's header an item shows without its category.
+            @Composable
+            fun ItemLine(item: KeepItem, inCategory: Boolean) {
                 if (item.isDivider()) {
                     androidx.compose.material3.HorizontalDivider(Modifier.padding(vertical = rowGap + 4.dp), color = textColor.copy(alpha = 0.4f))
-                    return@forEach
+                    return
                 }
+                val (shown, doc) = if (inCategory) Categories.rest(item, rich?.docs?.get(item.id)) else item.text to rich?.docs?.get(item.id)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         Modifier.clickable(enabled = app.listCheckInApp) { toggleItem(item) }
@@ -326,7 +327,7 @@ internal fun NoteTile(
                         CheckboxPreview(app.listCheckboxStyle, item.checked, app.listCheckboxSizeDp, textColor.copy(alpha = if (item.checked) 0.55f else 1f))
                     }
                     Text(
-                        highlightMatches(RichNotes.style(NoteLinks.annotate(item.text, linkColor), rich?.docs?.get(item.id)), query, markColor),
+                        highlightMatches(RichNotes.style(NoteLinks.annotate(shown, linkColor), doc), query, markColor),
                         color = if (item.checked) textColor.copy(alpha = 0.55f) else textColor,
                         style = MaterialTheme.typography.bodyMedium.copy(hyphens = Hyphens.Auto),
                         maxLines = 2,
@@ -335,12 +336,46 @@ internal fun NoteTile(
                     )
                 }
             }
-            if (visible.size > lines) {
-                Text(
-                    pluralStringResource(R.plurals.items_more, visible.size - lines, visible.size - lines),
-                    color = textColor.copy(alpha = 0.65f),
-                    style = MaterialTheme.typography.bodySmall,
-                )
+            val groups = Categories.groups(note.items, rich)
+            if (groups == null) {
+                // With the setting on, a numbered list counts again in the order shown here.
+                ListNumbering.display(note.items, visible.take(lines), app.renumberDisplay).forEach { ItemLine(it, inCategory = false) }
+                if (visible.size > lines) {
+                    Text(
+                        pluralStringResource(R.plurals.items_more, visible.size - lines, visible.size - lines),
+                        color = textColor.copy(alpha = 0.65f),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            } else {
+                // A checklist with categories: each under its header, which folds it; checked items stay in their category.
+                val folds = remember(CategoryFolds.version.intValue) { CategoryFolds.load(context) }
+                var left = lines
+                var hidden = 0
+                groups.forEach { group ->
+                    val open = group.items.filter { !it.checked }
+                    val done = group.items.filter { it.checked }
+                    val rows = when {
+                        !app.listCheckedToEnd -> group.items
+                        app.listCollapseChecked -> open
+                        else -> open + done
+                    }
+                    if (group.name != null) {
+                        val folded = CategoryFolds.key(account, note.id, group.name) in folds
+                        CategoryHeader(group.name, open.size, folded, textColor) {
+                            CategoryFolds.set(context, account, note.id, group.name, !folded)
+                        }
+                        if (folded) return@forEach
+                    }
+                    rows.forEach { item -> if (left > 0) { ItemLine(item, inCategory = group.name != null); left-- } else hidden++ }
+                }
+                if (hidden > 0) {
+                    Text(
+                        pluralStringResource(R.plurals.items_more, hidden, hidden),
+                        color = textColor.copy(alpha = 0.65f),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
             }
         } else if (note.text.isNotBlank()) {
             Text(
@@ -404,5 +439,26 @@ internal fun NoteTile(
             }
         }
     }
+    }
+}
+
+/** The header of a category in a checklist: its name, how many of its items are open, and the arrow that folds it. */
+@Composable
+internal fun CategoryHeader(name: String, open: Int, folded: Boolean, color: Color, onToggle: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clickable(onClick = onToggle).padding(top = 6.dp, bottom = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            name, color = color, style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
+            maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false),
+        )
+        if (open > 0) Text(" $open", color = color.copy(alpha = 0.65f), style = MaterialTheme.typography.labelMedium)
+        Spacer(Modifier.weight(1f))
+        Icon(
+            painterResource(if (folded) R.drawable.ic_arrow_left else R.drawable.ic_arrow_down),
+            contentDescription = stringResource(if (folded) R.string.unfold_all else R.string.fold_all),
+            tint = color.copy(alpha = 0.8f), modifier = Modifier.size(18.dp),
+        )
     }
 }

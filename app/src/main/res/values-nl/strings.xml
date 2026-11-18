@@ -449,4 +449,10 @@
     <string name="trim_empty_edges">Lege eerste en laatste regel bij opslaan verwijderen</string>
     <string name="trim_empty_edges_hint">Notities verliezen een lege eerste of laatste regel, checklists een leeg eerste of laatste item.</string>
     <string name="add_divider">Scheidingslijn toevoegen</string>
+    <string name="add_category">Categorie toevoegen</string>
+    <string name="add_category_confirm">Toevoegen</string>
+    <string name="category_name">Naam van de categorie</string>
+    <string name="category_new">Nieuwe categorie</string>
+    <string name="category_none">Geen categorie</string>
+    <string name="category_add_item">Item toevoegen aan %1$s</string>
 </resources>

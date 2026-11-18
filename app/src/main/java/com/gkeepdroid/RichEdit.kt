@@ -160,6 +160,15 @@ class FormatState(private val enabled: Boolean, private val rich: RichNote?) {
         return if (range.collapsed) cursorStyles(key, text, range.min) and bit != 0 else flagsFor(key, text).has(range.min, range.max, bit)
     }
 
+    /** Gives the text of [key] the style [bit] from [start] to [end], for an item made in a category (its bold name). */
+    fun setStyle(key: String, text: String, start: Int, end: Int, bit: Int) {
+        if (!enabled) return
+        val doc = flagsFor(key, text)
+        if (!doc.has(start, end, bit)) doc.toggle(start, end, bit)
+        if (key !in touched) touched.add(key)
+        version++
+    }
+
     /** Switches the style [bit] on for the selected text of the focused field (or off, if all of it has it). */
     fun toggleSelected(textOf: (String) -> String, bit: Int) {
         val key = focus ?: return
@@ -179,14 +188,17 @@ class FormatState(private val enabled: Boolean, private val rich: RichNote?) {
      * The changed formatting as the Python bridge wants it, or null if nothing changed. For a note that is made new (a conversion)
      * the items have no ids in Keep yet: [order] lists them, and they are addressed by their place.
      */
-    fun toJson(textOf: (String) -> String, order: List<String>?, newNote: Boolean): String? {
+    fun toJson(textOf: (String) -> String, order: List<String>?, newNote: Boolean, known: Set<String> = emptySet()): String? {
         if (!enabled || touched.isEmpty()) return null
         val json = JSONObject()
         touched.toList().forEach { key ->
             val current = textOf(key)
             val doc = docs[key]
             if (doc != null && doc.flags.size == current.length) {
-                val name = if (newNote && key != "text") order?.indexOf(key)?.takeIf { it >= 0 }?.let { "#$it" } else key
+                // An item that Keep does not know yet (made in this editor) gets its id from Keep only when it is saved, so it
+                // is addressed by its place among the items.
+                val byPlace = key != "text" && (newNote || key !in known)
+                val name = if (byPlace) order?.indexOf(key)?.takeIf { it >= 0 }?.let { "#$it" } else key
                 if (name != null) json.put(name, doc.toJson(current))
             }
         }

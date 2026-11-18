@@ -449,4 +449,10 @@
     <string name="trim_empty_edges">Leere erste und letzte Zeile beim Speichern entfernen</string>
     <string name="trim_empty_edges_hint">Notizen verlieren eine leere erste oder letzte Zeile, Checklisten einen leeren ersten oder letzten Eintrag.</string>
     <string name="add_divider">Trenner hinzufügen</string>
+    <string name="add_category">Kategorie hinzufügen</string>
+    <string name="add_category_confirm">Anlegen</string>
+    <string name="category_name">Name der Kategorie</string>
+    <string name="category_new">Neue Kategorie</string>
+    <string name="category_none">Ohne Kategorie</string>
+    <string name="category_add_item">Eintrag zu %1$s hinzufügen</string>
 </resources>

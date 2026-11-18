@@ -450,4 +450,10 @@
     <string name="trim_empty_edges">Remove empty first and last line when saving</string>
     <string name="trim_empty_edges_hint">Notes lose an empty first or last line, checklists an empty first or last item.</string>
     <string name="add_divider">Add divider</string>
+    <string name="add_category">Add category</string>
+    <string name="add_category_confirm">Add</string>
+    <string name="category_name">Name of the category</string>
+    <string name="category_new">New category</string>
+    <string name="category_none">No category</string>
+    <string name="category_add_item">Add item to %1$s</string>
 </resources>

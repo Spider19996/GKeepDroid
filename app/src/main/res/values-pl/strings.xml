@@ -467,4 +467,10 @@
     <string name="trim_empty_edges">Usuń pustą pierwszą i ostatnią linię przy zapisie</string>
     <string name="trim_empty_edges_hint">Notatki tracą pustą pierwszą lub ostatnią linię, listy pusty pierwszy lub ostatni element.</string>
     <string name="add_divider">Dodaj separator</string>
+    <string name="add_category">Dodaj kategorię</string>
+    <string name="add_category_confirm">Dodaj</string>
+    <string name="category_name">Nazwa kategorii</string>
+    <string name="category_new">Nowa kategoria</string>
+    <string name="category_none">Bez kategorii</string>
+    <string name="category_add_item">Dodaj pozycję do %1$s</string>
 </resources>

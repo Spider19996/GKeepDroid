@@ -467,4 +467,10 @@
     <string name="trim_empty_edges">Удалять пустую первую и последнюю строку при сохранении</string>
     <string name="trim_empty_edges_hint">В заметках удаляется пустая первая или последняя строка, в списках — пустой первый или последний пункт.</string>
     <string name="add_divider">Добавить разделитель</string>
+    <string name="add_category">Добавить категорию</string>
+    <string name="add_category_confirm">Добавить</string>
+    <string name="category_name">Название категории</string>
+    <string name="category_new">Новая категория</string>
+    <string name="category_none">Без категории</string>
+    <string name="category_add_item">Добавить пункт в %1$s</string>
 </resources>

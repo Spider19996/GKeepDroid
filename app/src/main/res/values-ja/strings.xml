@@ -440,4 +440,10 @@
     <string name="trim_empty_edges">保存時に先頭と末尾の空行を削除</string>
     <string name="trim_empty_edges_hint">メモは先頭・末尾の空行、チェックリストは先頭・末尾の空の項目が削除されます。</string>
     <string name="add_divider">区切りを追加</string>
+    <string name="add_category">カテゴリを追加</string>
+    <string name="add_category_confirm">追加</string>
+    <string name="category_name">カテゴリ名</string>
+    <string name="category_new">新しいカテゴリ</string>
+    <string name="category_none">カテゴリなし</string>
+    <string name="category_add_item">%1$s に項目を追加</string>
 </resources>

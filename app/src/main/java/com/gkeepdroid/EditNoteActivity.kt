@@ -388,6 +388,10 @@ class EditNoteActivity : ComponentActivity() {
         }
         /** The items as they are saved: with their numbers in the text when the list is numbered. */
         fun outItems(): List<KeepItem> = if (numbered) ListNumbering.apply(items.toList()) else items.toList()
+        // The item that takes the focus once it is shown (one just made in a category).
+        var focusItemId by remember { mutableStateOf<String?>(null) }
+        var addMenuOpen by remember { mutableStateOf(false) }
+        var newCategoryDialog by remember { mutableStateOf(false) }
         val allAccounts = remember { CredentialStore.accounts(this@EditNoteActivity) }
         var targetAccount by remember { mutableStateOf(account) }
         val wasHidden = existing != null && PrivateNotes.isPrivate(existing, account, PrivateNotes.load(this@EditNoteActivity))
@@ -403,6 +407,27 @@ class EditNoteActivity : ComponentActivity() {
         // Text formatting (bold, italic, underline, strikethrough) of existing notes of a Keep account.
         val canFormat = existing != null && !isLocal
         val format = remember { FormatState(canFormat, existing?.let { RichNotes.of(this@EditNoteActivity, account, it.id) }) }
+        /** The styles of the items as they are now in this editor, for finding their categories. */
+        fun editorRich(): RichNote? =
+            if (!canFormat) null else RichNote("", items.associate { it.id to RichDoc(it.text, format.flagsFor(it.id, it.text).runs()) })
+
+        /** A new item at the end of category [name] (a new category at the end of the list), its name in bold; null: no category. */
+        fun addInCategory(name: String?) {
+            val id = UUID.randomUUID().toString()
+            if (name == null) {
+                items.add(KeepItem(id, "", false))
+                focusItemId = id
+                return
+            }
+            val clean = name.trim()
+            val text = "$clean "
+            val last = Categories.groups(items, editorRich())?.firstOrNull { it.name == clean }?.items?.lastOrNull()
+            val at = last?.let { l -> items.indexOfFirst { it.id == l.id } + 1 }?.takeIf { it > 0 } ?: items.size
+            items.add(at, KeepItem(id, text, false))
+            format.setStyle(id, text, 0, clean.length, RichNotes.BOLD)
+            CategoryFolds.set(this@EditNoteActivity, account, existing?.id.orEmpty(), clean, false)
+            focusItemId = id
+        }
         fun formatTextOf(key: String): String = if (key == "text") text else items.firstOrNull { it.id == key }?.text.orEmpty()
         // A change that Keep does not have yet (and why, if sending it failed).
         val unsent = remember {
@@ -462,15 +487,25 @@ class EditNoteActivity : ComponentActivity() {
             }
         }
 
-        /** The changed formatting as the Python bridge wants it; a note made from the other kind addresses its items by their place. */
+        /**
+         * The changed formatting as the Python bridge wants it; a note made from the other kind, and items made in this editor,
+         * address their items by their place.
+         */
         fun formatJson(): String? = format.toJson(
-            ::formatTextOf, if (convertFrom != null && isList) outItems().filter { it.text.isNotBlank() }.map { it.id } else null, convertFrom != null,
+            ::formatTextOf, if (isList) outItems().filter { it.text.isNotBlank() }.map { it.id } else null, convertFrom != null,
+            known = if (convertFrom == null) existing?.items?.map { it.id }?.toSet().orEmpty() else emptySet(),
         )
 
         fun save(fromHome: Boolean = false) {
             if (saving || !canEdit) return
             saving = true
             error = ""
+            // An item made in a category but left without text would become a bold word of its own in Keep.
+            if (isList && canFormat) {
+                val rich = editorRich()
+                items.removeAll { item -> Categories.split(item, rich?.docs?.get(item.id))?.let { item.text.substring(it.restStart).isBlank() } == true }
+                if (items.isEmpty()) items.add(KeepItem(UUID.randomUUID().toString(), "", false))
+            }
             if (AppSettingsStore.load(this@EditNoteActivity).trimEmptyEdges) {
                 if (isList) {
                     // Only if something stays: an all-empty list is left as it is.
@@ -811,10 +846,27 @@ class EditNoteActivity : ComponentActivity() {
             // Always there, so it can be found; it works once something is ticked.
             visible = isList && canEdit, enabled = items.any { it.checked },
         )
+        // In a list with categories adding asks where the item goes: no category, one of them, or a new one.
+        val categoryNames = if (isList && canFormat) Categories.names(items, editorRich()) else emptyList()
         states["add_item"] = EditorActionState(
             R.drawable.ic_add, stringResource(R.string.add_item),
-            { items.add(KeepItem(UUID.randomUUID().toString(), "", false)) },
+            { if (categoryNames.isEmpty()) addInCategory(null) else addMenuOpen = true },
             visible = isList && canEdit,
+            popup = {
+                GroupedMenu(
+                    expanded = addMenuOpen, onDismissRequest = { addMenuOpen = false },
+                    groups = listOf(
+                        listOf(MenuEntry(stringResource(R.string.category_none)) { addMenuOpen = false; addInCategory(null) }),
+                        categoryNames.map { name -> MenuEntry(name) { addMenuOpen = false; addInCategory(name) } },
+                        listOf(MenuEntry(stringResource(R.string.category_new), R.drawable.ic_add) { addMenuOpen = false; newCategoryDialog = true }),
+                    ),
+                )
+            },
+        )
+        // A new category: its name is asked, then its first item waits for its text.
+        states["add_category"] = EditorActionState(
+            R.drawable.ic_category, stringResource(R.string.add_category), { newCategoryDialog = true },
+            visible = isList && canEdit && canFormat,
         )
         states["add_divider"] = EditorActionState(
             R.drawable.ic_divider, stringResource(R.string.add_divider),
@@ -1086,7 +1138,9 @@ class EditNoteActivity : ComponentActivity() {
                         }
                     }
                 }
-                items.forEachIndexed { index, item ->
+                // One item of the list as it is edited.
+                @Composable
+                fun ItemEditor(index: Int, item: KeepItem) {
                     key(item.id) {
                         ChecklistRow(
                             item, canEdit, dragging == item.id,
@@ -1121,7 +1175,28 @@ class EditNoteActivity : ComponentActivity() {
                                 }
                             },
                             onDragEnd = { dragging = null },
+                            focusNow = focusItemId == item.id, onFocused = { focusItemId = null },
                         )
+                    }
+                }
+                // With categories the items stand under their category's header (as on the cards); the header folds them and
+                // its "+" adds an item to them. The list itself keeps its order.
+                val editorGroups = if (canFormat) Categories.groups(items, editorRich()) else null
+                if (editorGroups == null) {
+                    items.forEachIndexed { index, item -> ItemEditor(index, item) }
+                } else {
+                    val folds = remember(CategoryFolds.version.intValue) { CategoryFolds.load(this@EditNoteActivity) }
+                    editorGroups.forEach { group ->
+                        if (group.name != null) {
+                            val folded = CategoryFolds.key(account, existing!!.id, group.name) in folds
+                            EditorCategoryHeader(
+                                group.name, group.items.count { !it.checked }, folded, canEdit,
+                                onToggle = { CategoryFolds.set(this@EditNoteActivity, account, existing.id, group.name, !folded) },
+                                onAdd = { addInCategory(group.name) },
+                            )
+                            if (folded) return@forEach
+                        }
+                        group.items.forEach { item -> ItemEditor(items.indexOfFirst { it.id == item.id }, item) }
                     }
                 }
             } else {
@@ -1232,6 +1307,24 @@ class EditNoteActivity : ComponentActivity() {
         }
         if (labelsOpen) EditorSheet({ labelsOpen = false }) {
             LabelsSection(account = targetAccount, labels = labels, onLabels = { labels = it }, canEdit = canEdit)
+        }
+        if (newCategoryDialog) {
+            var name by remember { mutableStateOf("") }
+            val create = { if (name.isNotBlank()) { newCategoryDialog = false; addInCategory(name) } }
+            AlertDialog(
+                onDismissRequest = { newCategoryDialog = false },
+                title = { Text(stringResource(R.string.add_category)) },
+                text = {
+                    OutlinedTextField(
+                        value = name, onValueChange = { name = it }, singleLine = true,
+                        placeholder = { Text(stringResource(R.string.category_name)) },
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Done),
+                        keyboardActions = androidx.compose.foundation.text.KeyboardActions(onDone = { create() }),
+                    )
+                },
+                confirmButton = { TextButton(onClick = create, enabled = name.isNotBlank(), shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.add_category_confirm)) } },
+                dismissButton = { TextButton(onClick = { newCategoryDialog = false }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) } },
+            )
         }
         if (confirmDiscard) AlertDialog(
             onDismissRequest = { confirmDiscard = false },

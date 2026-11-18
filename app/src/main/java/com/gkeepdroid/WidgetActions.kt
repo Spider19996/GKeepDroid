@@ -95,6 +95,19 @@ class ToggleFoldAction : ActionCallback {
     }
 }
 
+internal val CategoryKey = ActionParameters.Key<String>("category")
+
+/** Folds or unfolds one category of a checklist (on this device). */
+class ToggleCategoryAction : ActionCallback {
+    override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
+        val account = parameters[AccountKey] ?: return
+        val noteId = parameters[NoteIdKey] ?: return
+        val name = parameters[CategoryKey] ?: return
+        CategoryFolds.set(context, account, noteId, name, parameters[CollapsedKey] ?: return)
+        WidgetRefresh.all(context)
+    }
+}
+
 class ToggleCollapseAction : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         val account = parameters[AccountKey] ?: return

@@ -458,4 +458,10 @@
     <string name="trim_empty_edges">Rimuovi la prima e l\'ultima riga vuote al salvataggio</string>
     <string name="trim_empty_edges_hint">Le note perdono una prima o ultima riga vuota, le liste una prima o ultima voce vuota.</string>
     <string name="add_divider">Aggiungi separatore</string>
+    <string name="add_category">Aggiungi categoria</string>
+    <string name="add_category_confirm">Aggiungi</string>
+    <string name="category_name">Nome della categoria</string>
+    <string name="category_new">Nuova categoria</string>
+    <string name="category_none">Senza categoria</string>
+    <string name="category_add_item">Aggiungi elemento a %1$s</string>
 </resources>

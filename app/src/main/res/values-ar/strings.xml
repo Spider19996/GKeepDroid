@@ -485,4 +485,10 @@
     <string name="trim_empty_edges">إزالة السطر الأول والأخير الفارغ عند الحفظ</string>
     <string name="trim_empty_edges_hint">تفقد الملاحظات السطر الأول أو الأخير الفارغ، وتفقد قوائم المهام العنصر الأول أو الأخير الفارغ.</string>
     <string name="add_divider">إضافة فاصل</string>
+    <string name="add_category">إضافة فئة</string>
+    <string name="add_category_confirm">إضافة</string>
+    <string name="category_name">اسم الفئة</string>
+    <string name="category_new">فئة جديدة</string>
+    <string name="category_none">بدون فئة</string>
+    <string name="category_add_item">إضافة عنصر إلى %1$s</string>
 </resources>

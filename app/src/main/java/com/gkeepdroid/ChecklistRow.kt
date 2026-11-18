@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -56,10 +57,19 @@ internal fun ChecklistRow(
     onText: (String) -> Unit, onToggle: () -> Unit, onRemove: () -> Unit,
     onBounds: (Rect) -> Unit, onDragStart: () -> Unit, onDragTo: (Float) -> Unit, onDragEnd: () -> Unit,
     modifier: Modifier = Modifier, flags: DocFlags? = null, flagsVersion: Int = 0, onFocus: () -> Unit = {}, onSelection: (androidx.compose.ui.text.TextRange) -> Unit = {},
+    focusNow: Boolean = false, onFocused: () -> Unit = {},
 ) {
     // The field keeps its own selection, which the formatting buttons need.
     var field by remember(item.id) { mutableStateOf(androidx.compose.ui.text.input.TextFieldValue(item.text)) }
     val shownField = if (field.text == item.text) field else androidx.compose.ui.text.input.TextFieldValue(item.text, androidx.compose.ui.text.TextRange(item.text.length))
+    // A new item that should be typed into at once (one made in a category): the focus and the cursor at its end.
+    val focusRequester = remember { androidx.compose.ui.focus.FocusRequester() }
+    androidx.compose.runtime.LaunchedEffect(focusNow) {
+        if (!focusNow) return@LaunchedEffect
+        field = androidx.compose.ui.text.input.TextFieldValue(item.text, androidx.compose.ui.text.TextRange(item.text.length))
+        runCatching { focusRequester.requestFocus() }
+        onFocused()
+    }
     val maxPx = with(androidx.compose.ui.platform.LocalDensity.current) { 72.dp.toPx() }
     val trigger = maxPx * 0.75f
     var offsetX by remember { mutableStateOf(0f) }
@@ -154,7 +164,7 @@ internal fun ChecklistRow(
                 } else {
                     LocalTextStyle.current
                 },
-                modifier = Modifier.fillMaxWidth().onFocusChanged { if (it.isFocused) onFocus() }.then(modifier),
+                modifier = Modifier.fillMaxWidth().focusRequester(focusRequester).onFocusChanged { if (it.isFocused) onFocus() }.then(modifier),
             )
             // One button for both jobs: a tap switches the item between done and open, holding it and dragging moves the row.
             // The whole strip at the left is the touch area, 48 dp wide as Material asks; the capsule in it is the housing of the

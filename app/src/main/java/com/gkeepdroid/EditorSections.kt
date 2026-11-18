@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -396,3 +397,28 @@ internal fun quietToggleColors(
     checkedContainerColor = checkedContainer,
     checkedContentColor = checkedContent,
 )
+
+/** The header of a category in the editor's checklist: its name and number of open items fold it, the "+" adds an item to it. */
+@Composable
+internal fun EditorCategoryHeader(name: String, open: Int, folded: Boolean, canEdit: Boolean, onToggle: () -> Unit, onAdd: () -> Unit) {
+    androidx.compose.foundation.layout.Row(
+        Modifier.fillMaxWidth().padding(top = 8.dp),
+        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+    ) {
+        androidx.compose.foundation.layout.Row(
+            Modifier.weight(1f).clip(MaterialTheme.shapes.medium).clickable(onClick = onToggle).padding(horizontal = 8.dp, vertical = 10.dp),
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+        ) {
+            Icon(
+                painterResource(if (folded) R.drawable.ic_arrow_left else R.drawable.ic_arrow_down),
+                contentDescription = stringResource(if (folded) R.string.unfold_all else R.string.fold_all), modifier = Modifier.size(20.dp),
+            )
+            androidx.compose.foundation.layout.Spacer(Modifier.size(8.dp))
+            Text(name, style = MaterialTheme.typography.titleSmall.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), maxLines = 1)
+            if (open > 0) Text("  $open", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        if (canEdit) IconButton(onClick = onAdd, shapes = IconButtonDefaults.shapes()) {
+            Icon(painterResource(R.drawable.ic_add), contentDescription = stringResource(R.string.category_add_item, name))
+        }
+    }
+}
