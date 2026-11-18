@@ -2,9 +2,8 @@
 
 **Goal:** more content per screen, switchable, default off, still easy to tap.
 
-Decisions to take with the user first:
-- One global switch, or separate for editor / overview / widgets? (Proposal: one global switch in App settings; widgets follow it unless
-  their own `listSpacingDp` was changed.)
+Decided (user, 2026-11-19): **one global switch** in the App settings for editor, overview and widgets.
+Widgets follow it unless their own `listSpacingDp` was changed.
 
 Steps:
 - [ ] Setting: `compact: Boolean = false` in `settings/AppSettings.kt` (load/save like `foldNotes`), `appCompact` in `SettingsState.kt`,
