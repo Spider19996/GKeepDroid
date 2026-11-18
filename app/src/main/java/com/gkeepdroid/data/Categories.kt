@@ -43,8 +43,10 @@ object Categories {
         if (rich == null) return null
         val names = items.map { split(it, rich.docs[it.id])?.name }
         if (names.all { it == null }) return null
-        val order = mutableListOf<String?>(null)
-        names.filterNotNull().forEach { if (it !in order) order.add(it) }
+        // In the order the items are stored in (the editor saves them group by group), so the items without a category stand
+        // where the editor had them, not always first.
+        val order = mutableListOf<String?>()
+        names.forEach { if (it !in order) order.add(it) }
         return order.map { name -> Group(name, items.filterIndexed { i, _ -> names[i] == name }) }.filter { it.name != null || it.items.isNotEmpty() }
     }
 

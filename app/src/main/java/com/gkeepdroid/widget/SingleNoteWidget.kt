@@ -193,7 +193,14 @@ class SingleNoteWidget : GlanceAppWidget() {
                         val folded = group.name != null && CategoryFolds.key(account, note.id, group.name) in folds
                         val rows = if (folded) emptyList() else group.rows(settings)
                         if (group.name == null) {
-                            items(rows, itemId = { stableId("i", it.id) }) { ItemRow(note, it, account, settings, palette) }
+                            // Framed like the categories, only without a header.
+                            rows.forEachIndexed { i, row ->
+                                item(itemId = stableId("i", row.id)) {
+                                    val piece = GlanceModifier.fillMaxWidth().categoryFramePiece(i, rows.size)
+                                    if (i == 0) Box(GlanceModifier.fillMaxWidth().padding(top = 8.dp)) { Box(piece) { ItemRow(note, row, account, settings, palette) } }
+                                    else Box(piece) { ItemRow(note, row, account, settings, palette) }
+                                }
+                            }
                             return@forEach
                         }
                         // Each row of the list is a view of its own, so each draws its piece of the category's frame.

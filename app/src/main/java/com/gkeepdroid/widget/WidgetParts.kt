@@ -376,10 +376,8 @@ internal fun ChecklistBody(
         if (groups.first().name != null) androidx.glance.layout.Spacer(GlanceModifier.height(4.dp))
         var hidden = 0
         groups.forEach { group ->
-            if (group.name == null) {
-                group.rows(settings).forEach { item -> if (left > 0) { ItemRow(note, item, account, settings, palette); left-- } else hidden++ }
-                return@forEach
-            }
+            // The items without a category are framed too, only without a name.
+            if (group.name == null && group.rows(settings).isEmpty()) return@forEach
             // Each category in a frame of its own, with the line and rounding of the cards' border.
             // A widget's padding before a background is no margin, so the gap between two frames is a box of its own.
             Box(GlanceModifier.fillMaxWidth().padding(vertical = 4.dp)) { Column(
@@ -388,9 +386,9 @@ internal fun ChecklistBody(
                     // header row's own top padding is the list spacing).
                     .padding(start = 12.dp, end = 4.dp, top = (8 - settings.listSpacingDp).coerceAtLeast(0).dp, bottom = 6.dp),
             ) {
-                val folded = CategoryFolds.key(account, note.id, group.name) in folds
-                CategoryHeaderRow(note, account, group.name, Categories.progress(group.items), folded, settings, palette)
-                if (!folded) group.rows(settings).forEach { item -> if (left > 0) { ItemRow(note, item, account, settings, palette, inCategory = true); left-- } else hidden++ }
+                val folded = group.name != null && CategoryFolds.key(account, note.id, group.name) in folds
+                if (group.name != null) CategoryHeaderRow(note, account, group.name, Categories.progress(group.items), folded, settings, palette)
+                if (!folded) group.rows(settings).forEach { item -> if (left > 0) { ItemRow(note, item, account, settings, palette, inCategory = group.name != null); left-- } else hidden++ }
             } }
         }
         if (hidden > 0) {

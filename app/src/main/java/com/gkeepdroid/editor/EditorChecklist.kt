@@ -181,6 +181,9 @@ internal fun ColumnScope.EditorChecklist(
             var categoryFingerTop by remember { mutableStateOf(0f) }
             var categoryStartTop by remember { mutableStateOf(0f) }
             val headerLayoutTop = remember { mutableStateMapOf<String, Float>() }
+            // How far each category is swiped now (its header is held, the whole category moves).
+            val categorySwipe = remember { androidx.compose.runtime.mutableStateMapOf<String, Float>() }
+            val swipeMax = with(androidx.compose.ui.platform.LocalDensity.current) { 72.dp.toPx() }
             val headerNotches = remember { mutableMapOf<String, androidx.compose.runtime.snapshots.SnapshotStateList<Pair<Float, Float>>>() }
             // The drop places of the categories that have nothing else in them ("" for no category), and the one the item is over.
             val slotBounds = remember { mutableStateMapOf<String, Rect>() }
@@ -334,6 +337,11 @@ internal fun ColumnScope.EditorChecklist(
             }
             // The key sits right in the loop: inside a function called from it, it would not let the row move along.
             entries.forEachIndexed { entryIndex, (name, item) -> key(item?.id ?: "category:$name") {
+              val swipeKey = categoryOf[entryIndex]
+              CategorySwipeBand(
+                  swipeKey?.let { categorySwipe[it] } ?: 0f, if ((swipeKey?.let { categorySwipe[it] } ?: 0f) > 0f) itemSwipe.first else itemSwipe.second,
+                  frameAt(entryIndex), topInset = if (item == null && name != null && !name.startsWith(SLOT_PREFIX)) 10.dp else 0.dp,
+              ) {
                 if (item != null) {
                     // The items of a held category move with its header.
                     Box {
@@ -389,10 +397,23 @@ internal fun ColumnScope.EditorChecklist(
                         },
                         onDragEnd = { draggingCategory = null },
                         swipeRight = itemSwipe.first, swipeLeft = itemSwipe.second,
-                        onSwipe = { right -> swipeItems(group.items.map { it.id }, if (right) itemSwipe.first else itemSwipe.second) },
+                        onSwipeMove = { d ->
+                            val lo = if (itemSwipe.second != ITEM_SWIPE_NONE) -swipeMax else 0f
+                            val hi = if (itemSwipe.first != ITEM_SWIPE_NONE) swipeMax else 0f
+                            categorySwipe[name] = ((categorySwipe[name] ?: 0f) + d).coerceIn(lo, hi)
+                        },
+                        onSwipeStop = {
+                            val at = categorySwipe[name] ?: 0f
+                            scope.launch {
+                                androidx.compose.animation.core.animate(at, 0f) { v, _ -> categorySwipe[name] = v }
+                                categorySwipe.remove(name)
+                            }
+                            if (kotlin.math.abs(at) >= swipeMax * 0.75f) swipeItems(group.items.map { it.id }, if (at > 0f) itemSwipe.first else itemSwipe.second)
+                        },
                         alone = group.items.isEmpty() || folded || draggingCategory != null,
                     ) }
                 }
+              }
             } }
             // While an item is held, a place at the end takes it into a new category.
             if (dragging != null && canFormat) NewCategoryDropZone(

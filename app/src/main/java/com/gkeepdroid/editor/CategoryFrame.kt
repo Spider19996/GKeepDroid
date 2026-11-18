@@ -89,7 +89,7 @@ internal fun EditorCategoryHeader(
     notches: androidx.compose.runtime.snapshots.SnapshotStateList<Pair<Float, Float>>, modifier: Modifier = Modifier,
     onRename: () -> Unit = {}, dragged: Boolean = false,
     onDragStart: () -> Unit = {}, onDragTo: (Float) -> Unit = {}, onDragEnd: () -> Unit = {}, onShift: (Float) -> Unit = {},
-    swipeRight: Int = ITEM_SWIPE_NONE, swipeLeft: Int = ITEM_SWIPE_NONE, onSwipe: (Boolean) -> Unit = {},
+    swipeRight: Int = ITEM_SWIPE_NONE, swipeLeft: Int = ITEM_SWIPE_NONE, onSwipeMove: (Float) -> Unit = {}, onSwipeStop: () -> Unit = {},
     /** Nothing under the header (the category is empty, folded or held): it is a box of a hand's height then, not just a line. */
     alone: Boolean = false,
 ) {
@@ -101,12 +101,11 @@ internal fun EditorCategoryHeader(
     val dragEnd by androidx.compose.runtime.rememberUpdatedState(onDragEnd)
     val shift by androidx.compose.runtime.rememberUpdatedState(onShift)
     val rename by androidx.compose.runtime.rememberUpdatedState(onRename)
-    val swipe by androidx.compose.runtime.rememberUpdatedState(onSwipe)
+    val swipeMove by androidx.compose.runtime.rememberUpdatedState(onSwipeMove)
+    val swipeStop by androidx.compose.runtime.rememberUpdatedState(onSwipeStop)
     var rowTop by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0f) }
     var grab by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0f) }
     var nameCoords by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<androidx.compose.ui.layout.LayoutCoordinates?>(null) }
-    val maxPx = with(density) { 72.dp.toPx() }
-    var offsetX by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0f) }
     var nameRange by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0f to 0f) }
     var toolsRange by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0f to 0f) }
     val gapPx = with(density) { 4.dp.toPx() }
@@ -129,30 +128,13 @@ internal fun EditorCategoryHeader(
             }
     ) {
     Box {
-        if (offsetX != 0f) {
-            val toRight = offsetX > 0f
-            val (color, icon, tint) = swipeLook(if (toRight) swipeRight else swipeLeft)
-            Box(
-                Modifier.matchParentSize().clip(MaterialTheme.shapes.medium).background(color).padding(horizontal = 20.dp),
-                contentAlignment = if (toRight) androidx.compose.ui.Alignment.CenterStart else androidx.compose.ui.Alignment.CenterEnd,
-            ) { Icon(painterResource(icon), contentDescription = null, tint = tint) }
-        }
     androidx.compose.foundation.layout.Row(
         Modifier.fillMaxWidth()
-            .offset { androidx.compose.ui.unit.IntOffset(offsetX.toInt(), 0) }
-            .then(if (offsetX != 0f) Modifier.background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.medium) else Modifier)
             .draggable(
                 orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
                 enabled = canEdit && (swipeRight != ITEM_SWIPE_NONE || swipeLeft != ITEM_SWIPE_NONE),
-                state = androidx.compose.foundation.gestures.rememberDraggableState { delta ->
-                    offsetX = (offsetX + delta).coerceIn(if (swipeLeft != ITEM_SWIPE_NONE) -maxPx else 0f, if (swipeRight != ITEM_SWIPE_NONE) maxPx else 0f)
-                },
-                onDragStopped = {
-                    val passed = kotlin.math.abs(offsetX) >= maxPx * 0.75f
-                    val toRight = offsetX > 0f
-                    androidx.compose.animation.core.animate(offsetX, 0f) { value, _ -> offsetX = value }
-                    if (passed) swipe(toRight)
-                },
+                state = androidx.compose.foundation.gestures.rememberDraggableState { delta -> swipeMove(delta) },
+                onDragStopped = { swipeStop() },
             ),
         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
     ) {
@@ -328,4 +310,29 @@ internal fun Modifier.categoryFrame(position: Int, notches: List<Pair<Float, Flo
 @Composable
 internal fun DropLine() {
     Box(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 2.dp).height(3.dp).clip(androidx.compose.foundation.shape.CircleShape).background(MaterialTheme.colorScheme.primary))
+}
+
+/**
+ * A whole category swiped: every piece of it (header, items, drop place) moves by [offset], on a band in the swipe's color that
+ * has the frame's rounding at its ends, and the symbol sits at the header. Nothing is drawn while [offset] is 0.
+ */
+@Composable
+internal fun CategorySwipeBand(offset: Float, action: Int, frame: Int, topInset: androidx.compose.ui.unit.Dp, content: @Composable () -> Unit) {
+    val (color, icon, tint) = swipeLook(action)
+    val top = frame == FRAME_FIRST || frame == FRAME_ONLY
+    val bottom = frame == FRAME_LAST || frame == FRAME_ONLY
+    val r = 18.dp
+    val shape = androidx.compose.foundation.shape.RoundedCornerShape(if (top) r else 0.dp, if (top) r else 0.dp, if (bottom) r else 0.dp, if (bottom) r else 0.dp)
+    val active = offset != 0f && frame != FRAME_NONE
+    // The same structure while swiping or not, so the rows (and the header's gesture) are not made anew when it starts.
+    Box {
+        if (active) Box(
+            Modifier.matchParentSize().padding(top = topInset).clip(shape).background(color).padding(horizontal = 20.dp, vertical = 12.dp),
+            contentAlignment = if (offset > 0f) androidx.compose.ui.Alignment.TopStart else androidx.compose.ui.Alignment.TopEnd,
+        ) { if (top) Icon(painterResource(icon), contentDescription = null, tint = tint) }
+        Box(
+            Modifier.graphicsLayer { translationX = if (active) offset else 0f }
+                .then(if (active) Modifier.background(MaterialTheme.colorScheme.background, shape) else Modifier),
+        ) { content() }
+    }
 }
