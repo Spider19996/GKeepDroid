@@ -143,9 +143,9 @@ internal fun EditorCategoryHeader(
     ) {
         Text(
             name, style = labelStyle, color = if (dragged) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface, maxLines = 1,
-            // A little further in than the label of the title field (16 dp), so the corner's arc is whole before it: 20 dp from the frame's
-            // line (8 dp of the frame's padding, 8 here, 4 of the name's own).
-            modifier = Modifier.padding(start = 8.dp)
+            // A little further in than the label of the title field (16 dp), so the corner's arc is whole before it: 22 dp from the frame's
+            // line (8 dp of the frame's padding, 10 here, 4 of the name's own).
+            modifier = Modifier.padding(start = 10.dp)
                 .onGloballyPositioned { c ->
                     nameCoords = c
                     val x = c.positionInParent().x
@@ -274,7 +274,7 @@ internal fun Modifier.categoryFrame(position: Int, notches: List<Pair<Float, Flo
     return this.drawBehind {
         val stroke = 1.dp.toPx()
         // As round as the corners of the fields inside allow: the whole arc lies before the name and after the buttons.
-        val radius = 16.dp.toPx()
+        val radius = 18.dp.toPx()
         // Each piece draws down over the gap to the next row (the editor's 12 dp), exactly to where that one begins: the pieces
         // meet without overlapping, so the sides show no seam.
         val reach = 12.dp.toPx()
