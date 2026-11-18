@@ -458,6 +458,7 @@
     <string name="category_none">बिना श्रेणी</string>
     <string name="category_add_item">%1$s में आइटम जोड़ें</string>
     <string name="category_move">श्रेणी में ले जाएँ</string>
+    <string name="category_rename">श्रेणी का नाम बदलें</string>
     <string name="category_forget_hint">श्रेणी को चिह्नित करने के लिए दबाए रखें, भूलने के लिए फिर से दबाए रखें।</string>
     <string name="item_swipe_right">आइटम को दाएँ स्वाइप करें</string>
     <string name="item_swipe_left">आइटम को बाएँ स्वाइप करें</string>

@@ -252,8 +252,9 @@ internal fun NoteTile(
                     style = MaterialTheme.typography.titleSmall.copy(hyphens = Hyphens.Auto),
                     modifier = Modifier.weight(1f),
                 )
+                // On the height of the arrow that floats in the corner (its middle is 24 dp below the card's top).
                 if (progress != null) {
-                    Text(progress, color = textColor.copy(alpha = 0.7f), style = MaterialTheme.typography.labelMedium)
+                    Text(progress, color = textColor.copy(alpha = 0.7f), style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(top = 4.dp))
                 }
                 if (note.pinned) {
                     Icon(
@@ -463,21 +464,21 @@ internal fun NoteTile(
 @Composable
 internal fun CategoryHeader(name: String, progress: String?, folded: Boolean, color: Color, onToggle: () -> Unit) {
     Row(
-        Modifier.fillMaxWidth().clickable(onClick = onToggle).padding(top = 4.dp, bottom = 2.dp),
+        Modifier.fillMaxWidth().clickable(onClick = onToggle).padding(top = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             name, color = color, style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
-            maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false),
+            maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
         )
-        Spacer(Modifier.weight(1f))
-        // Where the progress of the checklist stands, and in its style: right before the arrow.
-        if (progress != null) Text(progress, color = color.copy(alpha = 0.8f), style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(end = 4.dp))
-        Icon(
-            // Folded it points to the right, where the items would open, like the "▸" of the widgets.
-            painterResource(if (folded) R.drawable.ic_arrow_right else R.drawable.ic_arrow_down),
-            contentDescription = stringResource(if (folded) R.string.unfold_all else R.string.fold_all),
-            tint = color.copy(alpha = 0.8f), modifier = Modifier.size(18.dp),
-        )
+        // The progress and the arrow as the note's own: the same style and size, the arrow exactly below the note's.
+        if (progress != null) Text(progress, color = color.copy(alpha = 0.7f), style = MaterialTheme.typography.labelMedium)
+        Box(Modifier.size(width = 36.dp, height = 28.dp), contentAlignment = Alignment.CenterEnd) {
+            Icon(
+                painterResource(if (folded) R.drawable.ic_arrow_left else R.drawable.ic_arrow_down),
+                contentDescription = stringResource(if (folded) R.string.unfold_all else R.string.fold_all),
+                tint = color, modifier = Modifier.padding(end = 6.dp).size(24.dp),
+            )
+        }
     }
 }

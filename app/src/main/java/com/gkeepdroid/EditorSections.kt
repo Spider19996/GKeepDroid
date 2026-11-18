@@ -22,7 +22,9 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.gestures.draggable
@@ -411,41 +413,51 @@ internal fun quietToggleColors(
     checkedContentColor = checkedContent,
 )
 
-/** The header of a category in the editor's checklist: its name and number of open items fold it, the "+" adds an item to it. */
+/**
+ * The header of a category in the editor's checklist, set into the top line of its frame as the label of a text field is: the name
+ * at the left, the progress, the arrow that folds it and the "+" that adds an item at the right. A tap on the name renames the
+ * category, holding it moves the category with its items; swiping the line does what swiping an item does, for all of them.
+ * [notches] gets the stretches of the line it covers (in pixels from the left of the frame), so the frame leaves them open.
+ */
 @Composable
 internal fun EditorCategoryHeader(
-    name: String, progress: String, folded: Boolean, canEdit: Boolean, onToggle: () -> Unit, onAdd: () -> Unit, modifier: Modifier = Modifier,
-    allChecked: Boolean = false, onCheckAll: () -> Unit = {}, dragged: Boolean = false,
-    onDragStart: () -> Unit = {}, onDragTo: (Float) -> Unit = {}, onDragEnd: () -> Unit = {},
+    name: String, progress: String, folded: Boolean, canEdit: Boolean, onToggle: () -> Unit, onAdd: () -> Unit,
+    notches: androidx.compose.runtime.snapshots.SnapshotStateList<Pair<Float, Float>>, modifier: Modifier = Modifier,
+    onRename: () -> Unit = {}, dragged: Boolean = false,
+    onDragStart: () -> Unit = {}, onDragTo: (Float) -> Unit = {}, onDragEnd: () -> Unit = {}, onShift: (Float) -> Unit = {},
     swipeRight: Int = ITEM_SWIPE_NONE, swipeLeft: Int = ITEM_SWIPE_NONE, onSwipe: (Boolean) -> Unit = {},
 ) {
-    // Swiped like an item, for all items of the category; the row stops where the symbol is shown.
-    val maxPx = with(androidx.compose.ui.platform.LocalDensity.current) { 72.dp.toPx() }
-    var offsetX by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0f) }
-    Box(modifier.fillMaxWidth()) {
-    if (offsetX != 0f) {
-        val toRight = offsetX > 0f
-        val (color, icon, tint) = swipeLook(if (toRight) swipeRight else swipeLeft)
-        Box(
-            Modifier.matchParentSize().padding(top = 8.dp).clip(MaterialTheme.shapes.medium).background(color).padding(horizontal = 20.dp),
-            contentAlignment = if (toRight) androidx.compose.ui.Alignment.CenterStart else androidx.compose.ui.Alignment.CenterEnd,
-        ) { Icon(painterResource(icon), contentDescription = null, tint = tint) }
-    }
-    // Held, the header follows the finger (as an item does); the others make room.
-    var rowTop by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0f) }
-    var fingerY by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<Float?>(null) }
-    var grab by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0f) }
-    var handle by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<androidx.compose.ui.layout.LayoutCoordinates?>(null) }
-    if (!dragged && fingerY != null) fingerY = null
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+    val density = androidx.compose.ui.platform.LocalDensity.current
     // The gestures call what the header is given now (the order changes while it is dragged).
     val dragTo by androidx.compose.runtime.rememberUpdatedState(onDragTo)
     val dragStart by androidx.compose.runtime.rememberUpdatedState(onDragStart)
     val dragEnd by androidx.compose.runtime.rememberUpdatedState(onDragEnd)
-    val checkAll by androidx.compose.runtime.rememberUpdatedState(onCheckAll)
+    val shift by androidx.compose.runtime.rememberUpdatedState(onShift)
+    val rename by androidx.compose.runtime.rememberUpdatedState(onRename)
     val swipe by androidx.compose.runtime.rememberUpdatedState(onSwipe)
+    var rowTop by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0f) }
+    var grab by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0f) }
+    var nameCoords by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<androidx.compose.ui.layout.LayoutCoordinates?>(null) }
+    val maxPx = with(density) { 72.dp.toPx() }
+    var offsetX by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0f) }
+    var nameRange by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0f to 0f) }
+    var toolsRange by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0f to 0f) }
+    val gapPx = with(density) { 4.dp.toPx() }
+    androidx.compose.runtime.SideEffect {
+        val wanted = listOf(nameRange.first - gapPx to nameRange.second + gapPx, toolsRange.first - gapPx to toolsRange.second + gapPx)
+        if (notches.toList() != wanted) { notches.clear(); notches.addAll(wanted) }
+    }
+    val labelStyle = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
     androidx.compose.foundation.layout.Row(
-        Modifier.fillMaxWidth().padding(top = 8.dp)
+        modifier.fillMaxWidth()
+            .onGloballyPositioned { rowTop = it.boundsInRoot().top }
+            // Its middle lies on the frame's top line: half of it above the frame, half inside.
+            .layout { m, c ->
+                val p = m.measure(c)
+                // Below the line it takes a little less than its lower half, so the first item is not far from the name.
+                layout(p.width, (p.height / 2 - 8.dp.roundToPx()).coerceAtLeast(0)) { p.place(0, -p.height / 2) }
+            }
             .offset { androidx.compose.ui.unit.IntOffset(offsetX.toInt(), 0) }
             .draggable(
                 orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
@@ -459,75 +471,67 @@ internal fun EditorCategoryHeader(
                     androidx.compose.animation.core.animate(offsetX, 0f) { value, _ -> offsetX = value }
                     if (passed) swipe(toRight)
                 },
-            )
-            .onGloballyPositioned { rowTop = it.boundsInRoot().top }
-            .then(if (dragged) Modifier.zIndex(1f) else Modifier)
-            .graphicsLayer {
-                val y = fingerY
-                translationY = if (dragged && y != null) y - grab - rowTop else 0f
-                if (dragged) { shadowElevation = 12f; scaleX = 1.02f; scaleY = 1.02f }
-            }
-            .background(if (dragged) MaterialTheme.colorScheme.surfaceContainerHigh else androidx.compose.ui.graphics.Color.Transparent, MaterialTheme.shapes.medium),
+            ),
         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
     ) {
-        // The same button as an item has: a tap ticks (or unticks) all items of the category, holding it moves the category
-        // with its items.
-        if (canEdit) Box(
-            Modifier.width(48.dp).height(56.dp)
-                .onGloballyPositioned { handle = it }
-                .pointerInput(name) { detectTapGestures(onTap = { checkAll() }) }
-                .pointerInput(name) {
+        Text(
+            name, style = labelStyle, color = if (dragged) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface, maxLines = 1,
+            // After the rounding of the frame's corner, as a text field's label sits after its corner.
+            modifier = Modifier.padding(start = 24.dp)
+                .onGloballyPositioned { c ->
+                    nameCoords = c
+                    val x = c.positionInParent().x
+                    nameRange = x to x + c.size.width
+                }
+                .clip(MaterialTheme.shapes.small)
+                .pointerInput(name, canEdit) {
+                    if (!canEdit) return@pointerInput
+                    detectTapGestures(onTap = { rename() })
+                }
+                .pointerInput(name, canEdit) {
+                    if (!canEdit) return@pointerInput
                     detectDragGesturesAfterLongPress(
                         onDragStart = { start ->
                             haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                            handle?.localToRoot(start)?.y?.let { fingerY = it; grab = it - rowTop }
+                            nameCoords?.localToRoot(start)?.y?.let { grab = it - rowTop }
                             dragStart()
                         },
-                        onDrag = { change, _ -> change.consume(); handle?.localToRoot(change.position)?.y?.let { fingerY = it; dragTo(it) } },
-                        onDragEnd = { fingerY = null; dragEnd() },
-                        onDragCancel = { fingerY = null; dragEnd() },
-                    )
-                },
-            contentAlignment = androidx.compose.ui.Alignment.CenterStart,
-        ) {
-            androidx.compose.foundation.layout.Column(
-                Modifier.padding(start = 11.dp).size(width = 26.dp, height = 40.dp)
-                    .clip(androidx.compose.foundation.shape.CircleShape)
-                    .background(if (allChecked) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.surfaceContainerHighest)
-                    .padding(vertical = 2.dp),
-            ) {
-                Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = androidx.compose.ui.Alignment.Center) {
-                    Icon(
-                        painterResource(if (allChecked) R.drawable.ic_done_all else R.drawable.ic_done), contentDescription = null,
-                        tint = if (allChecked) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(14.dp),
+                        onDrag = { change, _ ->
+                            change.consume()
+                            nameCoords?.localToRoot(change.position)?.y?.let { y -> shift(y - grab - rowTop); dragTo(y) }
+                        },
+                        onDragEnd = { shift(0f); dragEnd() },
+                        onDragCancel = { shift(0f); dragEnd() },
                     )
                 }
-                Box(Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outlineVariant))
-                Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = androidx.compose.ui.Alignment.Center) {
-                    androidx.compose.foundation.layout.Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        repeat(3) { Box(Modifier.size(width = 12.dp, height = 1.5.dp).background(MaterialTheme.colorScheme.onSurfaceVariant)) }
-                    }
-                }
-            }
-        }
+                .padding(horizontal = 4.dp, vertical = 6.dp),
+        )
+        androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
         androidx.compose.foundation.layout.Row(
-            Modifier.weight(1f).clip(MaterialTheme.shapes.medium).clickable(onClick = onToggle).padding(horizontal = 8.dp, vertical = 10.dp),
+            Modifier.padding(end = 24.dp).onGloballyPositioned { c ->
+                val x = c.positionInParent().x
+                toolsRange = x to x + c.size.width
+            },
             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
         ) {
-            Text(name, style = MaterialTheme.typography.titleSmall.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), maxLines = 1)
-            androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
-            // As the checklists show their progress: right before the arrow.
-            Text(progress, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(end = 8.dp))
-            Icon(
-                painterResource(if (folded) R.drawable.ic_arrow_right else R.drawable.ic_arrow_down),
-                contentDescription = stringResource(if (folded) R.string.unfold_all else R.string.fold_all), modifier = Modifier.size(20.dp),
-            )
-        }
-        if (canEdit) IconButton(onClick = onAdd, shapes = IconButtonDefaults.shapes()) {
-            Icon(painterResource(R.drawable.ic_add), contentDescription = stringResource(R.string.category_add_item, name))
+            Text(progress, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = 4.dp))
+            Box(
+                Modifier.size(32.dp).clip(androidx.compose.foundation.shape.CircleShape).clickable(onClick = onToggle),
+                contentAlignment = androidx.compose.ui.Alignment.Center,
+            ) {
+                Icon(
+                    painterResource(if (folded) R.drawable.ic_arrow_left else R.drawable.ic_arrow_down),
+                    contentDescription = stringResource(if (folded) R.string.unfold_all else R.string.fold_all), modifier = Modifier.size(24.dp),
+                )
+            }
+            if (canEdit) Box(
+                Modifier.size(32.dp).clip(androidx.compose.foundation.shape.CircleShape).clickable(onClick = onAdd),
+                contentAlignment = androidx.compose.ui.Alignment.Center,
+            ) {
+                Icon(painterResource(R.drawable.ic_add), contentDescription = stringResource(R.string.category_add_item, name), modifier = Modifier.size(24.dp))
+            }
         }
     }
-}
 }
 
 /** Shown at the end of a checklist while an item is held: letting it go here puts it into a new category. */
@@ -589,22 +593,35 @@ const val FRAME_ONLY = 4
  * them the sides; the sides reach over the gaps between the rows, so the pieces make one frame. The row moves in a little.
  */
 @Composable
-internal fun Modifier.categoryFrame(position: Int): Modifier {
+internal fun Modifier.categoryFrame(position: Int, notches: List<Pair<Float, Float>> = emptyList()): Modifier {
     if (position == FRAME_NONE) return this
     // The same line as the fields have (1 dp in the outline color).
     val color = MaterialTheme.colorScheme.outline
     val last = position == FRAME_LAST || position == FRAME_ONLY
+    val first = position == FRAME_FIRST || position == FRAME_ONLY
     // The gap to what follows is the editor's own between its rows, as between two fields.
     return this.drawBehind {
         val stroke = 1.dp.toPx()
         val radius = 20.dp.toPx()
-        // The pieces reach over the gaps between the rows (whatever they are), and draw the same line where they overlap.
-        val reach = 32.dp.toPx()
-        val first = position == FRAME_FIRST || position == FRAME_ONLY
+        // Each piece draws down over the gap to the next row (the editor's 12 dp), exactly to where that one begins: the pieces
+        // meet without overlapping, so the sides show no seam.
+        val reach = 12.dp.toPx()
         // The whole line lies inside the piece at the top and the bottom, so it is as thick there as at the sides.
-        val top = if (first) stroke / 2 else -reach - radius
+        val top = if (first) stroke / 2 else -radius
         val bottom = if (last) size.height - stroke / 2 else size.height + reach + radius
-        clipRect(top = if (first) 0f else -reach, bottom = if (last) size.height else size.height + reach) {
+        // Where it may draw: its own height (and over the gaps), less the stretches of the top line that the header covers, as
+        // a text field's line is left open at its label.
+        val area = androidx.compose.ui.graphics.Path().apply {
+            addRect(androidx.compose.ui.geometry.Rect(-reach, 0f, size.width + reach, if (last) size.height else size.height + reach))
+        }
+        val inset = 8.dp.toPx()
+        val open = if (!first) area else notches.filter { it.second > it.first }.fold(area) { acc, (from, to) ->
+            val hole = androidx.compose.ui.graphics.Path().apply {
+                addRect(androidx.compose.ui.geometry.Rect(inset + from, -reach, inset + to, 3.dp.toPx()))
+            }
+            androidx.compose.ui.graphics.Path.combine(androidx.compose.ui.graphics.PathOperation.Difference, acc, hole)
+        }
+        clipPath(open) {
             drawRoundRect(
                 color, topLeft = androidx.compose.ui.geometry.Offset(stroke / 2, top),
                 size = androidx.compose.ui.geometry.Size(size.width - stroke, bottom - top),

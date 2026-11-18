@@ -100,8 +100,12 @@ class NotesWidget : GlanceAppWidget() {
             val result = HashMap<String, Bitmap?>()
             if (settings.showNoteColors && account != null) {
                 var budget = PICTURE_BUDGET_BYTES
+                val foldedNow = FoldStore.load(context)
                 notes.forEach { note ->
-                    val bitmap = widgetPicture(context, settings, account, note, 0.45f)
+                    // A widget's picture background is as tall as the picture: a folded note gets a flat strip of it, so its
+                    // title decides its height as on the other folded notes.
+                    val folded = settings.foldable && note.canFold() && FoldStore.key(account, note.id) in foldedNow
+                    val bitmap = widgetPicture(context, settings, account, note, 0.45f)?.let { if (folded) flatStrip(it) else it }
                     if (bitmap != null && budget >= bitmap.byteCount) {
                         budget -= bitmap.byteCount
                         result[note.id] = bitmap
@@ -223,7 +227,8 @@ class NotesWidget : GlanceAppWidget() {
               Box(innerModifier) {
                 Column(
                     GlanceModifier.fillMaxWidth().padding(
-                        start = 8.dp, top = 8.dp, bottom = 8.dp,
+                        // As much room at the left as the arrow leaves at the right.
+                        start = 12.dp, top = 8.dp, bottom = 8.dp,
                         end = if (!hasTitleRow && (foldable || cornerExtra > 0)) ((if (foldable) 40 else 0) + cornerExtra).dp else 8.dp,
                     )
                 ) {
@@ -347,4 +352,10 @@ class NotesWidgetReceiver : GlanceAppWidgetReceiver() {
         super.onEnabled(context)
         SyncWorker.schedule(context)
     }
+}
+
+/** The middle of [bitmap] as a flat strip (ten times as wide as high), for a background that must not make its view taller. */
+internal fun flatStrip(bitmap: Bitmap): Bitmap {
+    val height = (bitmap.width / 10).coerceIn(1, bitmap.height)
+    return Bitmap.createBitmap(bitmap, 0, (bitmap.height - height) / 2, bitmap.width, height)
 }

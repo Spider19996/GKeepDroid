@@ -467,6 +467,7 @@
     <string name="category_none">Sin categoría</string>
     <string name="category_add_item">Añadir elemento a %1$s</string>
     <string name="category_move">Mover a categoría</string>
+    <string name="category_rename">Cambiar nombre de la categoría</string>
     <string name="category_forget_hint">Mantén pulsada una categoría para marcarla y otra vez para olvidarla.</string>
     <string name="item_swipe_right">Deslizar elemento a la derecha</string>
     <string name="item_swipe_left">Deslizar elemento a la izquierda</string>

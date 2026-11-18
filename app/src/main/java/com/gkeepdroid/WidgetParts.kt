@@ -372,6 +372,8 @@ internal fun ChecklistBody(
         // A checklist with categories: each under its header; checked items stay in their category.
         val folds = CategoryFolds.load(context)
         var left = if (rowLimit > 0) rowLimit else Int.MAX_VALUE
+        // Some room between the note's title and its first category.
+        if (groups.first().name != null) androidx.glance.layout.Spacer(GlanceModifier.height(4.dp))
         var hidden = 0
         groups.forEach { group ->
             if (group.name == null) {
@@ -382,7 +384,7 @@ internal fun ChecklistBody(
             // A widget's padding before a background is no margin, so the gap between two frames is a box of its own.
             Box(GlanceModifier.fillMaxWidth().padding(vertical = 4.dp)) { Column(
                 GlanceModifier.fillMaxWidth().background(ImageProvider(R.drawable.card_border))
-                    .padding(horizontal = 6.dp, vertical = 6.dp),
+                    .padding(start = 10.dp, end = 4.dp, top = 4.dp, bottom = 6.dp),
             ) {
                 val folded = CategoryFolds.key(account, note.id, group.name) in folds
                 CategoryHeaderRow(note, account, group.name, Categories.progress(group.items), folded, settings, palette)
@@ -460,6 +462,7 @@ internal fun CategoryHeaderRow(
             Text(
                 name,
                 maxLines = 1,
+                // On one line with the boxes of the items below.
                 style = TextStyle(color = palette.provider(0.85f), fontSize = settings.textSizeSp.sp, fontWeight = FontWeight.Bold),
                 modifier = GlanceModifier.defaultWeight(),
             )

@@ -22,6 +22,8 @@ import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.ui.layout.boundsInRoot
@@ -406,6 +408,8 @@ class EditNoteActivity : ComponentActivity() {
         // An earlier category held once: it turns red, held again it is forgotten.
         var armedForget by remember { mutableStateOf<String?>(null) }
         var historyVersion by remember { mutableIntStateOf(0) }
+        // The category whose name is being changed.
+        var renameCategory by remember { mutableStateOf<String?>(null) }
         // The visible part of the note, for scrolling along while an item is dragged near its edges.
         var editorViewport by remember { mutableStateOf<Rect?>(null) }
         val allAccounts = remember { CredentialStore.accounts(this@EditNoteActivity) }
@@ -1289,6 +1293,9 @@ class EditNoteActivity : ComponentActivity() {
                 var overNewCategory by remember { mutableStateOf(false) }
                 // The category whose header is held: its items are left out while it moves, and follow it when it is let go.
                 var draggingCategory by remember { mutableStateOf<String?>(null) }
+                // How far the held header is from its place, and the stretches of each frame's top line its header covers.
+                var categoryShift by remember { mutableStateOf(0f) }
+                val headerNotches = remember { mutableMapOf<String, androidx.compose.runtime.snapshots.SnapshotStateList<Pair<Float, Float>>>() }
                 // The drop places of the categories that have nothing else in them ("" for no category), and the one the item is over.
                 val slotBounds = remember { mutableStateMapOf<String, Rect>() }
                 var hoverTarget by remember { mutableStateOf<String?>(null) }
@@ -1458,23 +1465,25 @@ class EditNoteActivity : ComponentActivity() {
                         val group = editorGroups!!.first { it.name == name }
                         val folded = CategoryFolds.key(account, noteKey, name) in folds
                         val real = group.items.filter { !it.isDivider() }
-                        Box(Modifier.categoryFrame(frameAt(entryIndex))) { EditorCategoryHeader(
+                        val notches = headerNotches.getOrPut(name) { androidx.compose.runtime.mutableStateListOf() }
+                        // Room above for the half of the header that lies over the frame's top line.
+                        Box(
+                            Modifier.padding(top = 10.dp)
+                                .then(if (draggingCategory == name) Modifier.zIndex(1f).graphicsLayer { translationY = categoryShift } else Modifier.animatePlacement())
+                                .categoryFrame(frameAt(entryIndex), notches),
+                        ) { EditorCategoryHeader(
                             name, Categories.progress(group.items), folded, canEdit,
                             onToggle = { CategoryFolds.set(this@EditNoteActivity, account, noteKey, name, !folded) },
                             onAdd = { addInCategory(name) },
-                            modifier = Modifier.onGloballyPositioned { headerBounds[name] = it.boundsInRoot() }
-                                .then(if (draggingCategory == name) Modifier else Modifier.animatePlacement()),
-                            allChecked = real.isNotEmpty() && real.all { it.checked },
-                            onCheckAll = {
-                                val tick = !(real.isNotEmpty() && real.all { it.checked })
-                                val ids = real.map { it.id }.toSet()
-                                for (i in items.indices) if (items[i].id in ids) items[i] = items[i].copy(checked = tick)
-                            },
+                            notches = notches,
+                            modifier = Modifier.onGloballyPositioned { headerBounds[name] = it.boundsInRoot() },
+                            onRename = { renameCategory = name },
                             dragged = draggingCategory == name,
                             onDragStart = { draggingCategory = name },
+                            onShift = { categoryShift = it },
                             onDragTo = { y ->
                                 // Over another header: the held category takes its place in the order.
-                                val over = headerBounds.entries.firstOrNull { (other, r) -> other != name && y >= r.top && y < r.bottom }?.key
+                                val over = headerBounds.entries.firstOrNull { (other, r) -> other != name && y >= r.top - 40f && y < r.bottom + 40f }?.key
                                 if (over != null) {
                                     val from = sessionCategories.indexOf(name)
                                     val to = sessionCategories.indexOf(over)
@@ -1486,7 +1495,7 @@ class EditNoteActivity : ComponentActivity() {
                                     if (step != 0f) scope.launch { scroll.scrollBy(step) }
                                 }
                             },
-                            onDragEnd = { draggingCategory = null },
+                            onDragEnd = { draggingCategory = null; categoryShift = 0f },
                             swipeRight = itemSwipe.first, swipeLeft = itemSwipe.second,
                             onSwipe = { right -> swipeItems(group.items.map { it.id }, if (right) itemSwipe.first else itemSwipe.second) },
                         ) }
@@ -1606,6 +1615,38 @@ class EditNoteActivity : ComponentActivity() {
         }
         if (labelsOpen) EditorSheet({ labelsOpen = false }) {
             LabelsSection(account = targetAccount, labels = labels, onLabels = { labels = it }, canEdit = canEdit)
+        }
+        renameCategory?.let { old ->
+            // The whole name is selected, so typing replaces it and a tap places the cursor.
+            var field by remember(old) { mutableStateOf(androidx.compose.ui.text.input.TextFieldValue(old, androidx.compose.ui.text.TextRange(0, old.length))) }
+            val name = field.text
+            val renameFocus = remember { androidx.compose.ui.focus.FocusRequester() }
+            LaunchedEffect(old) { kotlinx.coroutines.delay(100); runCatching { renameFocus.requestFocus() } }
+            val done = {
+                val clean = name.trim()
+                if (clean.isNotEmpty() && clean != old) {
+                    // Every item of the category gets the new name in front; the category keeps its place.
+                    val at = sessionCategories.indexOf(old)
+                    categoryGroups()?.firstOrNull { it.name == old }?.items?.forEach { setCategory(it.id, clean) }
+                    sessionCategories.remove(clean)
+                    if (at >= 0 && at <= sessionCategories.size) { sessionCategories.remove(old); sessionCategories.add(at.coerceAtMost(sessionCategories.size), clean) }
+                }
+                renameCategory = null
+            }
+            AlertDialog(
+                onDismissRequest = { renameCategory = null },
+                title = { Text(stringResource(R.string.category_rename)) },
+                text = {
+                    OutlinedTextField(
+                        value = field, onValueChange = { field = it }, singleLine = true, shape = MaterialTheme.shapes.medium,
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Done),
+                        keyboardActions = androidx.compose.foundation.text.KeyboardActions(onDone = { done() }),
+                        modifier = Modifier.focusRequester(renameFocus),
+                    )
+                },
+                confirmButton = { TextButton(onClick = done, enabled = name.isNotBlank(), shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.save)) } },
+                dismissButton = { TextButton(onClick = { renameCategory = null }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) } },
+            )
         }
         if (newCategoryDialog) {
             var name by remember { mutableStateOf("") }

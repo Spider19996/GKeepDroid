@@ -476,6 +476,7 @@
     <string name="category_none">Без категории</string>
     <string name="category_add_item">Добавить пункт в %1$s</string>
     <string name="category_move">Переместить в категорию</string>
+    <string name="category_rename">Переименовать категорию</string>
     <string name="category_forget_hint">Удерживайте категорию, чтобы отметить её, ещё раз — чтобы забыть.</string>
     <string name="item_swipe_right">Смахнуть пункт вправо</string>
     <string name="item_swipe_left">Смахнуть пункт влево</string>

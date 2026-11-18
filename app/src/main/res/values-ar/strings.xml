@@ -494,6 +494,7 @@
     <string name="category_none">بدون فئة</string>
     <string name="category_add_item">إضافة عنصر إلى %1$s</string>
     <string name="category_move">نقل إلى فئة</string>
+    <string name="category_rename">إعادة تسمية الفئة</string>
     <string name="category_forget_hint">اضغط مطولاً على فئة لتحديدها، واضغط مطولاً مرة أخرى لنسيانها.</string>
     <string name="item_swipe_right">سحب العنصر لليمين</string>
     <string name="item_swipe_left">سحب العنصر لليسار</string>

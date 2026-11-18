@@ -250,11 +250,13 @@ internal fun ChecklistRow(
                 Column(
                     Modifier
                         .padding(start = 11.dp).size(width = 26.dp, height = if (item.isDivider()) 22.dp else 40.dp)
-                        // A filled capsule as Material 3 Expressive has it: tonal while open, in the check's color once done.
+                        // A filled capsule as Material 3 Expressive has it, see-through in the text's color, so it suits every
+                        // note color and picture; once done it takes on the check's color.
                         .clip(androidx.compose.foundation.shape.CircleShape)
                         .background(
                             androidx.compose.animation.animateColorAsState(
-                                if (item.checked && !item.isDivider()) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.surfaceContainerHighest,
+                                if (item.checked && !item.isDivider()) MaterialTheme.colorScheme.tertiary.copy(alpha = 0.28f)
+                                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f),
                                 label = "capsule",
                             ).value,
                         )

@@ -458,6 +458,7 @@
     <string name="category_none">Geen categorie</string>
     <string name="category_add_item">Item toevoegen aan %1$s</string>
     <string name="category_move">Naar categorie verplaatsen</string>
+    <string name="category_rename">Categorie hernoemen</string>
     <string name="category_forget_hint">Houd een categorie ingedrukt om haar te markeren, nog eens om haar te vergeten.</string>
     <string name="item_swipe_right">Item naar rechts vegen</string>
     <string name="item_swipe_left">Item naar links vegen</string>
