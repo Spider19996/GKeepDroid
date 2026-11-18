@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.ui.layout.layout
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.Arrangement
@@ -366,8 +367,12 @@ internal fun NoteTile(
                     }
                     // Each category in a frame of its own, rounded like the card around it.
                     Column(
-                        // Little room around it: a card in the grid is narrow.
-                        Modifier.fillMaxWidth().padding(vertical = 2.dp)
+                        // Little room around it: a card in the grid is narrow, so the frame reaches into the card's own padding.
+                        Modifier.fillMaxWidth().padding(vertical = 2.dp).layout { m, c ->
+                            val grow = 8.dp.roundToPx()
+                            val p = m.measure(c.copy(maxWidth = c.maxWidth + grow * 2, minWidth = (c.minWidth + grow * 2).coerceAtMost(c.maxWidth + grow * 2)))
+                            layout(c.maxWidth, p.height) { p.place(-grow, 0) }
+                        }
                             .border(1.dp, textColor.copy(alpha = 0.35f), MaterialTheme.shapes.medium)
                             .padding(start = 6.dp, end = 2.dp, bottom = 2.dp),
                     ) {

@@ -1236,14 +1236,31 @@ class EditNoteActivity : ComponentActivity() {
             val noteZone = editorLayout.inZone(ZONE_NOTE)
             val noteAt = noteZone.indexOfFirst { it.id == NOTE_ID }.coerceAtLeast(0)
             NoteActionButtons(noteZone.take(noteAt), states, inline = inlineBlocks)
-            OutlinedTextField(
-                // The rounder fields of Material 3 Expressive; the frame of a category is rounded to match (see categoryFrame).
-                shape = MaterialTheme.shapes.medium,
-                value = title, onValueChange = { title = it }, readOnly = !canEdit,
-                label = { Text(stringResource(R.string.title_hint)) },
-                textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.fillMaxWidth(),
-            )
+            // The rounder fields of Material 3 Expressive; the frame of a category is rounded to match (see categoryFrame). The
+            // title has a thicker line than the rest, so it stands out from the items below it.
+            run {
+                val titleInteraction = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+                val titleColors = androidx.compose.material3.OutlinedTextFieldDefaults.colors()
+                val titleStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                androidx.compose.foundation.text.BasicTextField(
+                    value = title, onValueChange = { title = it }, readOnly = !canEdit, singleLine = false,
+                    textStyle = titleStyle, interactionSource = titleInteraction,
+                    cursorBrush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.primary),
+                    modifier = Modifier.fillMaxWidth(),
+                ) { inner ->
+                    androidx.compose.material3.OutlinedTextFieldDefaults.DecorationBox(
+                        value = title, innerTextField = inner, enabled = true, singleLine = false,
+                        visualTransformation = VisualTransformation.None, interactionSource = titleInteraction,
+                        label = { Text(stringResource(R.string.title_hint)) }, colors = titleColors,
+                        container = {
+                            androidx.compose.material3.OutlinedTextFieldDefaults.Container(
+                                enabled = true, isError = false, interactionSource = titleInteraction, colors = titleColors,
+                                shape = MaterialTheme.shapes.medium, focusedBorderThickness = 3.dp, unfocusedBorderThickness = 2.dp,
+                            )
+                        },
+                    )
+                }
+            }
 
             if (isList) {
                 // How the rows work; the cross hides this explanation for good.

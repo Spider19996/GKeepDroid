@@ -379,15 +379,15 @@ internal fun ChecklistBody(
                 return@forEach
             }
             // Each category in a frame of its own, with the line and rounding of the cards' border.
-            Column(
-                // As much room above and below the frame's content as at its sides, and a gap between two frames.
-                GlanceModifier.fillMaxWidth().padding(vertical = 3.dp).background(ImageProvider(R.drawable.card_border))
+            // A widget's padding before a background is no margin, so the gap between two frames is a box of its own.
+            Box(GlanceModifier.fillMaxWidth().padding(vertical = 4.dp)) { Column(
+                GlanceModifier.fillMaxWidth().background(ImageProvider(R.drawable.card_border))
                     .padding(horizontal = 6.dp, vertical = 6.dp),
             ) {
                 val folded = CategoryFolds.key(account, note.id, group.name) in folds
                 CategoryHeaderRow(note, account, group.name, group.items.count { !it.checked }, folded, settings, palette)
                 if (!folded) group.rows(settings).forEach { item -> if (left > 0) { ItemRow(note, item, account, settings, palette, inCategory = true); left-- } else hidden++ }
-            }
+            } }
         }
         if (hidden > 0) {
             Text(
@@ -424,9 +424,7 @@ internal fun ChecklistBody(
  * The piece of a category's frame for one of its rows in a list where every row is a view of its own: [index] of [count] rows
  * (the header is the first).
  */
-internal fun GlanceModifier.categoryFramePiece(index: Int, count: Int): GlanceModifier =
-    // A gap above the first piece and below the last, between two frames as in the list widget.
-    padding(top = if (index == 0) 3.dp else 0.dp, bottom = if (index == count - 1) 3.dp else 0.dp).background(
+internal fun GlanceModifier.categoryFramePiece(index: Int, count: Int): GlanceModifier = background(
     ImageProvider(
         when {
             count == 1 -> R.drawable.card_border
@@ -460,12 +458,20 @@ internal fun CategoryHeaderRow(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                (if (folded) "▸ " else "▾ ") + name + (if (open > 0) "  $open" else ""),
+                name + (if (open > 0) "  $open" else ""),
                 maxLines = 1,
                 style = TextStyle(color = palette.provider(0.85f), fontSize = settings.textSizeSp.sp, fontWeight = FontWeight.Bold),
                 modifier = GlanceModifier.defaultWeight(),
             )
         }
+        // The same arrows as on the notes: down when open, left when folded.
+        ArrowButton(
+            if (folded) R.drawable.ic_arrow_left else R.drawable.ic_arrow_down, palette.provider(),
+            context.getString(if (folded) R.string.unfold_all else R.string.fold_all),
+            actionRunCallback<ToggleCategoryAction>(
+                actionParametersOf(NoteIdKey to note.id, AccountKey to account, CategoryKey to name, CollapsedKey to !folded),
+            ),
+        )
         // The padding belongs to the box around the symbol, so the area to tap is larger than the symbol.
         Box(
             GlanceModifier.padding(horizontal = 8.dp, vertical = 2.dp).clickable(

@@ -199,8 +199,11 @@ class SingleNoteWidget : GlanceAppWidget() {
                         // Each row of the list is a view of its own, so each draws its piece of the category's frame.
                         val count = rows.size + 1
                         item(itemId = stableId("c", group.name)) {
-                            Box(GlanceModifier.fillMaxWidth().categoryFramePiece(0, count)) {
-                                CategoryHeaderRow(note, account, group.name, group.items.count { !it.checked }, folded, settings, palette)
+                            // The gap above the frame is a box of its own: a widget's padding before a background is no margin.
+                            Box(GlanceModifier.fillMaxWidth().padding(top = 8.dp)) {
+                                Box(GlanceModifier.fillMaxWidth().categoryFramePiece(0, count)) {
+                                    CategoryHeaderRow(note, account, group.name, group.items.count { !it.checked }, folded, settings, palette)
+                                }
                             }
                         }
                         rows.forEachIndexed { i, row ->

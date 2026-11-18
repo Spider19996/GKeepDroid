@@ -590,12 +590,16 @@ const val FRAME_ONLY = 4
 @Composable
 internal fun Modifier.categoryFrame(position: Int): Modifier {
     if (position == FRAME_NONE) return this
-    val color = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
-    return this.drawBehind {
-        val stroke = 1.5.dp.toPx()
+    // The same line as the fields have (1 dp in the outline color).
+    val color = MaterialTheme.colorScheme.outline
+    val last = position == FRAME_LAST || position == FRAME_ONLY
+    // Room below a category, so two frames do not touch.
+    return this.padding(bottom = if (last) 8.dp else 0.dp).drawBehind {
+        val stroke = 1.dp.toPx()
         // Concentric with the fields inside: their rounding (12 dp, Material's medium shape) plus the 8 dp between them and the frame.
         val radius = 20.dp.toPx()
-        val gap = 12.dp.toPx()
+        // Far enough over the gap to the next row that the sides never break.
+        val gap = 32.dp.toPx()
         val top = if (position == FRAME_FIRST || position == FRAME_ONLY) stroke / 2 else -gap / 2 - 1f
         val bottom = if (position == FRAME_LAST || position == FRAME_ONLY) size.height + 6.dp.toPx() else size.height + gap / 2 + 1f
         // A rounded box that is cut where the frame goes on in the next or the previous row.
