@@ -318,7 +318,10 @@ internal fun DropLine() {
  * has the frame's rounding at its ends, and the symbol sits at the header. Nothing is drawn while [offset] is 0.
  */
 @Composable
-internal fun CategorySwipeBand(offset: Float, action: Int, frame: Int, topInset: androidx.compose.ui.unit.Dp, content: @Composable () -> Unit) {
+internal fun CategorySwipeBand(
+    offset: Float, action: Int, frame: Int, topInset: androidx.compose.ui.unit.Dp, category: String, index: Int,
+    bounds: androidx.compose.runtime.snapshots.SnapshotStateMap<String, Pair<Float, Float>>, content: @Composable () -> Unit,
+) {
     val (color, icon, tint) = swipeLook(action)
     val surface = MaterialTheme.colorScheme.background
     val top = frame == FRAME_FIRST || frame == FRAME_ONLY
@@ -326,7 +329,12 @@ internal fun CategorySwipeBand(offset: Float, action: Int, frame: Int, topInset:
     val active = offset != 0f && frame != FRAME_NONE
     // The same structure while swiping or not, so the rows (and the header's gesture) are not made anew when it starts.
     Box(
-        Modifier.then(
+        // The header's piece is drawn above the pieces below it, so its symbol (in the middle of the category) is not covered by them.
+        Modifier.zIndex(if (active && top) 1f else 0f).onGloballyPositioned {
+            val b = it.boundsInRoot()
+            val now = b.top to b.bottom
+            if (bounds["$category#$index"] != now) bounds["$category#$index"] = now
+        }.then(
             if (!active) Modifier else Modifier.drawBehind {
                 // The frame's own extent: 8 dp in from the sides, down over the 12 dp gap to the next piece, so the bands meet.
                 val side = 0f
@@ -345,10 +353,18 @@ internal fun CategorySwipeBand(offset: Float, action: Int, frame: Int, topInset:
         ),
     ) {
         // The symbol sits at the header, on the side the swipe comes from.
-        if (active && top) Box(
-            Modifier.matchParentSize().padding(top = topInset + 4.dp, start = 20.dp, end = 20.dp),
-            contentAlignment = if (offset > 0f) androidx.compose.ui.Alignment.TopStart else androidx.compose.ui.Alignment.TopEnd,
-        ) { Icon(painterResource(icon), contentDescription = null, tint = tint, modifier = Modifier.requiredSize(24.dp)) }
+        if (active && top) {
+            // The symbol in the middle of the whole category (its pieces report where they are), not of the header's piece.
+            val mine = bounds["$category#$index"]
+            val all = bounds.filterKeys { it.startsWith("$category#") }.values
+            val middle = if (all.isEmpty()) null else (all.minOf { it.first } + all.maxOf { it.second }) / 2f
+            Box(Modifier.matchParentSize().padding(start = 20.dp, end = 20.dp), contentAlignment = if (offset > 0f) androidx.compose.ui.Alignment.TopStart else androidx.compose.ui.Alignment.TopEnd) {
+                Icon(
+                    painterResource(icon), contentDescription = null, tint = tint,
+                    modifier = Modifier.requiredSize(24.dp).offset { androidx.compose.ui.unit.IntOffset(0, if (middle != null && mine != null) (middle - mine.first - 12.dp.toPx()).toInt() else topInset.roundToPx() + 4.dp.roundToPx()) },
+                )
+            }
+        }
         Box(
             Modifier.graphicsLayer { translationX = if (active) offset else 0f }
                 // What moves hides the band behind it, down over the gap to the next piece as the frame's line does.

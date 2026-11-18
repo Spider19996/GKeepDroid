@@ -182,6 +182,7 @@ internal fun ColumnScope.EditorChecklist(
             var categoryStartTop by remember { mutableStateOf(0f) }
             val headerLayoutTop = remember { mutableStateMapOf<String, Float>() }
             // How far each category is swiped now (its header is held, the whole category moves).
+            val pieceBounds = remember { androidx.compose.runtime.mutableStateMapOf<String, Pair<Float, Float>>() }
             val categorySwipe = remember { androidx.compose.runtime.mutableStateMapOf<String, Float>() }
             val swipeMax = with(androidx.compose.ui.platform.LocalDensity.current) { 72.dp.toPx() }
             val headerNotches = remember { mutableMapOf<String, androidx.compose.runtime.snapshots.SnapshotStateList<Pair<Float, Float>>>() }
@@ -329,6 +330,7 @@ internal fun ColumnScope.EditorChecklist(
             }
             // One frame around each category: its header, its items and its drop place, each drawing its piece.
             val categoryOf = entries.map { (n, i) -> if (i != null) n else n?.let { if (it.startsWith(SLOT_PREFIX)) it.removePrefix(SLOT_PREFIX) else it } }
+            androidx.compose.runtime.SideEffect { pieceBounds.keys.retainAll(categoryOf.indices.map { "${categoryOf[it] ?: ""}#$it" }.toSet()) }
             fun frameAt(index: Int): Int {
                 val c = categoryOf[index] ?: return FRAME_NONE
                 val first = index == 0 || categoryOf[index - 1] != c
@@ -341,6 +343,7 @@ internal fun ColumnScope.EditorChecklist(
               CategorySwipeBand(
                   swipeKey?.let { categorySwipe[it] } ?: 0f, if ((swipeKey?.let { categorySwipe[it] } ?: 0f) > 0f) itemSwipe.first else itemSwipe.second,
                   frameAt(entryIndex), topInset = if (item == null && name != null && !name.startsWith(SLOT_PREFIX)) 10.dp else 0.dp,
+                  category = swipeKey ?: "", index = entryIndex, bounds = pieceBounds,
               ) {
                 if (item != null) {
                     // The items of a held category move with its header.

@@ -1,6 +1,8 @@
 package com.gkeepdroid
 
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.clipRect
 import android.text.format.DateUtils
 import androidx.activity.ComponentActivity
@@ -536,7 +538,7 @@ private fun CategorySwipe(
             // so the band's inner corners follow the frame's arcs and nothing has to be covered.
             val shape = MaterialTheme.shapes.medium
             Box(
-                Modifier.matchParentSize().drawBehind {
+                Modifier.matchParentSize().drawWithContent {
                     val grow = 8.dp.toPx()
                     val lift = 1.dp.toPx()
                     val frameSize = androidx.compose.ui.geometry.Size(size.width + grow * 2, size.height + lift * 2)
@@ -548,6 +550,8 @@ private fun CategorySwipe(
                     }
                     val band = androidx.compose.ui.graphics.Path.combine(androidx.compose.ui.graphics.PathOperation.Difference, frameAt(0f), frameAt(offsetX))
                     drawPath(band, bg)
+                    // The symbol lies under the frame like the band: only what the band shows of it is seen.
+                    clipPath(band) { this@drawWithContent.drawContent() }
                 },
                 contentAlignment = if (toRight) Alignment.CenterStart else Alignment.CenterEnd,
             ) { Icon(painterResource(icon), contentDescription = null, tint = tint, modifier = Modifier.padding(horizontal = 12.dp)) }
