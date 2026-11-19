@@ -1,57 +1,22 @@
 package com.gkeepdroid
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ButtonGroup
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.FilledTonalIconToggleButton
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -60,45 +25,31 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
-import androidx.compose.ui.graphics.drawscope.clipRect
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 
 // The pieces of a checklist with categories in the editor: the header set into the frame's top line, the frame itself drawn in
 // pieces by the rows, the drop places and the chips of the dialogs.
@@ -232,54 +183,6 @@ internal fun EditorCategoryHeader(
     }
 }
 
-/** Shown at the end of a checklist while an item is held: letting it go here puts it into a new category. */
-@Composable
-internal fun NewCategoryDropZone(active: Boolean, modifier: Modifier = Modifier) {
-    val color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
-    Row(
-        modifier.fillMaxWidth().padding(top = 8.dp).clip(MaterialTheme.shapes.medium)
-            .background(if (active) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else Color.Transparent)
-            .border(if (active) 2.dp else 1.dp, color, MaterialTheme.shapes.medium)
-            .padding(horizontal = 16.dp, vertical = 18.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
-    ) {
-        Icon(painterResource(R.drawable.ic_add), contentDescription = null, tint = color)
-        Spacer(Modifier.size(8.dp))
-        Text(stringResource(R.string.category_new), color = color, style = MaterialTheme.typography.titleSmall)
-    }
-}
-
-/** A category to choose; held, [onLongClick] runs (an earlier category turns red, held again it is forgotten). */
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-internal fun CategoryChip(name: String, armed: Boolean = false, onLongClick: (() -> Unit)? = null, onClick: () -> Unit) {
-    val color = if (armed) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline
-    Box(
-        Modifier.clip(MaterialTheme.shapes.small)
-            .background(if (armed) MaterialTheme.colorScheme.errorContainer else Color.Transparent)
-            .border(1.dp, color, MaterialTheme.shapes.small)
-            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-    ) {
-        Text(name, style = MaterialTheme.typography.labelLarge, color = if (armed) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onSurface)
-    }
-}
-
-/** A place to drop a held item into a category that has nothing else in it; [label] names it where no header does. */
-@Composable
-internal fun CategoryDropSlot(label: String?, active: Boolean, modifier: Modifier = Modifier) {
-    val color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
-    Box(
-        modifier.fillMaxWidth().padding(top = 4.dp).height(56.dp).clip(MaterialTheme.shapes.medium)
-            .background(if (active) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else Color.Transparent)
-            .border(if (active) 2.dp else 1.dp, color, MaterialTheme.shapes.medium),
-        contentAlignment = Alignment.Center,
-    ) {
-        if (label != null) Text(label, color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.titleSmall)
-    }
-}
-
 /** Geometry shared by the category frame, its swipe band and the rows around them. */
 val FRAME_RADIUS = 18.dp
 val FRAME_SIDE = 8.dp
@@ -339,90 +242,4 @@ internal fun Modifier.categoryFrame(position: Int, notches: List<Pair<Float, Flo
             )
         }
     }.padding(start = FRAME_SIDE, end = FRAME_SIDE, bottom = if (last) FRAME_SIDE else 0.dp)
-}
-
-/** Where a held category would be put: a line in the primary color. */
-@Composable
-internal fun DropLine() {
-    Box(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 2.dp).height(3.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary))
-}
-
-/**
- * A whole category swiped: every piece of it (header, items, drop place) moves by [offset], on a band in the swipe's color that
- * has the frame's rounding at its ends, and the symbol sits at the header. Nothing is drawn while [offset] is 0.
- */
-@Composable
-internal fun CategorySwipeBand(
-    offset: Float, action: Int, frame: Int, topInset: Dp, category: String, index: Int,
-    bounds: SnapshotStateMap<String, Pair<Float, Float>>, content: @Composable () -> Unit,
-) {
-    val (color, icon, tint) = swipeLook(action)
-    val surface = MaterialTheme.colorScheme.background
-    val top = frame == FRAME_FIRST || frame == FRAME_ONLY
-    val bottom = frame == FRAME_LAST || frame == FRAME_ONLY
-    val active = offset != 0f && frame != FRAME_NONE
-    // The same structure while swiping or not, so the rows (and the header's gesture) are not made anew when it starts.
-    Box(
-        // The header's piece is drawn above the pieces below it, so its symbol (in the middle of the category) is not covered by them.
-        Modifier.zIndex(if (active && top) 1f else 0f).onGloballyPositioned {
-            val b = it.boundsInRoot()
-            val now = b.top to b.bottom
-            if (bounds["$category#$index"] != now) bounds["$category#$index"] = now
-        }.then(
-            if (!active) Modifier else Modifier.drawBehind {
-                // The band is the frame's place less the frame where it is now, both on the line's centre path: there is nothing
-                // to cover (so no seam or sliver beside the line), and the line itself lies over the band's edge.
-                val half = 0.5.dp.toPx()
-                val r = FRAME_RADIUS.toPx()
-                val from = if (top) topInset.toPx() + half else 0f
-                val to = if (bottom) size.height - half else size.height + ROW_GAP.toPx()
-                // The frame that is cut out is a hair smaller than the line's centre path, so the band reaches under the line (which is
-                // 1 dp thick) and the antialiasing of its arcs, which meet the line at a very shallow angle at the top, leaves no gap.
-                val e = 0.5.dp.toPx()
-                fun shape(dx: Float, grow: Float): Path {
-                    val zero = CornerRadius.Zero
-                    val round = CornerRadius(r - grow)
-                    return Path().apply {
-                        addRoundRect(
-                            RoundRect(
-                                half + dx + grow, if (top) from + grow else from, size.width - half + dx - grow, if (bottom) to - grow else to,
-                                topLeftCornerRadius = if (top) round else zero, topRightCornerRadius = if (top) round else zero,
-                                bottomLeftCornerRadius = if (bottom) round else zero, bottomRightCornerRadius = if (bottom) round else zero,
-                            ),
-                        )
-                    }
-                }
-                val band = Path.combine(PathOperation.Difference, shape(0f, 0f), shape(offset, e))
-                // Only as far as the arcs reach: what is left of the shrunk frame along the top (over the title's gap) is not drawn.
-                val reach = 14.dp.toPx()
-                clipRect(
-                    if (offset > 0f) 0f else size.width + offset - half - reach, -100000f,
-                    if (offset > 0f) offset + half + reach else size.width, 100000f,
-                ) { drawPath(band, color) }
-            },
-        ),
-    ) {
-        // The symbol sits at the header, on the side the swipe comes from.
-        if (active && top) {
-            // The symbol in the middle of the whole category (its pieces report where they are), not of the header's piece.
-            val mine = bounds["$category#$index"]
-            val all = bounds.filterKeys { it.startsWith("$category#") }.values
-            val middle = if (all.isEmpty()) null else (all.minOf { it.first } + with(LocalDensity.current) { topInset.toPx() } + all.maxOf { it.second }) / 2f
-            // Only the strip the category has left shows it: it lies under the moving rows, not on top of them.
-            Box(
-                Modifier.matchParentSize().drawWithContent {
-                    val from = if (offset > 0f) 0f else size.width + offset
-                    val to = if (offset > 0f) offset else size.width
-                    clipRect(from, -100000f, to, 100000f) { this@drawWithContent.drawContent() }
-                }.padding(start = 20.dp, end = 20.dp), contentAlignment = if (offset > 0f) Alignment.TopStart else Alignment.TopEnd) {
-                Icon(
-                    painterResource(icon), contentDescription = null, tint = tint,
-                    modifier = Modifier.wrapContentSize(if (offset > 0f) Alignment.TopStart else Alignment.TopEnd, unbounded = true).size(24.dp).offset { IntOffset(0, if (middle != null && mine != null) (middle - mine.first - 12.dp.toPx()).toInt() else topInset.roundToPx() + 4.dp.roundToPx()) },
-                )
-            }
-        }
-        Box(
-            Modifier.graphicsLayer { translationX = if (active) offset else 0f },
-        ) { content() }
-    }
 }
