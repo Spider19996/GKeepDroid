@@ -1,69 +1,57 @@
 package com.gkeepdroid
 
 import android.content.Intent
-import androidx.core.content.edit
-import android.text.format.DateUtils
 import android.os.Bundle
 import android.os.SystemClock
+import android.text.format.DateUtils
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import kotlinx.coroutines.delay
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
-import androidx.compose.foundation.gestures.scrollBy
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButtonMenu
 import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -73,26 +61,41 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.ToggleFloatingActionButtonDefaults.animateIcon
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.content.edit
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 // The grid (or list) of the note cards on the notes screen, with moving a card by dragging it.
@@ -178,7 +181,7 @@ internal fun NotesGrid(
     }
 
     // The drag gesture lives longer than one composition: it must always call the current version of drop().
-    val dropNow by androidx.compose.runtime.rememberUpdatedState<() -> Unit>({ drop() })
+    val dropNow by rememberUpdatedState<() -> Unit>({ drop() })
 
     // Near the top or bottom edge the list scrolls along with the finger.
     LaunchedEffect(dragKey) {
@@ -194,8 +197,8 @@ internal fun NotesGrid(
     /** The long-press drag of one card. */
     @Composable
     fun dragModifier(key: String): Modifier {
-        val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
-        val toggle = { haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress); onToggle(key) }
+        val haptic = LocalHapticFeedback.current
+        val toggle = { haptic.performHapticFeedback(HapticFeedbackType.LongPress); onToggle(key) }
         // Once notes are chosen, a tap adds or removes one, and the cards no longer move (the card being pressed keeps its gesture).
         if (selected.isNotEmpty() && dragKey != key) return Modifier
         // Without a place to drag to, a long press chooses the note.

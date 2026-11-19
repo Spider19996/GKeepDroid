@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +15,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -21,6 +25,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -29,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -61,7 +67,7 @@ class AddItemActivity : ComponentActivity() {
         setContent { KeepTheme(themeMode, opaque = false) { AddItemDialog(account, noteId, categories, preset) } }
     }
 
-    @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+    @OptIn(ExperimentalLayoutApi::class)
     @Composable
     private fun AddItemDialog(account: String, noteId: String, categories: List<String>, preset: String?) {
         val scope = rememberCoroutineScope()
@@ -71,7 +77,7 @@ class AddItemActivity : ComponentActivity() {
         var added by remember { mutableStateOf(0) }
         // The category the next item goes into (null: none), the ones to choose from, and the name of a new one being typed.
         var category by remember { mutableStateOf(preset) }
-        val known = remember { androidx.compose.runtime.mutableStateListOf<String>().apply { addAll(categories); if (preset != null && preset !in this) add(preset) } }
+        val known = remember { mutableStateListOf<String>().apply { addAll(categories); if (preset != null && preset !in this) add(preset) } }
         var newCategory by remember { mutableStateOf<String?>(null) }
 
         LaunchedEffect(Unit) { focus.requestFocus() }
@@ -108,23 +114,23 @@ class AddItemActivity : ComponentActivity() {
                 Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(stringResource(R.string.add_item), style = MaterialTheme.typography.titleLarge)
                     // Where the item goes: no category, one of the list's, or a new one.
-                    androidx.compose.foundation.layout.FlowRow(
+                    FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
-                        androidx.compose.material3.FilterChip(
+                        FilterChip(
                             selected = category == null && newCategory == null, onClick = { category = null; newCategory = null },
                             label = { Text(stringResource(R.string.category_none)) },
                         )
                         known.forEach { name ->
-                            androidx.compose.material3.FilterChip(
+                            FilterChip(
                                 selected = category == name && newCategory == null, onClick = { category = name; newCategory = null },
                                 label = { Text(name) },
                             )
                         }
-                        androidx.compose.material3.FilterChip(
+                        FilterChip(
                             selected = newCategory != null, onClick = { newCategory = newCategory ?: "" },
                             label = { Text(stringResource(R.string.category_new)) },
-                            leadingIcon = { androidx.compose.material3.Icon(androidx.compose.ui.res.painterResource(R.drawable.ic_add), contentDescription = null) },
+                            leadingIcon = { Icon(painterResource(R.drawable.ic_add), contentDescription = null) },
                         )
                     }
                     if (newCategory != null) OutlinedTextField(
@@ -143,8 +149,8 @@ class AddItemActivity : ComponentActivity() {
                     )
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
                         if (added > 0) Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            androidx.compose.material3.Icon(
-                                androidx.compose.ui.res.painterResource(R.drawable.ic_done), contentDescription = null,
+                            Icon(
+                                painterResource(R.drawable.ic_done), contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary,
                             )
                             Text("$added", color = MaterialTheme.colorScheme.primary)

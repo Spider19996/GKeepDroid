@@ -9,9 +9,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
@@ -51,7 +51,7 @@ fun DebugWatermark() {
 }
 
 /** The same mark for the widgets (Glance cannot rotate text). Touches pass through it as well. */
-@androidx.compose.runtime.Composable
+@Composable
 fun DebugWatermarkGlance() {
     val context = androidx.glance.LocalContext.current
     if (!isDebugBuild(context) || DemoNotes.enabled(context)) return

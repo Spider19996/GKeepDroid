@@ -22,10 +22,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -37,15 +40,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
@@ -253,7 +257,7 @@ fun ButtonEditor(
                 Text(stringResource(caption), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Place(Modifier.fillMaxWidth())
             }
-            androidx.compose.runtime.SideEffect { columns[key] = vertical }
+            SideEffect { columns[key] = vertical }
         }
     }
     Box(Modifier.fillMaxWidth().onGloballyPositioned { origin = it.positionInRoot() }) {
@@ -298,7 +302,7 @@ fun LayoutFileButtons(
     onStatus: (String) -> Unit,
     resetEnabled: Boolean = true,
 ) {
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
     val export by rememberUpdatedState(export)
     val import by rememberUpdatedState(import)
     val saved = stringResource(R.string.layout_saved)
@@ -333,16 +337,16 @@ fun LayoutFileButtons(
     // Save and load side by side with the same width, reset below them across the whole width: they never wrap unevenly.
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            androidx.compose.material3.OutlinedButton(
+            OutlinedButton(
                 onClick = { save.launch("$filePrefix-${java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US).format(java.util.Date())}.json") },
-                modifier = Modifier.weight(1f), shapes = androidx.compose.material3.ButtonDefaults.shapes(),
+                modifier = Modifier.weight(1f), shapes = ButtonDefaults.shapes(),
             ) { Text(stringResource(R.string.layout_save), maxLines = 1) }
-            androidx.compose.material3.OutlinedButton(
-                onClick = { load.launch(arrayOf("*/*")) }, modifier = Modifier.weight(1f), shapes = androidx.compose.material3.ButtonDefaults.shapes(),
+            OutlinedButton(
+                onClick = { load.launch(arrayOf("*/*")) }, modifier = Modifier.weight(1f), shapes = ButtonDefaults.shapes(),
             ) { Text(stringResource(R.string.layout_load), maxLines = 1) }
         }
-        androidx.compose.material3.OutlinedButton(
-            enabled = resetEnabled, onClick = onReset, modifier = Modifier.fillMaxWidth(), shapes = androidx.compose.material3.ButtonDefaults.shapes(),
+        OutlinedButton(
+            enabled = resetEnabled, onClick = onReset, modifier = Modifier.fillMaxWidth(), shapes = ButtonDefaults.shapes(),
         ) { Text(resetLabel, maxLines = 1) }
     }
 }

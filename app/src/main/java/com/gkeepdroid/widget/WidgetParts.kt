@@ -1,6 +1,5 @@
 package com.gkeepdroid
 
-import androidx.core.net.toUri
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -11,11 +10,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.glance.ColorFilter
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
-import androidx.glance.text.FontWeight
 import androidx.glance.LocalContext
 import androidx.glance.action.Action
 import androidx.glance.action.actionParametersOf
@@ -30,11 +29,13 @@ import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.ContentScale
 import androidx.glance.layout.Row
+import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.text.FontStyle
+import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextDecoration
 import androidx.glance.text.TextStyle
@@ -70,7 +71,7 @@ internal fun GlanceModifier.noteBackground(
     transparentFallback: Color = Color.Transparent,
     picture: android.graphics.Bitmap? = null,
 ): GlanceModifier = when {
-    picture != null -> background(ImageProvider(picture), androidx.glance.layout.ContentScale.Crop)
+    picture != null -> background(ImageProvider(picture), ContentScale.Crop)
     noteColor != null -> background(ColorProvider(Color(noteColor).copy(alpha = settings.noteAlpha)))
     settings.plainCardStyle == PLAIN_GRAY -> background(ColorProvider(Color(0xFF424242).copy(alpha = settings.noteAlpha)))
     settings.plainCardStyle == PLAIN_BORDER -> background(ImageProvider(R.drawable.card_border))
@@ -373,7 +374,7 @@ internal fun ChecklistBody(
         val folds = CategoryFolds.load(context)
         var left = if (rowLimit > 0) rowLimit else Int.MAX_VALUE
         // Some room between the note's title and its first category.
-        if (groups.first().name != null) androidx.glance.layout.Spacer(GlanceModifier.height(4.dp))
+        if (groups.first().name != null) Spacer(GlanceModifier.height(4.dp))
         var hidden = 0
         groups.forEach { group ->
             // The items without a category are framed too, only without a name.

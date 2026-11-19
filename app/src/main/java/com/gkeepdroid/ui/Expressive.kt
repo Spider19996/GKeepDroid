@@ -3,15 +3,15 @@ package com.gkeepdroid
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.CheckableDropdownMenuItem
@@ -30,8 +30,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
@@ -133,7 +134,7 @@ internal fun GroupedMenu(expanded: Boolean, onDismissRequest: () -> Unit, groups
 /** Gives a small round control the 48 dp touch area Material asks for; the control inside keeps its own size. */
 @Composable
 internal fun RoundTouchTarget(
-    onClick: () -> Unit, enabled: Boolean = true, shape: androidx.compose.ui.graphics.Shape = CircleShape, content: @Composable () -> Unit,
+    onClick: () -> Unit, enabled: Boolean = true, shape: Shape = CircleShape, content: @Composable () -> Unit,
 ) {
     Box(
         Modifier.size(48.dp).clip(shape).clickable(enabled = enabled, role = Role.Button, onClick = onClick),

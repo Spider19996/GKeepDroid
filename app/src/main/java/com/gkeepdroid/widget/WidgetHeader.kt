@@ -4,22 +4,25 @@ import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
+import androidx.glance.LocalSize
 import androidx.glance.action.Action
+import androidx.glance.action.ActionParameters
 import androidx.glance.action.actionParametersOf
 import androidx.glance.action.actionStartActivity
+import androidx.glance.appwidget.GlanceAppWidgetManager
+import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
+import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.ColumnScope
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
-import androidx.glance.LocalSize
-import androidx.glance.currentState
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
@@ -247,17 +250,17 @@ internal fun WithHeaderBar(
 /** The page the bar of [side] shows when its buttons do not fit (kept in the widget's state). */
 internal fun barPageKey(side: Int) = intPreferencesKey("bar_page_$side")
 
-internal val SideKey = androidx.glance.action.ActionParameters.Key<Int>("side")
-internal val PageKey = androidx.glance.action.ActionParameters.Key<Int>("page")
+internal val SideKey = ActionParameters.Key<Int>("side")
+internal val PageKey = ActionParameters.Key<Int>("page")
 
 /** Turns the bar of a widget to another page of its buttons. */
-class BarPageAction : androidx.glance.appwidget.action.ActionCallback {
-    override suspend fun onAction(context: android.content.Context, glanceId: androidx.glance.GlanceId, parameters: androidx.glance.action.ActionParameters) {
+class BarPageAction : ActionCallback {
+    override suspend fun onAction(context: android.content.Context, glanceId: androidx.glance.GlanceId, parameters: ActionParameters) {
         val side = parameters[SideKey] ?: return
         val page = parameters[PageKey] ?: return
         androidx.glance.appwidget.state.updateAppWidgetState(context, glanceId) { it[barPageKey(side)] = page }
         // Only the widget whose bar was turned is drawn again.
-        val manager = androidx.glance.appwidget.GlanceAppWidgetManager(context)
+        val manager = GlanceAppWidgetManager(context)
         if (glanceId in manager.getGlanceIds(NotesWidget::class.java)) NotesWidget().update(context, glanceId)
         else SingleNoteWidget().update(context, glanceId)
     }

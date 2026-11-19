@@ -1,18 +1,19 @@
 package com.gkeepdroid
 
 import android.content.Context
-import androidx.core.graphics.createBitmap
-import androidx.core.graphics.scale
-import androidx.core.content.edit
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.core.content.edit
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.scale
 import com.caverock.androidsvg.SVG
 import java.io.File
 import java.net.HttpURLConnection
@@ -288,7 +289,7 @@ object NoteLook {
     class Look(val textColor: Int?, val dark: Boolean?)
 
     /** Changes whenever a look is saved, so open screens redraw their cards. */
-    val version = androidx.compose.runtime.mutableIntStateOf(0)
+    val version = mutableIntStateOf(0)
 
     private fun prefs(context: Context) = context.getSharedPreferences("note_look", Context.MODE_PRIVATE)
 

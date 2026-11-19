@@ -3,6 +3,11 @@ package com.gkeepdroid
 import android.app.Activity
 import android.os.Build
 import android.view.Window
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -17,20 +22,27 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MotionScheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.expressiveLightColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.expressiveLightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -47,22 +59,22 @@ private fun Window.makeBarsSeeThrough() {
 
 /** A color and a picture behind a whole screen; the note editor sets them while a note has them. One per activity. */
 class ScreenTint {
-    var color by androidx.compose.runtime.mutableStateOf<Int?>(null)
-    var image by androidx.compose.runtime.mutableStateOf<android.graphics.Bitmap?>(null)
+    var color by mutableStateOf<Int?>(null)
+    var image by mutableStateOf<android.graphics.Bitmap?>(null)
     /** The picture is the dark version of one of Keep's, so the screen stays dark and its text light. */
-    var darkImage by androidx.compose.runtime.mutableStateOf(false)
+    var darkImage by mutableStateOf(false)
     /** While true, changes of the color and picture show at once instead of fading (a screen opens in its final look). */
-    var instant by androidx.compose.runtime.mutableStateOf(false)
+    var instant by mutableStateOf(false)
 }
 
 /** Whether the app is in a dark theme (dark or OLED, or the phone's dark mode when the app follows it). */
-val LocalDarkTheme = androidx.compose.runtime.compositionLocalOf { false }
+val LocalDarkTheme = compositionLocalOf { false }
 
 /** True where content sits on a note's own color or picture. */
-val LocalOnNote = androidx.compose.runtime.compositionLocalOf { false }
+val LocalOnNote = compositionLocalOf { false }
 
 private fun lerpScheme(a: ColorScheme, b: ColorScheme, f: Float): ColorScheme {
-    fun mix(x: Color, y: Color) = androidx.compose.ui.graphics.lerp(x, y, f)
+    fun mix(x: Color, y: Color) = lerp(x, y, f)
     return b.copy(
         primary = mix(a.primary, b.primary), onPrimary = mix(a.onPrimary, b.onPrimary),
         primaryContainer = mix(a.primaryContainer, b.primaryContainer), onPrimaryContainer = mix(a.onPrimaryContainer, b.onPrimaryContainer),
@@ -89,11 +101,11 @@ private fun lerpScheme(a: ColorScheme, b: ColorScheme, f: Float): ColorScheme {
 /** The scheme to show: when [target] changes (the key tells when), the colors fade over to it instead of jumping. */
 @Composable
 private fun fadingScheme(target: ColorScheme, key: Any?): ColorScheme {
-    var from by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(target) }
-    var to by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(target) }
-    val progress = androidx.compose.runtime.remember { androidx.compose.animation.core.Animatable(1f) }
-    val latest by androidx.compose.runtime.rememberUpdatedState(target)
-    var shownKey by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(key) }
+    var from by remember { mutableStateOf(target) }
+    var to by remember { mutableStateOf(target) }
+    val progress = remember { Animatable(1f) }
+    val latest by rememberUpdatedState(target)
+    var shownKey by remember { mutableStateOf(key) }
     androidx.compose.runtime.LaunchedEffect(key) {
         // Nothing changed (the first run, or the same look again): no fade, which would redraw the whole screen every frame for nothing.
         if (key == shownKey) return@LaunchedEffect
@@ -101,7 +113,7 @@ private fun fadingScheme(target: ColorScheme, key: Any?): ColorScheme {
         from = lerpScheme(from, to, progress.value)
         to = latest
         progress.snapTo(0f)
-        progress.animateTo(1f, androidx.compose.animation.core.tween(450))
+        progress.animateTo(1f, tween(450))
     }
     return if (progress.value >= 1f) to else lerpScheme(from, to, progress.value)
 }
@@ -117,7 +129,7 @@ fun OnNoteTheme(
 ) {
     val context = LocalContext.current
     val outer = MaterialTheme.colorScheme
-    val outerContent = androidx.compose.material3.LocalContentColor.current
+    val outerContent = LocalContentColor.current
     val darkTheme = LocalDarkTheme.current
     var scheme = when {
         // The dark version of a picture needs light text, also in a light theme.
@@ -125,10 +137,10 @@ fun OnNoteTheme(
             val base = if (darkTheme) outer else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) dynamicDarkColorScheme(context) else darkColorScheme()
             if (accent == null) base else {
                 // The same for a dark picture: menus and dialogs in a dark shade of its color.
-                val surface = androidx.compose.ui.graphics.lerp(Color(accent), Color.Black, 0.75f)
+                val surface = lerp(Color(accent), Color.Black, 0.75f)
                 // Buttons and outlines in a light shade of the color, on the dark note.
-                val bright = androidx.compose.ui.graphics.lerp(Color(accent), Color.White, 0.7f)
-                val container = androidx.compose.ui.graphics.lerp(Color(accent), Color.White, 0.22f)
+                val bright = lerp(Color(accent), Color.White, 0.7f)
+                val container = lerp(Color(accent), Color.White, 0.22f)
                 base.copy(
                     primary = bright, onPrimary = DarkNoteText,
                     primaryContainer = container, onPrimaryContainer = Color.White,
@@ -148,9 +160,9 @@ fun OnNoteTheme(
                 // Buttons in a dark shade of the note's hue, their containers in a light one, so they sit well on the note.
                 val hsv = FloatArray(3).also { android.graphics.Color.colorToHSV(accent, it) }
                 val dark = Color(android.graphics.Color.HSVToColor(floatArrayOf(hsv[0], (hsv[1] + 0.35f).coerceIn(0.45f, 0.9f), 0.34f)))
-                val light = androidx.compose.ui.graphics.lerp(Color(accent), Color.White, 0.55f)
+                val light = lerp(Color(accent), Color.White, 0.55f)
                 // Menus and dialogs take a light shade of the note's color, so everything looks of one piece.
-                val surface = androidx.compose.ui.graphics.lerp(Color(accent), Color.White, 0.8f)
+                val surface = lerp(Color(accent), Color.White, 0.8f)
                 base.copy(
                     primary = dark, onPrimary = Color.White,
                     primaryContainer = light, onPrimaryContainer = dark,
@@ -180,10 +192,10 @@ fun OnNoteTheme(
     val shown = fadingScheme(scheme, listOf(active, accent, darkOnPicture, textColor))
     val target = textColor?.let { Color(it) } ?: if (darkOnPicture) scheme.onSurface else if (active) DarkNoteText else outerContent
     // The text color follows the fade as well.
-    val contentColor by androidx.compose.animation.animateColorAsState(target, androidx.compose.animation.core.tween(450), label = "content")
+    val contentColor by animateColorAsState(target, tween(450), label = "content")
     MaterialExpressiveTheme(colorScheme = shown, motionScheme = MotionScheme.expressive()) {
-        androidx.compose.runtime.CompositionLocalProvider(
-            androidx.compose.material3.LocalContentColor provides contentColor,
+        CompositionLocalProvider(
+            LocalContentColor provides contentColor,
             LocalOnNote provides transparentRows,
         ) { content() }
     }
@@ -221,7 +233,7 @@ fun KeepTheme(themeMode: Int, opaque: Boolean = true, tint: ScreenTint? = null, 
     // Demo mode (for screenshots) runs full screen: the status bar and the three buttons are hidden, and a swipe from the edge brings them back.
     val fullScreen = DemoNotes.version.intValue >= 0 && DemoNotes.enabled(context)
     // Switching the demo mode on or off changes how the window is laid out; a fresh activity does that cleanly.
-    val shownFullScreen = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(fullScreen) }
+    val shownFullScreen = remember { mutableStateOf(fullScreen) }
     SideEffect {
         if (shownFullScreen.value != fullScreen) {
             shownFullScreen.value = fullScreen
@@ -258,21 +270,21 @@ fun KeepTheme(themeMode: Int, opaque: Boolean = true, tint: ScreenTint? = null, 
         ) {
             // A color or picture behind the screen fades in and out.
             val instant = tint?.instant == true
-            val tintColor by androidx.compose.animation.animateColorAsState(
+            val tintColor by animateColorAsState(
                 tint?.color?.let { Color(it) } ?: Color.Transparent,
-                if (instant) androidx.compose.animation.core.snap() else androidx.compose.animation.core.tween(450), label = "tint",
+                if (instant) snap() else tween(450), label = "tint",
             )
             Box(Modifier.fillMaxSize().background(tintColor)) {
-                androidx.compose.animation.Crossfade(
+                Crossfade(
                     targetState = tint?.image,
-                    animationSpec = if (instant) androidx.compose.animation.core.snap() else androidx.compose.animation.core.tween(450), label = "tintImage",
+                    animationSpec = if (instant) snap() else tween(450), label = "tintImage",
                 ) { image ->
                     if (image != null) Box(Modifier.fillMaxSize().noteBackground(image))
                 }
                 // The content keeps clear of the bars, the keyboard and, in landscape, a camera hole at the side. The top
                 // cutout is left out: the status bar covers it, and the full-screen demo draws into that strip on purpose.
                 val clear = WindowInsets.systemBars.union(WindowInsets.ime).union(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
-                androidx.compose.runtime.CompositionLocalProvider(LocalDarkTheme provides dark) {
+                CompositionLocalProvider(LocalDarkTheme provides dark) {
                     Box(Modifier.windowInsetsPadding(clear)) { content() }
                 }
                 // Debug builds only; it lies above everything and lets touches through.

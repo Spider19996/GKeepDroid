@@ -1,8 +1,8 @@
 package com.gkeepdroid
 
-import android.widget.Toast
 import android.content.Intent
 import android.text.format.DateUtils
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -119,7 +120,7 @@ internal fun ColumnScope.FilterBarOptions(bar: Boolean, chips: Int, onBar: (Bool
     SwitchRow(R.string.filter_bar_show, bar, onBar)
     if (bar) filterChoices.forEach { (bit, label) ->
         Row(verticalAlignment = Alignment.CenterVertically) {
-            androidx.compose.material3.Checkbox(checked = chips and bit != 0, onCheckedChange = { on -> onChips(if (on) chips or bit else chips and bit.inv()) })
+            Checkbox(checked = chips and bit != 0, onCheckedChange = { on -> onChips(if (on) chips or bit else chips and bit.inv()) })
             Text(stringResource(label))
         }
     }

@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.LocalSize
 import androidx.glance.action.actionParametersOf
@@ -26,18 +27,19 @@ import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
-import androidx.glance.ImageProvider
 import androidx.glance.background
 import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
+import androidx.glance.layout.ContentScale
 import androidx.glance.layout.Row
+import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
-import androidx.glance.layout.width
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
+import androidx.glance.layout.width
 import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.text.FontWeight
@@ -200,7 +202,7 @@ class NotesWidget : GlanceAppWidget() {
         }
         val innerModifier = if (framed) {
             GlanceModifier.fillMaxWidth().cornerRadius(R.dimen.widget_inner_corner)
-                .background(ImageProvider(picture!!), androidx.glance.layout.ContentScale.Crop)
+                .background(ImageProvider(picture!!), ContentScale.Crop)
         } else {
             GlanceModifier.fillMaxWidth()
         }
@@ -252,7 +254,7 @@ class NotesWidget : GlanceAppWidget() {
                             if (isPrivate) LockIndicator(settings, palette) else ProgressIndicator(note, settings, palette)
                             if (pinned) PinIndicator(settings, palette)
                             // Room for the arrow that floats over the corner.
-                            if (foldable) androidx.glance.layout.Spacer(GlanceModifier.width(32.dp))
+                            if (foldable) Spacer(GlanceModifier.width(32.dp))
                             if (reordering) {
                                 // Arrows to move this note; the top note cannot go up, the last cannot go down.
                                 if (canMoveUp) {
@@ -282,7 +284,7 @@ class NotesWidget : GlanceAppWidget() {
                         if (first.isNotBlank()) {
                             Text(first, maxLines = 1, style = TextStyle(color = palette.provider(0.7f), fontSize = settings.textSizeSp.sp))
                         } else if (!hasTitleRow) {
-                            androidx.glance.layout.Spacer(GlanceModifier.height(22.dp))
+                            Spacer(GlanceModifier.height(22.dp))
                         }
                     } else if (isPrivate) {
                         PrivateHint(settings, palette)
@@ -308,7 +310,7 @@ class NotesWidget : GlanceAppWidget() {
                     // The arrow's middle on the middle of the title's first line.
                     Box(GlanceModifier.fillMaxWidth().padding(top = 5.dp, end = 2.dp)) {
                         Row(GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                            androidx.glance.layout.Spacer(GlanceModifier.defaultWeight())
+                            Spacer(GlanceModifier.defaultWeight())
                             if (!hasTitleRow) {
                                 if (!isPrivate) ProgressIndicator(note, settings, palette)
                                 if (pinned) PinIndicator(settings, palette)

@@ -1,12 +1,20 @@
 package com.gkeepdroid
 
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
-import androidx.core.net.toUri
 import android.content.Intent
-import java.util.UUID
 import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.core.net.toUri
+import java.util.UUID
 
 /** Recognises text typed as a list ("- milk", "* eggs", "[ ] bread") and turns it into checklist items. */
 internal object ChecklistText {
@@ -34,7 +42,7 @@ internal object NoteLinks {
     private val phone = Regex("""[+0][\d ()/.-]{5,}\d""")
 
     /** The text with its links made tappable: the system opens each in the app made for it (browser, mail, phone). */
-    fun annotate(text: String, color: androidx.compose.ui.graphics.Color): androidx.compose.ui.text.AnnotatedString {
+    fun annotate(text: String, color: Color): AnnotatedString {
         val taken = mutableListOf<IntRange>()
         val ranges = mutableListOf<Pair<IntRange, String>>()
         fun add(range: IntRange, url: String) {
@@ -53,15 +61,15 @@ internal object NoteLinks {
         phone.findAll(text).forEach { m ->
             if (m.value.count { it.isDigit() } >= 7) add(m.range, "tel:" + m.value.filter { it.isDigit() || it == '+' })
         }
-        if (ranges.isEmpty()) return androidx.compose.ui.text.AnnotatedString(text)
-        return androidx.compose.ui.text.buildAnnotatedString {
+        if (ranges.isEmpty()) return AnnotatedString(text)
+        return buildAnnotatedString {
             append(text)
             ranges.forEach { (range, url) ->
                 addLink(
-                    androidx.compose.ui.text.LinkAnnotation.Url(
+                    LinkAnnotation.Url(
                         url,
-                        androidx.compose.ui.text.TextLinkStyles(
-                            androidx.compose.ui.text.SpanStyle(color = color, textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline)
+                        TextLinkStyles(
+                            SpanStyle(color = color, textDecoration = TextDecoration.Underline)
                         ),
                     ),
                     range.first, range.last + 1,
@@ -100,7 +108,7 @@ internal object ListContinue {
     private val numbered = Regex("""^(\s*)(\d{1,3})([.)])\s(.*)$""")
     private val bulleted = Regex("""^(\s*)([-*•])\s(.*)$""")
 
-    fun apply(old: String, typed: androidx.compose.ui.text.input.TextFieldValue): androidx.compose.ui.text.input.TextFieldValue {
+    fun apply(old: String, typed: TextFieldValue): TextFieldValue {
         val text = typed.text
         val pos = typed.selection.start
         // Only one Enter typed at the cursor counts; anything else (paste, delete, other typing) is left alone.
@@ -126,12 +134,12 @@ internal object ListContinue {
         }
         return if (empty) {
             // Enter on an empty item: the marker goes away and the list is over.
-            androidx.compose.ui.text.input.TextFieldValue(
-                old.substring(0, lineStart) + old.substring(pos - 1), androidx.compose.ui.text.TextRange(lineStart),
+            TextFieldValue(
+                old.substring(0, lineStart) + old.substring(pos - 1), TextRange(lineStart),
             )
         } else {
-            androidx.compose.ui.text.input.TextFieldValue(
-                text.substring(0, pos) + marker + text.substring(pos), androidx.compose.ui.text.TextRange(pos + marker.length),
+            TextFieldValue(
+                text.substring(0, pos) + marker + text.substring(pos), TextRange(pos + marker.length),
             )
         }
     }

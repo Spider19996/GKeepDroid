@@ -1,10 +1,11 @@
 package com.gkeepdroid
 
 import android.content.Context
+import androidx.compose.runtime.mutableIntStateOf
+import java.io.File
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-import java.io.File
 
 /** Per-account cache of the last synced notes, so widgets render without network. */
 object NotesCache {
@@ -23,7 +24,7 @@ object NotesCache {
      * [pending] checks that were not sent to Keep yet are applied on top of what Keep returned.
      */
     /** Counts every change of the cached notes, so an open screen shows the change at once. */
-    val version = androidx.compose.runtime.mutableIntStateOf(0)
+    val version = mutableIntStateOf(0)
 
     fun write(
         context: Context, email: String, json: String, pending: List<PendingToggle> = emptyList(),

@@ -3,22 +3,27 @@ package com.gkeepdroid
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -29,29 +34,34 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
 const val ZONE_TOP_LEFT = 0
 const val ZONE_TOP_RIGHT = 1
@@ -206,13 +216,13 @@ internal fun EditorBar(
             // surplus out of sight at its outer edge; when both are full they meet in the middle. Where more buttons wait, the
             // row fades out and a small arrow points there. A tap on a button brings it back to rest (unless switched off).
             val scroll = rememberScrollState()
-            val scope = androidx.compose.runtime.rememberCoroutineScope()
-            val density = androidx.compose.ui.platform.LocalDensity.current
-            var leftWidth by androidx.compose.runtime.remember { androidx.compose.runtime.mutableIntStateOf(0) }
+            val scope = rememberCoroutineScope()
+            val density = LocalDensity.current
+            var leftWidth by remember { mutableIntStateOf(0) }
             val gapWidth = 16.dp
             val rest = with(density) { (sidePadding + gapWidth / 2 - maxWidth / 2).toPx() }.toInt() + leftWidth
             val restAt = rest.coerceIn(0, scroll.maxValue)
-            androidx.compose.runtime.LaunchedEffect(restAt) { scroll.scrollTo(restAt) }
+            LaunchedEffect(restAt) { scroll.scrollTo(restAt) }
             fun withReturn(state: EditorActionState?): EditorActionState? = if (state == null || !snapBack) state else EditorActionState(
                 state.icon, state.label, { state.onClick(); scope.launch { scroll.animateScrollTo(restAt) } },
                 visible = state.visible, enabled = state.enabled, checked = state.checked, dimmed = state.dimmed, tint = state.tint, popup = state.popup,
@@ -352,16 +362,16 @@ internal fun NoteActionButtons(
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     run.chunked(perRow).forEach { rowSpecs ->
                         // A row that is not full keeps the width of the full ones, so the columns line up.
-                        Row(Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             rowSpecs.forEach { spec ->
                                 val state = states.getValue(spec.id)
-                                val content: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit = {
+                                val content: @Composable RowScope.() -> Unit = {
                                     Icon(painterResource(state.icon), contentDescription = null, Modifier.size(18.dp))
                                     Spacer(Modifier.size(8.dp))
                                     // A name of two words always breaks between them, so the buttons of a row look alike.
-                                    Text(state.label.split(" ").let { if (it.size == 2) it.joinToString("\n") else state.label }, maxLines = 2, textAlign = androidx.compose.ui.text.style.TextAlign.Start)
+                                    Text(state.label.split(" ").let { if (it.size == 2) it.joinToString("\n") else state.label }, maxLines = 2, textAlign = TextAlign.Start)
                                 }
-                                val tight = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                                val tight = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
                                 val mark = Modifier.fillMaxSize().then(
                                     if (spec.id == highlightId) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp)) else Modifier,
                                 )
@@ -369,7 +379,7 @@ internal fun NoteActionButtons(
                                 val tint = noteButtonTint(spec.id)
                                 // The box is what the row divides; a menu of the action (the one of "more") hangs on it.
                                 Box(Modifier.weight(1f).fillMaxHeight().longPressFirst(state.onLongClick)) {
-                                    androidx.compose.material3.OutlinedButton(
+                                    OutlinedButton(
                                         onClick = state.onClick, enabled = state.enabled, shapes = ButtonDefaults.shapes(), modifier = mark, contentPadding = tight,
                                         colors = if (tint != null) ButtonDefaults.outlinedButtonColors(contentColor = tint) else ButtonDefaults.outlinedButtonColors(),
                                         content = content,

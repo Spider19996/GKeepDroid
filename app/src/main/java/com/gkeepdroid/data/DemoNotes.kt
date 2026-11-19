@@ -1,6 +1,7 @@
 package com.gkeepdroid
 
 import android.content.Context
+import androidx.compose.runtime.mutableIntStateOf
 
 /**
  * Demo mode, for screenshots: every account shows the same generic notes, the account names are
@@ -10,7 +11,7 @@ object DemoNotes {
     fun enabled(context: Context): Boolean = SettingsStore.loadGlobal(context).demoMode
 
     /** Changes whenever the settings are saved, so screens can react to the demo mode being switched. */
-    val version = androidx.compose.runtime.mutableIntStateOf(0)
+    val version = mutableIntStateOf(0)
 
     const val ACCOUNT_NAME = "demo@example.com"
 

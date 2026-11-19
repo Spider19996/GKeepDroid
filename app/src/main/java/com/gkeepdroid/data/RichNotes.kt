@@ -1,12 +1,14 @@
 package com.gkeepdroid
 
 import android.content.Context
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.em
 import org.json.JSONObject
 
@@ -29,7 +31,7 @@ object RichNotes {
     private val cache = HashMap<String, Cached>()
 
     /** Changes whenever the app writes formatting itself, so open cards read it again at once. */
-    val version = androidx.compose.runtime.mutableIntStateOf(0)
+    val version = mutableIntStateOf(0)
     private const val RECHECK_MS = 500L
 
     private fun load(context: Context, account: String): Map<String, RichNote> {
@@ -154,7 +156,7 @@ object RichNotes {
                         fontWeight = if (flags and (BOLD or HEADING) != 0) FontWeight.Bold else null,
                         fontStyle = if (flags and ITALIC != 0) FontStyle.Italic else null,
                         textDecoration = if (decoration.isEmpty()) null else TextDecoration.combine(decoration),
-                        fontSize = if (flags and HEADING != 0) 1.25.em else androidx.compose.ui.unit.TextUnit.Unspecified,
+                        fontSize = if (flags and HEADING != 0) 1.25.em else TextUnit.Unspecified,
                     ),
                     start, to,
                 )

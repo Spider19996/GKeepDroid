@@ -1,84 +1,72 @@
 package com.gkeepdroid
 
+import android.app.KeyguardManager
 import android.appwidget.AppWidgetManager
-import androidx.core.content.edit
-import androidx.core.net.toUri
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
-import android.widget.Toast
-import android.app.KeyguardManager
 import android.os.Bundle
-import androidx.compose.ui.draw.alpha
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ButtonGroup
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.layout.onPlaced
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.zIndex
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.foundation.gestures.scrollBy
-import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.key
-import java.util.UUID
+import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.animate
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.isImeVisible
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
-import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalIconToggleButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -86,16 +74,29 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isCtrlPressed
@@ -103,37 +104,44 @@ import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onPlaced
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.core.content.FileProvider
+import androidx.core.content.edit
+import androidx.core.net.toUri
+import java.util.UUID
 import kotlinx.coroutines.launch
-import androidx.compose.foundation.layout.ColumnScope
 
 /**
  * The checklist of the editor: the hint above it, the items (under the headers of their categories, if it has some) with their drag
  * handles and swipes, and what goes with them. Lives in [EditNoteActivity]'s column.
  */
-@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun ColumnScope.EditorChecklist(
     model: EditorModel, categories: EditorCategories, format: FormatState, itemSwipe: Pair<Int, Int>,
     account: String, noteKey: String, canFormat: Boolean, styleLabels: List<String>, applyStyle: (Int) -> Unit,
     swipeItems: (List<String>, Int) -> Unit, addInCategory: (String?) -> Unit,
-    scroll: androidx.compose.foundation.ScrollState, scope: kotlinx.coroutines.CoroutineScope,
+    scroll: ScrollState, scope: kotlinx.coroutines.CoroutineScope,
 ) {
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
     val items = model.items
     val sessionCategories = categories.session
     fun editorRich() = categories.rich()
@@ -182,10 +190,10 @@ internal fun ColumnScope.EditorChecklist(
             var categoryStartTop by remember { mutableStateOf(0f) }
             val headerLayoutTop = remember { mutableStateMapOf<String, Float>() }
             // How far each category is swiped now (its header is held, the whole category moves).
-            val pieceBounds = remember { androidx.compose.runtime.mutableStateMapOf<String, Pair<Float, Float>>() }
-            val categorySwipe = remember { androidx.compose.runtime.mutableStateMapOf<String, Float>() }
-            val swipeMax = with(androidx.compose.ui.platform.LocalDensity.current) { 72.dp.toPx() }
-            val headerNotches = remember { mutableMapOf<String, androidx.compose.runtime.snapshots.SnapshotStateList<Pair<Float, Float>>>() }
+            val pieceBounds = remember { mutableStateMapOf<String, Pair<Float, Float>>() }
+            val categorySwipe = remember { mutableStateMapOf<String, Float>() }
+            val swipeMax = with(LocalDensity.current) { 72.dp.toPx() }
+            val headerNotches = remember { mutableMapOf<String, SnapshotStateList<Pair<Float, Float>>>() }
             // The drop places of the categories that have nothing else in them ("" for no category), and the one the item is over.
             val slotBounds = remember { mutableStateMapOf<String, Rect>() }
             var hoverTarget by remember { mutableStateOf<String?>(null) }
@@ -238,7 +246,7 @@ internal fun ColumnScope.EditorChecklist(
                         flagsVersion = format.version,
                         onFocus = { format.focus = item.id },
                         modifier = if (canFormat && canEdit) Modifier.textStyleMenu(styleLabels, applyStyle) else Modifier,
-                        onSelection = { format.selection[item.id] = androidx.compose.ui.text.TextRange(it.start + cut, it.end + cut) },
+                        onSelection = { format.selection[item.id] = TextRange(it.start + cut, it.end + cut) },
                         onToggle = { items.indexOfFirst { it.id == item.id }.let { i -> if (i >= 0 && !items[i].isDivider()) items[i] = items[i].copy(checked = !items[i].checked) } },
                         onRemove = {
                             items.removeAll { it.id == item.id }
@@ -323,14 +331,14 @@ internal fun ColumnScope.EditorChecklist(
             // Only what is shown can be dropped onto: rows of folded categories and headers that are gone are forgotten.
             val shownRows = entries.mapNotNull { it.second?.id }.toSet()
             val shownHeaders = editorGroups?.map { it.name ?: NONE }?.toSet().orEmpty()
-            androidx.compose.runtime.SideEffect {
+            SideEffect {
                 rowBounds.keys.retainAll(shownRows)
                 headerBounds.keys.retainAll(shownHeaders)
                 slotBounds.keys.retainAll(entries.mapNotNull { (n, i) -> if (i == null && n != null && n.startsWith(SLOT_PREFIX)) n.removePrefix(SLOT_PREFIX) else null }.toSet())
             }
             // One frame around each category: its header, its items and its drop place, each drawing its piece.
             val categoryOf = entries.map { (n, i) -> if (i != null) n else n?.let { if (it.startsWith(SLOT_PREFIX)) it.removePrefix(SLOT_PREFIX) else it } }
-            androidx.compose.runtime.SideEffect { pieceBounds.keys.retainAll(categoryOf.indices.map { "${categoryOf[it] ?: ""}#$it" }.toSet()) }
+            SideEffect { pieceBounds.keys.retainAll(categoryOf.indices.map { "${categoryOf[it] ?: ""}#$it" }.toSet()) }
             fun frameAt(index: Int): Int {
                 val c = categoryOf[index] ?: return FRAME_NONE
                 val first = index == 0 || categoryOf[index - 1] != c
@@ -360,7 +368,7 @@ internal fun ColumnScope.EditorChecklist(
                     val group = editorGroups!!.first { (it.name ?: NONE) == name }
                     val folded = CategoryFolds.key(account, noteKey, name) in folds
                     val real = group.items.filter { !it.isDivider() }
-                    val notches = headerNotches.getOrPut(name) { androidx.compose.runtime.mutableStateListOf() }
+                    val notches = headerNotches.getOrPut(name) { mutableStateListOf() }
                     // Room above for the half of the header that lies over the frame's top line.
                     Box(
                         // Held, it is drawn where the finger has it: its place in the layout is read while it is placed, in the
@@ -408,7 +416,7 @@ internal fun ColumnScope.EditorChecklist(
                         onSwipeStop = {
                             val at = categorySwipe[name] ?: 0f
                             scope.launch {
-                                androidx.compose.animation.core.animate(at, 0f) { v, _ -> categorySwipe[name] = v }
+                                animate(at, 0f) { v, _ -> categorySwipe[name] = v }
                                 categorySwipe.remove(name)
                             }
                             if (kotlin.math.abs(at) >= swipeMax * 0.75f) swipeItems(group.items.map { it.id }, if (at > 0f) itemSwipe.first else itemSwipe.second)
@@ -422,7 +430,7 @@ internal fun ColumnScope.EditorChecklist(
             if (dragging != null && canFormat) NewCategoryDropZone(
                 active = overNewCategory,
                 modifier = Modifier.onGloballyPositioned { newCategoryZone = it.boundsInRoot() },
-            ) else if (newCategoryZone != null) androidx.compose.runtime.SideEffect { newCategoryZone = null }
+            ) else if (newCategoryZone != null) SideEffect { newCategoryZone = null }
 }
 
 /** Marks a drop place among the rows of the editor; what follows is its category ("" for none). */

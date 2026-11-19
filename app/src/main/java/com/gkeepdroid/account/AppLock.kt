@@ -12,7 +12,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,7 +30,7 @@ import androidx.lifecycle.LifecycleEventObserver
  */
 object AppLock {
     /** Counts every "lock now", so open screens lock at once. */
-    val lockVersion = androidx.compose.runtime.mutableIntStateOf(0)
+    val lockVersion = mutableIntStateOf(0)
 
     enum class Result { OK, CANCELED, FAILED }
 
@@ -207,7 +209,7 @@ object AppLock {
         }
         // "Lock now" (menu, screen off) takes effect while the app is open, too.
         val lockCount = lockVersion.intValue
-        androidx.compose.runtime.LaunchedEffect(lockCount) {
+        LaunchedEffect(lockCount) {
             if (!valid(activity)) {
                 unlocked = false
                 if (activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) ask()

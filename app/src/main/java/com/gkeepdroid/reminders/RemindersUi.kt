@@ -1,17 +1,17 @@
-@file:OptIn(ExperimentalLayoutApi::class, androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 
 package com.gkeepdroid
 
 import android.app.Activity
-import androidx.core.content.edit
-import androidx.core.net.toUri
 import android.content.Intent
 import android.media.RingtoneManager
 import android.net.Uri
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,10 +20,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.background
-import android.widget.Toast
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -33,31 +29,37 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.SelectableDates
-import androidx.compose.material3.TimePicker
-import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberTimePickerState
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.content.edit
+import androidx.core.net.toUri
 
 /**
  * The list of a note's reminders, with a dialog to add and change one. Every change is saved at once
@@ -297,7 +299,7 @@ class RemindersActivity : androidx.activity.ComponentActivity() {
 @Composable
 fun rememberNotificationsOn(activity: Activity): Boolean {
     var on by remember { mutableStateOf(Reminders.canNotify(activity)) }
-    androidx.compose.runtime.DisposableEffect(activity) {
+    DisposableEffect(activity) {
         val lifecycle = (activity as androidx.lifecycle.LifecycleOwner).lifecycle
         val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
             if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) on = Reminders.canNotify(activity)

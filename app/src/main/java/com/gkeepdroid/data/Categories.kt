@@ -1,6 +1,7 @@
 package com.gkeepdroid
 
 import android.content.Context
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.core.content.edit
 
 /**
@@ -100,7 +101,7 @@ object CategoryFolds {
     fun key(account: String, noteId: String, name: String) = "$account|$noteId|$name"
 
     /** Changes whenever a category is folded or unfolded, so open screens redraw at once. */
-    val version = androidx.compose.runtime.mutableIntStateOf(0)
+    val version = mutableIntStateOf(0)
 
     fun load(context: Context): Set<String> = prefs(context).getStringSet("keys", null)?.toSet().orEmpty()
 

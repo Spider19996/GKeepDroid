@@ -11,10 +11,11 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,6 +24,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -40,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
@@ -297,19 +302,19 @@ class SettingsActivity : ComponentActivity() {
                     actions = {
                         // The explanation of a page lives behind a button, so the page itself has room for what it is about.
                         page.helpTexts()?.let { help ->
-                            var infoOpen by remember(page) { androidx.compose.runtime.mutableStateOf(false) }
-                            androidx.compose.material3.IconButton(onClick = { infoOpen = true }, shapes = IconButtonDefaults.shapes()) {
-                                androidx.compose.material3.Icon(
-                                    androidx.compose.ui.res.painterResource(R.drawable.ic_info),
+                            var infoOpen by remember(page) { mutableStateOf(false) }
+                            IconButton(onClick = { infoOpen = true }, shapes = IconButtonDefaults.shapes()) {
+                                Icon(
+                                    painterResource(R.drawable.ic_info),
                                     contentDescription = stringResource(R.string.show_explanation),
                                 )
                             }
-                            if (infoOpen) androidx.compose.material3.AlertDialog(
+                            if (infoOpen) AlertDialog(
                                 onDismissRequest = { infoOpen = false },
                                 title = { Text(stringResource(page.title)) },
-                                text = { Column(verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)) { help.forEach { Text(stringResource(it)) } } },
+                                text = { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) { help.forEach { Text(stringResource(it)) } } },
                                 confirmButton = {
-                                    androidx.compose.material3.TextButton(onClick = { infoOpen = false }, shapes = androidx.compose.material3.ButtonDefaults.shapes()) {
+                                    TextButton(onClick = { infoOpen = false }, shapes = ButtonDefaults.shapes()) {
                                         Text(stringResource(android.R.string.ok))
                                     }
                                 },
@@ -317,8 +322,8 @@ class SettingsActivity : ComponentActivity() {
                         }
                         // Rarely needed: the demo mode for screenshots lives in a menu of its own.
                         if (page == Page.Main && !hasWidget) {
-                            var menuOpen by remember { androidx.compose.runtime.mutableStateOf(false) }
-                            var logOn by remember { androidx.compose.runtime.mutableStateOf(AppLog.enabled(this@SettingsActivity)) }
+                            var menuOpen by remember { mutableStateOf(false) }
+                            var logOn by remember { mutableStateOf(AppLog.enabled(this@SettingsActivity)) }
                             // The log is written where the user chooses (Downloads, Documents...), as a plain text file.
                             val logLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
                                 if (uri != null) {
@@ -330,10 +335,10 @@ class SettingsActivity : ComponentActivity() {
                                     ).show()
                                 }
                             }
-                            androidx.compose.foundation.layout.Box {
-                                androidx.compose.material3.IconButton(onClick = { menuOpen = true }, shapes = IconButtonDefaults.shapes()) {
-                                    androidx.compose.material3.Icon(
-                                        androidx.compose.ui.res.painterResource(R.drawable.ic_more_vert),
+                            Box {
+                                IconButton(onClick = { menuOpen = true }, shapes = IconButtonDefaults.shapes()) {
+                                    Icon(
+                                        painterResource(R.drawable.ic_more_vert),
                                         contentDescription = stringResource(R.string.more_actions),
                                     )
                                 }

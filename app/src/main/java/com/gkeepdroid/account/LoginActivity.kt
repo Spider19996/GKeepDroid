@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -33,15 +34,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.chaquo.python.Python
+import java.net.HttpURLConnection
+import java.net.URL
+import kotlin.random.Random
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import org.json.JSONTokener
-import java.net.HttpURLConnection
-import java.net.URL
-import kotlin.random.Random
 
 /**
  * Signs in with Google instead of pasting a master token: Google's own setup page runs in a web
@@ -73,7 +74,7 @@ class LoginActivity : ComponentActivity() {
         super.onDestroy()
     }
 
-    @OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
     @Composable
     private fun LoginScreen() {
         val scope = rememberCoroutineScope()

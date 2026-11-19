@@ -2,13 +2,14 @@ package com.gkeepdroid
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
-import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -26,6 +27,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -67,10 +70,10 @@ fun ImageViewerDialog(bitmap: Bitmap, onClose: () -> Unit) {
                         translationY = offset.y,
                     ),
             )
-            androidx.compose.material3.IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).padding(16.dp), shapes = IconButtonDefaults.shapes()) {
-                androidx.compose.material3.Icon(
-                    androidx.compose.ui.res.painterResource(R.drawable.ic_close),
-                    contentDescription = androidx.compose.ui.res.stringResource(R.string.back), tint = Color.White,
+            IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).padding(16.dp), shapes = IconButtonDefaults.shapes()) {
+                Icon(
+                    painterResource(R.drawable.ic_close),
+                    contentDescription = stringResource(R.string.back), tint = Color.White,
                 )
             }
         }

@@ -1,6 +1,7 @@
 package com.gkeepdroid
 
 import android.content.Context
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.core.content.edit
 
 /** Per-note override of whether the checked items of a checklist are collapsed in the widget. */
@@ -37,7 +38,7 @@ object FoldStore {
     fun key(account: String, noteId: String) = "$account|$noteId"
 
     /** Changes whenever a note is folded or unfolded, so open screens redraw their cards at once. */
-    val version = androidx.compose.runtime.mutableIntStateOf(0)
+    val version = mutableIntStateOf(0)
 
     fun load(context: Context): Set<String> = prefs(context).getStringSet("keys", null)?.toSet().orEmpty()
 
@@ -63,7 +64,7 @@ object PrivateNotes {
     fun load(context: Context): Set<String> = prefs(context).getStringSet("keys", null)?.toSet().orEmpty()
 
     /** Changes whenever a note is hidden or shown, so open screens redraw their cards at once. */
-    val version = androidx.compose.runtime.mutableIntStateOf(0)
+    val version = mutableIntStateOf(0)
 
     fun set(context: Context, account: String, noteId: String, hidden: Boolean) {
         version.intValue++

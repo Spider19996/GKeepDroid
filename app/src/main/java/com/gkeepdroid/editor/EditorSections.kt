@@ -3,7 +3,13 @@ package com.gkeepdroid
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,26 +23,11 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.clickable
-import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.graphics.drawscope.clipRect
-import androidx.compose.ui.graphics.drawscope.clipPath
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.zIndex
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -45,12 +36,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FilledTonalIconToggleButton
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -59,21 +51,32 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 
 /** The parts of the note editor that stand on their own: its sections, each with the state it needs only itself. */
 
@@ -125,7 +128,7 @@ internal fun ColumnScope.AppearanceSection(
         // The row keeps its height whether the button shows or not.
         Box(Modifier.size(48.dp), contentAlignment = Alignment.Center) {
             if (isExisting && (color != NoteColors.DEFAULT || (background.isNotEmpty() && background != CUSTOM_BACKGROUND))) {
-                androidx.compose.material3.IconToggleButton(
+                IconToggleButton(
                     checked = darkVersion, onCheckedChange = onDarkVersion, enabled = canEdit,
                     colors = IconButtonDefaults.iconToggleButtonColors(
                         contentColor = LocalContentColor.current, checkedContentColor = LocalContentColor.current,
@@ -170,7 +173,7 @@ internal fun ColumnScope.AppearanceSection(
             }
         }
         if (!isLocal) NoteBackgrounds.NAMES.forEach { name ->
-            val thumb by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, name) {
+            val thumb by produceState<android.graphics.Bitmap?>(null, name) {
                 value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { NoteBackgrounds.load(context, name) }
             }
             RoundTouchTarget(onClick = { onBackground(name) }, enabled = canEdit, shape = MaterialTheme.shapes.small) {
@@ -223,7 +226,7 @@ internal fun ColumnScope.AppearanceSection(
                 Box(
                     Modifier.size(if (custom) 44.dp else 36.dp)
                         .clip(CircleShape)
-                        .background(androidx.compose.ui.graphics.Brush.sweepGradient(listOf(Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red)))
+                        .background(Brush.sweepGradient(listOf(Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red)))
                         .border(
                             if (custom) 3.dp else 1.dp,
                             if (custom) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
@@ -404,10 +407,10 @@ internal fun ReminderButton(reminderSet: Boolean, notificationsOn: Boolean, onRe
 /** Toggle buttons of the title row: no container until they are on, so the row stays calm. */
 @Composable
 internal fun quietToggleColors(
-    checkedContainer: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.secondaryContainer,
-    checkedContent: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSecondaryContainer,
+    checkedContainer: Color = MaterialTheme.colorScheme.secondaryContainer,
+    checkedContent: Color = MaterialTheme.colorScheme.onSecondaryContainer,
 ) = IconButtonDefaults.filledTonalIconToggleButtonColors(
-    containerColor = androidx.compose.ui.graphics.Color.Transparent,
+    containerColor = Color.Transparent,
     contentColor = LocalContentColor.current,
     checkedContainerColor = checkedContainer,
     checkedContentColor = checkedContent,

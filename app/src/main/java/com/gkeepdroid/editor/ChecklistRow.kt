@@ -1,72 +1,87 @@
 package com.gkeepdroid
 
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.draw.alpha
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.zIndex
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.onPlaced
-import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.round
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector2D
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.spring
-import androidx.compose.ui.composed
-import kotlinx.coroutines.launch
-import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onPlaced
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.round
+import androidx.compose.ui.zIndex
+import kotlinx.coroutines.launch
 
 /**
  * One item of a checklist while editing: just the text, with a green check at the bottom right when it is
  * done. Swiping right ticks (or unticks) it, swiping left removes it, and the row stops where the symbol is shown.
  */
-@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun ChecklistRow(
     item: KeepItem, editable: Boolean, dragged: Boolean, number: Int?,
     onText: (String) -> Unit, onToggle: () -> Unit, onRemove: () -> Unit,
     onBounds: (Rect) -> Unit, onDragStart: () -> Unit, onDragTo: (Float) -> Unit, onDragEnd: () -> Unit,
-    modifier: Modifier = Modifier, flags: DocFlags? = null, flagsVersion: Int = 0, onFocus: () -> Unit = {}, onSelection: (androidx.compose.ui.text.TextRange) -> Unit = {},
+    modifier: Modifier = Modifier, flags: DocFlags? = null, flagsVersion: Int = 0, onFocus: () -> Unit = {}, onSelection: (TextRange) -> Unit = {},
     focusNow: Boolean = false, onFocused: () -> Unit = {},
     /** What swiping to the right and to the left does (ITEM_SWIPE_*); [onSwipe] gets the direction, true for right. */
     swipeRight: Int = ITEM_SWIPE_TICK, swipeLeft: Int = ITEM_SWIPE_REMOVE, onSwipe: ((Boolean) -> Unit)? = null,
@@ -77,30 +92,30 @@ internal fun ChecklistRow(
 ) {
     // The gesture lives as long as the row; it calls what the row is given now, not what it was given when it started (the
     // category of the item changes while it is dragged).
-    val dragTo by androidx.compose.runtime.rememberUpdatedState(onDragTo)
-    val dragStart by androidx.compose.runtime.rememberUpdatedState(onDragStart)
-    val dragEnd by androidx.compose.runtime.rememberUpdatedState(onDragEnd)
-    val toggleNow by androidx.compose.runtime.rememberUpdatedState(onToggle)
+    val dragTo by rememberUpdatedState(onDragTo)
+    val dragStart by rememberUpdatedState(onDragStart)
+    val dragEnd by rememberUpdatedState(onDragEnd)
+    val toggleNow by rememberUpdatedState(onToggle)
     // The field keeps its own selection, which the formatting buttons need.
-    var field by remember(item.id) { mutableStateOf(androidx.compose.ui.text.input.TextFieldValue(item.text)) }
-    val shownField = if (field.text == item.text) field else androidx.compose.ui.text.input.TextFieldValue(item.text, androidx.compose.ui.text.TextRange(item.text.length))
+    var field by remember(item.id) { mutableStateOf(TextFieldValue(item.text)) }
+    val shownField = if (field.text == item.text) field else TextFieldValue(item.text, TextRange(item.text.length))
     // A new item that should be typed into at once (one made in a category): the focus and the cursor at its end.
-    val focusRequester = remember { androidx.compose.ui.focus.FocusRequester() }
+    val focusRequester = remember { FocusRequester() }
     androidx.compose.runtime.LaunchedEffect(focusNow) {
         if (!focusNow) return@LaunchedEffect
-        field = androidx.compose.ui.text.input.TextFieldValue(item.text, androidx.compose.ui.text.TextRange(item.text.length))
+        field = TextFieldValue(item.text, TextRange(item.text.length))
         runCatching { focusRequester.requestFocus() }
         onFocused()
     }
-    val maxPx = with(androidx.compose.ui.platform.LocalDensity.current) { 72.dp.toPx() }
+    val maxPx = with(LocalDensity.current) { 72.dp.toPx() }
     val trigger = maxPx * 0.75f
     var offsetX by remember { mutableStateOf(0f) }
     var handle by remember { mutableStateOf<LayoutCoordinates?>(null) }
     // The handle stays in the middle of the row; when the text wraps to another line (or loses one) it glides there instead of
     // jumping. The first height is taken as it is, so a long item does not slide into place when the editor opens.
-    val handleTop = remember { androidx.compose.animation.core.Animatable(0f) }
+    val handleTop = remember { Animatable(0f) }
     var measured by remember { mutableStateOf(false) }
-    val handleHeightPx = with(androidx.compose.ui.platform.LocalDensity.current) { 56.dp.toPx() }
+    val handleHeightPx = with(LocalDensity.current) { 56.dp.toPx() }
     val scope = androidx.compose.runtime.rememberCoroutineScope()
     val green = MaterialTheme.colorScheme.tertiary
     val red = MaterialTheme.colorScheme.error
@@ -141,7 +156,7 @@ internal fun ChecklistRow(
         }
         Box(
             Modifier
-                .offset { androidx.compose.ui.unit.IntOffset(offsetX.toInt(), 0) }
+                .offset { IntOffset(offsetX.toInt(), 0) }
                 // In a category, a second, lighter frame around the field.
                 .then(
                     if (framed) Modifier.border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), MaterialTheme.shapes.medium).padding(4.dp)
@@ -153,20 +168,20 @@ internal fun ChecklistRow(
                         measured = true
                         scope.launch { handleTop.snapTo(target) }
                     } else if (target != handleTop.targetValue) {
-                        scope.launch { handleTop.animateTo(target, androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 500f)) }
+                        scope.launch { handleTop.animateTo(target, spring(dampingRatio = 0.8f, stiffness = 500f)) }
                     }
                 }
                 // On a note's own color or picture the rows show it instead of covering it; the change fades like the rest.
                 .background(
                     androidx.compose.animation.animateColorAsState(
                         MaterialTheme.colorScheme.background.let { if (LocalOnNote.current) it.copy(alpha = 0f) else it },
-                        androidx.compose.animation.core.tween(450), label = "row",
+                        tween(450), label = "row",
                     ).value,
                     // Rounded like the frame, so a swipe's color is not covered at the corners behind the line.
                     MaterialTheme.shapes.medium,
                 )
                 .draggable(
-                    orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
+                    orientation = Orientation.Horizontal,
                     enabled = editable,
                     state = androidx.compose.foundation.gestures.rememberDraggableState { delta ->
                         // A direction that does nothing does not move; a divider cannot be ticked.
@@ -188,7 +203,7 @@ internal fun ChecklistRow(
             // the handle to the top and left, the checkbox to the left and bottom, and the text to the checkbox.
             val mark = if (item.checked) green else red
             if (item.isDivider()) Box(Modifier.fillMaxWidth().height(56.dp).padding(start = 56.dp, end = 16.dp), contentAlignment = Alignment.Center) {
-                androidx.compose.material3.HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.outline)
+                HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.outline)
             } else OutlinedTextField(
                 shape = MaterialTheme.shapes.medium,
                 value = shownField, readOnly = !editable,
@@ -210,7 +225,7 @@ internal fun ChecklistRow(
                 },
                 textStyle = if (item.checked) {
                     LocalTextStyle.current.copy(
-                        textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough,
+                        textDecoration = TextDecoration.LineThrough,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
                     )
                 } else {
@@ -222,11 +237,11 @@ internal fun ChecklistRow(
             // The whole strip at the left is the touch area, 48 dp wide as Material asks; the capsule in it is the housing of the
             // check (green) or cross (red), with the grip below it as a hint that it can be dragged. Both sit in the middle of
             // their half, and the capsule has the same 11 dp to the left edge and to the text.
-            val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+            val haptic = LocalHapticFeedback.current
             val dragDescription = stringResource(R.string.drag_handle)
             Box(
                 Modifier
-                    .align(Alignment.TopStart).offset { androidx.compose.ui.unit.IntOffset(0, handleTop.value.toInt()) }.width(48.dp).height(56.dp)
+                    .align(Alignment.TopStart).offset { IntOffset(0, handleTop.value.toInt()) }.width(48.dp).height(56.dp)
                     .onGloballyPositioned { handle = it }
                     .pointerInput(item.id, editable) {
                         if (!editable) return@pointerInput
@@ -236,7 +251,7 @@ internal fun ChecklistRow(
                         if (!editable) return@pointerInput
                         detectDragGesturesAfterLongPress(
                             onDragStart = { start ->
-                                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 handle?.localToRoot(start)?.y?.let { fingerY = it; grab = it - rowTop }
                                 dragStart()
                             },
@@ -256,7 +271,7 @@ internal fun ChecklistRow(
                         .padding(start = 11.dp).size(width = 26.dp, height = if (item.isDivider()) 22.dp else 40.dp)
                         // A filled capsule as Material 3 Expressive has it, see-through in the text's color, so it suits every
                         // note color and picture; once done it takes on the check's color.
-                        .clip(androidx.compose.foundation.shape.CircleShape)
+                        .clip(CircleShape)
                         .background(
                             androidx.compose.animation.animateColorAsState(
                                 if (item.checked && !item.isDivider()) MaterialTheme.colorScheme.tertiary.copy(alpha = 0.28f)
@@ -295,7 +310,7 @@ internal fun ChecklistRow(
 internal fun Modifier.animatePlacement(): Modifier = composed {
     val scope = androidx.compose.runtime.rememberCoroutineScope()
     var target by remember { mutableStateOf<IntOffset?>(null) }
-    val animatable = remember { mutableStateOf<Animatable<IntOffset, androidx.compose.animation.core.AnimationVector2D>?>(null) }
+    val animatable = remember { mutableStateOf<Animatable<IntOffset, AnimationVector2D>?>(null) }
     this.onPlaced { target = it.positionInParent().round() }
         .offset {
             val to = target ?: return@offset IntOffset.Zero
@@ -307,7 +322,7 @@ internal fun Modifier.animatePlacement(): Modifier = composed {
 
 /** How a swipe looks under the row: ticking green, removing red, moving to a category in the primary color. */
 @Composable
-internal fun swipeLook(action: Int): Triple<androidx.compose.ui.graphics.Color, Int, androidx.compose.ui.graphics.Color> = when (action) {
+internal fun swipeLook(action: Int): Triple<Color, Int, Color> = when (action) {
     ITEM_SWIPE_TICK -> Triple(MaterialTheme.colorScheme.tertiary, R.drawable.ic_done, MaterialTheme.colorScheme.onTertiary)
     ITEM_SWIPE_CATEGORY -> Triple(MaterialTheme.colorScheme.primary, R.drawable.ic_category, MaterialTheme.colorScheme.onPrimary)
     else -> Triple(MaterialTheme.colorScheme.error, R.drawable.ic_close, MaterialTheme.colorScheme.onError)

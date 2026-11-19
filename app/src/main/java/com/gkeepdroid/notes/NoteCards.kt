@@ -1,17 +1,15 @@
 package com.gkeepdroid
 
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.drawscope.clipPath
-import androidx.compose.ui.graphics.drawscope.clipRect
 import android.text.format.DateUtils
 import androidx.activity.ComponentActivity
+import androidx.compose.animation.core.animate
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.ui.layout.layout
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,29 +22,47 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
@@ -60,12 +76,12 @@ internal fun SwipeCard(app: AppSettings, enabled: Boolean, onAction: (Int) -> Un
         Box(modifier) { content() }
         return
     }
-    val density = androidx.compose.ui.platform.LocalDensity.current
+    val density = LocalDensity.current
     val maxPx = with(density) { 72.dp.toPx() }
     val trigger = maxPx * 0.75f
     var offsetX by remember { mutableStateOf(0f) }
-    val current by androidx.compose.runtime.rememberUpdatedState(app)
-    val action by androidx.compose.runtime.rememberUpdatedState(onAction)
+    val current by rememberUpdatedState(app)
+    val action by rememberUpdatedState(onAction)
     val toRight = offsetX > 0f
     val kind = if (toRight) app.swipeRight else app.swipeLeft
     Box(modifier) {
@@ -93,9 +109,9 @@ internal fun SwipeCard(app: AppSettings, enabled: Boolean, onAction: (Int) -> Un
         }
         Box(
             Modifier
-                .offset { androidx.compose.ui.unit.IntOffset(offsetX.toInt(), 0) }
+                .offset { IntOffset(offsetX.toInt(), 0) }
                 .draggable(
-                    orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
+                    orientation = Orientation.Horizontal,
                     state = androidx.compose.foundation.gestures.rememberDraggableState { delta ->
                         val lowest = if (current.swipeLeft != SWIPE_NONE) -maxPx else 0f
                         val highest = if (current.swipeRight != SWIPE_NONE) maxPx else 0f
@@ -104,7 +120,7 @@ internal fun SwipeCard(app: AppSettings, enabled: Boolean, onAction: (Int) -> Un
                     onDragStopped = {
                         val passed = kotlin.math.abs(offsetX) >= trigger
                         val chosen = if (offsetX > 0f) current.swipeRight else current.swipeLeft
-                        androidx.compose.animation.core.animate(offsetX, 0f) { value, _ -> offsetX = value }
+                        animate(offsetX, 0f) { value, _ -> offsetX = value }
                         if (passed) action(chosen)
                     },
                 )
@@ -193,7 +209,7 @@ internal fun NoteTile(
         backgroundName != null -> NoteBackgrounds.peek(context, backgroundName, darkVariant)
         else -> null
     }
-    val backgroundImage by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(firstPicture, backgroundName, customStamp, app.showNoteColors, darkVariant) {
+    val backgroundImage by produceState<android.graphics.Bitmap?>(firstPicture, backgroundName, customStamp, app.showNoteColors, darkVariant) {
         value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
             when {
                 !app.showNoteColors -> null
@@ -274,7 +290,7 @@ internal fun NoteTile(
         if (hasTitleRow) {
             Row(verticalAlignment = Alignment.Top) {
                 Text(
-                    highlightMatches(androidx.compose.ui.text.AnnotatedString(note.title), query, markColor),
+                    highlightMatches(AnnotatedString(note.title), query, markColor),
                     color = textColor,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleSmall.copy(hyphens = Hyphens.Auto),
@@ -320,7 +336,7 @@ internal fun NoteTile(
                 stringResource(R.string.note_private_hint),
                 color = textColor.copy(alpha = 0.65f),
                 style = MaterialTheme.typography.bodyMedium,
-                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                fontStyle = FontStyle.Italic,
             )
         } else {
         if (app.showLabels && note.labels.isNotEmpty()) {
@@ -345,7 +361,7 @@ internal fun NoteTile(
             @Composable
             fun ItemLine(item: KeepItem, inCategory: Boolean) {
                 if (item.isDivider()) {
-                    androidx.compose.material3.HorizontalDivider(Modifier.padding(vertical = rowGap + 4.dp), color = textColor.copy(alpha = 0.4f))
+                    HorizontalDivider(Modifier.padding(vertical = rowGap + 4.dp), color = textColor.copy(alpha = 0.4f))
                     return
                 }
                 val (shown, doc) = if (inCategory) Categories.rest(item, rich?.docs?.get(item.id)) else item.text to rich?.docs?.get(item.id)
@@ -454,7 +470,7 @@ internal fun NoteTile(
                 color = textColor.copy(alpha = 0.6f),
                 // Android's narrow font, so "Edited 28 minutes ago" fits on one line more often.
                 style = MaterialTheme.typography.bodySmall.copy(
-                    fontFamily = androidx.compose.ui.text.font.FontFamily(android.graphics.Typeface.create("sans-serif-condensed", android.graphics.Typeface.NORMAL)),
+                    fontFamily = FontFamily(android.graphics.Typeface.create("sans-serif-condensed", android.graphics.Typeface.NORMAL)),
                 ),
             )
         }
@@ -474,7 +490,7 @@ internal fun NoteTile(
             }
             if (foldable) Box(
                 Modifier.size(48.dp).clickable(
-                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                    interactionSource = remember { MutableInteractionSource() },
                     indication = null,
                 ) {
                     FoldStore.set(context, account, note.id, !folded)
@@ -501,7 +517,7 @@ internal fun CategoryHeader(name: String, progress: String?, folded: Boolean, co
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            name, color = color, style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
+            name, color = color, style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
             maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
         )
         // The progress and the arrow as the note's own: the same style and size, the arrow exactly below the note's.
@@ -525,9 +541,9 @@ private fun CategorySwipe(
     enabled: Boolean, swipeRight: Int, swipeLeft: Int, onSwipe: (Boolean) -> Unit,
     content: @Composable (Modifier) -> Unit,
 ) {
-    val maxPx = with(androidx.compose.ui.platform.LocalDensity.current) { 72.dp.toPx() }
+    val maxPx = with(LocalDensity.current) { 72.dp.toPx() }
     var offsetX by remember { mutableStateOf(0f) }
-    val swipe by androidx.compose.runtime.rememberUpdatedState(onSwipe)
+    val swipe by rememberUpdatedState(onSwipe)
     val canRight = enabled && swipeRight != ITEM_SWIPE_NONE
     val canLeft = enabled && swipeLeft != ITEM_SWIPE_NONE
     Box(Modifier.fillMaxWidth()) {
@@ -541,14 +557,14 @@ private fun CategorySwipe(
                 Modifier.matchParentSize().drawWithContent {
                     val grow = 8.dp.toPx()
                     val lift = 1.dp.toPx()
-                    val frameSize = androidx.compose.ui.geometry.Size(size.width + grow * 2, size.height + lift * 2)
+                    val frameSize = Size(size.width + grow * 2, size.height + lift * 2)
                     val outline = shape.createOutline(frameSize, layoutDirection, this)
-                    fun frameAt(dx: Float) = androidx.compose.ui.graphics.Path().apply {
-                        (outline as? androidx.compose.ui.graphics.Outline.Rounded)?.let { addRoundRect(it.roundRect) }
-                        (outline as? androidx.compose.ui.graphics.Outline.Generic)?.let { addPath(it.path) }
-                        translate(androidx.compose.ui.geometry.Offset(-grow + dx, -lift))
+                    fun frameAt(dx: Float) = Path().apply {
+                        (outline as? Outline.Rounded)?.let { addRoundRect(it.roundRect) }
+                        (outline as? Outline.Generic)?.let { addPath(it.path) }
+                        translate(Offset(-grow + dx, -lift))
                     }
-                    val band = androidx.compose.ui.graphics.Path.combine(androidx.compose.ui.graphics.PathOperation.Difference, frameAt(0f), frameAt(offsetX))
+                    val band = Path.combine(PathOperation.Difference, frameAt(0f), frameAt(offsetX))
                     drawPath(band, bg)
                     // The symbol lies under the frame like the band: only what the band shows of it is seen.
                     clipPath(band) { this@drawWithContent.drawContent() }
@@ -557,8 +573,8 @@ private fun CategorySwipe(
             ) { Icon(painterResource(icon), contentDescription = null, tint = tint, modifier = Modifier.padding(horizontal = 12.dp)) }
         }
         content(
-            Modifier.offset { androidx.compose.ui.unit.IntOffset(offsetX.toInt(), 0) }.draggable(
-                orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
+            Modifier.offset { IntOffset(offsetX.toInt(), 0) }.draggable(
+                orientation = Orientation.Horizontal,
                 enabled = canRight || canLeft,
                 state = androidx.compose.foundation.gestures.rememberDraggableState { delta ->
                     offsetX = (offsetX + delta).coerceIn(if (canLeft) -maxPx else 0f, if (canRight) maxPx else 0f)
@@ -566,7 +582,7 @@ private fun CategorySwipe(
                 onDragStopped = {
                     val passed = kotlin.math.abs(offsetX) >= maxPx * 0.75f
                     val toRight = offsetX > 0f
-                    androidx.compose.animation.core.animate(offsetX, 0f) { value, _ -> offsetX = value }
+                    animate(offsetX, 0f) { value, _ -> offsetX = value }
                     if (passed) swipe(toRight)
                 },
             ),
