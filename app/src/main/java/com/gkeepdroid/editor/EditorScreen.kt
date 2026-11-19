@@ -189,7 +189,7 @@ internal fun EditorScreen(
         AlertDialog(
             onDismissRequest = { localHint = false },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(ROW_GAP)) {
                     Text(stringResource(R.string.own_photo_hint))
                     Row(
                         Modifier.fillMaxWidth().clickable { never = !never },
@@ -479,7 +479,7 @@ internal fun EditorScreen(
     BoxWithConstraints(Modifier.weight(1f)) {
     val viewport = maxHeight
     Column(Modifier.fillMaxSize().onGloballyPositioned { editorViewport = it.boundsInRoot() }.verticalScroll(scroll).padding(EDITOR_PADDING)) {
-    Column(Modifier.fillMaxWidth().heightIn(min = viewport - EDITOR_PADDING * 2), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(Modifier.fillMaxWidth().heightIn(min = viewport - EDITOR_PADDING * 2), verticalArrangement = Arrangement.spacedBy(ROW_GAP)) {
         EditorNoteHeader(model, existing, account, allAccounts, unsent, remote, offline, images, scope, onReload, { leaveNote(it) })
         // Where a short note sits is a setting; with the keyboard open it is at the top, where one types.
         if (!imeVisible && editorLayout.option != EDITOR_ALIGN_TOP) Spacer(Modifier.weight(1f))

@@ -77,8 +77,8 @@ internal fun SwipeCard(app: AppSettings, enabled: Boolean, onAction: (Int) -> Un
         return
     }
     val density = LocalDensity.current
-    val maxPx = with(density) { 72.dp.toPx() }
-    val trigger = maxPx * 0.75f
+    val maxPx = with(density) { SWIPE_MAX.toPx() }
+    val trigger = maxPx * SWIPE_TRIGGER
     var offsetX by remember { mutableStateOf(0f) }
     val current by rememberUpdatedState(app)
     val action by rememberUpdatedState(onAction)
@@ -541,7 +541,7 @@ private fun CategorySwipe(
     enabled: Boolean, swipeRight: Int, swipeLeft: Int, onSwipe: (Boolean) -> Unit,
     content: @Composable (Modifier) -> Unit,
 ) {
-    val maxPx = with(LocalDensity.current) { 72.dp.toPx() }
+    val maxPx = with(LocalDensity.current) { SWIPE_MAX.toPx() }
     var offsetX by remember { mutableStateOf(0f) }
     val swipe by rememberUpdatedState(onSwipe)
     val canRight = enabled && swipeRight != ITEM_SWIPE_NONE
@@ -580,7 +580,7 @@ private fun CategorySwipe(
                     offsetX = (offsetX + delta).coerceIn(if (canLeft) -maxPx else 0f, if (canRight) maxPx else 0f)
                 },
                 onDragStopped = {
-                    val passed = kotlin.math.abs(offsetX) >= maxPx * 0.75f
+                    val passed = kotlin.math.abs(offsetX) >= maxPx * SWIPE_TRIGGER
                     val toRight = offsetX > 0f
                     animate(offsetX, 0f) { value, _ -> offsetX = value }
                     if (passed) swipe(toRight)

@@ -170,7 +170,7 @@ internal fun EditorCategoryHeader(
             color = if (dragged) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface, maxLines = 1,
             // A little further in than the label of the title field (16 dp), so the corner's arc is whole before it: 22 dp from the frame's
             // line (8 dp of the frame's padding, 10 here, 4 of the name's own).
-            modifier = Modifier.padding(start = 10.dp)
+            modifier = Modifier.padding(start = HEADER_INSET)
                 .onGloballyPositioned { c ->
                     nameCoords = c
                     val x = c.positionInParent().x
@@ -280,6 +280,16 @@ internal fun CategoryDropSlot(label: String?, active: Boolean, modifier: Modifie
     }
 }
 
+/** Geometry shared by the category frame, its swipe band and the rows around them. */
+val FRAME_RADIUS = 18.dp
+val FRAME_SIDE = 8.dp
+/** The space between two rows of the editor; the frame's line reaches into it, so frame and rows must use the same value. */
+val ROW_GAP = 12.dp
+val HEADER_INSET = 10.dp
+/** How far a row or category can be swiped, and the share of it from which the swipe counts. */
+val SWIPE_MAX = 72.dp
+const val SWIPE_TRIGGER = 0.75f
+
 const val FRAME_NONE = 0
 const val FRAME_FIRST = 1
 const val FRAME_MIDDLE = 2
@@ -301,10 +311,10 @@ internal fun Modifier.categoryFrame(position: Int, notches: List<Pair<Float, Flo
     return this.drawBehind {
         val stroke = 1.dp.toPx()
         // As round as the corners of the fields inside allow: the whole arc lies before the name and after the buttons.
-        val radius = 18.dp.toPx()
+        val radius = FRAME_RADIUS.toPx()
         // Each piece draws down over the gap to the next row (the editor's 12 dp), exactly to where that one begins: the pieces
         // meet without overlapping, so the sides show no seam.
-        val reach = 12.dp.toPx()
+        val reach = ROW_GAP.toPx()
         // The whole line lies inside the piece at the top and the bottom, so it is as thick there as at the sides.
         val top = if (first) stroke / 2 else -radius
         val bottom = if (last) size.height - stroke / 2 else size.height + reach + radius
@@ -313,7 +323,7 @@ internal fun Modifier.categoryFrame(position: Int, notches: List<Pair<Float, Flo
         val area = Path().apply {
             addRect(Rect(-reach, 0f, size.width + reach, if (last) size.height else size.height + reach))
         }
-        val inset = 8.dp.toPx()
+        val inset = FRAME_SIDE.toPx()
         val open = if (!first) area else notches.filter { it.second > it.first }.fold(area) { acc, (from, to) ->
             val hole = Path().apply {
                 addRect(Rect(inset + from, -reach, inset + to, 3.dp.toPx()))
@@ -328,7 +338,7 @@ internal fun Modifier.categoryFrame(position: Int, notches: List<Pair<Float, Flo
                 style = Stroke(stroke),
             )
         }
-    }.padding(start = 8.dp, end = 8.dp, bottom = if (last) 8.dp else 0.dp)
+    }.padding(start = FRAME_SIDE, end = FRAME_SIDE, bottom = if (last) FRAME_SIDE else 0.dp)
 }
 
 /** Where a held category would be put: a line in the primary color. */
@@ -363,9 +373,9 @@ internal fun CategorySwipeBand(
                 // The band is the frame's place less the frame where it is now, both on the line's centre path: there is nothing
                 // to cover (so no seam or sliver beside the line), and the line itself lies over the band's edge.
                 val half = 0.5.dp.toPx()
-                val r = 18.dp.toPx()
+                val r = FRAME_RADIUS.toPx()
                 val from = if (top) topInset.toPx() + half else 0f
-                val to = if (bottom) size.height - half else size.height + 12.dp.toPx()
+                val to = if (bottom) size.height - half else size.height + ROW_GAP.toPx()
                 // The frame that is cut out is a hair smaller than the line's centre path, so the band reaches under the line (which is
                 // 1 dp thick) and the antialiasing of its arcs, which meet the line at a very shallow angle at the top, leaves no gap.
                 val e = 0.5.dp.toPx()

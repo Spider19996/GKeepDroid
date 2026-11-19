@@ -107,8 +107,8 @@ internal fun ChecklistRow(
         runCatching { focusRequester.requestFocus() }
         onFocused()
     }
-    val maxPx = with(LocalDensity.current) { 72.dp.toPx() }
-    val trigger = maxPx * 0.75f
+    val maxPx = with(LocalDensity.current) { SWIPE_MAX.toPx() }
+    val trigger = maxPx * SWIPE_TRIGGER
     var offsetX by remember { mutableStateOf(0f) }
     var handle by remember { mutableStateOf<LayoutCoordinates?>(null) }
     // The handle stays in the middle of the row; when the text wraps to another line (or loses one) it glides there instead of

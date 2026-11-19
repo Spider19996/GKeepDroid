@@ -192,7 +192,7 @@ internal fun ColumnScope.EditorChecklist(
             // How far each category is swiped now (its header is held, the whole category moves).
             val pieceBounds = remember { mutableStateMapOf<String, Pair<Float, Float>>() }
             val categorySwipe = remember { mutableStateMapOf<String, Float>() }
-            val swipeMax = with(LocalDensity.current) { 72.dp.toPx() }
+            val swipeMax = with(LocalDensity.current) { SWIPE_MAX.toPx() }
             val headerNotches = remember { mutableMapOf<String, SnapshotStateList<Pair<Float, Float>>>() }
             // The drop places of the categories that have nothing else in them ("" for no category), and the one the item is over.
             val slotBounds = remember { mutableStateMapOf<String, Rect>() }
@@ -419,7 +419,7 @@ internal fun ColumnScope.EditorChecklist(
                                 animate(at, 0f) { v, _ -> categorySwipe[name] = v }
                                 categorySwipe.remove(name)
                             }
-                            if (kotlin.math.abs(at) >= swipeMax * 0.75f) swipeItems(group.items.map { it.id }, if (at > 0f) itemSwipe.first else itemSwipe.second)
+                            if (kotlin.math.abs(at) >= swipeMax * SWIPE_TRIGGER) swipeItems(group.items.map { it.id }, if (at > 0f) itemSwipe.first else itemSwipe.second)
                         },
                         alone = group.items.isEmpty() || folded || draggingCategory != null,
                     ) }
