@@ -76,12 +76,8 @@ internal fun SwipeCard(app: AppSettings, enabled: Boolean, onAction: (Int) -> Un
         Box(modifier) { content() }
         return
     }
-    val density = LocalDensity.current
-    val maxPx = with(density) { SWIPE_MAX.toPx() }
-    val trigger = maxPx * SWIPE_TRIGGER
-    var offsetX by remember { mutableStateOf(0f) }
-    val current by rememberUpdatedState(app)
-    val action by rememberUpdatedState(onAction)
+    val swipe = rememberSwipeState()
+    val offsetX = swipe.offset
     val toRight = offsetX > 0f
     val kind = if (toRight) app.swipeRight else app.swipeLeft
     Box(modifier) {
@@ -95,35 +91,16 @@ internal fun SwipeCard(app: AppSettings, enabled: Boolean, onAction: (Int) -> Un
                     .padding(horizontal = 24.dp),
                 contentAlignment = if (toRight) Alignment.CenterStart else Alignment.CenterEnd,
             ) {
-                val (icon, name) = when (kind) {
-                    SWIPE_ARCHIVE -> R.drawable.ic_archive to R.string.archive_note
-                    SWIPE_TRASH -> R.drawable.ic_delete to R.string.move_to_trash
-                    SWIPE_PIN -> R.drawable.ic_push_pin to R.string.pin_note
-                    SWIPE_REMINDER -> R.drawable.ic_alarm to R.string.reminders_title
-                    SWIPE_SHARE -> R.drawable.ic_share to R.string.share_note
-                    SWIPE_HIDE -> R.drawable.ic_lock to R.string.hide_content
-                    else -> return@Box
-                }
+                val (icon, name) = cardSwipeSymbol(kind) ?: return@Box
                 Icon(painterResource(icon), contentDescription = stringResource(name))
             }
         }
         Box(
             Modifier
                 .offset { IntOffset(offsetX.toInt(), 0) }
-                .draggable(
-                    orientation = Orientation.Horizontal,
-                    state = androidx.compose.foundation.gestures.rememberDraggableState { delta ->
-                        val lowest = if (current.swipeLeft != SWIPE_NONE) -maxPx else 0f
-                        val highest = if (current.swipeRight != SWIPE_NONE) maxPx else 0f
-                        offsetX = (offsetX + delta).coerceIn(lowest, highest)
-                    },
-                    onDragStopped = {
-                        val passed = kotlin.math.abs(offsetX) >= trigger
-                        val chosen = if (offsetX > 0f) current.swipeRight else current.swipeLeft
-                        animate(offsetX, 0f) { value, _ -> offsetX = value }
-                        if (passed) action(chosen)
-                    },
-                )
+                .swipeDrag(swipe, canLeft = app.swipeLeft != SWIPE_NONE, canRight = app.swipeRight != SWIPE_NONE) { toRight ->
+                    onAction(if (toRight) app.swipeRight else app.swipeLeft)
+                }
         ) { content() }
     }
 }
@@ -179,7 +156,7 @@ internal fun NoteTile(
         val all = items.filter { !it.isDivider() }
         if (all.isEmpty() || (action != ITEM_SWIPE_TICK && action != ITEM_SWIPE_REMOVE)) return
         fun apply() {
-            val tick = !all.all { it.checked }
+            val tick = Categories.tickTarget(all)
             all.forEach { item ->
                 val checked = if (action == ITEM_SWIPE_REMOVE) true else tick
                 val delete = action == ITEM_SWIPE_REMOVE || (app.listDeleteChecked && checked)
@@ -532,6 +509,17 @@ internal fun CategoryHeader(name: String, progress: String?, folded: Boolean, co
     }
 }
 
+/** The symbol and its description for what swiping a card does; null for no action. */
+private fun cardSwipeSymbol(kind: Int): Pair<Int, Int>? = when (kind) {
+    SWIPE_ARCHIVE -> R.drawable.ic_archive to R.string.archive_note
+    SWIPE_TRASH -> R.drawable.ic_delete to R.string.move_to_trash
+    SWIPE_PIN -> R.drawable.ic_push_pin to R.string.pin_note
+    SWIPE_REMINDER -> R.drawable.ic_alarm to R.string.reminders_title
+    SWIPE_SHARE -> R.drawable.ic_share to R.string.share_note
+    SWIPE_HIDE -> R.drawable.ic_lock to R.string.hide_content
+    else -> null
+}
+
 /**
  * A category of a card that swipes as a whole: it moves by the finger, and the strip it leaves is a band in the swipe's color with
  * its symbol, rounded like the frame. [content] gets the modifier that moves it.
@@ -541,9 +529,8 @@ private fun CategorySwipe(
     enabled: Boolean, swipeRight: Int, swipeLeft: Int, onSwipe: (Boolean) -> Unit,
     content: @Composable (Modifier) -> Unit,
 ) {
-    val maxPx = with(LocalDensity.current) { SWIPE_MAX.toPx() }
-    var offsetX by remember { mutableStateOf(0f) }
-    val swipe by rememberUpdatedState(onSwipe)
+    val swipeState = rememberSwipeState()
+    val offsetX = swipeState.offset
     val canRight = enabled && swipeRight != ITEM_SWIPE_NONE
     val canLeft = enabled && swipeLeft != ITEM_SWIPE_NONE
     Box(Modifier.fillMaxWidth()) {
@@ -573,19 +560,7 @@ private fun CategorySwipe(
             ) { Icon(painterResource(icon), contentDescription = null, tint = tint, modifier = Modifier.padding(horizontal = 12.dp)) }
         }
         content(
-            Modifier.offset { IntOffset(offsetX.toInt(), 0) }.draggable(
-                orientation = Orientation.Horizontal,
-                enabled = canRight || canLeft,
-                state = androidx.compose.foundation.gestures.rememberDraggableState { delta ->
-                    offsetX = (offsetX + delta).coerceIn(if (canLeft) -maxPx else 0f, if (canRight) maxPx else 0f)
-                },
-                onDragStopped = {
-                    val passed = kotlin.math.abs(offsetX) >= maxPx * SWIPE_TRIGGER
-                    val toRight = offsetX > 0f
-                    animate(offsetX, 0f) { value, _ -> offsetX = value }
-                    if (passed) swipe(toRight)
-                },
-            ),
+            Modifier.offset { IntOffset(offsetX.toInt(), 0) }.swipeDrag(swipeState, canLeft, canRight, enabled = canRight || canLeft, onSwiped = onSwipe),
         )
     }
 }

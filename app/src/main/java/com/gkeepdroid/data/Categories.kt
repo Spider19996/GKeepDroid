@@ -51,6 +51,9 @@ object Categories {
         return order.map { name -> Group(name, items.filterIndexed { i, _ -> names[i] == name }) }.filter { it.name != null || it.items.isNotEmpty() }
     }
 
+    /** What a swipe that ticks does to a group of items: tick them all, or untick them when they all are ticked already. Dividers do not count. */
+    fun tickTarget(items: List<KeepItem>): Boolean = !items.filter { !it.isDivider() }.all { it.checked }
+
     /** How far a category is, as the checklists show it: ticked of all its items ("1/3"); dividers do not count. */
     fun progress(items: List<KeepItem>): String {
         val real = items.filter { !it.isDivider() }

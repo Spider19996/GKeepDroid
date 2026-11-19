@@ -191,8 +191,9 @@ internal fun ColumnScope.EditorChecklist(
             val headerLayoutTop = remember { mutableStateMapOf<String, Float>() }
             // How far each category is swiped now (its header is held, the whole category moves).
             val pieceBounds = remember { mutableStateMapOf<String, Pair<Float, Float>>() }
-            val categorySwipe = remember { mutableStateMapOf<String, Float>() }
             val swipeMax = with(LocalDensity.current) { SWIPE_MAX.toPx() }
+            val categorySwipe = remember { mutableMapOf<String, SwipeState>() }
+            fun swipeOf(category: String) = categorySwipe.getOrPut(category) { SwipeState(swipeMax) }
             val headerNotches = remember { mutableMapOf<String, SnapshotStateList<Pair<Float, Float>>>() }
             // The drop places of the categories that have nothing else in them ("" for no category), and the one the item is over.
             val slotBounds = remember { mutableStateMapOf<String, Rect>() }
@@ -349,7 +350,7 @@ internal fun ColumnScope.EditorChecklist(
             entries.forEachIndexed { entryIndex, (name, item) -> key(item?.id ?: "category:$name") {
               val swipeKey = categoryOf[entryIndex]
               CategorySwipeBand(
-                  swipeKey?.let { categorySwipe[it] } ?: 0f, if ((swipeKey?.let { categorySwipe[it] } ?: 0f) > 0f) itemSwipe.first else itemSwipe.second,
+                  swipeKey?.let { swipeOf(it).offset } ?: 0f, if ((swipeKey?.let { swipeOf(it).offset } ?: 0f) > 0f) itemSwipe.first else itemSwipe.second,
                   frameAt(entryIndex), topInset = if (item == null && name != null && !name.startsWith(SLOT_PREFIX)) 10.dp else 0.dp,
                   category = swipeKey ?: "", index = entryIndex, bounds = pieceBounds,
               ) {
@@ -408,18 +409,13 @@ internal fun ColumnScope.EditorChecklist(
                         },
                         onDragEnd = { draggingCategory = null },
                         swipeRight = itemSwipe.first, swipeLeft = itemSwipe.second,
-                        onSwipeMove = { d ->
-                            val lo = if (itemSwipe.second != ITEM_SWIPE_NONE) -swipeMax else 0f
-                            val hi = if (itemSwipe.first != ITEM_SWIPE_NONE) swipeMax else 0f
-                            categorySwipe[name] = ((categorySwipe[name] ?: 0f) + d).coerceIn(lo, hi)
-                        },
+                        onSwipeMove = { d -> swipeOf(name).drag(d, itemSwipe.second != ITEM_SWIPE_NONE, itemSwipe.first != ITEM_SWIPE_NONE) },
                         onSwipeStop = {
-                            val at = categorySwipe[name] ?: 0f
                             scope.launch {
-                                animate(at, 0f) { v, _ -> categorySwipe[name] = v }
-                                categorySwipe.remove(name)
+                                swipeOf(name).release()?.let { right ->
+                                    swipeItems(group.items.map { it.id }, if (right) itemSwipe.first else itemSwipe.second)
+                                }
                             }
-                            if (kotlin.math.abs(at) >= swipeMax * SWIPE_TRIGGER) swipeItems(group.items.map { it.id }, if (at > 0f) itemSwipe.first else itemSwipe.second)
                         },
                         alone = group.items.isEmpty() || folded || draggingCategory != null,
                     ) }

@@ -292,8 +292,7 @@ internal fun EditorScreen(
     fun swipeItems(ids: List<String>, action: Int) {
         when (action) {
             ITEM_SWIPE_TICK -> {
-                val all = items.filter { it.id in ids && !it.isDivider() }
-                val tick = !all.all { it.checked }
+                val tick = Categories.tickTarget(items.filter { it.id in ids })
                 for (i in items.indices) if (items[i].id in ids && !items[i].isDivider()) items[i] = items[i].copy(checked = if (ids.size == 1) !items[i].checked else tick)
             }
             ITEM_SWIPE_REMOVE -> {

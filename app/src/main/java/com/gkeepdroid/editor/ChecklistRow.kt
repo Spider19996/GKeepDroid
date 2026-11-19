@@ -107,9 +107,8 @@ internal fun ChecklistRow(
         runCatching { focusRequester.requestFocus() }
         onFocused()
     }
-    val maxPx = with(LocalDensity.current) { SWIPE_MAX.toPx() }
-    val trigger = maxPx * SWIPE_TRIGGER
-    var offsetX by remember { mutableStateOf(0f) }
+    val swipe = rememberSwipeState()
+    val offsetX = swipe.offset
     var handle by remember { mutableStateOf<LayoutCoordinates?>(null) }
     // The handle stays in the middle of the row; when the text wraps to another line (or loses one) it glides there instead of
     // jumping. The first height is taken as it is, so a long item does not slide into place when the editor opens.
@@ -180,24 +179,13 @@ internal fun ChecklistRow(
                     // Rounded like the frame, so a swipe's color is not covered at the corners behind the line.
                     MaterialTheme.shapes.medium,
                 )
-                .draggable(
-                    orientation = Orientation.Horizontal,
-                    enabled = editable,
-                    state = androidx.compose.foundation.gestures.rememberDraggableState { delta ->
-                        // A direction that does nothing does not move; a divider cannot be ticked.
-                        fun allowed(action: Int) = action != ITEM_SWIPE_NONE && !(item.isDivider() && action == ITEM_SWIPE_TICK)
-                        offsetX = (offsetX + delta).coerceIn(if (allowed(swipeLeft)) -maxPx else 0f, if (allowed(swipeRight)) maxPx else 0f)
-                    },
-                    onDragStopped = {
-                        val passed = kotlin.math.abs(offsetX) >= trigger
-                        val toRight = offsetX > 0f
-                        androidx.compose.animation.core.animate(offsetX, 0f) { value, _ -> offsetX = value }
-                        if (passed) {
-                            val swipe = onSwipe
-                            if (swipe != null) swipe(toRight) else if (toRight) onToggle() else onRemove()
-                        }
-                    },
-                )
+                // A direction that does nothing does not move; a divider cannot be ticked.
+                .swipeDrag(
+                    swipe, canLeft = swipeAllowed(swipeLeft, item), canRight = swipeAllowed(swipeRight, item), enabled = editable,
+                ) { toRight ->
+                    val onSwipe = onSwipe
+                    if (onSwipe != null) onSwipe(toRight) else if (toRight) onToggle() else onRemove()
+                }
         ) {
             // Handle and checkbox sit in the left corners, one above the other and small. Every gap to an edge is 8 dp:
             // the handle to the top and left, the checkbox to the left and bottom, and the text to the checkbox.
@@ -327,3 +315,5 @@ internal fun swipeLook(action: Int): Triple<Color, Int, Color> = when (action) {
     ITEM_SWIPE_CATEGORY -> Triple(MaterialTheme.colorScheme.primary, R.drawable.ic_category, MaterialTheme.colorScheme.onPrimary)
     else -> Triple(MaterialTheme.colorScheme.error, R.drawable.ic_close, MaterialTheme.colorScheme.onError)
 }
+
+private fun swipeAllowed(action: Int, item: KeepItem) = action != ITEM_SWIPE_NONE && !(item.isDivider() && action == ITEM_SWIPE_TICK)
