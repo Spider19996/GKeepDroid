@@ -304,7 +304,8 @@ internal fun NoteTile(
                     )
                 }
             }
-            val groups = Categories.groups(note.items, rich)
+            // Grouping reads the bold start of every item; it is redone only when the items or their formatting change.
+            val groups = remember(note.items, rich) { Categories.groups(note.items, rich) }
             if (groups == null) {
                 // With the setting on, a numbered list counts again in the order shown here.
                 ListNumbering.display(note.items, visible.take(lines), app.renumberDisplay).forEach { ItemLine(it, inCategory = false) }
