@@ -12,6 +12,7 @@ import re
 import gkeepapi
 from gkeepapi.node import BlobType, ColorValue
 from gkeepapi.node import List as KeepList
+from gkeepapi.node import ListItem
 
 
 def _login(email, master_token, state_path, pull=True):
@@ -29,6 +30,7 @@ def _login(email, master_token, state_path, pull=True):
             state = None
 
     keep = gkeepapi.Keep()
+    _watch_type_changes(keep)
     try:
         keep.authenticate(email, master_token, state=state, sync=pull or state is None)
     except Exception:
@@ -36,8 +38,38 @@ def _login(email, master_token, state_path, pull=True):
             raise
         # The cached state may be stale or corrupt: retry with a full sync.
         keep = gkeepapi.Keep()
+        _watch_type_changes(keep)
+        keep.authenticate(email, master_token, sync=True)
+    if state is not None and (keep._type_changed or _has_wrong_type(keep)):
+        # A note was turned into a checklist (or back) in another client. gkeepapi keeps the old kind of such a note
+        # for good, also in its saved state, so the checklist shows as one text line. Only a full sync builds it anew.
+        keep = gkeepapi.Keep()
+        _watch_type_changes(keep)
         keep.authenticate(email, master_token, sync=True)
     return keep
+
+
+def _watch_type_changes(keep):
+    """Remember if Keep reports a note under a different kind (note or checklist) than the one gkeepapi holds for it."""
+    keep._type_changed = False
+    parse = keep._parseNodes
+
+    def checked(raw):
+        for raw_node in raw:
+            node = keep._nodes.get(raw_node.get("id"))
+            if node is not None and raw_node.get("parentId") == "root" and raw_node.get("type") != node.type.value:
+                keep._type_changed = True
+        return parse(raw)
+
+    keep._parseNodes = checked
+
+
+def _has_wrong_type(keep):
+    """Whether the cached state already holds a note that has checklist items (it was converted before this was noticed)."""
+    for note in keep.all():
+        if not isinstance(note, KeepList) and any(isinstance(child, ListItem) for child in note.children):
+            return True
+    return False
 
 
 def _image_blobs(note):
