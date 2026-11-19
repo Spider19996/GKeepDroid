@@ -1,6 +1,6 @@
 # Plans
 
-Plans for upcoming work; each file stands on its own. Nothing here is implemented yet.
+Plans for upcoming work; each file stands on its own. Plans 01–04 are implemented (see the notes in each file); 05 and 06 are not.
 
 | # | Plan | Risk | Depends on |
 |---|---|---|---|

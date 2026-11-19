@@ -13,3 +13,6 @@
 | `settings/SettingsActivity.kt`, `reminders/Reminders.kt` (~415) | leave unless touched |
 
 Steps: one file per commit; after each: build, smoke test of that area. Update `CLAUDE.md` only if the folder list changes.
+
+Done: `CategorySwipeBand.kt`, `CategoryDropSlots.kt`, `NoteCategories.kt`, `ui/SwipeCard.kt`, `WidgetChecklist.kt`, `EditorButtonCatalog.kt`; selection and swipe actions of the notes screen are `NotesActions.kt`; the editor's item and category actions are `EditorItemActions.kt`.
+Not done: `EditorScreen` is still one long composable that owns the editor's state (the rest of it is already in `EditorModel`, `EditorLook`, `EditorChecklist` …); `NoteTile` stays in `NoteCards.kt`; `WidgetParts.kt` has no shared category loop yet.
