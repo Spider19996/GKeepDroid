@@ -288,54 +288,14 @@ internal fun EditorScreen(
     // What a swipe does to items in this editor, from the settings.
     val itemSwipe = remember(activity.layoutKey) { AppSettingsStore.load(activity).let { it.itemSwipeRight to it.itemSwipeLeft } }
 
-    /** A swipe on one item, or on a category's header for all its items: tick, remove, or choose another category. */
-    fun swipeItems(ids: List<String>, action: Int) {
-        when (action) {
-            ITEM_SWIPE_TICK -> {
-                val tick = Categories.tickTarget(items.filter { it.id in ids })
-                for (i in items.indices) if (items[i].id in ids && !items[i].isDivider()) items[i] = items[i].copy(checked = if (ids.size == 1) !items[i].checked else tick)
-            }
-            ITEM_SWIPE_REMOVE -> {
-                items.removeAll { it.id in ids }
-                if (items.isEmpty()) items.add(KeepItem(UUID.randomUUID().toString(), "", false))
-                if (items.isNotEmpty() && items[0].indent) items[0] = items[0].copy(indent = false)
-            }
-            ITEM_SWIPE_CATEGORY -> {
-                moveItems = ids
-                newCategoryDialog = true
-            }
-        }
-    }
+    val itemActions = remember { EditorItemActions(items, categories, model) }
+    fun swipeItems(ids: List<String>, action: Int) = itemActions.swipeItems(ids, action)
 
     /** Makes the list an ordinary checklist again: the words of the categories stay, no longer in bold. */
     fun dissolveCategories() = categories.dissolve()
 
-    /** A new item at the end of category [name] (a new category at the end of the list), its name in bold; null: no category. */
-    fun addInCategory(name: String?) {
-        if (name == null) {
-            val id = UUID.randomUUID().toString()
-            items.add(KeepItem(id, "", false))
-            focusItemId = id
-        } else focusItemId = categories.addIn(name)
-    }
-
-    /** The name for a new category was given: for an item dropped onto "New category", as a first empty one, or with a new item. */
-    fun createCategory(name: String) {
-        val clean = name.trim()
-        val forItem = newCategoryFor
-        when {
-            forItem != null -> {
-                setCategory(forItem, clean)
-                // To the end, where the new category's header appears.
-                val at = items.indexOfFirst { it.id == forItem }
-                if (at >= 0) items.add(items.removeAt(at))
-            }
-            newCategoryEmpty -> keepCategory(clean)
-            else -> addInCategory(clean)
-        }
-        newCategoryFor = null
-        newCategoryEmpty = false
-    }
+    fun addInCategory(name: String?) = itemActions.addInCategory(name)
+    fun createCategory(name: String) = itemActions.createCategory(name)
     // A change that Keep does not have yet (and why, if sending it failed).
     val unsent = remember {
         existing?.let { note ->
