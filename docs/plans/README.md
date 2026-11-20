@@ -1,15 +1,11 @@
 # Plans
 
-Plans for upcoming work; each file stands on its own. Plans 01–04 are implemented (see the notes in each file); 05 and 06 are not.
+Plans for upcoming work; each file stands on its own. Plans 01–04 are done and removed (see git history before v1.8.1); 05 and 06 are still open.
 
 | # | Plan | Risk | Depends on |
 |---|---|---|---|
-| [01](01-imports-and-constants.md) | Imports and constants | low | – |
-| [02](02-shared-swipe.md) | Shared swipe and frame geometry | medium (visual) | 01 |
-| [03](03-file-splits.md) | File splits | low | 01 (02 for `CategoryFrame.kt`, `NoteCards.kt`) |
-| [04](04-recomposition.md) | Recomposition and duplicated work | medium | 03 |
 | [05](05-release-size.md) | Release build size (R8) | high | – (independent) |
-| [06](06-compact-mode.md) | Compact mode | medium (touches many layouts) | 01, 02 |
+| [06](06-compact-mode.md) | Compact mode | medium (touches many layouts) | – (01, 02 are done) |
 
 Working rules for every plan:
 - One plan per session/commit series; commit locally after each step, push only when the user says so (version bump at push time).
