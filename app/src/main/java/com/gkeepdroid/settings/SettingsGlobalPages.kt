@@ -197,11 +197,6 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
     with(s) {
         // Notes: the Markdown folder, synced both ways, is the continuous copy of all notes.
         SectionTitle(stringResource(R.string.md_sync_title))
-        Text(
-            stringResource(R.string.md_sync_hint),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
         SwitchRow(R.string.md_sync_enable, mdEnabled) { on ->
             if (on && MarkdownSync.treeUri(context) == null) {
                 folderLauncher.launch(null)
@@ -210,15 +205,9 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
                 mdEnabled = on
             }
         }
-        mdFolder?.let { Text(stringResource(R.string.md_sync_folder, it)) }
-        OutlinedButton(
-            onClick = { folderLauncher.launch(null) },
-            modifier = Modifier.fillMaxWidth(),
-            shapes = ButtonDefaults.shapes(),
-        ) { Text(stringResource(R.string.md_sync_choose)) }
-        Button(
-            enabled = mdEnabled,
-            onClick = {
+        if (mdFolder != null) FolderRow(R.string.md_sync_folder, mdFolder.orEmpty(), R.string.md_sync_choose, mdEnabled, R.string.md_sync_now,
+            onChoose = { folderLauncher.launch(null) },
+            onSync = {
                 scope.launch {
                     status = runCatching { MarkdownSync.syncNow(context) }.fold(
                         onSuccess = { context.resources.getQuantityString(R.plurals.md_sync_done, it, it) },
@@ -226,18 +215,11 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
                     )
                 }
             },
-            modifier = Modifier.fillMaxWidth(),
-            shapes = ButtonDefaults.shapes(),
-        ) { Text(stringResource(R.string.md_sync_now)) }
+        )
 
         // What Keep has no place for, kept in step on all phones through a folder.
         HorizontalDivider(Modifier.padding(vertical = 8.dp))
         SectionTitle(stringResource(R.string.device_sync_title))
-        Text(
-            stringResource(R.string.device_sync_hint),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
         SwitchRow(R.string.device_sync_enable, dsEnabled) { on ->
             if (on && DeviceSync.treeUri(context) == null) {
                 deviceFolderLauncher.launch(null)
@@ -246,20 +228,9 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
                 dsEnabled = on
             }
         }
-        dsFolder?.let { Text(stringResource(R.string.device_sync_folder, it)) }
-        OutlinedButton(
-            onClick = { deviceFolderLauncher.launch(null) },
-            modifier = Modifier.fillMaxWidth(),
-            shapes = ButtonDefaults.shapes(),
-        ) { Text(stringResource(R.string.device_sync_choose)) }
-        SwitchRow(R.string.device_sync_reminders, dsReminders) { on ->
-            DeviceSync.setRemindersEnabled(context, on)
-            dsReminders = on
-        }
-        Hint(R.string.device_sync_reminders_hint)
-        Button(
-            enabled = dsEnabled,
-            onClick = {
+        if (dsFolder != null) FolderRow(R.string.device_sync_folder, dsFolder.orEmpty(), R.string.device_sync_choose, dsEnabled, R.string.device_sync_now,
+            onChoose = { deviceFolderLauncher.launch(null) },
+            onSync = {
                 scope.launch {
                     dsStatus = runCatching { DeviceSync.syncNow(context) }.fold(
                         onSuccess = { context.getString(R.string.device_sync_done, it) },
@@ -267,25 +238,38 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
                     )
                 }
             },
-            modifier = Modifier.fillMaxWidth(),
-            shapes = ButtonDefaults.shapes(),
-        ) { Text(stringResource(R.string.device_sync_now)) }
-        if (dsStatus.isNotEmpty()) Text(dsStatus)
+        )
+        if (dsEnabled) SwitchRow(R.string.device_sync_reminders, dsReminders) { on ->
+            DeviceSync.setRemindersEnabled(context, on)
+            dsReminders = on
+        }
+        if (dsStatus.isNotEmpty()) Text(dsStatus, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
         // Settings: one file with everything except accounts and tokens.
         HorizontalDivider(Modifier.padding(vertical = 8.dp))
-        Text(stringResource(R.string.backup_note), Modifier.searchFlash(R.string.backup_note))
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { exportLauncher.launch("gkeepdroid-settings.json") },
-            shapes = ButtonDefaults.shapes(),
-        ) { Text(stringResource(R.string.export_settings)) }
-        OutlinedButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { importLauncher.launch(arrayOf("*/*")) },
-            shapes = ButtonDefaults.shapes(),
-        ) { Text(stringResource(R.string.import_settings)) }
+        Row(Modifier.fillMaxWidth().searchFlash(R.string.backup_note), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(
+                modifier = Modifier.weight(1f),
+                onClick = { exportLauncher.launch("gkeepdroid-settings.json") },
+                shapes = ButtonDefaults.shapes(),
+            ) { Text(stringResource(R.string.export_settings)) }
+            OutlinedButton(
+                modifier = Modifier.weight(1f),
+                onClick = { importLauncher.launch(arrayOf("*/*")) },
+                shapes = ButtonDefaults.shapes(),
+            ) { Text(stringResource(R.string.import_settings)) }
+        }
     }
+}
+
+/** The chosen folder of a sync, with a button to change it, and the button that syncs now. */
+@Composable
+private fun FolderRow(folder: Int, name: String, choose: Int, enabled: Boolean, now: Int, onChoose: () -> Unit, onSync: () -> Unit) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(stringResource(folder, name), Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, maxLines = 2)
+        TextButton(onClick = onChoose, shapes = ButtonDefaults.shapes()) { Text(stringResource(choose)) }
+    }
+    OutlinedButton(enabled = enabled, onClick = onSync, modifier = Modifier.fillMaxWidth(), shapes = ButtonDefaults.shapes()) { Text(stringResource(now)) }
 }
 
 internal val swipeChoices = listOf(

@@ -159,5 +159,6 @@ internal val WIDGET_PAGES = setOf(Page.Appearance, Page.Notes, Page.ManageNotes,
 internal fun Page.helpTexts(): List<Int>? = when (this) {
     Page.EditorButtons -> listOf(R.string.editor_buttons_hint, R.string.button_preview_help)
     Page.ButtonBar -> listOf(R.string.button_layout_hint, R.string.button_preview_help)
+    Page.Backup -> listOf(R.string.md_sync_hint, R.string.device_sync_hint, R.string.device_sync_reminders_hint, R.string.backup_note)
     else -> null
 }
