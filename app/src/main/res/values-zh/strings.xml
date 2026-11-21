@@ -486,4 +486,5 @@
     <string name="device_sync_name_taken">“%1$s”已被另一部手机使用。仍要使用吗?</string>
     <string name="device_sync_name_use">仍然使用</string>
     <string name="device_sync_name_change">更改名称</string>
+    <string name="device_sync_share">分享</string>
 </resources>

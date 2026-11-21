@@ -157,6 +157,8 @@ internal class SettingsState(val context: SettingsActivity) {
     var dsBusy by mutableStateOf(false)
     var mdBusy by mutableStateOf(false)
     var dsFiles by mutableStateOf<List<DeviceSync.StoredItem>?>(null)
+    var dsViewTitle by mutableStateOf("")
+    var dsViewed by mutableStateOf<DeviceSync.Viewed?>(null)
     var dsDelete by mutableStateOf<DeviceSync.StoredItem?>(null)
     var dsName by mutableStateOf(DeviceSync.deviceName(context))
     var dsNameClash by mutableStateOf<String?>(null)

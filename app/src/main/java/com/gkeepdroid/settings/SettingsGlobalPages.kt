@@ -27,11 +27,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -372,6 +374,32 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
                 dismissButton = { TextButton(onClick = { dsDelete = null }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) } },
             )
         }
+        dsViewed?.let { viewed ->
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = { dsViewed = null },
+                title = { Text(dsViewTitle) },
+                text = {
+                    Column(Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState())) {
+                        val bitmap = remember(viewed) { viewed.photo?.let { android.graphics.BitmapFactory.decodeByteArray(it, 0, it.size)?.asImageBitmap() } }
+                        if (bitmap != null) androidx.compose.foundation.Image(bitmap, contentDescription = null, Modifier.fillMaxWidth())
+                        // Selectable, so a part of it can be copied.
+                        viewed.text?.let { androidx.compose.foundation.text.selection.SelectionContainer { Text(it, style = MaterialTheme.typography.bodySmall, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace) } }
+                    }
+                },
+                confirmButton = { TextButton(onClick = { dsViewed = null }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.ok)) } },
+                dismissButton = viewed.text?.let { text ->
+                    {
+                        TextButton(
+                            onClick = {
+                                val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text)
+                                context.startActivity(Intent.createChooser(send, null))
+                            },
+                            shapes = ButtonDefaults.shapes(),
+                        ) { Text(stringResource(R.string.device_sync_share)) }
+                    }
+                },
+            )
+        }
         dsFiles?.let { files ->
             androidx.compose.material3.AlertDialog(
                 onDismissRequest = { dsFiles = null },
@@ -382,9 +410,18 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
                     } else {
                         Column(Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             files.sortedBy { it.file.name }.forEach { item ->
-                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                val shownTitle = item.label ?: stringResource(R.string.device_sync_photo)
+                                Row(
+                                    Modifier.clickable {
+                                        scope.launch {
+                                            val viewed = runCatching { DeviceSync.view(context, item.file.name) }.getOrNull()
+                                            if (viewed != null) { dsViewTitle = shownTitle; dsViewed = viewed }
+                                        }
+                                    },
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
                                     Column(Modifier.weight(1f)) {
-                                        val title = item.label ?: stringResource(R.string.device_sync_photo)
+                                        val title = shownTitle
                                         Text(if (item.own) stringResource(R.string.device_sync_this_phone, title) else title, style = MaterialTheme.typography.bodyMedium)
                                         if (item.file.modified > 0) Text(
                                             DateUtils.formatDateTime(context, item.file.modified, DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_ABBREV_ALL),

@@ -496,4 +496,5 @@
     <string name="device_sync_name_taken">“%1$s” is already used by another phone. Use it anyway?</string>
     <string name="device_sync_name_use">Use anyway</string>
     <string name="device_sync_name_change">Change name</string>
+    <string name="device_sync_share">Share</string>
 </resources>

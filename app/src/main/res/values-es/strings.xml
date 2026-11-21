@@ -504,4 +504,5 @@
     <string name="device_sync_name_taken">«%1$s» ya lo usa otro móvil. ¿Usarlo de todos modos?</string>
     <string name="device_sync_name_use">Usar de todos modos</string>
     <string name="device_sync_name_change">Cambiar nombre</string>
+    <string name="device_sync_share">Compartir</string>
 </resources>

@@ -495,4 +495,5 @@
     <string name="device_sync_name_taken">“%1$s” नाम किसी दूसरे फ़ोन में पहले से है। फिर भी इस्तेमाल करें?</string>
     <string name="device_sync_name_use">फिर भी इस्तेमाल करें</string>
     <string name="device_sync_name_change">नाम बदलें</string>
+    <string name="device_sync_share">साझा करें</string>
 </resources>

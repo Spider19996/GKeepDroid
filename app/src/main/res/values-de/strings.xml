@@ -495,4 +495,5 @@
     <string name="device_sync_name_taken">„%1$s“ wird schon von einem anderen Handy benutzt. Trotzdem verwenden?</string>
     <string name="device_sync_name_use">Trotzdem verwenden</string>
     <string name="device_sync_name_change">Name ändern</string>
+    <string name="device_sync_share">Teilen</string>
 </resources>

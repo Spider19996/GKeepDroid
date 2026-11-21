@@ -504,4 +504,5 @@
     <string name="device_sync_name_taken">« %1$s » est déjà utilisé par un autre téléphone. L’utiliser quand même ?</string>
     <string name="device_sync_name_use">Utiliser quand même</string>
     <string name="device_sync_name_change">Changer le nom</string>
+    <string name="device_sync_share">Partager</string>
 </resources>

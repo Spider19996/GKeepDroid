@@ -486,4 +486,5 @@
     <string name="device_sync_name_taken">「%1$s」はすでに別の端末で使われています。それでも使いますか?</string>
     <string name="device_sync_name_use">それでも使う</string>
     <string name="device_sync_name_change">名前を変更</string>
+    <string name="device_sync_share">共有</string>
 </resources>

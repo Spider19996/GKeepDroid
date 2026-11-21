@@ -513,4 +513,5 @@
     <string name="device_sync_name_taken">„%1$s” jest już używana przez inny telefon. Użyć mimo to?</string>
     <string name="device_sync_name_use">Użyj mimo to</string>
     <string name="device_sync_name_change">Zmień nazwę</string>
+    <string name="device_sync_share">Udostępnij</string>
 </resources>

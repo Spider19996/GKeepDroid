@@ -495,4 +495,5 @@
     <string name="device_sync_name_taken">“%1$s” wordt al door een andere telefoon gebruikt. Toch gebruiken?</string>
     <string name="device_sync_name_use">Toch gebruiken</string>
     <string name="device_sync_name_change">Naam wijzigen</string>
+    <string name="device_sync_share">Delen</string>
 </resources>

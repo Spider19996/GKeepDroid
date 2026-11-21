@@ -513,4 +513,5 @@
     <string name="device_sync_name_taken">«%1$s» уже используется другим телефоном. Всё равно использовать?</string>
     <string name="device_sync_name_use">Всё равно использовать</string>
     <string name="device_sync_name_change">Изменить название</string>
+    <string name="device_sync_share">Поделиться</string>
 </resources>

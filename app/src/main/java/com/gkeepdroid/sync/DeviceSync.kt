@@ -265,6 +265,16 @@ object DeviceSync {
         }
     }
 
+    /** What a stored file holds, for the user to look at: the text of a phone's file (indented), or the bytes of a photo. Null if it cannot be read. */
+    class Viewed(val text: String?, val photo: ByteArray?)
+
+    suspend fun view(context: Context, name: String): Viewed? = withContext(Dispatchers.IO) {
+        val storage = storage(context.applicationContext) ?: return@withContext null
+        storage.list()
+        val bytes = storage.read(name) ?: return@withContext null
+        if (name.endsWith(".json")) Viewed(runCatching { JSONObject(bytes.decodeToString()).toString(2) }.getOrDefault(bytes.decodeToString()), null) else Viewed(null, bytes)
+    }
+
     /** Removes a file of the sync. A phone that is still in use writes its own file again at its next sync; what the others know of it stays with them. */
     suspend fun deleteFile(context: Context, name: String) = withContext(Dispatchers.IO) { storage(context.applicationContext)?.also { it.list(); it.delete(name) } }
 
