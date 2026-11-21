@@ -494,4 +494,5 @@
     <string name="device_sync_auto_delete_hint">Bu süre boyunca dokunulmamış diğer telefonların dosyalarını siler (en az 14 gün). Kullanılan bir telefon dosyasını her hafta yeniler.</string>
     <string name="device_sync_name_taken">“%1$s” zaten başka bir telefon tarafından kullanılıyor. Yine de kullanılsın mı?</string>
     <string name="device_sync_name_use">Yine de kullan</string>
+    <string name="device_sync_name_change">Adı değiştir</string>
 </resources>

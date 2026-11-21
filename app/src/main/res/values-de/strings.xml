@@ -494,4 +494,5 @@
     <string name="device_sync_auto_delete_hint">Löscht die Dateien anderer Handys, die so lange nicht berührt wurden (mindestens 14 Tage). Ein benutztes Handy erneuert seine Datei jede Woche.</string>
     <string name="device_sync_name_taken">„%1$s“ wird schon von einem anderen Handy benutzt. Trotzdem verwenden?</string>
     <string name="device_sync_name_use">Trotzdem verwenden</string>
+    <string name="device_sync_name_change">Name ändern</string>
 </resources>

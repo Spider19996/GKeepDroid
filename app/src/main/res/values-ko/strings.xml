@@ -485,4 +485,5 @@
     <string name="device_sync_auto_delete_hint">이 기간 동안 건드리지 않은 다른 휴대폰의 파일을 삭제합니다(최소 14일). 사용 중인 휴대폰은 매주 파일을 갱신합니다.</string>
     <string name="device_sync_name_taken">“%1$s” 이름은 이미 다른 휴대폰에서 사용 중입니다. 그래도 사용할까요?</string>
     <string name="device_sync_name_use">그래도 사용</string>
+    <string name="device_sync_name_change">이름 변경</string>
 </resources>

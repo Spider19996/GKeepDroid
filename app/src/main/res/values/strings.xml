@@ -495,4 +495,5 @@
     <string name="device_sync_auto_delete_hint">Deletes the files of other phones that have not been touched for this long (at least 14 days). A phone in use renews its file every week.</string>
     <string name="device_sync_name_taken">“%1$s” is already used by another phone. Use it anyway?</string>
     <string name="device_sync_name_use">Use anyway</string>
+    <string name="device_sync_name_change">Change name</string>
 </resources>

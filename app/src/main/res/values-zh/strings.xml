@@ -485,4 +485,5 @@
     <string name="device_sync_auto_delete_hint">删除其他手机上这么久没有动过的文件(至少 14 天)。仍在使用的手机每周会更新自己的文件。</string>
     <string name="device_sync_name_taken">“%1$s”已被另一部手机使用。仍要使用吗?</string>
     <string name="device_sync_name_use">仍然使用</string>
+    <string name="device_sync_name_change">更改名称</string>
 </resources>

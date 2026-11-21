@@ -503,4 +503,5 @@
     <string name="device_sync_auto_delete_hint">Elimina i file degli altri telefoni che non sono stati toccati per tutto questo tempo (almeno 14 giorni). Un telefono in uso rinnova il suo file ogni settimana.</string>
     <string name="device_sync_name_taken">«%1$s» è già usato da un altro telefono. Usarlo comunque?</string>
     <string name="device_sync_name_use">Usa comunque</string>
+    <string name="device_sync_name_change">Cambia nome</string>
 </resources>

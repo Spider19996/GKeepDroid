@@ -503,4 +503,5 @@
     <string name="device_sync_auto_delete_hint">Elimina los archivos de otros móviles que no se han tocado en tanto tiempo (mínimo 14 días). Un móvil en uso renueva su archivo cada semana.</string>
     <string name="device_sync_name_taken">«%1$s» ya lo usa otro móvil. ¿Usarlo de todos modos?</string>
     <string name="device_sync_name_use">Usar de todos modos</string>
+    <string name="device_sync_name_change">Cambiar nombre</string>
 </resources>

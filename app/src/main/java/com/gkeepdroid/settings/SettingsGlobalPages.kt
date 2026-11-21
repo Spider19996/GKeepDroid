@@ -274,6 +274,10 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
                 dismissButton = { TextButton(onClick = { dsNameEdit = null }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) } },
             )
         }
+        // A phone that came with the name of another one is asked about it as soon as the page is opened.
+        androidx.compose.runtime.LaunchedEffect(dsEnabled, dsMode) {
+            if (dsEnabled) DeviceSync.nameClash(context)?.let { dsNameClash = it; dsNameClashDefault = true }
+        }
         dsNameClash?.let { taken ->
             androidx.compose.material3.AlertDialog(
                 onDismissRequest = { dsNameClash = null },
@@ -285,11 +289,21 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
                             DeviceSync.setDeviceName(context, taken)
                             dsName = DeviceSync.deviceName(context)
                             dsNameClash = null
+                            dsNameClashDefault = false
                         },
                         shapes = ButtonDefaults.shapes(),
                     ) { Text(stringResource(R.string.device_sync_name_use)) }
                 },
-                dismissButton = { TextButton(onClick = { dsNameClash = null }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) } },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            dsNameClash = null
+                            if (dsNameClashDefault) dsNameEdit = taken
+                            dsNameClashDefault = false
+                        },
+                        shapes = ButtonDefaults.shapes(),
+                    ) { Text(stringResource(if (dsNameClashDefault) R.string.device_sync_name_change else android.R.string.cancel)) }
+                },
             )
         }
         if (dsEnabled) {

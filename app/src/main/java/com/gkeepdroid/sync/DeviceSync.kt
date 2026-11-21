@@ -226,16 +226,27 @@ object DeviceSync {
     }.getOrDefault(false)
 
     /** The name of this phone, as the other phones show it in their list of stored files. */
-    fun deviceName(context: Context): String = prefs(context).getString("name", null)?.takeIf { it.isNotBlank() } ?: (modelName(context) + if (context.packageName.endsWith(".debug")) "-debug" else "")
+    fun deviceName(context: Context): String = prefs(context).getString("name", null)?.takeIf { it.isNotBlank() } ?: (modelName(context) + if (context.packageName.endsWith(".debug")) " - DEBUG" else "")
 
-    /** What the phone calls itself ("OnePlus 8T"), else the maker and the model code. The debug app adds "-debug" to it, so it is not taken for the release app of the same phone. */
+    /** What the phone calls itself ("OnePlus 8T"), else the maker and the model code. The debug app adds " - DEBUG" to it, so it is not taken for the release app of the same phone. */
     private fun modelName(context: Context): String =
         runCatching { android.provider.Settings.Global.getString(context.contentResolver, "device_name") }.getOrNull()?.takeIf { it.isNotBlank() }
             ?: listOf(android.os.Build.MANUFACTURER, android.os.Build.MODEL).filter { it.isNotBlank() }.distinct().joinToString(" ").ifBlank { "Phone" }
 
+    /** Saves the name; the user has seen to it that it is fine (also when another phone has it too), so it is not asked about again. */
     fun setDeviceName(context: Context, name: String) {
-        prefs(context).edit { putString("name", name.trim().take(40)) }
+        prefs(context).edit { putString("name", name.trim().take(40)).putString("name_ok", name.trim().take(40).lowercase()) }
         request(context)
+    }
+
+    /**
+     * Whether another phone has put a file under the very name this phone has, and the user has not accepted that yet: the default
+     * name of a phone is the model, so two phones of one model start out with the same one.
+     */
+    suspend fun nameClash(context: Context): String? {
+        val name = deviceName(context)
+        if (prefs(context).getString("name_ok", null) == name.lowercase()) return null
+        return runCatching { contents(context).any { !it.own && it.label.equals(name, ignoreCase = true) } }.getOrDefault(false).let { if (it) name else null }
     }
 
     /** A file of the sync as the user sees it: [label] is the phone's name for a phone's file, null for a photo. */

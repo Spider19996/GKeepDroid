@@ -494,4 +494,5 @@
     <string name="device_sync_auto_delete_hint">दूसरे फ़ोनों की वे फ़ाइलें हटाता है जिन्हें इतने समय से छुआ नहीं गया (कम से कम 14 दिन)। इस्तेमाल में रहने वाला फ़ोन हर हफ़्ते अपनी फ़ाइल नई करता है।</string>
     <string name="device_sync_name_taken">“%1$s” नाम किसी दूसरे फ़ोन में पहले से है। फिर भी इस्तेमाल करें?</string>
     <string name="device_sync_name_use">फिर भी इस्तेमाल करें</string>
+    <string name="device_sync_name_change">नाम बदलें</string>
 </resources>

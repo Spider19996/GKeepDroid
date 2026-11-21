@@ -160,6 +160,7 @@ internal class SettingsState(val context: SettingsActivity) {
     var dsDelete by mutableStateOf<DeviceSync.StoredItem?>(null)
     var dsName by mutableStateOf(DeviceSync.deviceName(context))
     var dsNameClash by mutableStateOf<String?>(null)
+    var dsNameClashDefault by mutableStateOf(false)
     var dsAutoDelete by mutableStateOf(DeviceSync.autoDeleteEnabled(context))
     var dsAutoDays by mutableStateOf(DeviceSync.autoDeleteDays(context))
     var dsNameEdit by mutableStateOf<String?>(null)

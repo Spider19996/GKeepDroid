@@ -512,4 +512,5 @@
     <string name="device_sync_auto_delete_hint">Удаляет файлы других телефонов, которых так долго не касались (не менее 14 дней). Используемый телефон обновляет свой файл каждую неделю.</string>
     <string name="device_sync_name_taken">«%1$s» уже используется другим телефоном. Всё равно использовать?</string>
     <string name="device_sync_name_use">Всё равно использовать</string>
+    <string name="device_sync_name_change">Изменить название</string>
 </resources>

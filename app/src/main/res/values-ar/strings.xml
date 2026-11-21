@@ -530,4 +530,5 @@
     <string name="device_sync_auto_delete_hint">يحذف ملفات الهواتف الأخرى التي لم يُلمس منها شيء طوال هذه المدة (14 يومًا على الأقل). الهاتف المستخدم يجدد ملفه كل أسبوع.</string>
     <string name="device_sync_name_taken">الاسم «%1$s» مستخدم بالفعل في هاتف آخر. هل تريد استخدامه على أي حال؟</string>
     <string name="device_sync_name_use">استخدمه على أي حال</string>
+    <string name="device_sync_name_change">تغيير الاسم</string>
 </resources>

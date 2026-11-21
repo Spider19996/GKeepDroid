@@ -494,4 +494,5 @@
     <string name="device_sync_auto_delete_hint">Verwijdert de bestanden van andere telefoons die zo lang niet zijn aangeraakt (minstens 14 dagen). Een telefoon in gebruik vernieuwt zijn bestand elke week.</string>
     <string name="device_sync_name_taken">“%1$s” wordt al door een andere telefoon gebruikt. Toch gebruiken?</string>
     <string name="device_sync_name_use">Toch gebruiken</string>
+    <string name="device_sync_name_change">Naam wijzigen</string>
 </resources>
