@@ -469,7 +469,7 @@
     <string name="quote_add">उद्धरण जोड़ें</string>
     <string name="device_sync_title">फ़ोनों के बीच सिंक</string>
     <string name="device_sync_enable">फ़ोनों के बीच सिंक करें</string>
-    <string name="device_sync_hint">जो Keep नहीं रख सकता (निजी नोट, अपने रंग और फ़ोटो, समेटे हुए नोट, चाहें तो रिमाइंडर) उसे आपके सभी फ़ोनों पर एक जैसा रखता है। हर फ़ोन एक फ़ोल्डर में छोटी फ़ाइल रखता है, जिसे Syncthing, Nextcloud या कोई क्लाउड ऐप बाकी फ़ोनों तक पहुँचाता है।</string>
+    <string name="device_sync_hint">जो Keep नहीं रख सकता (निजी नोट, अपने रंग और फ़ोटो, समेटे हुए नोट, चाहें तो रिमाइंडर) उसे आपके सभी फ़ोनों पर एक जैसा रखता है। हर फ़ोन अपनी छोटी फ़ाइल या तो आपके Google Drive के छिपे ऐप फ़ोल्डर में रखता है या ऐसे फ़ोल्डर में जिसे Syncthing, Nextcloud या कोई क्लाउड ऐप बाकी फ़ोनों तक पहुँचाता है।</string>
     <string name="device_sync_folder">फ़ोल्डर: %1$s</string>
     <string name="device_sync_choose">फ़ोल्डर चुनें</string>
     <string name="device_sync_reminders">दूसरे फ़ोनों के रिमाइंडर अपनाएँ</string>
@@ -477,4 +477,7 @@
     <string name="device_sync_now">अभी सिंक करें</string>
     <string name="device_sync_done">सिंक हो गया, %1$d बदलाव अपनाए गए</string>
     <string name="device_sync_failed">सिंक विफल: %1$s</string>
+    <string name="device_sync_via_drive">Google Drive के ज़रिए (अपने-आप)</string>
+    <string name="device_sync_via_folder">फ़ोल्डर के ज़रिए (Syncthing, Nextcloud, …)</string>
+    <string name="device_sync_account">खाता: %1$s</string>
 </resources>

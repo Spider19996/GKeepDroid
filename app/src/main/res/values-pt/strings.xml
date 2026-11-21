@@ -478,7 +478,7 @@
     <string name="quote_add">Adicionar citação</string>
     <string name="device_sync_title">Sincronização entre telemóveis</string>
     <string name="device_sync_enable">Sincronizar entre telemóveis</string>
-    <string name="device_sync_hint">Mantém igual em todos os teus telemóveis o que o Keep não consegue guardar (notas privadas, cores e fotos próprias, notas recolhidas e, se quiseres, lembretes). Cada telemóvel deixa um pequeno ficheiro numa pasta que o Syncthing, o Nextcloud ou uma app na nuvem leva aos outros.</string>
+    <string name="device_sync_hint">Mantém igual em todos os teus telemóveis o que o Keep não consegue guardar (notas privadas, cores e fotos próprias, notas recolhidas e, se quiseres, lembretes). Cada telemóvel deixa um pequeno ficheiro seu, na pasta oculta da app no teu Google Drive ou numa pasta que o Syncthing, o Nextcloud ou uma app na nuvem leva aos outros.</string>
     <string name="device_sync_folder">Pasta: %1$s</string>
     <string name="device_sync_choose">Escolher pasta</string>
     <string name="device_sync_reminders">Receber lembretes de outros telemóveis</string>
@@ -486,4 +486,7 @@
     <string name="device_sync_now">Sincronizar agora</string>
     <string name="device_sync_done">Sincronizado, %1$d alterações recebidas</string>
     <string name="device_sync_failed">Falha na sincronização: %1$s</string>
+    <string name="device_sync_via_drive">Através do Google Drive (automático)</string>
+    <string name="device_sync_via_folder">Através de uma pasta (Syncthing, Nextcloud, …)</string>
+    <string name="device_sync_account">Conta: %1$s</string>
 </resources>

@@ -470,7 +470,7 @@
     <string name="quote_add">Add quote</string>
     <string name="device_sync_title">Sync between phones</string>
     <string name="device_sync_enable">Sync between phones</string>
-    <string name="device_sync_hint">Keeps what Keep cannot store (private notes, own colors and photos, folded notes, optionally reminders) the same on all your phones. Each phone writes a small file into a folder that Syncthing, Nextcloud or a cloud app carries to the others.</string>
+    <string name="device_sync_hint">Keeps what Keep cannot store (private notes, own colors and photos, folded notes, optionally reminders) the same on all your phones. Each phone writes a small file of its own, either into the hidden app folder of your Google Drive or into a folder that Syncthing, Nextcloud or a cloud app carries to the others.</string>
     <string name="device_sync_folder">Folder: %1$s</string>
     <string name="device_sync_choose">Choose folder</string>
     <string name="device_sync_reminders">Take over reminders from other phones</string>
@@ -478,4 +478,7 @@
     <string name="device_sync_now">Sync now</string>
     <string name="device_sync_done">Synced, %1$d changes taken over</string>
     <string name="device_sync_failed">Sync failed: %1$s</string>
+    <string name="device_sync_via_drive">Via Google Drive (automatic)</string>
+    <string name="device_sync_via_folder">Via a folder (Syncthing, Nextcloud, …)</string>
+    <string name="device_sync_account">Account: %1$s</string>
 </resources>

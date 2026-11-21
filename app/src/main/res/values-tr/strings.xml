@@ -469,7 +469,7 @@
     <string name="quote_add">Alıntı ekle</string>
     <string name="device_sync_title">Telefonlar arası eşitleme</string>
     <string name="device_sync_enable">Telefonlar arasında eşitle</string>
-    <string name="device_sync_hint">Keep’in saklayamadığı şeyleri (özel notlar, kendi renk ve fotoğraflar, katlanmış notlar, istenirse hatırlatıcılar) tüm telefonlarında aynı tutar. Her telefon bir klasöre küçük bir dosya yazar; Syncthing, Nextcloud veya bir bulut uygulaması klasörü diğerlerine taşır.</string>
+    <string name="device_sync_hint">Keep’in saklayamadığı şeyleri (özel notlar, kendi renk ve fotoğraflar, katlanmış notlar, istenirse hatırlatıcılar) tüm telefonlarında aynı tutar. Her telefon kendi küçük dosyasını ya Google Drive’ındaki gizli uygulama klasörüne ya da Syncthing, Nextcloud veya bir bulut uygulamasının diğerlerine taşıdığı bir klasöre yazar.</string>
     <string name="device_sync_folder">Klasör: %1$s</string>
     <string name="device_sync_choose">Klasör seç</string>
     <string name="device_sync_reminders">Diğer telefonlardaki hatırlatıcıları al</string>
@@ -477,4 +477,7 @@
     <string name="device_sync_now">Şimdi eşitle</string>
     <string name="device_sync_done">Eşitlendi, %1$d değişiklik alındı</string>
     <string name="device_sync_failed">Eşitleme başarısız: %1$s</string>
+    <string name="device_sync_via_drive">Google Drive üzerinden (otomatik)</string>
+    <string name="device_sync_via_folder">Klasör üzerinden (Syncthing, Nextcloud, …)</string>
+    <string name="device_sync_account">Hesap: %1$s</string>
 </resources>

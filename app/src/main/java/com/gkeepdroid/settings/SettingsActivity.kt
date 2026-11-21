@@ -151,6 +151,7 @@ class SettingsActivity : ComponentActivity() {
                     )
                     DeviceSync.setFolder(context, uri)
                     dsEnabled = true
+                    dsMode = DeviceSync.MODE_FOLDER
                     dsFolder = DeviceSync.folderLabel(uri)
                 }
             }

@@ -478,7 +478,7 @@
     <string name="quote_add">Aggiungi citazione</string>
     <string name="device_sync_title">Sincronizzazione tra telefoni</string>
     <string name="device_sync_enable">Sincronizza tra telefoni</string>
-    <string name="device_sync_hint">Mantiene uguale su tutti i tuoi telefoni ciò che Keep non può salvare (note private, colori e foto propri, note ripiegate e, se vuoi, promemoria). Ogni telefono lascia un piccolo file in una cartella che Syncthing, Nextcloud o un’app cloud porta agli altri.</string>
+    <string name="device_sync_hint">Mantiene uguale su tutti i tuoi telefoni ciò che Keep non può salvare (note private, colori e foto propri, note ripiegate e, se vuoi, promemoria). Ogni telefono lascia un piccolo file suo, nella cartella nascosta dell’app nel tuo Google Drive oppure in una cartella che Syncthing, Nextcloud o un’app cloud porta agli altri.</string>
     <string name="device_sync_folder">Cartella: %1$s</string>
     <string name="device_sync_choose">Scegli cartella</string>
     <string name="device_sync_reminders">Importa i promemoria degli altri telefoni</string>
@@ -486,4 +486,7 @@
     <string name="device_sync_now">Sincronizza ora</string>
     <string name="device_sync_done">Sincronizzato, %1$d modifiche importate</string>
     <string name="device_sync_failed">Sincronizzazione non riuscita: %1$s</string>
+    <string name="device_sync_via_drive">Tramite Google Drive (automatico)</string>
+    <string name="device_sync_via_folder">Tramite una cartella (Syncthing, Nextcloud, …)</string>
+    <string name="device_sync_account">Account: %1$s</string>
 </resources>

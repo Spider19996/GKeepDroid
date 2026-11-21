@@ -153,6 +153,7 @@ internal class SettingsState(val context: SettingsActivity) {
     var mdFolder by mutableStateOf(MarkdownSync.treeUri(context)?.let { MarkdownSync.folderLabel(it) })
     var dsEnabled by mutableStateOf(DeviceSync.isEnabled(context))
     var dsFolder by mutableStateOf(DeviceSync.treeUri(context)?.let { DeviceSync.folderLabel(it) })
+    var dsMode by mutableStateOf(DeviceSync.mode(context))
     var dsReminders by mutableStateOf(DeviceSync.remindersEnabled(context))
     var dsStatus by mutableStateOf("")
     var confirmRemoveLocal by mutableStateOf(false)

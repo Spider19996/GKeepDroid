@@ -460,7 +460,7 @@
     <string name="quote_add">引用を追加</string>
     <string name="device_sync_title">端末間の同期</string>
     <string name="device_sync_enable">端末間で同期</string>
-    <string name="device_sync_hint">Keep に保存できないもの(非公開メモ、独自の色や写真、折りたたんだメモ、必要ならリマインダー)を、すべての端末で同じに保ちます。各端末がフォルダに小さなファイルを置き、Syncthing、Nextcloud、クラウドアプリがそれを他の端末へ運びます。</string>
+    <string name="device_sync_hint">Keep に保存できないもの(非公開メモ、独自の色や写真、折りたたんだメモ、必要ならリマインダー)を、すべての端末で同じに保ちます。各端末は自分用の小さなファイルを、Google ドライブの非表示のアプリフォルダか、Syncthing・Nextcloud・クラウドアプリが他の端末へ運ぶフォルダに置きます。</string>
     <string name="device_sync_folder">フォルダ: %1$s</string>
     <string name="device_sync_choose">フォルダを選択</string>
     <string name="device_sync_reminders">他の端末のリマインダーを取り込む</string>
@@ -468,4 +468,7 @@
     <string name="device_sync_now">今すぐ同期</string>
     <string name="device_sync_done">同期しました(%1$d 件の変更を取り込み)</string>
     <string name="device_sync_failed">同期に失敗しました: %1$s</string>
+    <string name="device_sync_via_drive">Google ドライブ経由(自動)</string>
+    <string name="device_sync_via_folder">フォルダ経由(Syncthing、Nextcloud など)</string>
+    <string name="device_sync_account">アカウント: %1$s</string>
 </resources>

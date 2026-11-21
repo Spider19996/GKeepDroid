@@ -5,7 +5,9 @@ import android.net.Uri
 import android.provider.DocumentsContract
 import androidx.core.content.edit
 import androidx.core.net.toUri
+import androidx.work.Constraints
 import androidx.work.CoroutineWorker
+import androidx.work.NetworkType
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -44,7 +46,22 @@ object DeviceSync {
 
     fun treeUri(context: Context): Uri? = prefs(context).getString("tree", null)?.toUri()
 
-    fun isEnabled(context: Context) = prefs(context).getBoolean("enabled", false) && treeUri(context) != null
+    const val MODE_DRIVE = "drive"
+    const val MODE_FOLDER = "folder"
+
+    /** Where the phones meet: the hidden app folder of Google Drive, or a folder the user syncs with another app. Drive unless a folder was chosen before. */
+    fun mode(context: Context): String = prefs(context).getString("mode", null) ?: if (treeUri(context) != null) MODE_FOLDER else MODE_DRIVE
+
+    fun setMode(context: Context, mode: String) {
+        prefs(context).edit { putString("mode", mode) }
+        request(context)
+    }
+
+    /** The account whose Drive is used: the first signed-in Google account. */
+    fun driveAccount(context: Context): String? = syncedAccounts(context).firstOrNull { CredentialStore.token(context, it) != null }
+
+    fun isEnabled(context: Context) =
+        prefs(context).getBoolean("enabled", false) && (if (mode(context) == MODE_DRIVE) driveAccount(context) != null else treeUri(context) != null)
 
     fun setEnabled(context: Context, on: Boolean) {
         prefs(context).edit { putBoolean("enabled", on) }
@@ -52,7 +69,7 @@ object DeviceSync {
     }
 
     fun setFolder(context: Context, tree: Uri) {
-        prefs(context).edit { putString("tree", tree.toString()).putBoolean("enabled", true) }
+        prefs(context).edit { putString("tree", tree.toString()).putString("mode", MODE_FOLDER).putBoolean("enabled", true) }
         request(context)
     }
 
@@ -66,7 +83,8 @@ object DeviceSync {
         request(context)
     }
 
-    private fun storage(context: Context): SyncStorage? = treeUri(context)?.let { FolderSyncStorage(context, it) }
+    private fun storage(context: Context): SyncStorage? =
+        if (mode(context) == MODE_DRIVE) driveAccount(context)?.let { DriveSyncStorage(context, it) } else treeUri(context)?.let { FolderSyncStorage(context, it) }
 
     private fun deviceId(context: Context): String =
         prefs(context).getString("device", null) ?: UUID.randomUUID().toString().take(8).also { id -> prefs(context).edit { putString("device", id) } }
@@ -270,7 +288,10 @@ class DeviceSyncWorker(context: Context, params: WorkerParameters) : CoroutineWo
 
     companion object {
         fun schedule(context: Context) {
-            val request = OneTimeWorkRequestBuilder<DeviceSyncWorker>().setInitialDelay(4, TimeUnit.SECONDS).build()
+            val builder = OneTimeWorkRequestBuilder<DeviceSyncWorker>().setInitialDelay(4, TimeUnit.SECONDS)
+            // Drive needs a connection; a folder does not.
+            if (DeviceSync.mode(context) == DeviceSync.MODE_DRIVE) builder.setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+            val request = builder.build()
             WorkManager.getInstance(context).enqueueUniqueWork("device_sync", ExistingWorkPolicy.REPLACE, request)
         }
     }

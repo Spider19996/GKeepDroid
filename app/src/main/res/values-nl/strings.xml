@@ -469,7 +469,7 @@
     <string name="quote_add">Citaat toevoegen</string>
     <string name="device_sync_title">Sync tussen telefoons</string>
     <string name="device_sync_enable">Synchroniseren tussen telefoons</string>
-    <string name="device_sync_hint">Houdt wat Keep niet kan opslaan (privénotities, eigen kleuren en foto’s, ingeklapte notities, optioneel herinneringen) gelijk op al je telefoons. Elke telefoon zet een klein bestand in een map die Syncthing, Nextcloud of een cloud-app naar de andere brengt.</string>
+    <string name="device_sync_hint">Houdt wat Keep niet kan opslaan (privénotities, eigen kleuren en foto’s, ingeklapte notities, optioneel herinneringen) gelijk op al je telefoons. Elke telefoon zet een klein eigen bestand neer, in de verborgen app-map van je Google Drive of in een map die Syncthing, Nextcloud of een cloud-app naar de andere brengt.</string>
     <string name="device_sync_folder">Map: %1$s</string>
     <string name="device_sync_choose">Map kiezen</string>
     <string name="device_sync_reminders">Herinneringen van andere telefoons overnemen</string>
@@ -477,4 +477,7 @@
     <string name="device_sync_now">Nu synchroniseren</string>
     <string name="device_sync_done">Gesynchroniseerd, %1$d wijzigingen overgenomen</string>
     <string name="device_sync_failed">Synchronisatie mislukt: %1$s</string>
+    <string name="device_sync_via_drive">Via Google Drive (automatisch)</string>
+    <string name="device_sync_via_folder">Via een map (Syncthing, Nextcloud, …)</string>
+    <string name="device_sync_account">Account: %1$s</string>
 </resources>

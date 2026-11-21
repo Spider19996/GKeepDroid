@@ -816,3 +816,24 @@ def set_sort(email, master_token, state_path, note_id, sort):
     note.sort = int(sort)
     keep.sync()
     return _finish(keep, state_path)
+
+
+def drive_token(email, master_token):
+    """An access token for the hidden app folder of the account's Google Drive.
+
+    Like the Keep token it is asked for as the Keep app (the one client that is known to Google for this account).
+    """
+    import gpsoauth
+
+    res = gpsoauth.perform_oauth(
+        email,
+        master_token,
+        hashlib.md5(email.encode()).hexdigest()[:16],
+        service="oauth2:https://www.googleapis.com/auth/drive.appdata",
+        app="com.google.android.keep",
+        client_sig="38918a453d07199354f8b19af05ec6562ced5788",
+    )
+    token = res.get("Auth")
+    if not token:
+        raise ValueError(res.get("Error") or "Google did not return a token")
+    return token

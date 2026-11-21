@@ -469,7 +469,7 @@
     <string name="quote_add">Zitat hinzufügen</string>
     <string name="device_sync_title">Sync zwischen Handys</string>
     <string name="device_sync_enable">Zwischen Handys synchronisieren</string>
-    <string name="device_sync_hint">Hält, was Keep nicht speichern kann (private Notizen, eigene Farben und Fotos, eingeklappte Notizen, optional Erinnerungen), auf all deinen Handys gleich. Jedes Handy legt eine kleine Datei in einem Ordner ab, den Syncthing, Nextcloud oder eine Cloud-App zu den anderen trägt.</string>
+    <string name="device_sync_hint">Hält, was Keep nicht speichern kann (private Notizen, eigene Farben und Fotos, eingeklappte Notizen, optional Erinnerungen), auf all deinen Handys gleich. Jedes Handy legt eine kleine eigene Datei ab, entweder im versteckten App-Ordner deines Google Drive oder in einem Ordner, den Syncthing, Nextcloud oder eine Cloud-App zu den anderen trägt.</string>
     <string name="device_sync_folder">Ordner: %1$s</string>
     <string name="device_sync_choose">Ordner wählen</string>
     <string name="device_sync_reminders">Erinnerungen von anderen Handys übernehmen</string>
@@ -477,4 +477,7 @@
     <string name="device_sync_now">Jetzt synchronisieren</string>
     <string name="device_sync_done">Synchronisiert, %1$d Änderungen übernommen</string>
     <string name="device_sync_failed">Sync fehlgeschlagen: %1$s</string>
+    <string name="device_sync_via_drive">Über Google Drive (automatisch)</string>
+    <string name="device_sync_via_folder">Über einen Ordner (Syncthing, Nextcloud, …)</string>
+    <string name="device_sync_account">Konto: %1$s</string>
 </resources>

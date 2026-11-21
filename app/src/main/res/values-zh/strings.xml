@@ -460,7 +460,7 @@
     <string name="quote_add">添加引用</string>
     <string name="device_sync_title">手机间同步</string>
     <string name="device_sync_enable">在手机间同步</string>
-    <string name="device_sync_hint">让 Keep 无法保存的内容(私密笔记、自己的颜色和照片、已折叠的笔记,以及可选的提醒)在你所有手机上保持一致。每部手机在文件夹里放一个小文件,再由 Syncthing、Nextcloud 或云盘应用传给其他手机。</string>
+    <string name="device_sync_hint">让 Keep 无法保存的内容(私密笔记、自己的颜色和照片、已折叠的笔记,以及可选的提醒)在你所有手机上保持一致。每部手机会把自己的小文件放进你 Google 云端硬盘的隐藏应用文件夹,或放进由 Syncthing、Nextcloud 或云盘应用传给其他手机的文件夹。</string>
     <string name="device_sync_folder">文件夹:%1$s</string>
     <string name="device_sync_choose">选择文件夹</string>
     <string name="device_sync_reminders">接收其他手机的提醒</string>
@@ -468,4 +468,7 @@
     <string name="device_sync_now">立即同步</string>
     <string name="device_sync_done">已同步,接收了 %1$d 项更改</string>
     <string name="device_sync_failed">同步失败:%1$s</string>
+    <string name="device_sync_via_drive">通过 Google 云端硬盘(自动)</string>
+    <string name="device_sync_via_folder">通过文件夹(Syncthing、Nextcloud 等)</string>
+    <string name="device_sync_account">账号:%1$s</string>
 </resources>

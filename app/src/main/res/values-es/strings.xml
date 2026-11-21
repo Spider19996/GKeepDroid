@@ -478,7 +478,7 @@
     <string name="quote_add">Añadir cita</string>
     <string name="device_sync_title">Sincronización entre móviles</string>
     <string name="device_sync_enable">Sincronizar entre móviles</string>
-    <string name="device_sync_hint">Mantiene igual en todos tus móviles lo que Keep no puede guardar (notas privadas, colores y fotos propios, notas plegadas y, si quieres, recordatorios). Cada móvil deja un pequeño archivo en una carpeta que Syncthing, Nextcloud o una app en la nube lleva a los demás.</string>
+    <string name="device_sync_hint">Mantiene igual en todos tus móviles lo que Keep no puede guardar (notas privadas, colores y fotos propios, notas plegadas y, si quieres, recordatorios). Cada móvil deja un pequeño archivo propio, bien en la carpeta oculta de la app en tu Google Drive, bien en una carpeta que Syncthing, Nextcloud o una app en la nube lleva a los demás.</string>
     <string name="device_sync_folder">Carpeta: %1$s</string>
     <string name="device_sync_choose">Elegir carpeta</string>
     <string name="device_sync_reminders">Adoptar recordatorios de otros móviles</string>
@@ -486,4 +486,7 @@
     <string name="device_sync_now">Sincronizar ahora</string>
     <string name="device_sync_done">Sincronizado, %1$d cambios adoptados</string>
     <string name="device_sync_failed">Error de sincronización: %1$s</string>
+    <string name="device_sync_via_drive">Mediante Google Drive (automático)</string>
+    <string name="device_sync_via_folder">Mediante una carpeta (Syncthing, Nextcloud, …)</string>
+    <string name="device_sync_account">Cuenta: %1$s</string>
 </resources>

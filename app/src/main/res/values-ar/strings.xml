@@ -505,7 +505,7 @@
     <string name="quote_add">إضافة اقتباس</string>
     <string name="device_sync_title">المزامنة بين الهواتف</string>
     <string name="device_sync_enable">المزامنة بين الهواتف</string>
-    <string name="device_sync_hint">يُبقي ما لا يستطيع Keep حفظه (الملاحظات الخاصة، والألوان والصور الخاصة، والملاحظات المطوية، والتذكيرات اختياريًا) متطابقًا على جميع هواتفك. يضع كل هاتف ملفًا صغيرًا في مجلد ينقله Syncthing أو Nextcloud أو تطبيق سحابي إلى الباقي.</string>
+    <string name="device_sync_hint">يُبقي ما لا يستطيع Keep حفظه (الملاحظات الخاصة، والألوان والصور الخاصة، والملاحظات المطوية، والتذكيرات اختياريًا) متطابقًا على جميع هواتفك. يضع كل هاتف ملفًا صغيرًا خاصًا به إما في مجلد التطبيق المخفي في Google Drive لديك أو في مجلد ينقله Syncthing أو Nextcloud أو تطبيق سحابي إلى الباقي.</string>
     <string name="device_sync_folder">المجلد: %1$s</string>
     <string name="device_sync_choose">اختيار المجلد</string>
     <string name="device_sync_reminders">استلام التذكيرات من الهواتف الأخرى</string>
@@ -513,4 +513,7 @@
     <string name="device_sync_now">زامن الآن</string>
     <string name="device_sync_done">تمت المزامنة، تم استلام %1$d تغييرات</string>
     <string name="device_sync_failed">فشلت المزامنة: %1$s</string>
+    <string name="device_sync_via_drive">عبر Google Drive (تلقائيًا)</string>
+    <string name="device_sync_via_folder">عبر مجلد (Syncthing أو Nextcloud، …)</string>
+    <string name="device_sync_account">الحساب: %1$s</string>
 </resources>

@@ -487,7 +487,7 @@
     <string name="quote_add">Dodaj cytat</string>
     <string name="device_sync_title">Synchronizacja między telefonami</string>
     <string name="device_sync_enable">Synchronizuj między telefonami</string>
-    <string name="device_sync_hint">Utrzymuje na wszystkich telefonach to, czego Keep nie przechowuje (notatki prywatne, własne kolory i zdjęcia, zwinięte notatki, opcjonalnie przypomnienia). Każdy telefon zapisuje mały plik w folderze, który Syncthing, Nextcloud lub aplikacja chmurowa przenosi do pozostałych.</string>
+    <string name="device_sync_hint">Utrzymuje na wszystkich telefonach to, czego Keep nie przechowuje (notatki prywatne, własne kolory i zdjęcia, zwinięte notatki, opcjonalnie przypomnienia). Każdy telefon zapisuje mały własny plik: w ukrytym folderze aplikacji na Twoim Dysku Google albo w folderze, który Syncthing, Nextcloud lub aplikacja chmurowa przenosi do pozostałych.</string>
     <string name="device_sync_folder">Folder: %1$s</string>
     <string name="device_sync_choose">Wybierz folder</string>
     <string name="device_sync_reminders">Przejmuj przypomnienia z innych telefonów</string>
@@ -495,4 +495,7 @@
     <string name="device_sync_now">Synchronizuj teraz</string>
     <string name="device_sync_done">Zsynchronizowano, przejęto zmian: %1$d</string>
     <string name="device_sync_failed">Synchronizacja nie powiodła się: %1$s</string>
+    <string name="device_sync_via_drive">Przez Dysk Google (automatycznie)</string>
+    <string name="device_sync_via_folder">Przez folder (Syncthing, Nextcloud, …)</string>
+    <string name="device_sync_account">Konto: %1$s</string>
 </resources>

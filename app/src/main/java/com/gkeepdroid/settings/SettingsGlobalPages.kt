@@ -221,14 +221,28 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
         HorizontalDivider(Modifier.padding(vertical = 8.dp))
         SectionTitle(stringResource(R.string.device_sync_title))
         SwitchRow(R.string.device_sync_enable, dsEnabled) { on ->
-            if (on && DeviceSync.treeUri(context) == null) {
+            if (on && dsMode == DeviceSync.MODE_FOLDER && DeviceSync.treeUri(context) == null) {
                 deviceFolderLauncher.launch(null)
             } else {
                 DeviceSync.setEnabled(context, on)
                 dsEnabled = on
             }
         }
-        if (dsFolder != null) FolderRow(R.string.device_sync_folder, dsFolder.orEmpty(), R.string.device_sync_choose, dsEnabled, R.string.device_sync_now,
+        if (dsEnabled) {
+            RadioRow(R.string.device_sync_via_drive, dsMode == DeviceSync.MODE_DRIVE) {
+                DeviceSync.setMode(context, DeviceSync.MODE_DRIVE)
+                dsMode = DeviceSync.MODE_DRIVE
+            }
+            RadioRow(R.string.device_sync_via_folder, dsMode == DeviceSync.MODE_FOLDER) {
+                dsMode = DeviceSync.MODE_FOLDER
+                if (DeviceSync.treeUri(context) == null) deviceFolderLauncher.launch(null) else DeviceSync.setMode(context, DeviceSync.MODE_FOLDER)
+            }
+            if (dsMode == DeviceSync.MODE_DRIVE) {
+                DeviceSync.driveAccount(context)?.let { Text(stringResource(R.string.device_sync_account, it), style = MaterialTheme.typography.bodyMedium) }
+            }
+        }
+        if (dsEnabled || dsFolder != null) FolderRow(
+            R.string.device_sync_folder, if (dsMode == DeviceSync.MODE_FOLDER) dsFolder else null, R.string.device_sync_choose, dsEnabled, R.string.device_sync_now,
             onChoose = { deviceFolderLauncher.launch(null) },
             onSync = {
                 scope.launch {
@@ -262,10 +276,19 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
     }
 }
 
+/** One of several exclusive choices. */
+@Composable
+private fun RadioRow(label: Int, selected: Boolean, onClick: () -> Unit) {
+    Row(Modifier.fillMaxWidth().clickable(onClick = onClick), verticalAlignment = Alignment.CenterVertically) {
+        androidx.compose.material3.RadioButton(selected = selected, onClick = onClick)
+        Text(stringResource(label), Modifier.weight(1f))
+    }
+}
+
 /** The chosen folder of a sync, with a button to change it, and the button that syncs now. */
 @Composable
-private fun FolderRow(folder: Int, name: String, choose: Int, enabled: Boolean, now: Int, onChoose: () -> Unit, onSync: () -> Unit) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+private fun FolderRow(folder: Int, name: String?, choose: Int, enabled: Boolean, now: Int, onChoose: () -> Unit, onSync: () -> Unit) {
+    if (name != null) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text(stringResource(folder, name), Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, maxLines = 2)
         TextButton(onClick = onChoose, shapes = ButtonDefaults.shapes()) { Text(stringResource(choose)) }
     }
