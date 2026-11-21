@@ -134,7 +134,8 @@ object DeviceSync {
         QuoteBlocks.load(context).forEach { add(it, "qfold:") }
         CategoryHistory.all(context).forEach { (noteKey, names) -> if (mine(noteKey)) names.forEach { out["$noteKey|chist:$it"] = "1" } }
         if (remindersEnabled(context)) Reminders.all(context).forEach { (key, value) -> if (mine(key)) out[key] = value }
-        accounts.forEach { account ->
+        // Reading all notes only to look for photos is slow; without a single photo there is nothing to find.
+        if (CustomBackgrounds.hasAny(context)) accounts.forEach { account ->
             NotesCache.readAll(context, account).forEach { note -> photoHash(context, account, note.id)?.let { out["$account|${note.id}|bg"] = it } }
         }
         return out
@@ -289,7 +290,8 @@ object DeviceSync {
 
             val last = loadLast(app)
             val state = loadState(app)
-            DeviceSyncMerge.stampLocalChanges(last.orEmpty(), collect(app), state, now, first = last == null)
+            val local = collect(app)
+            DeviceSyncMerge.stampLocalChanges(last.orEmpty(), local, state, now, first = last == null)
 
             val files = storage.list()
             for (file in files) {
@@ -305,7 +307,7 @@ object DeviceSync {
             // What the others know and this phone does not: written into the stores, without counting as changes made here.
             val accounts = syncedAccounts(app)
             var taken = 0
-            val todo = DeviceSyncMerge.toApply(state, collect(app)).filter { (key, _) ->
+            val todo = DeviceSyncMerge.toApply(state, local).filter { (key, _) ->
                 val parts = key.split("|", limit = 3)
                 parts.size == 3 && parts[0] in accounts && (remindersEnabled(app) || !parts[2].startsWith("rem:"))
             }
@@ -329,13 +331,13 @@ object DeviceSync {
                 prefs(app).edit { putString("written", digest).putLong("written_at", now) }
             }
 
-            val after = collect(app)
+            // What the stores hold now: the same as before unless values of other phones were just written into them.
+            val after = if (todo.isEmpty()) local else collect(app)
             val have = files.map { it.name }.toSet()
-            accounts.forEach { account ->
-                NotesCache.readAll(app, account).forEach { note ->
-                    val hash = after["$account|${note.id}|bg"] ?: return@forEach
-                    if (photoName(hash) !in have) storage.write(photoName(hash), CustomBackgrounds.fileOf(app, account, note.id).readBytes())
-                }
+            after.forEach { (key, hash) ->
+                if (!key.endsWith("|bg") || photoName(hash) in have) return@forEach
+                val (account, note) = key.split("|", limit = 3)
+                storage.write(photoName(hash), CustomBackgrounds.fileOf(app, account, note).readBytes())
             }
             if (autoDeleteEnabled(app)) {
                 DeviceSyncMerge.staleDeviceFiles(files, "${PREFIX}device-", ownName, now - autoDeleteDays(app) * DAY).forEach { storage.delete(it.name) }

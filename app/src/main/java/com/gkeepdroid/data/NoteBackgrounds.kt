@@ -218,6 +218,9 @@ object CustomBackgrounds {
 
     fun fileOf(context: Context, account: String, noteId: String): File = file(context, account, noteId)
 
+    /** Whether any note has a photo of its own: most users have none, and then nothing has to be looked up. */
+    fun hasAny(context: Context): Boolean = File(context.filesDir, "custom_backgrounds").list()?.isNotEmpty() == true
+
     /** Keeps a photo that arrived from another phone as it is (it was shrunk and saved as a JPEG there). */
     fun store(context: Context, account: String, noteId: String, bytes: ByteArray) {
         file(context, account, noteId).writeBytes(bytes)

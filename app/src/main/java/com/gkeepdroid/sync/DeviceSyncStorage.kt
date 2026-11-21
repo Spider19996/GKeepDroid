@@ -101,7 +101,7 @@ class DriveSyncStorage(private val context: Context, private val account: String
                 val stream = if (code in 200..299) connection.inputStream else connection.errorStream
                 return code to (stream?.use { it.readBytes() } ?: ByteArray(0))
             } finally {
-                connection.disconnect()
+                // Not disconnected: a connection whose answer was read to the end is kept for the next call, which saves a new handshake.
             }
         }
         error("unreachable")

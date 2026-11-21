@@ -22,21 +22,29 @@ class SyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
         if (MarkdownSync.isEnabled(applicationContext)) {
             try { MarkdownSync.syncNow(applicationContext) } catch (_: Exception) {}
         }
-        // Meets the other phones, whether or not a widget is placed.
-        if (DeviceSync.isEnabled(applicationContext)) {
-            try { DeviceSync.syncNow(applicationContext) } catch (_: Exception) {}
-        }
         if (PendingEdits.all(applicationContext).isNotEmpty() && PendingEdits.flush(applicationContext)) {
             PendingEditsWorker.schedule(applicationContext)
         }
         // Nothing to update when no widget is placed, unless the app itself asked.
-        if (!inputData.getBoolean(FORCE, false) && !WidgetRefresh.hasWidgets(applicationContext)) return Result.success()
+        if (!inputData.getBoolean(FORCE, false) && !WidgetRefresh.hasWidgets(applicationContext)) {
+            syncPhones()
+            return Result.success()
+        }
         // The worker only runs with a connection, so the red arrow of an earlier refresh without one is over.
         SyncState.setOffline(applicationContext, false)
         SyncState.set(applicationContext, true)
         val ok = try { KeepRepository.syncAll(applicationContext) } finally { SyncState.set(applicationContext, false) }
         SyncPolicy.markResult(applicationContext, ok)
+        // After the notes, so what the user waits for (the widgets, the arrow) is not held up by it; whether or not a widget is placed.
+        syncPhones()
         return if (ok) Result.success() else Result.retry()
+    }
+
+    /** Meets the other phones; a failure here must not spoil the sync of the notes. */
+    private suspend fun syncPhones() {
+        if (DeviceSync.isEnabled(applicationContext)) {
+            try { DeviceSync.syncNow(applicationContext) } catch (_: Exception) {}
+        }
     }
 
     companion object {
