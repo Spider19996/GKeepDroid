@@ -144,7 +144,7 @@
     <string name="md_sync_enable">将笔记保存为 Markdown 文件</string>
     <string name="md_sync_choose">选择文件夹</string>
     <string name="md_sync_now">立即同步</string>
-    <string name="md_sync_hint">每条笔记都作为单独的 .md 文件保存在你选择的文件夹中（每个账号一个子文件夹），并保持双向同步：在小组件或 Keep 中编辑笔记，文件随之改变；在其他应用（Obsidian、Markor 等）中编辑文件，笔记随之改变。文件夹中新的 .md 文件会成为新笔记。删除文件不会删除笔记；在 Keep 中移除的笔记，其文件会移到子文件夹 _removed。如果双方都改过，较新的一方获胜，另一方保存为 .conflict 文件。图片会复制到文件旁边，但不能在那里修改。其他应用的更改在应用运行时很快送达，否则在下次同步时送达。</string>
+    <string name="md_sync_hint">每条笔记都会在你选择的文件夹中成为独立的 .md 文件,并双向保持同步。在 Obsidian、Markor 或其他应用中修改文件,笔记也会随之改变。</string>
     <plurals name="md_sync_done">
         <item quantity="other">Markdown 文件夹已同步（%1$d 处更改）。</item>
     </plurals>
@@ -460,7 +460,7 @@
     <string name="quote_add">添加引用</string>
     <string name="device_sync_title">手机间同步</string>
     <string name="device_sync_enable">在手机间同步</string>
-    <string name="device_sync_hint">让 Keep 无法保存的内容在你所有手机上保持一致:私密笔记、笔记自己的文字颜色和照片、已折叠的笔记、分类和引用,以及(如果需要)提醒。每部手机会在文件夹里放一个自己的小文件,再由另一个应用(Syncthing、Nextcloud、云盘应用等)把文件夹在手机之间传递。请在每部手机上选择同一个同步文件夹。</string>
+    <string name="device_sync_hint">让 Keep 无法保存的内容(私密笔记、自己的颜色和照片、已折叠的笔记,以及可选的提醒)在你所有手机上保持一致。每部手机在文件夹里放一个小文件,再由 Syncthing、Nextcloud 或云盘应用传给其他手机。</string>
     <string name="device_sync_folder">文件夹:%1$s</string>
     <string name="device_sync_choose">选择文件夹</string>
     <string name="device_sync_reminders">接收其他手机的提醒</string>

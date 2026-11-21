@@ -146,7 +146,7 @@
     <string name="md_sync_enable">Notizen als Markdown-Dateien ablegen</string>
     <string name="md_sync_choose">Ordner wählen</string>
     <string name="md_sync_now">Jetzt synchronisieren</string>
-    <string name="md_sync_hint">Jede Notiz liegt als eigene .md-Datei in einem Ordner deiner Wahl, ein Unterordner pro Konto, und bleibt in beide Richtungen synchron: Änderst du eine Notiz im Widget oder in Keep, ändert sich die Datei; änderst du die Datei in einer anderen App (Obsidian, Markor, …), ändert sich die Notiz. Neue .md-Dateien im Ordner werden zu neuen Notizen. Das Löschen einer Datei löscht die Notiz nicht; eine in Keep entfernte Notiz verschiebt ihre Datei in den Unterordner _removed. Haben sich beide Seiten geändert, gewinnt die neuere, die andere bleibt als .conflict-Datei erhalten. Bilder werden neben die Dateien kopiert, lassen sich dort aber nicht ändern. Änderungen aus anderen Apps kommen bei laufender App sofort an, sonst beim nächsten Sync.</string>
+    <string name="md_sync_hint">Jede Notiz wird zu einer eigenen .md-Datei in einem Ordner deiner Wahl und bleibt in beide Richtungen synchron. Änderst du eine Datei in Obsidian, Markor oder einer anderen App, ändert sich die Notiz.</string>
     <plurals name="md_sync_done">
         <item quantity="one">Markdown-Ordner synchronisiert (1 Änderung).</item>
         <item quantity="other">Markdown-Ordner synchronisiert (%1$d Änderungen).</item>
@@ -469,7 +469,7 @@
     <string name="quote_add">Zitat hinzufügen</string>
     <string name="device_sync_title">Sync zwischen Handys</string>
     <string name="device_sync_enable">Zwischen Handys synchronisieren</string>
-    <string name="device_sync_hint">Hält alles, wofür Keep keinen Platz hat, auf all deinen Handys gleich: private Notizen, eigene Textfarbe und eigenes Foto einer Notiz, eingeklappte Notizen, Kategorien und Zitate und (wenn du willst) Erinnerungen. Jedes Handy legt eine kleine eigene Datei in einem Ordner ab, und eine andere App (Syncthing, Nextcloud, eine Cloud-App, …) trägt den Ordner von Handy zu Handy. Wähle auf jedem Handy denselben synchronisierten Ordner.</string>
+    <string name="device_sync_hint">Hält, was Keep nicht speichern kann (private Notizen, eigene Farben und Fotos, eingeklappte Notizen, optional Erinnerungen), auf all deinen Handys gleich. Jedes Handy legt eine kleine Datei in einem Ordner ab, den Syncthing, Nextcloud oder eine Cloud-App zu den anderen trägt.</string>
     <string name="device_sync_folder">Ordner: %1$s</string>
     <string name="device_sync_choose">Ordner wählen</string>
     <string name="device_sync_reminders">Erinnerungen von anderen Handys übernehmen</string>

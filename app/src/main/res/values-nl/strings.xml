@@ -146,7 +146,7 @@
     <string name="md_sync_enable">Notities bewaren als Markdown-bestanden</string>
     <string name="md_sync_choose">Map kiezen</string>
     <string name="md_sync_now">Nu synchroniseren</string>
-    <string name="md_sync_hint">Elke notitie staat als eigen .md-bestand in een map naar keuze, één submap per account, en blijft in beide richtingen gesynchroniseerd: bewerk je een notitie in de widget of in Keep, dan verandert het bestand; bewerk je het bestand in een andere app (Obsidian, Markor, …), dan verandert de notitie. Nieuwe .md-bestanden in de map worden nieuwe notities. Een bestand verwijderen verwijdert de notitie niet; een in Keep verwijderde notitie verplaatst haar bestand naar de submap _removed. Als beide kanten zijn gewijzigd, wint de nieuwste en blijft de andere bewaard als .conflict-bestand. Afbeeldingen worden naast de bestanden gekopieerd maar kunnen daar niet worden gewijzigd. Wijzigingen uit andere apps komen direct aan zolang de app draait, anders bij de volgende synchronisatie.</string>
+    <string name="md_sync_hint">Elke notitie wordt een eigen .md-bestand in een map naar keuze en blijft in beide richtingen gesynchroniseerd. Wijzig je een bestand in Obsidian, Markor of een andere app, dan verandert de notitie.</string>
     <plurals name="md_sync_done">
         <item quantity="one">Markdown-map gesynchroniseerd (1 wijziging).</item>
         <item quantity="other">Markdown-map gesynchroniseerd (%1$d wijzigingen).</item>
@@ -469,7 +469,7 @@
     <string name="quote_add">Citaat toevoegen</string>
     <string name="device_sync_title">Sync tussen telefoons</string>
     <string name="device_sync_enable">Synchroniseren tussen telefoons</string>
-    <string name="device_sync_hint">Houdt alles wat Keep niet kan opslaan gelijk op al je telefoons: privénotities, eigen tekstkleur en eigen foto van een notitie, ingeklapte notities, categorieën en citaten en (als je wilt) herinneringen. Elke telefoon zet één eigen klein bestand in een map, en een andere app (Syncthing, Nextcloud, een cloud-app, …) brengt de map van telefoon naar telefoon. Kies op elke telefoon dezelfde gesynchroniseerde map.</string>
+    <string name="device_sync_hint">Houdt wat Keep niet kan opslaan (privénotities, eigen kleuren en foto’s, ingeklapte notities, optioneel herinneringen) gelijk op al je telefoons. Elke telefoon zet een klein bestand in een map die Syncthing, Nextcloud of een cloud-app naar de andere brengt.</string>
     <string name="device_sync_folder">Map: %1$s</string>
     <string name="device_sync_choose">Map kiezen</string>
     <string name="device_sync_reminders">Herinneringen van andere telefoons overnemen</string>

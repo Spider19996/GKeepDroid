@@ -156,9 +156,15 @@ internal fun settingEntries(isSingleNote: Boolean): List<SettingEntry> = buildLi
 internal val WIDGET_PAGES = setOf(Page.Appearance, Page.Notes, Page.ManageNotes, Page.Checklists, Page.ButtonBar)
 
 /** The explanation of a page that has one: the texts the info button in its title bar shows, so they do not take room on the page. */
-internal fun Page.helpTexts(): List<Int>? = when (this) {
-    Page.EditorButtons -> listOf(R.string.editor_buttons_hint, R.string.button_preview_help)
-    Page.ButtonBar -> listOf(R.string.button_layout_hint, R.string.button_preview_help)
-    Page.Backup -> listOf(R.string.md_sync_hint, R.string.device_sync_hint, R.string.device_sync_reminders_hint, R.string.backup_note)
+internal fun Page.helpTexts(): List<Pair<Int?, Int>>? = when (this) {
+    Page.EditorButtons -> listOf(null to R.string.editor_buttons_hint, null to R.string.button_preview_help)
+    Page.ButtonBar -> listOf(null to R.string.button_layout_hint, null to R.string.button_preview_help)
+    // One short paragraph per section, each under its own heading.
+    Page.Backup -> listOf(
+        R.string.md_sync_title to R.string.md_sync_hint,
+        R.string.device_sync_title to R.string.device_sync_hint,
+        R.string.device_sync_reminders to R.string.device_sync_reminders_hint,
+        R.string.export_settings to R.string.backup_note,
+    )
     else -> null
 }

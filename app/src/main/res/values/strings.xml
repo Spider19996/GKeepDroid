@@ -147,7 +147,7 @@
     <string name="md_sync_enable">Keep notes as Markdown files</string>
     <string name="md_sync_choose">Choose folder</string>
     <string name="md_sync_now">Sync now</string>
-    <string name="md_sync_hint">Every note is kept as its own .md file in a folder you choose, one subfolder per account, and stays in sync both ways: edit a note in the widget or in Keep and the file changes; edit the file in another app (Obsidian, Markor, …) and the note changes. New .md files in the folder become new notes. Deleting a file does not delete the note; a note removed in Keep moves its file to the subfolder _removed. If both sides changed, the newer one wins and the other is kept as a .conflict file. Images are copied next to the files but cannot be changed there. Edits from other apps arrive within moments while the app is running, otherwise at the next sync.</string>
+    <string name="md_sync_hint">Every note becomes its own .md file in a folder you choose and is kept in sync both ways. Edit a file in Obsidian, Markor or any other app and the note changes.</string>
     <plurals name="md_sync_done">
         <item quantity="one">Markdown folder synced (1 change).</item>
         <item quantity="other">Markdown folder synced (%1$d changes).</item>
@@ -470,7 +470,7 @@
     <string name="quote_add">Add quote</string>
     <string name="device_sync_title">Sync between phones</string>
     <string name="device_sync_enable">Sync between phones</string>
-    <string name="device_sync_hint">Keeps what Keep has no place for in step on all your phones: private notes, a note\'s own text color and photo, folded notes, categories and quotes, and (if you want) reminders. Each phone writes one small file of its own into a folder, and another app (Syncthing, Nextcloud, a cloud app, …) carries the folder from phone to phone. Choose the same synced folder on every phone.</string>
+    <string name="device_sync_hint">Keeps what Keep cannot store (private notes, own colors and photos, folded notes, optionally reminders) the same on all your phones. Each phone writes a small file into a folder that Syncthing, Nextcloud or a cloud app carries to the others.</string>
     <string name="device_sync_folder">Folder: %1$s</string>
     <string name="device_sync_choose">Choose folder</string>
     <string name="device_sync_reminders">Take over reminders from other phones</string>

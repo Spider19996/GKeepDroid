@@ -148,7 +148,7 @@
     <string name="md_sync_enable">Guardar las notas como archivos Markdown</string>
     <string name="md_sync_choose">Elegir carpeta</string>
     <string name="md_sync_now">Sincronizar ahora</string>
-    <string name="md_sync_hint">Cada nota se guarda como un archivo .md propio en la carpeta que elijas, una subcarpeta por cuenta, y se mantiene sincronizada en ambos sentidos: si editas una nota en el widget o en Keep, cambia el archivo; si editas el archivo en otra app (Obsidian, Markor…), cambia la nota. Los archivos .md nuevos de la carpeta se convierten en notas nuevas. Borrar un archivo no borra la nota; si una nota se elimina en Keep, su archivo pasa a la subcarpeta _removed. Si ambos lados cambiaron, gana el más reciente y el otro se guarda como archivo .conflict. Las imágenes se copian junto a los archivos pero no se pueden cambiar allí. Los cambios de otras apps llegan enseguida mientras la app está activa; si no, en la siguiente sincronización.</string>
+    <string name="md_sync_hint">Cada nota se convierte en su propio archivo .md en una carpeta que eliges y se mantiene sincronizada en ambos sentidos. Si editas un archivo en Obsidian, Markor u otra app, la nota cambia.</string>
     <plurals name="md_sync_done">
         <item quantity="one">Carpeta Markdown sincronizada (1 cambio).</item>
         <item quantity="many">Carpeta Markdown sincronizada (%1$d cambios).</item>
@@ -478,7 +478,7 @@
     <string name="quote_add">Añadir cita</string>
     <string name="device_sync_title">Sincronización entre móviles</string>
     <string name="device_sync_enable">Sincronizar entre móviles</string>
-    <string name="device_sync_hint">Mantiene igual en todos tus móviles lo que Keep no puede guardar: notas privadas, el color de texto y la foto propios de una nota, notas plegadas, categorías y citas y, si quieres, los recordatorios. Cada móvil deja un pequeño archivo propio en una carpeta, y otra aplicación (Syncthing, Nextcloud, una app en la nube, …) lleva la carpeta de un móvil a otro. Elige en cada móvil la misma carpeta sincronizada.</string>
+    <string name="device_sync_hint">Mantiene igual en todos tus móviles lo que Keep no puede guardar (notas privadas, colores y fotos propios, notas plegadas y, si quieres, recordatorios). Cada móvil deja un pequeño archivo en una carpeta que Syncthing, Nextcloud o una app en la nube lleva a los demás.</string>
     <string name="device_sync_folder">Carpeta: %1$s</string>
     <string name="device_sync_choose">Elegir carpeta</string>
     <string name="device_sync_reminders">Adoptar recordatorios de otros móviles</string>

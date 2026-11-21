@@ -148,7 +148,7 @@
     <string name="md_sync_enable">Conserver les notes en fichiers Markdown</string>
     <string name="md_sync_choose">Choisir le dossier</string>
     <string name="md_sync_now">Synchroniser maintenant</string>
-    <string name="md_sync_hint">Chaque note est conservée dans son propre fichier .md, dans un dossier de votre choix (un sous-dossier par compte), et reste synchronisée dans les deux sens : modifiez une note dans le widget ou dans Keep et le fichier change ; modifiez le fichier dans une autre appli (Obsidian, Markor…) et la note change. Les nouveaux fichiers .md du dossier deviennent de nouvelles notes. Supprimer un fichier ne supprime pas la note ; une note supprimée dans Keep déplace son fichier dans le sous-dossier _removed. Si les deux côtés ont changé, le plus récent l\'emporte et l\'autre est conservé en fichier .conflict. Les images sont copiées à côté des fichiers mais ne peuvent pas y être modifiées. Les modifications venant d\'autres applis arrivent aussitôt quand l\'appli tourne, sinon à la prochaine synchronisation.</string>
+    <string name="md_sync_hint">Chaque note devient son propre fichier .md dans un dossier de votre choix et reste synchronisée dans les deux sens. Modifiez un fichier dans Obsidian, Markor ou une autre appli et la note change.</string>
     <plurals name="md_sync_done">
         <item quantity="one">Dossier Markdown synchronisé (%1$d modification).</item>
         <item quantity="many">Dossier Markdown synchronisé (%1$d modifications).</item>
@@ -478,7 +478,7 @@
     <string name="quote_add">Ajouter une citation</string>
     <string name="device_sync_title">Synchronisation entre téléphones</string>
     <string name="device_sync_enable">Synchroniser entre téléphones</string>
-    <string name="device_sync_hint">Garde identique sur tous vos téléphones ce que Keep ne peut pas stocker : notes privées, couleur de texte et photo propres à une note, notes repliées, catégories et citations et, si vous le souhaitez, les rappels. Chaque téléphone dépose un petit fichier à lui dans un dossier, et une autre application (Syncthing, Nextcloud, une appli cloud, …) transporte le dossier d’un téléphone à l’autre. Choisissez le même dossier synchronisé sur chaque téléphone.</string>
+    <string name="device_sync_hint">Garde identique sur tous vos téléphones ce que Keep ne peut pas stocker (notes privées, couleurs et photos propres, notes repliées et, si vous le souhaitez, rappels). Chaque téléphone dépose un petit fichier dans un dossier que Syncthing, Nextcloud ou une appli cloud transmet aux autres.</string>
     <string name="device_sync_folder">Dossier : %1$s</string>
     <string name="device_sync_choose">Choisir le dossier</string>
     <string name="device_sync_reminders">Reprendre les rappels des autres téléphones</string>

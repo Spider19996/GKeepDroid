@@ -144,7 +144,7 @@
     <string name="md_sync_enable">メモを Markdown ファイルとして保存</string>
     <string name="md_sync_choose">フォルダを選ぶ</string>
     <string name="md_sync_now">今すぐ同期</string>
-    <string name="md_sync_hint">メモは 1 件ごとに 1 つの .md ファイルとして、選んだフォルダ（アカウントごとにサブフォルダ）に保存され、双方向で同期されます。ウィジェットや Keep でメモを編集するとファイルが変わり、他のアプリ（Obsidian、Markor など）でファイルを編集するとメモが変わります。フォルダ内の新しい .md ファイルは新しいメモになります。ファイルを削除してもメモは削除されません。Keep で削除されたメモのファイルはサブフォルダ _removed に移されます。両側が変更された場合は新しい方が優先され、もう一方は .conflict ファイルとして残ります。画像はファイルの隣にコピーされますが、そこでは変更できません。他のアプリでの変更は、アプリの実行中はすぐに、そうでなければ次の同期で反映されます。</string>
+    <string name="md_sync_hint">各メモは、選んだフォルダに専用の .md ファイルとして保存され、双方向に同期されます。Obsidian や Markor など別のアプリでファイルを編集すると、メモも変わります。</string>
     <plurals name="md_sync_done">
         <item quantity="other">Markdown フォルダを同期しました（%1$d 件の変更）。</item>
     </plurals>
@@ -460,7 +460,7 @@
     <string name="quote_add">引用を追加</string>
     <string name="device_sync_title">端末間の同期</string>
     <string name="device_sync_enable">端末間で同期</string>
-    <string name="device_sync_hint">Keep に保存できないものを、すべての端末で同じに保ちます: 非公開メモ、メモ固有の文字色と写真、折りたたんだメモ、カテゴリと引用、そして(必要なら)リマインダー。各端末はフォルダに自分用の小さなファイルを1つ置き、別のアプリ(Syncthing、Nextcloud、クラウドアプリなど)がそのフォルダを端末から端末へ運びます。どの端末でも同じ同期フォルダを選んでください。</string>
+    <string name="device_sync_hint">Keep に保存できないもの(非公開メモ、独自の色や写真、折りたたんだメモ、必要ならリマインダー)を、すべての端末で同じに保ちます。各端末がフォルダに小さなファイルを置き、Syncthing、Nextcloud、クラウドアプリがそれを他の端末へ運びます。</string>
     <string name="device_sync_folder">フォルダ: %1$s</string>
     <string name="device_sync_choose">フォルダを選択</string>
     <string name="device_sync_reminders">他の端末のリマインダーを取り込む</string>

@@ -150,7 +150,7 @@
     <string name="md_sync_enable">Trzymaj notatki jako pliki Markdown</string>
     <string name="md_sync_choose">Wybierz folder</string>
     <string name="md_sync_now">Synchronizuj teraz</string>
-    <string name="md_sync_hint">Każda notatka jest osobnym plikiem .md w wybranym folderze, z podfolderem na konto, i pozostaje zsynchronizowana w obie strony: zmiana notatki w widżecie lub w Keep zmienia plik; zmiana pliku w innej aplikacji (Obsidian, Markor…) zmienia notatkę. Nowe pliki .md w folderze stają się nowymi notatkami. Usunięcie pliku nie usuwa notatki; notatka usunięta w Keep przenosi swój plik do podfolderu _removed. Jeśli zmieniły się obie strony, wygrywa nowsza, a druga zostaje jako plik .conflict. Obrazy są kopiowane obok plików, ale tam nie można ich zmieniać. Zmiany z innych aplikacji docierają od razu, gdy aplikacja działa, w przeciwnym razie przy następnej synchronizacji.</string>
+    <string name="md_sync_hint">Każda notatka staje się osobnym plikiem .md w wybranym folderze i pozostaje zsynchronizowana w obie strony. Zmień plik w Obsidian, Markor lub innej aplikacji, a notatka się zmieni.</string>
     <plurals name="md_sync_done">
         <item quantity="one">Folder Markdown zsynchronizowany (zmian: %1$d).</item>
         <item quantity="few">Folder Markdown zsynchronizowany (zmian: %1$d).</item>
@@ -487,7 +487,7 @@
     <string name="quote_add">Dodaj cytat</string>
     <string name="device_sync_title">Synchronizacja między telefonami</string>
     <string name="device_sync_enable">Synchronizuj między telefonami</string>
-    <string name="device_sync_hint">Utrzymuje na wszystkich Twoich telefonach to, czego Keep nie przechowuje: notatki prywatne, własny kolor tekstu i własne zdjęcie notatki, zwinięte notatki, kategorie i cytaty oraz (jeśli chcesz) przypomnienia. Każdy telefon zapisuje w folderze jeden własny, mały plik, a inna aplikacja (Syncthing, Nextcloud, aplikacja chmurowa, …) przenosi folder z telefonu na telefon. Wybierz na każdym telefonie ten sam synchronizowany folder.</string>
+    <string name="device_sync_hint">Utrzymuje na wszystkich telefonach to, czego Keep nie przechowuje (notatki prywatne, własne kolory i zdjęcia, zwinięte notatki, opcjonalnie przypomnienia). Każdy telefon zapisuje mały plik w folderze, który Syncthing, Nextcloud lub aplikacja chmurowa przenosi do pozostałych.</string>
     <string name="device_sync_folder">Folder: %1$s</string>
     <string name="device_sync_choose">Wybierz folder</string>
     <string name="device_sync_reminders">Przejmuj przypomnienia z innych telefonów</string>

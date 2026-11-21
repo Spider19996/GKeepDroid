@@ -148,7 +148,7 @@
     <string name="md_sync_enable">Tieni le note come file Markdown</string>
     <string name="md_sync_choose">Scegli cartella</string>
     <string name="md_sync_now">Sincronizza ora</string>
-    <string name="md_sync_hint">Ogni nota è un file .md a sé in una cartella a tua scelta, una sottocartella per account, e resta sincronizzata nei due sensi: modifichi una nota nel widget o in Keep e il file cambia; modifichi il file in un\'altra app (Obsidian, Markor…) e la nota cambia. I nuovi file .md nella cartella diventano nuove note. Eliminare un file non elimina la nota; una nota rimossa in Keep sposta il suo file nella sottocartella _removed. Se entrambi i lati sono cambiati, vince il più recente e l\'altro resta come file .conflict. Le immagini vengono copiate accanto ai file ma lì non si possono modificare. Le modifiche di altre app arrivano subito mentre l\'app è in esecuzione, altrimenti alla prossima sincronizzazione.</string>
+    <string name="md_sync_hint">Ogni nota diventa un file .md in una cartella a tua scelta e resta sincronizzata in entrambe le direzioni. Se modifichi un file in Obsidian, Markor o un’altra app, la nota cambia.</string>
     <plurals name="md_sync_done">
         <item quantity="one">Cartella Markdown sincronizzata (1 modifica).</item>
         <item quantity="many">Cartella Markdown sincronizzata (%1$d modifiche).</item>
@@ -478,7 +478,7 @@
     <string name="quote_add">Aggiungi citazione</string>
     <string name="device_sync_title">Sincronizzazione tra telefoni</string>
     <string name="device_sync_enable">Sincronizza tra telefoni</string>
-    <string name="device_sync_hint">Mantiene uguale su tutti i tuoi telefoni ciò che Keep non può salvare: note private, colore del testo e foto propri di una nota, note ripiegate, categorie e citazioni e, se vuoi, i promemoria. Ogni telefono lascia in una cartella un piccolo file suo, e un’altra app (Syncthing, Nextcloud, un’app cloud, …) porta la cartella da un telefono all’altro. Scegli su ogni telefono la stessa cartella sincronizzata.</string>
+    <string name="device_sync_hint">Mantiene uguale su tutti i tuoi telefoni ciò che Keep non può salvare (note private, colori e foto propri, note ripiegate e, se vuoi, promemoria). Ogni telefono lascia un piccolo file in una cartella che Syncthing, Nextcloud o un’app cloud porta agli altri.</string>
     <string name="device_sync_folder">Cartella: %1$s</string>
     <string name="device_sync_choose">Scegli cartella</string>
     <string name="device_sync_reminders">Importa i promemoria degli altri telefoni</string>

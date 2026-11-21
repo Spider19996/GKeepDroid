@@ -323,7 +323,16 @@ class SettingsActivity : ComponentActivity() {
                             if (infoOpen) AlertDialog(
                                 onDismissRequest = { infoOpen = false },
                                 title = { Text(stringResource(page.title)) },
-                                text = { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) { help.forEach { Text(stringResource(it)) } } },
+                                text = {
+                                    Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                                        help.forEach { (heading, body) ->
+                                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                                heading?.let { Text(stringResource(it), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary) }
+                                                Text(stringResource(body))
+                                            }
+                                        }
+                                    }
+                                },
                                 confirmButton = {
                                     TextButton(onClick = { infoOpen = false }, shapes = ButtonDefaults.shapes()) {
                                         Text(stringResource(android.R.string.ok))

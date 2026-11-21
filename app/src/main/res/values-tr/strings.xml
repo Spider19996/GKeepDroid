@@ -146,7 +146,7 @@
     <string name="md_sync_enable">Notları Markdown dosyaları olarak tut</string>
     <string name="md_sync_choose">Klasör seç</string>
     <string name="md_sync_now">Şimdi senkronize et</string>
-    <string name="md_sync_hint">Her not, seçtiğiniz klasörde (hesap başına bir alt klasör) kendi .md dosyası olarak tutulur ve iki yönlü senkron kalır: bir notu widget\'ta veya Keep\'te düzenlerseniz dosya değişir; dosyayı başka bir uygulamada (Obsidian, Markor…) düzenlerseniz not değişir. Klasördeki yeni .md dosyaları yeni not olur. Bir dosyayı silmek notu silmez; Keep\'te kaldırılan bir notun dosyası _removed alt klasörüne taşınır. İki taraf da değiştiyse yenisi kazanır, diğeri .conflict dosyası olarak saklanır. Görseller dosyaların yanına kopyalanır ama orada değiştirilemez. Diğer uygulamalardan gelen değişiklikler uygulama çalışırken hemen, aksi halde sonraki senkronizasyonda gelir.</string>
+    <string name="md_sync_hint">Her not, seçtiğin klasörde kendi .md dosyası olur ve iki yönlü eşitlenir. Bir dosyayı Obsidian, Markor veya başka bir uygulamada değiştirirsen not da değişir.</string>
     <plurals name="md_sync_done">
         <item quantity="one">Markdown klasörü senkronize edildi (%1$d değişiklik).</item>
         <item quantity="other">Markdown klasörü senkronize edildi (%1$d değişiklik).</item>
@@ -469,7 +469,7 @@
     <string name="quote_add">Alıntı ekle</string>
     <string name="device_sync_title">Telefonlar arası eşitleme</string>
     <string name="device_sync_enable">Telefonlar arasında eşitle</string>
-    <string name="device_sync_hint">Keep’in saklayamadığı şeyleri tüm telefonlarında aynı tutar: özel notlar, bir notun kendi metin rengi ve fotoğrafı, katlanmış notlar, kategoriler ve alıntılar ve (istersen) hatırlatıcılar. Her telefon bir klasöre kendine ait küçük bir dosya yazar, başka bir uygulama (Syncthing, Nextcloud, bir bulut uygulaması, …) klasörü telefondan telefona taşır. Her telefonda aynı eşitlenen klasörü seç.</string>
+    <string name="device_sync_hint">Keep’in saklayamadığı şeyleri (özel notlar, kendi renk ve fotoğraflar, katlanmış notlar, istenirse hatırlatıcılar) tüm telefonlarında aynı tutar. Her telefon bir klasöre küçük bir dosya yazar; Syncthing, Nextcloud veya bir bulut uygulaması klasörü diğerlerine taşır.</string>
     <string name="device_sync_folder">Klasör: %1$s</string>
     <string name="device_sync_choose">Klasör seç</string>
     <string name="device_sync_reminders">Diğer telefonlardaki hatırlatıcıları al</string>
