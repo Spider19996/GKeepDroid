@@ -120,7 +120,7 @@ internal fun NoteTile(
     val rich = remember(resumeKey, NotesCache.version.intValue, RichNotes.version.intValue, note.id) { RichNotes.of(context, account, note.id) }
     val backgroundName = rich?.background?.takeIf { app.showNoteColors && it.isNotEmpty() && it != "default" }
     // A photo of the user's own wins over Keep's pictures (choosing it takes Keep's picture away).
-    val customStamp = remember(resumeKey, NotesCache.version.intValue, note.id) { CustomBackgrounds.stamp(context, account, note.id) }
+    val customStamp = remember(resumeKey, NotesCache.version.intValue, CustomBackgrounds.version.intValue, note.id) { CustomBackgrounds.stamp(context, account, note.id) }
     // In a dark theme Keep's pictures come in their dark version, with light text on them (a note can choose its version).
     val look = remember(resumeKey, NoteLook.version.intValue, note.id) { NoteLook.of(context, account, note.id) }
     val darkVariant = look.dark ?: LocalDarkTheme.current

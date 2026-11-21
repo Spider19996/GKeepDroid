@@ -240,13 +240,13 @@ internal class EditorController(
         val target = if (existing != null) account else targetAccount
         val galleryNow = if (background == CUSTOM_BACKGROUND) "" else background
         if (existing != null) NoteLook.save(activity, account, existing.id, ownText, variantDark)
-        if (existing != null) scope.launch { WidgetRefresh.all(activity) }
+        if (existing != null) KeepRepository.refreshWidgets(activity)
         // The photo of one's own stays on this phone; the widgets learn of a change right away.
         if (existing != null && (background == CUSTOM_BACKGROUND && picked != null || background != CUSTOM_BACKGROUND && originalCustom)) {
             if (background == CUSTOM_BACKGROUND) CustomBackgrounds.save(activity, account, existing.id, picked!!)
             else CustomBackgrounds.remove(activity, account, existing.id)
             pickedBackground = null
-            scope.launch { WidgetRefresh.all(activity) }
+            KeepRepository.refreshWidgets(activity)
         }
         val converting = convertFrom != null
         val function = if (existing != null && !converting) "update_note" else "create_note"

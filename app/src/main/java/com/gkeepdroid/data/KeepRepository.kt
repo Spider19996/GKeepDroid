@@ -145,19 +145,32 @@ object KeepRepository {
             val note = NotesCache.read(appContext, edit.account).firstOrNull { it.id == noteId }
             RichNotes.applyLocally(appContext, edit.account, noteId, note?.items?.filter { it.text.isNotBlank() }?.map { it.id }.orEmpty(), edit.args[1] as String)
         }
+        // So is a changed picture of Keep's: it lives in the same file and is not part of the notes cache.
+        val background = RichNotes.pendingBackground(edit)
+        if (background != null && !CredentialStore.isLocal(edit.account)) {
+            runCatching { RichNotes.setBackgroundLocally(appContext, edit.account, edit.args[0] as String, background) }
+        }
         backgroundScope.launch {
-            if (changed) {
-                WidgetRefresh.all(appContext)
-                MarkdownSync.request(appContext)
-            }
+            if (changed || background != null) WidgetRefresh.all(appContext)
+            if (changed) MarkdownSync.request(appContext)
             PendingEdits.sendNow(appContext)
         }
+    }
+
+    /**
+     * Redraws the widgets in a scope of its own: a screen that closes right after a change (the editor) would cancel its own
+     * scope, and with it a redraw that has not finished.
+     */
+    fun refreshWidgets(context: Context) {
+        val appContext = context.applicationContext
+        backgroundScope.launch { WidgetRefresh.all(appContext) }
     }
 
     private suspend fun call(context: Context, email: String, function: String, vararg args: Any, ignoreEdit: String? = null) {
         val appContext = context.applicationContext
         // Demo mode never touches the real notes.
         if (DemoNotes.enabled(appContext)) return
+        val richBefore = NotesCache.richFile(appContext, email).let { it.lastModified() to it.length() }
         val json = if (CredentialStore.isLocal(email)) {
             // Local notes live on the device: no login, no network.
             lock.withLock { withContext(Dispatchers.IO) { LocalNotes.run(appContext, email, function, args.toList()) } }
@@ -174,6 +187,9 @@ object KeepRepository {
                 }
             }
         }
+        // The bridge writes the formatting and the pictures to a file of their own, which the notes cache does not cover.
+        val richChanged = NotesCache.richFile(appContext, email).let { it.lastModified() != richBefore.first || it.length() != richBefore.second }
+        if (richChanged) RichNotes.invalidate(email)
         // Ticks not sent yet stay visible instead of being overwritten by Keep's older state.
         val pending = PendingToggles.list(appContext, email)
         // Widgets are only redrawn when something actually changed.
@@ -183,6 +199,8 @@ object KeepRepository {
             WidgetRefresh.all(appContext)
             // The Markdown files follow every change of the notes.
             MarkdownSync.request(appContext)
+        } else if (richChanged) {
+            WidgetRefresh.all(appContext)
         }
     }
 

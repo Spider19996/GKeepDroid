@@ -64,9 +64,53 @@ object RichNotes {
                     )
                 }
             }.getOrDefault(emptyMap())
-            cache[account] = Cached(file.lastModified(), file.length(), notes, now)
-            return notes
+            val shown = withPendingBackgrounds(context, account, notes)
+            cache[account] = Cached(file.lastModified(), file.length(), shown, now)
+            return shown
         }
+    }
+
+    /**
+     * A picture chosen in the editor shows before Keep has it: a sync that answers before the edit is sent would otherwise
+     * bring the old picture back for a while. The edits are read only when the file is read again, not for every card.
+     */
+    private fun withPendingBackgrounds(context: Context, account: String, notes: Map<String, RichNote>): Map<String, RichNote> {
+        val wanted = PendingEdits.all(context).filter { it.account == account && it.function == "update_note" }
+            .mapNotNull { edit -> pendingBackground(edit)?.let { edit.args[0] as String to it } }
+        if (wanted.isEmpty()) return notes
+        val out = notes.toMutableMap()
+        wanted.forEach { (id, background) -> out[id] = RichNote(background, notes[id]?.docs.orEmpty()) }
+        return out
+    }
+
+    /** The picture an update_note edit gives its note ("" takes it away), or null if the edit leaves the picture alone. */
+    fun pendingBackground(edit: PendingEdit): String? {
+        if (edit.function != "update_note") return null
+        val name = edit.args.getOrNull(8) as? String
+        return if (name.isNullOrEmpty()) null else if (name == "default") "" else name
+    }
+
+    /** Writes the note's picture into the file the app reads it from, at once (see [applyLocally]); Keep confirms it later. */
+    fun setBackgroundLocally(context: Context, account: String, noteId: String, background: String) {
+        synchronized(cache) {
+            val file = NotesCache.richFile(context, account)
+            val all = runCatching { JSONObject(file.readText()) }.getOrNull() ?: JSONObject()
+            val byNote = all.optJSONObject("n") ?: JSONObject().also { all.put("n", it) }
+            val entry = byNote.optJSONObject(noteId) ?: JSONObject().put("d", JSONObject()).also { byNote.put(noteId, it) }
+            entry.put("bg", background)
+            file.writeText(all.toString())
+            cache.remove(account)
+        }
+        version.intValue++
+    }
+
+    /**
+     * Forgets what was read, after the bridge wrote the file: within [RECHECK_MS] of the last look the old pictures would
+     * otherwise still be handed out, to the cards that redraw right now and to the widgets.
+     */
+    fun invalidate(account: String) {
+        synchronized(cache) { cache.remove(account) }
+        version.intValue++
     }
 
     /** The names of all background pictures the notes of an account use. */

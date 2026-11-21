@@ -219,14 +219,23 @@ object CustomBackgrounds {
     /** Changes whenever the note's photo changes; 0 if it has none. */
     fun stamp(context: Context, account: String, noteId: String): Long = file(context, account, noteId).let { if (it.exists()) it.lastModified() else 0L }
 
+    /**
+     * Changes whenever a photo is saved or removed, so open cards look again at once: the file's time alone is only read
+     * again when the screen comes back, which a screen that never left (split screen, a widget's editor) does not do.
+     */
+    val version = mutableIntStateOf(0)
+
     fun remove(context: Context, account: String, noteId: String) {
         file(context, account, noteId).delete()
+        version.intValue++
     }
 
     /** Keeps the photo behind [uri] as the note's background, shrunk to a size that is enough for a screen. */
     fun save(context: Context, account: String, noteId: String, uri: android.net.Uri): Boolean {
         val bitmap = decode(context, uri) ?: return false
-        return runCatching { file(context, account, noteId).outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 88, it) } }.getOrDefault(false)
+        val saved = runCatching { file(context, account, noteId).outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 88, it) } }.getOrDefault(false)
+        version.intValue++
+        return saved
     }
 
     private fun decode(context: Context, uri: android.net.Uri): Bitmap? = runCatching {
