@@ -203,8 +203,59 @@ object DeviceSync {
 
     // ---- the sync itself -------------------------------------------------------------------------
 
+    /** Whether files of phones that have not been seen for a long time are deleted by this phone. Off unless the user wants it. */
+    fun autoDeleteEnabled(context: Context) = prefs(context).getBoolean("auto_delete", false)
+
+    fun setAutoDelete(context: Context, on: Boolean) {
+        prefs(context).edit { putBoolean("auto_delete", on) }
+        request(context)
+    }
+
+    /** After how many days; never less than two weeks, as a phone in use only renews its file once a week. */
+    fun autoDeleteDays(context: Context) = prefs(context).getInt("auto_delete_days", 90).coerceAtLeast(MIN_DAYS)
+
+    fun setAutoDeleteDays(context: Context, days: Int) {
+        prefs(context).edit { putInt("auto_delete_days", days.coerceAtLeast(MIN_DAYS)) }
+    }
+
+    const val MIN_DAYS = 14
+
+    /** Whether another phone already uses this name; false if that cannot be found out now. */
+    suspend fun nameTaken(context: Context, name: String): Boolean = runCatching {
+        contents(context).any { !it.own && it.label.equals(name.trim(), ignoreCase = true) }
+    }.getOrDefault(false)
+
+    /** The name of this phone, as the other phones show it in their list of stored files. */
+    fun deviceName(context: Context): String = prefs(context).getString("name", null)?.takeIf { it.isNotBlank() } ?: (modelName(context) + if (context.packageName.endsWith(".debug")) "-debug" else "")
+
+    /** What the phone calls itself ("OnePlus 8T"), else the maker and the model code. The debug app adds "-debug" to it, so it is not taken for the release app of the same phone. */
+    private fun modelName(context: Context): String =
+        runCatching { android.provider.Settings.Global.getString(context.contentResolver, "device_name") }.getOrNull()?.takeIf { it.isNotBlank() }
+            ?: listOf(android.os.Build.MANUFACTURER, android.os.Build.MODEL).filter { it.isNotBlank() }.distinct().joinToString(" ").ifBlank { "Phone" }
+
+    fun setDeviceName(context: Context, name: String) {
+        prefs(context).edit { putString("name", name.trim().take(40)) }
+        request(context)
+    }
+
+    /** A file of the sync as the user sees it: [label] is the phone's name for a phone's file, null for a photo. */
+    class StoredItem(val file: StoredFile, val label: String?, val own: Boolean)
+
     /** The files stored in the place where the phones meet, for the user to look at. */
-    suspend fun contents(context: Context): List<StoredFile> = withContext(Dispatchers.IO) { storage(context.applicationContext)?.list().orEmpty() }
+    suspend fun contents(context: Context): List<StoredItem> = withContext(Dispatchers.IO) {
+        val app = context.applicationContext
+        val storage = storage(app) ?: return@withContext emptyList()
+        val ownName = "${PREFIX}device-${deviceId(app)}.json"
+        storage.list().map { file ->
+            val isDevice = file.name.startsWith("${PREFIX}device-")
+            val label = if (!isDevice) null else if (file.name == ownName) deviceName(app) else
+                runCatching { JSONObject(storage.read(file.name)!!.decodeToString()).optString("name") }.getOrNull()?.ifBlank { null } ?: file.name.removePrefix("${PREFIX}device-").removeSuffix(".json")
+            StoredItem(file, label, file.name == ownName)
+        }
+    }
+
+    /** Removes a file of the sync. A phone that is still in use writes its own file again at its next sync; what the others know of it stays with them. */
+    suspend fun deleteFile(context: Context, name: String) = withContext(Dispatchers.IO) { storage(context.applicationContext)?.also { it.list(); it.delete(name) } }
 
     /** Syncs once; returns how many values of other phones were taken over. */
     suspend fun syncNow(context: Context): Int = mutex.withLock {
@@ -248,11 +299,13 @@ object DeviceSync {
             }
 
             // The state first, the photos after it: a phone that sees a photo in a state file can wait for it, but not the other way round.
-            val content = JSONObject().put("version", 1).put("device", device).put("time", now).put("entries", entriesJson(state)).toString()
-            val digest = sha1(content.substringAfter("\"entries\"").toByteArray())
-            if (prefs(app).getString("written", null) != digest || files.none { it.name == ownName }) {
+            val content = JSONObject().put("version", 1).put("device", device).put("name", deviceName(app)).put("time", now).put("entries", entriesJson(state)).toString()
+            val digest = sha1((deviceName(app) + content.substringAfter("\"entries\"")).toByteArray())
+            // Also once a week without a change, so the other phones can tell this one is still in use.
+            val renew = now - prefs(app).getLong("written_at", 0L) > 7 * DAY
+            if (prefs(app).getString("written", null) != digest || files.none { it.name == ownName } || renew) {
                 storage.write(ownName, content.toByteArray())
-                prefs(app).edit { putString("written", digest) }
+                prefs(app).edit { putString("written", digest).putLong("written_at", now) }
             }
 
             val after = collect(app)
@@ -262,6 +315,9 @@ object DeviceSync {
                     val hash = after["$account|${note.id}|bg"] ?: return@forEach
                     if (photoName(hash) !in have) storage.write(photoName(hash), CustomBackgrounds.fileOf(app, account, note.id).readBytes())
                 }
+            }
+            if (autoDeleteEnabled(app)) {
+                DeviceSyncMerge.staleDeviceFiles(files, "${PREFIX}device-", ownName, now - autoDeleteDays(app) * DAY).forEach { storage.delete(it.name) }
             }
             // Photos no value points to any more go after a day, long enough for a phone that wrote its state a moment ago.
             val wanted = state.filter { it.key.endsWith("|bg") }.mapNotNull { it.value.value }.map(::photoName).toSet()

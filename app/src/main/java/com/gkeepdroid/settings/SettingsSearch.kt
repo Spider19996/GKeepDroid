@@ -164,6 +164,7 @@ internal fun Page.helpTexts(): List<Pair<Int?, Int>>? = when (this) {
         R.string.md_sync_title to R.string.md_sync_hint,
         R.string.device_sync_title to R.string.device_sync_hint,
         R.string.device_sync_reminders to R.string.device_sync_reminders_hint,
+        R.string.device_sync_auto_delete to R.string.device_sync_auto_delete_hint,
         R.string.export_settings to R.string.backup_note,
     )
     else -> null

@@ -43,6 +43,10 @@ object DeviceSyncMerge {
     fun toApply(state: Map<String, SyncEntry>, now: Map<String, String>): Map<String, String?> =
         state.filter { (key, entry) -> entry.value != now[key] }.mapValues { it.value.value }
 
+    /** The files of other phones that nobody has touched since [olderThan]: a phone in use renews its file every week, so these are left behind. */
+    fun staleDeviceFiles(files: List<StoredFile>, devicePrefix: String, ownName: String, olderThan: Long): List<StoredFile> =
+        files.filter { it.name.startsWith(devicePrefix) && it.name.endsWith(".json") && it.name != ownName && it.modified in 1 until olderThan }
+
     /** Forgets deletions that every phone has long had the time to see. */
     fun prune(state: MutableMap<String, SyncEntry>, olderThan: Long) {
         state.entries.removeAll { it.value.value == null && it.value.time < olderThan }

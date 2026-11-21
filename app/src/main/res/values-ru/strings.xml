@@ -501,4 +501,15 @@
     <string name="device_sync_busy">Синхронизация …</string>
     <string name="device_sync_contents">Показать сохранённые файлы</string>
     <string name="device_sync_contents_empty">Пока ничего не сохранено.</string>
+    <string name="device_sync_name">Название этого телефона</string>
+    <string name="device_sync_this_phone">%1$s (этот телефон)</string>
+    <string name="device_sync_delete">Удалить</string>
+    <string name="device_sync_delete_confirm">Удалить «%1$s» из хранилища синхронизации? Телефон, которым ещё пользуются, запишет свой файл снова при следующей синхронизации.</string>
+    <string name="device_sync_photo">Фото</string>
+    <string name="device_sync_auto_delete">Автоматически удалять старые файлы</string>
+    <string name="device_sync_auto_delete_after">Через</string>
+    <string name="device_sync_days">дн.</string>
+    <string name="device_sync_auto_delete_hint">Удаляет файлы других телефонов, которых так долго не касались (не менее 14 дней). Используемый телефон обновляет свой файл каждую неделю.</string>
+    <string name="device_sync_name_taken">«%1$s» уже используется другим телефоном. Всё равно использовать?</string>
+    <string name="device_sync_name_use">Всё равно использовать</string>
 </resources>

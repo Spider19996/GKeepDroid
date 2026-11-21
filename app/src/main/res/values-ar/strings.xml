@@ -519,4 +519,15 @@
     <string name="device_sync_busy">جارٍ المزامنة …</string>
     <string name="device_sync_contents">عرض الملفات المحفوظة</string>
     <string name="device_sync_contents_empty">لم يُحفظ أي شيء بعد.</string>
+    <string name="device_sync_name">اسم هذا الهاتف</string>
+    <string name="device_sync_this_phone">%1$s (هذا الهاتف)</string>
+    <string name="device_sync_delete">حذف</string>
+    <string name="device_sync_delete_confirm">هل تريد حذف «%1$s» من مخزن المزامنة؟ الهاتف الذي لا يزال قيد الاستخدام يكتب ملفه من جديد عند المزامنة التالية.</string>
+    <string name="device_sync_photo">صورة</string>
+    <string name="device_sync_auto_delete">حذف الملفات القديمة تلقائيًا</string>
+    <string name="device_sync_auto_delete_after">بعد</string>
+    <string name="device_sync_days">يومًا</string>
+    <string name="device_sync_auto_delete_hint">يحذف ملفات الهواتف الأخرى التي لم يُلمس منها شيء طوال هذه المدة (14 يومًا على الأقل). الهاتف المستخدم يجدد ملفه كل أسبوع.</string>
+    <string name="device_sync_name_taken">الاسم «%1$s» مستخدم بالفعل في هاتف آخر. هل تريد استخدامه على أي حال؟</string>
+    <string name="device_sync_name_use">استخدمه على أي حال</string>
 </resources>

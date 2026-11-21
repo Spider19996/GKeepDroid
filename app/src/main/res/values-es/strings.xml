@@ -492,4 +492,15 @@
     <string name="device_sync_busy">Sincronizando …</string>
     <string name="device_sync_contents">Mostrar archivos guardados</string>
     <string name="device_sync_contents_empty">Todavía no hay nada guardado.</string>
+    <string name="device_sync_name">Nombre de este móvil</string>
+    <string name="device_sync_this_phone">%1$s (este móvil)</string>
+    <string name="device_sync_delete">Eliminar</string>
+    <string name="device_sync_delete_confirm">¿Eliminar «%1$s» del almacén de sincronización? Un móvil que sigue en uso vuelve a escribir su archivo en la próxima sincronización.</string>
+    <string name="device_sync_photo">Foto</string>
+    <string name="device_sync_auto_delete">Eliminar archivos antiguos automáticamente</string>
+    <string name="device_sync_auto_delete_after">Después de</string>
+    <string name="device_sync_days">días</string>
+    <string name="device_sync_auto_delete_hint">Elimina los archivos de otros móviles que no se han tocado en tanto tiempo (mínimo 14 días). Un móvil en uso renueva su archivo cada semana.</string>
+    <string name="device_sync_name_taken">«%1$s» ya lo usa otro móvil. ¿Usarlo de todos modos?</string>
+    <string name="device_sync_name_use">Usar de todos modos</string>
 </resources>

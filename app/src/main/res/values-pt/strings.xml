@@ -492,4 +492,15 @@
     <string name="device_sync_busy">A sincronizar …</string>
     <string name="device_sync_contents">Mostrar ficheiros guardados</string>
     <string name="device_sync_contents_empty">Ainda não há nada guardado.</string>
+    <string name="device_sync_name">Nome deste telemóvel</string>
+    <string name="device_sync_this_phone">%1$s (este telemóvel)</string>
+    <string name="device_sync_delete">Eliminar</string>
+    <string name="device_sync_delete_confirm">Eliminar «%1$s» do armazenamento de sincronização? Um telemóvel que ainda esteja em uso volta a escrever o seu ficheiro na próxima sincronização.</string>
+    <string name="device_sync_photo">Foto</string>
+    <string name="device_sync_auto_delete">Eliminar ficheiros antigos automaticamente</string>
+    <string name="device_sync_auto_delete_after">Após</string>
+    <string name="device_sync_days">dias</string>
+    <string name="device_sync_auto_delete_hint">Elimina os ficheiros de outros telemóveis que não são tocados há tanto tempo (no mínimo 14 dias). Um telemóvel em uso renova o seu ficheiro todas as semanas.</string>
+    <string name="device_sync_name_taken">«%1$s» já é usado por outro telemóvel. Usar mesmo assim?</string>
+    <string name="device_sync_name_use">Usar mesmo assim</string>
 </resources>

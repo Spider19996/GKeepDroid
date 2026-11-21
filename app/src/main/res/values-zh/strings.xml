@@ -474,4 +474,15 @@
     <string name="device_sync_busy">正在同步 …</string>
     <string name="device_sync_contents">显示已保存的文件</string>
     <string name="device_sync_contents_empty">尚未保存任何内容。</string>
+    <string name="device_sync_name">本手机的名称</string>
+    <string name="device_sync_this_phone">%1$s(本手机)</string>
+    <string name="device_sync_delete">删除</string>
+    <string name="device_sync_delete_confirm">要从同步存储中删除“%1$s”吗?仍在使用的手机会在下次同步时重新写入它的文件。</string>
+    <string name="device_sync_photo">照片</string>
+    <string name="device_sync_auto_delete">自动删除旧文件</string>
+    <string name="device_sync_auto_delete_after">超过</string>
+    <string name="device_sync_days">天</string>
+    <string name="device_sync_auto_delete_hint">删除其他手机上这么久没有动过的文件(至少 14 天)。仍在使用的手机每周会更新自己的文件。</string>
+    <string name="device_sync_name_taken">“%1$s”已被另一部手机使用。仍要使用吗?</string>
+    <string name="device_sync_name_use">仍然使用</string>
 </resources>

@@ -492,4 +492,15 @@
     <string name="device_sync_busy">Sincronizzazione …</string>
     <string name="device_sync_contents">Mostra i file salvati</string>
     <string name="device_sync_contents_empty">Ancora nulla di salvato.</string>
+    <string name="device_sync_name">Nome di questo telefono</string>
+    <string name="device_sync_this_phone">%1$s (questo telefono)</string>
+    <string name="device_sync_delete">Elimina</string>
+    <string name="device_sync_delete_confirm">Eliminare «%1$s» dall’archivio di sincronizzazione? Un telefono ancora in uso riscrive il suo file alla prossima sincronizzazione.</string>
+    <string name="device_sync_photo">Foto</string>
+    <string name="device_sync_auto_delete">Elimina automaticamente i file vecchi</string>
+    <string name="device_sync_auto_delete_after">Dopo</string>
+    <string name="device_sync_days">giorni</string>
+    <string name="device_sync_auto_delete_hint">Elimina i file degli altri telefoni che non sono stati toccati per tutto questo tempo (almeno 14 giorni). Un telefono in uso rinnova il suo file ogni settimana.</string>
+    <string name="device_sync_name_taken">«%1$s» è già usato da un altro telefono. Usarlo comunque?</string>
+    <string name="device_sync_name_use">Usa comunque</string>
 </resources>

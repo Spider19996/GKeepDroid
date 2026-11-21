@@ -483,4 +483,15 @@
     <string name="device_sync_busy">Synchronisiere …</string>
     <string name="device_sync_contents">Gespeicherte Dateien anzeigen</string>
     <string name="device_sync_contents_empty">Noch nichts gespeichert.</string>
+    <string name="device_sync_name">Name dieses Handys</string>
+    <string name="device_sync_this_phone">%1$s (dieses Handy)</string>
+    <string name="device_sync_delete">Löschen</string>
+    <string name="device_sync_delete_confirm">„%1$s“ aus dem Sync-Speicher löschen? Ein Handy, das noch benutzt wird, schreibt seine Datei beim nächsten Sync neu.</string>
+    <string name="device_sync_photo">Foto</string>
+    <string name="device_sync_auto_delete">Alte Dateien automatisch löschen</string>
+    <string name="device_sync_auto_delete_after">Nach</string>
+    <string name="device_sync_days">Tagen</string>
+    <string name="device_sync_auto_delete_hint">Löscht die Dateien anderer Handys, die so lange nicht berührt wurden (mindestens 14 Tage). Ein benutztes Handy erneuert seine Datei jede Woche.</string>
+    <string name="device_sync_name_taken">„%1$s“ wird schon von einem anderen Handy benutzt. Trotzdem verwenden?</string>
+    <string name="device_sync_name_use">Trotzdem verwenden</string>
 </resources>

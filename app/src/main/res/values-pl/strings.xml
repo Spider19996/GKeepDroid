@@ -501,4 +501,15 @@
     <string name="device_sync_busy">Synchronizowanie …</string>
     <string name="device_sync_contents">Pokaż zapisane pliki</string>
     <string name="device_sync_contents_empty">Nic jeszcze nie zapisano.</string>
+    <string name="device_sync_name">Nazwa tego telefonu</string>
+    <string name="device_sync_this_phone">%1$s (ten telefon)</string>
+    <string name="device_sync_delete">Usuń</string>
+    <string name="device_sync_delete_confirm">Usunąć „%1$s” z magazynu synchronizacji? Telefon, który jest nadal używany, zapisze swój plik ponownie przy następnej synchronizacji.</string>
+    <string name="device_sync_photo">Zdjęcie</string>
+    <string name="device_sync_auto_delete">Automatycznie usuwaj stare pliki</string>
+    <string name="device_sync_auto_delete_after">Po</string>
+    <string name="device_sync_days">dniach</string>
+    <string name="device_sync_auto_delete_hint">Usuwa pliki innych telefonów, których nikt nie ruszał tak długo (co najmniej 14 dni). Używany telefon odnawia swój plik co tydzień.</string>
+    <string name="device_sync_name_taken">„%1$s” jest już używana przez inny telefon. Użyć mimo to?</string>
+    <string name="device_sync_name_use">Użyj mimo to</string>
 </resources>

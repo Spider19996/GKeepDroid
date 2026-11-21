@@ -70,3 +70,15 @@ class DeviceSyncMergeTest {
         assertEquals(e("1", 1), state["kept"])
     }
 }
+
+class StaleFilesTest {
+    private val prefix = "gkd-sync-device-"
+
+    @Test fun onlyOldFilesOfOtherPhonesAreStale() {
+        val files = listOf(
+            StoredFile("${prefix}own.json", 10), StoredFile("${prefix}old.json", 10), StoredFile("${prefix}new.json", 900),
+            StoredFile("${prefix}unknown.json", 0), StoredFile("gkd-sync-photo-abc.jpg", 10),
+        )
+        assertEquals(listOf("${prefix}old.json"), DeviceSyncMerge.staleDeviceFiles(files, prefix, "${prefix}own.json", 500).map { it.name })
+    }
+}

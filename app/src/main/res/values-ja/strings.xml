@@ -474,4 +474,15 @@
     <string name="device_sync_busy">同期中 …</string>
     <string name="device_sync_contents">保存されているファイルを表示</string>
     <string name="device_sync_contents_empty">まだ何も保存されていません。</string>
+    <string name="device_sync_name">この端末の名前</string>
+    <string name="device_sync_this_phone">%1$s(この端末)</string>
+    <string name="device_sync_delete">削除</string>
+    <string name="device_sync_delete_confirm">同期ストレージから「%1$s」を削除しますか?まだ使われている端末は、次の同期でファイルを書き直します。</string>
+    <string name="device_sync_photo">写真</string>
+    <string name="device_sync_auto_delete">古いファイルを自動で削除</string>
+    <string name="device_sync_auto_delete_after">経過日数</string>
+    <string name="device_sync_days">日</string>
+    <string name="device_sync_auto_delete_hint">これだけの期間更新されていない他の端末のファイルを削除します(14日以上)。使われている端末は毎週ファイルを更新します。</string>
+    <string name="device_sync_name_taken">「%1$s」はすでに別の端末で使われています。それでも使いますか?</string>
+    <string name="device_sync_name_use">それでも使う</string>
 </resources>

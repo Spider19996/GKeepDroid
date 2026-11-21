@@ -483,4 +483,15 @@
     <string name="device_sync_busy">Eşitleniyor …</string>
     <string name="device_sync_contents">Kayıtlı dosyaları göster</string>
     <string name="device_sync_contents_empty">Henüz bir şey kaydedilmedi.</string>
+    <string name="device_sync_name">Bu telefonun adı</string>
+    <string name="device_sync_this_phone">%1$s (bu telefon)</string>
+    <string name="device_sync_delete">Sil</string>
+    <string name="device_sync_delete_confirm">“%1$s” eşitleme deposundan silinsin mi? Hâlâ kullanılan bir telefon dosyasını bir sonraki eşitlemede yeniden yazar.</string>
+    <string name="device_sync_photo">Fotoğraf</string>
+    <string name="device_sync_auto_delete">Eski dosyaları otomatik sil</string>
+    <string name="device_sync_auto_delete_after">Sonra</string>
+    <string name="device_sync_days">gün</string>
+    <string name="device_sync_auto_delete_hint">Bu süre boyunca dokunulmamış diğer telefonların dosyalarını siler (en az 14 gün). Kullanılan bir telefon dosyasını her hafta yeniler.</string>
+    <string name="device_sync_name_taken">“%1$s” zaten başka bir telefon tarafından kullanılıyor. Yine de kullanılsın mı?</string>
+    <string name="device_sync_name_use">Yine de kullan</string>
 </resources>

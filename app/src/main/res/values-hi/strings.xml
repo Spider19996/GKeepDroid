@@ -483,4 +483,15 @@
     <string name="device_sync_busy">सिंक हो रहा है …</string>
     <string name="device_sync_contents">सहेजी गई फ़ाइलें दिखाएँ</string>
     <string name="device_sync_contents_empty">अभी कुछ सहेजा नहीं गया है।</string>
+    <string name="device_sync_name">इस फ़ोन का नाम</string>
+    <string name="device_sync_this_phone">%1$s (यह फ़ोन)</string>
+    <string name="device_sync_delete">हटाएँ</string>
+    <string name="device_sync_delete_confirm">“%1$s” को सिंक स्टोरेज से हटाएँ? जो फ़ोन अब भी इस्तेमाल में है, वह अगले सिंक पर अपनी फ़ाइल फिर लिख देगा।</string>
+    <string name="device_sync_photo">फ़ोटो</string>
+    <string name="device_sync_auto_delete">पुरानी फ़ाइलें अपने-आप हटाएँ</string>
+    <string name="device_sync_auto_delete_after">इतने के बाद</string>
+    <string name="device_sync_days">दिन</string>
+    <string name="device_sync_auto_delete_hint">दूसरे फ़ोनों की वे फ़ाइलें हटाता है जिन्हें इतने समय से छुआ नहीं गया (कम से कम 14 दिन)। इस्तेमाल में रहने वाला फ़ोन हर हफ़्ते अपनी फ़ाइल नई करता है।</string>
+    <string name="device_sync_name_taken">“%1$s” नाम किसी दूसरे फ़ोन में पहले से है। फिर भी इस्तेमाल करें?</string>
+    <string name="device_sync_name_use">फिर भी इस्तेमाल करें</string>
 </resources>

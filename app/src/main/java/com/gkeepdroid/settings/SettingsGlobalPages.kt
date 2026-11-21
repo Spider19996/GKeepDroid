@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -244,6 +245,64 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
                 DeviceSync.driveAccount(context)?.let { Text(stringResource(R.string.device_sync_account, it), style = MaterialTheme.typography.bodyMedium) }
             }
         }
+        if (dsEnabled) Column(Modifier.fillMaxWidth().clickable { dsNameEdit = dsName }) {
+            Text(stringResource(R.string.device_sync_name), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(dsName, style = MaterialTheme.typography.bodyLarge)
+        }
+        dsNameEdit?.let { edit ->
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = { dsNameEdit = null },
+                title = { Text(stringResource(R.string.device_sync_name)) },
+                text = { OutlinedTextField(value = edit, onValueChange = { dsNameEdit = it.take(40) }, singleLine = true) },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            dsNameEdit = null
+                            if (edit.isNotBlank() && !edit.trim().equals(dsName, ignoreCase = true)) scope.launch {
+                                // Two phones with one name could not be told apart in the list.
+                                if (DeviceSync.nameTaken(context, edit)) {
+                                    dsNameClash = edit
+                                } else {
+                                    DeviceSync.setDeviceName(context, edit)
+                                    dsName = DeviceSync.deviceName(context)
+                                }
+                            }
+                        },
+                        shapes = ButtonDefaults.shapes(),
+                    ) { Text(stringResource(R.string.save)) }
+                },
+                dismissButton = { TextButton(onClick = { dsNameEdit = null }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) } },
+            )
+        }
+        dsNameClash?.let { taken ->
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = { dsNameClash = null },
+                title = { Text(stringResource(R.string.device_sync_name)) },
+                text = { Text(stringResource(R.string.device_sync_name_taken, taken.trim())) },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            DeviceSync.setDeviceName(context, taken)
+                            dsName = DeviceSync.deviceName(context)
+                            dsNameClash = null
+                        },
+                        shapes = ButtonDefaults.shapes(),
+                    ) { Text(stringResource(R.string.device_sync_name_use)) }
+                },
+                dismissButton = { TextButton(onClick = { dsNameClash = null }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) } },
+            )
+        }
+        if (dsEnabled) {
+            SwitchRow(R.string.device_sync_auto_delete, dsAutoDelete) { on ->
+                DeviceSync.setAutoDelete(context, on)
+                dsAutoDelete = on
+            }
+            if (dsAutoDelete) NumberRow(R.string.device_sync_auto_delete_after, dsAutoDays, stringResource(R.string.device_sync_days)) {
+                dsAutoDays = it
+                // Saved as typed, but never below two weeks: the value used is the one shown after the next visit.
+                DeviceSync.setAutoDeleteDays(context, it)
+            }
+        }
         if (dsEnabled || dsFolder != null) FolderRow(
             R.string.device_sync_folder, if (dsMode == DeviceSync.MODE_FOLDER) dsFolder else null, R.string.device_sync_choose, dsEnabled, dsBusy, R.string.device_sync_now,
             onChoose = { deviceFolderLauncher.launch(null) },
@@ -274,6 +333,31 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
             modifier = Modifier.fillMaxWidth(),
             shapes = ButtonDefaults.shapes(),
         ) { Text(stringResource(R.string.device_sync_contents)) }
+        dsDelete?.let { item ->
+            val title = item.label ?: stringResource(R.string.device_sync_photo)
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = { dsDelete = null },
+                title = { Text(stringResource(R.string.device_sync_delete)) },
+                text = { Text(stringResource(R.string.device_sync_delete_confirm, title)) },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            dsDelete = null
+                            scope.launch {
+                                dsBusy = true
+                                runCatching { DeviceSync.deleteFile(context, item.file.name); DeviceSync.contents(context) }.fold(
+                                    onSuccess = { dsFiles = it },
+                                    onFailure = { dsStatus = context.getString(R.string.device_sync_failed, it.message ?: it.javaClass.simpleName) },
+                                )
+                                dsBusy = false
+                            }
+                        },
+                        shapes = ButtonDefaults.shapes(),
+                    ) { Text(stringResource(R.string.device_sync_delete)) }
+                },
+                dismissButton = { TextButton(onClick = { dsDelete = null }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.cancel)) } },
+            )
+        }
         dsFiles?.let { files ->
             androidx.compose.material3.AlertDialog(
                 onDismissRequest = { dsFiles = null },
@@ -283,13 +367,20 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
                         Text(stringResource(R.string.device_sync_contents_empty))
                     } else {
                         Column(Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            files.sortedBy { it.name }.forEach { f ->
-                                Column {
-                                    Text(f.name.removePrefix("gkd-sync-"), style = MaterialTheme.typography.bodyMedium)
-                                    if (f.modified > 0) Text(
-                                        DateUtils.formatDateTime(context, f.modified, DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_ABBREV_ALL),
-                                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
+                            files.sortedBy { it.file.name }.forEach { item ->
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Column(Modifier.weight(1f)) {
+                                        val title = item.label ?: stringResource(R.string.device_sync_photo)
+                                        Text(if (item.own) stringResource(R.string.device_sync_this_phone, title) else title, style = MaterialTheme.typography.bodyMedium)
+                                        if (item.file.modified > 0) Text(
+                                            DateUtils.formatDateTime(context, item.file.modified, DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_ABBREV_ALL),
+                                            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    }
+                                    // The file of this phone would only be written again, so it has no button.
+                                    if (!item.own) androidx.compose.material3.IconButton(onClick = { dsDelete = item }) {
+                                        androidx.compose.material3.Icon(painterResource(R.drawable.ic_delete), contentDescription = stringResource(R.string.device_sync_delete))
+                                    }
                                 }
                             }
                         }

@@ -484,4 +484,15 @@
     <string name="device_sync_busy">Syncing …</string>
     <string name="device_sync_contents">Show stored files</string>
     <string name="device_sync_contents_empty">Nothing is stored yet.</string>
+    <string name="device_sync_name">Name of this phone</string>
+    <string name="device_sync_this_phone">%1$s (this phone)</string>
+    <string name="device_sync_delete">Delete</string>
+    <string name="device_sync_delete_confirm">Delete “%1$s” from the sync storage? A phone that is still in use writes its file again at its next sync.</string>
+    <string name="device_sync_photo">Photo</string>
+    <string name="device_sync_auto_delete">Delete old files automatically</string>
+    <string name="device_sync_auto_delete_after">After</string>
+    <string name="device_sync_days">days</string>
+    <string name="device_sync_auto_delete_hint">Deletes the files of other phones that have not been touched for this long (at least 14 days). A phone in use renews its file every week.</string>
+    <string name="device_sync_name_taken">“%1$s” is already used by another phone. Use it anyway?</string>
+    <string name="device_sync_name_use">Use anyway</string>
 </resources>
