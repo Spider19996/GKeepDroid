@@ -71,10 +71,13 @@ def _watch_type_changes(keep):
 
 
 def _wrong_type_ids(keep):
-    """The notes of the cached state that have checklist items without being a checklist (converted in another client)."""
+    """The notes of the cached state that have several checklist items without being a checklist (converted in another client).
+
+    A plain note holds its text as one such item itself, so one is normal; only more than one means a converted checklist.
+    """
     return sorted(
         note.id for note in keep.all()
-        if not isinstance(note, KeepList) and any(isinstance(child, ListItem) for child in note.children)
+        if not isinstance(note, KeepList) and sum(1 for child in note.children if isinstance(child, ListItem)) > 1
     )
 
 
