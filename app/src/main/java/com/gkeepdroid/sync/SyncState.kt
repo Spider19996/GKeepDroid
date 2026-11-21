@@ -34,10 +34,13 @@ object SyncState {
         if (WidgetRefresh.hasWidgets(context)) WidgetRefresh.all(context)
     }
 
-    /** Whether the device has a network that reaches the internet now. */
+    /** Whether the device has a network that really reaches the internet now (a Wi-Fi with a login page does not). */
     fun connected(context: Context): Boolean {
         val cm = context.getSystemService(android.net.ConnectivityManager::class.java) ?: return true
         val caps = cm.getNetworkCapabilities(cm.activeNetwork) ?: return false
-        return caps.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        // VALIDATED: Android has tested that the network gets through to the internet, which a Wi-Fi without a connection or
+        // behind a login page fails.
+        return caps.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+            caps.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_VALIDATED)
     }
 }
