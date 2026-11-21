@@ -59,8 +59,8 @@ object PrivateNotes {
 
     fun key(account: String, noteId: String) = "$account|$noteId"
 
-    /** Hidden by the mark in Keep, or by the older mark that only this phone knows. */
-    fun isPrivate(note: KeepNote, account: String, keys: Set<String>) = note.hidden || key(account, note.id) in keys
+    /** Hidden on this phone (and, with the sync between phones, on all of them). */
+    fun isPrivate(note: KeepNote, account: String, keys: Set<String>) = key(account, note.id) in keys
 
     fun load(context: Context): Set<String> = prefs(context).getStringSet("keys", null)?.toSet().orEmpty()
 

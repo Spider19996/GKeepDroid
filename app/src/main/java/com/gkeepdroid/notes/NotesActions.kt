@@ -21,12 +21,9 @@ internal class NotesActions(
         val targets = selectedEntries()
         model.selected = emptySet()
         act {
-            val privateKeys = PrivateNotes.load(context)
             targets.forEach { (note, account) ->
                 val n = change(note, account)
                 val args = KeepRepository.updateNoteArgs(n.id, n.title, n.text, n.items, n.color, n.pinned, emptyList(), n.labels)
-                // A note that still carries the old mark in Keep becomes private on this phone before the edit takes the mark off.
-                if (note.hidden && PrivateNotes.isPrivate(note, account, privateKeys)) PrivateNotes.set(context, account, n.id, true)
                 KeepRepository.queueEdit(context, PendingEdit(account, "update_note", args))
             }
         }

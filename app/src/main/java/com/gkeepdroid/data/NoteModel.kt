@@ -29,17 +29,8 @@ data class KeepNote(
     val created: Long = 0,
     /** "active", or "archived" / "trashed" for notes that are only listed in the app. */
     val state: String = "active",
-    /** Without the hidden mark, which is not a label for the user (see [HIDDEN_LABEL]). */
     val labels: List<String> = emptyList(),
-    /** Still carries [HIDDEN_LABEL] in Keep: the mark of an older version, taken over into [PrivateNotes] at the next sync. */
-    val hidden: Boolean = false,
 )
-
-/**
- * The special label that once marked hidden notes in Keep. It is no longer written: the mark lives on the phones now and is synced
- * between them (see [DeviceSync]). It is still read, to take over the mark of notes that carry it, and then taken off in Keep.
- */
-const val HIDDEN_LABEL = "GKeepDroid hidden"
 
 
 /** Keep's note colors, as named by gkeepapi, mapped to ARGB values. */

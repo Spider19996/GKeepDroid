@@ -151,7 +151,7 @@ object NotesCache {
         if (email == null) return emptyList()
         return try {
             val f = labelsFile(context, email)
-            if (f.exists()) JSONArray(f.readText()).let { a -> (0 until a.length()).map { a.getString(it) } }.filter { it != HIDDEN_LABEL } else emptyList()
+            if (f.exists()) JSONArray(f.readText()).let { a -> (0 until a.length()).map { a.getString(it) } } else emptyList()
         } catch (e: JSONException) {
             emptyList()
         }
@@ -210,9 +210,7 @@ object NotesCache {
             updated = o.optLong("updated"),
             created = o.optLong("created"),
             state = o.optString("state", "active"),
-            labels = o.optJSONArray("labels")?.let { a -> (0 until a.length()).map { a.getString(it) } }.orEmpty()
-                .filter { it != HIDDEN_LABEL },
-            hidden = o.optJSONArray("labels")?.let { a -> (0 until a.length()).any { a.getString(it) == HIDDEN_LABEL } } ?: false,
+            labels = o.optJSONArray("labels")?.let { a -> (0 until a.length()).map { a.getString(it) } }.orEmpty(),
         )
     }
 }

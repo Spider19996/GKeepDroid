@@ -29,7 +29,6 @@ object KeepRepository {
             if (CredentialStore.token(context, email) == null) return@forEach
             try {
                 sync(context, email)
-                takeOverHiddenMark(context, email)
             } catch (e: Exception) {
                 allOk = false
                 if (expired == null && SyncPolicy.isAuthError(e)) expired = email
@@ -44,20 +43,6 @@ object KeepRepository {
     }
 
     suspend fun sync(context: Context, email: String) = call(context, email, "fetch_notes")
-
-    /**
-     * Older versions marked a hidden note with a label in Keep. The mark now lives on the phones, so notes that still carry the
-     * label become private here, and the label is taken off in Keep (it is deleted there once no note has it).
-     */
-    private fun takeOverHiddenMark(context: Context, email: String) {
-        val marked = NotesCache.readAll(context, email).filter { it.hidden }
-        if (marked.isEmpty()) return
-        val queued = PendingEdits.all(context).filter { it.account == email && it.function == "set_note_labels" }.map { it.args.firstOrNull() }.toSet()
-        marked.forEach { note ->
-            PrivateNotes.set(context, email, note.id, true)
-            if (note.id !in queued) queueEdit(context, PendingEdit(email, "set_note_labels", listOf(note.id, JSONArray(note.labels).toString())))
-        }
-    }
 
     /** Sends the queued checklist ticks of an account to Keep in one go. */
     suspend fun sendToggles(context: Context, email: String, ops: List<PendingToggle>) {
