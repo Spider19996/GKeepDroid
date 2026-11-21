@@ -40,12 +40,18 @@ def _login(email, master_token, state_path, pull=True):
         keep = gkeepapi.Keep()
         _watch_type_changes(keep)
         keep.authenticate(email, master_token, sync=True)
-    if state is not None and (keep._type_changed or _has_wrong_type(keep)):
+    if state is None:
+        # A full sync was done just now: whatever looks odd in it stays so, and is not rebuilt again and again.
+        _save_wrong_type(state_path, _wrong_type_ids(keep))
+    elif keep._type_changed or set(_wrong_type_ids(keep)) - _load_wrong_type(state_path):
         # A note was turned into a checklist (or back) in another client. gkeepapi keeps the old kind of such a note
         # for good, also in its saved state, so the checklist shows as one text line. Only a full sync builds it anew.
         keep = gkeepapi.Keep()
         _watch_type_changes(keep)
         keep.authenticate(email, master_token, sync=True)
+        # A text note can keep checklist items that Keep hides; a full sync does not remove them. Remembering which ones
+        # there were keeps every later sync from rebuilding everything (it took about 15 seconds each time).
+        _save_wrong_type(state_path, _wrong_type_ids(keep))
     return keep
 
 
@@ -64,12 +70,33 @@ def _watch_type_changes(keep):
     keep._parseNodes = checked
 
 
-def _has_wrong_type(keep):
-    """Whether the cached state already holds a note that has checklist items (it was converted before this was noticed)."""
-    for note in keep.all():
-        if not isinstance(note, KeepList) and any(isinstance(child, ListItem) for child in note.children):
-            return True
-    return False
+def _wrong_type_ids(keep):
+    """The notes of the cached state that have checklist items without being a checklist (converted in another client)."""
+    return sorted(
+        note.id for note in keep.all()
+        if not isinstance(note, KeepList) and any(isinstance(child, ListItem) for child in note.children)
+    )
+
+
+def _wrong_type_file(state_path):
+    return state_path.rsplit(".json", 1)[0] + "_wrongtype.json"
+
+
+def _load_wrong_type(state_path):
+    """The notes that were still odd after the last full rebuild; only a note that is new to this list rebuilds again."""
+    try:
+        with open(_wrong_type_file(state_path)) as f:
+            return set(json.load(f))
+    except (OSError, ValueError):
+        return set()
+
+
+def _save_wrong_type(state_path, ids):
+    try:
+        with open(_wrong_type_file(state_path), "w") as f:
+            json.dump(ids, f)
+    except OSError:
+        pass
 
 
 def _image_blobs(note):
