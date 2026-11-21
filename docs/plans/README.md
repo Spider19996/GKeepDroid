@@ -1,11 +1,12 @@
 # Plans
 
-Plans for upcoming work; each file stands on its own. Plans 01–04 are done and removed (see git history before v1.8.1); 05 and 06 are still open.
+Plans for upcoming work; each file stands on its own. Plans 01–04 are done and removed (see git history before v1.8.1); 05, 06 and 07 are still open.
 
 | # | Plan | Risk | Depends on |
 |---|---|---|---|
 | [05](05-release-size.md) | Release build size (R8) | high | – (independent) |
 | [06](06-compact-mode.md) | Compact mode | medium (touches many layouts) | – (01, 02 are done) |
+| [07](07-further-splits.md) | Further splits by responsibility | low (moves only) | – (do before 06: fewer places to touch) |
 
 Working rules for every plan:
 - One plan per session/commit series; commit locally after each step, push only when the user says so (version bump at push time).

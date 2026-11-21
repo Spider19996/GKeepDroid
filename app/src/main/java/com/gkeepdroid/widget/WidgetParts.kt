@@ -15,7 +15,9 @@ import androidx.glance.ColorFilter
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.compose.ui.graphics.toArgb
 import androidx.glance.LocalContext
+import androidx.glance.appwidget.AndroidRemoteViews
 import androidx.glance.action.Action
 import androidx.glance.action.actionParametersOf
 import androidx.glance.action.actionStartActivity
@@ -84,10 +86,18 @@ internal fun HeaderIcon(
         modifier.padding(8.dp).clickable(action),
         contentAlignment = Alignment.Center,
     ) {
-        Image(
+        val context = androidx.glance.LocalContext.current
+        if (icon == R.drawable.ic_refresh && android.os.Build.VERSION.SDK_INT >= 31 && SyncState.running(context)) {
+            // While notes are fetched the arrow turns round (a progress view that draws it; it can be given a color from Android 12 on).
+            val views = android.widget.RemoteViews(context.packageName, R.layout.widget_refresh_spinner).apply {
+                setColorStateList(R.id.refresh_spinner, "setIndeterminateTintList", android.content.res.ColorStateList.valueOf(color.getColor(context).toArgb()))
+            }
+            AndroidRemoteViews(views, GlanceModifier.size(sizeDp.dp))
+        } else Image(
             provider = ImageProvider(icon),
             contentDescription = description,
-            colorFilter = ColorFilter.tint(color),
+            // Red while a refresh waits for a connection.
+            colorFilter = ColorFilter.tint(if (icon == R.drawable.ic_refresh && SyncState.offline(context)) ColorProvider(androidx.compose.ui.graphics.Color(0xFFE53935)) else color),
             modifier = GlanceModifier.size(sizeDp.dp),
         )
     }

@@ -42,6 +42,8 @@ val EDITOR_ACTIONS = listOf(
     ButtonSpec("list_sort", R.drawable.ic_sort, R.string.list_sort_alpha, 0, ZONE_MENU),
     // Gives an ordinary checklist categories (its first one, empty), or takes them all away again.
     ButtonSpec("list_categories", R.drawable.ic_category, R.string.list_categorize, 0, ZONE_MENU),
+    // Puts "> " before the lines of the selection (or the line of the cursor): a block that can be folded.
+    ButtonSpec("quote_add", R.drawable.ic_format_quote, R.string.quote_add, 0, ZONE_MENU),
     ButtonSpec("open_in_keep", R.drawable.ic_open_new, R.string.open_in_keep, 1, ZONE_MENU),
     ButtonSpec("share", R.drawable.ic_share, R.string.share_note, 1, ZONE_MENU),
     ButtonSpec("hide_content", R.drawable.ic_visibility_off, R.string.hide_content, 1, ZONE_MENU),
@@ -49,6 +51,8 @@ val EDITOR_ACTIONS = listOf(
     ButtonSpec("delete", R.drawable.ic_delete, R.string.move_to_trash, 2, ZONE_MENU),
     // A shortcut to the settings of these buttons; the last entry of the menu, apart from the others.
     ButtonSpec("editor_settings", R.drawable.ic_settings, R.string.editor_buttons_title, 5, ZONE_MENU),
+    // The title field: in the note's place above the text, or taken out of it into a bar, where it is a field between the buttons.
+    ButtonSpec("title", R.drawable.ic_title, R.string.editor_btn_title_field, 4, ZONE_NOTE),
     ButtonSpec("note", R.drawable.ic_notes, R.string.editor_buttons_note, 4, ZONE_NOTE),
     // Under the items of a checklist, as it always was; it can also be a symbol in a bar or an entry of the menu.
     ButtonSpec("add_item", R.drawable.ic_add, R.string.add_item, 0, ZONE_NOTE),
@@ -62,6 +66,7 @@ private val LIST_TOOLS = setOf("list_number", "list_check_all", "list_uncheck_al
 fun isListTool(id: String) = id in LIST_TOOLS
 
 const val NOTE_ID = "note"
+const val TITLE_ID = "title"
 
 /** Tells a saved layout file of the editor from the files of other editors. */
 const val EDITOR_LAYOUT_MARKER = "editorLayout"
@@ -69,12 +74,19 @@ const val EDITOR_LAYOUT_MARKER = "editorLayout"
 /** What the sheets of the bottom bar (and the list of text styles) hold; set in the note's place, each shows itself there instead of opening. */
 val NOTE_INLINE = setOf("palette", "labels", "format")
 
-/** Where an action of the editor may be moved to: the note only within its own place, every other action anywhere (the note's place included, as a button with a name). */
-private fun editorAllowedZones(id: String): Set<Int>? = if (id == NOTE_ID) setOf(ZONE_NOTE) else null
+/**
+ * Where an action of the editor may be moved to: the note's text only within its own place, the title there or in a bar, every other
+ * action anywhere (the note's place included, as a button with a name).
+ */
+private fun editorAllowedZones(id: String): Set<Int>? = when (id) {
+    NOTE_ID -> setOf(ZONE_NOTE)
+    TITLE_ID -> setOf(ZONE_NOTE, ZONE_TOP_LEFT, ZONE_TOP_RIGHT, ZONE_BOTTOM_LEFT, ZONE_BOTTOM_RIGHT)
+    else -> null
+}
 
 /** The editor's buttons and its rules; the layout of them is a [ButtonLayout] of this catalog. */
 val EDITOR_CATALOG = ButtonCatalog(
     EDITOR_ACTIONS, hiddenZone = ZONE_HIDDEN, validZone = { it in ZONE_TOP_LEFT..ZONE_NOTE }, allowedFor = ::editorAllowedZones,
     optionRange = EDITOR_ALIGN_CENTER..EDITOR_ALIGN_BOTTOM,
-    defaultAnchors = mapOf("list_delete_checked" to "undo"),
+    defaultAnchors = mapOf("list_delete_checked" to "undo", TITLE_ID to NOTE_ID),
 )

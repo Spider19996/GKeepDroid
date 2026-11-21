@@ -24,7 +24,7 @@ class ButtonCatalog(
     private val allowedFor: (String) -> Set<Int>? = { null },
     val optionRange: IntRange = 0..0,
     /**
-     * Buttons whose default place was moved in front of another one ("button" to "stands before this one") after layouts were
+     * Buttons (also new ones, which a saved layout does not know yet) whose default place is in front of another one ("button" to "stands before this one") after layouts were
      * saved: a saved layout takes them there too, as long as the person has not moved the button.
      */
     val defaultAnchors: Map<String, String> = emptyMap(),
@@ -102,7 +102,7 @@ data class ButtonLayout(
             var order = o.getJSONArray("order").let { a -> (0 until a.length()).map { a.getString(it) } }
             val z = o.getJSONObject("zones")
             catalog.defaultAnchors.forEach { (id, anchor) ->
-                if (!z.has(id) && id in order && anchor in order) {
+                if (!z.has(id) && anchor in order) {
                     val rest = order.filter { it != id }
                     order = rest.take(rest.indexOf(anchor)) + id + rest.drop(rest.indexOf(anchor))
                 }

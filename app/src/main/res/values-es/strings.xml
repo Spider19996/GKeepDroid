@@ -474,4 +474,6 @@
     <string name="item_swipe_tick">Marcar</string>
     <string name="item_swipe_remove">Quitar</string>
     <string name="item_swipe_hint">Deslizar el encabezado de una categoría hace lo mismo con todos sus elementos.</string>
+    <string name="editor_btn_title_field">Título</string>
+    <string name="quote_add">Añadir cita</string>
 </resources>

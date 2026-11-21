@@ -61,7 +61,7 @@ private fun checkboxRes(style: Int, checked: Boolean): Int? = when (style) {
  * area to hit is larger than the drawn box; the whole row can be made tappable instead.
  */
 @Composable
-internal fun ItemRow(note: KeepNote, item: KeepItem, account: String, settings: WidgetSettings, palette: TextPalette, inCategory: Boolean = false) {
+internal fun ItemRow(note: KeepNote, item: KeepItem, account: String, settings: WidgetSettings, palette: TextPalette, inCategory: Boolean = false, textAction: androidx.glance.action.Action? = null) {
     val context = androidx.glance.LocalContext.current
     val pad = settings.listSpacingDp.dp
     if (item.isDivider()) {
@@ -89,6 +89,8 @@ internal fun ItemRow(note: KeepNote, item: KeepItem, account: String, settings: 
     var boxModifier = GlanceModifier.padding(end = 12.dp, top = pad, bottom = pad)
     if (tick != null && !settings.tapWholeRow) boxModifier = boxModifier.clickable(tick)
 
+    // A tap on the text opens the editor when the card around does not (it would swallow the ticks).
+    val textClick = textAction != null && !(tick != null && settings.tapWholeRow)
     Row(rowModifier, verticalAlignment = Alignment.CenterVertically) {
         Box(boxModifier) {
             val resource = checkboxRes(settings.checkboxStyle, item.checked)
@@ -113,7 +115,7 @@ internal fun ItemRow(note: KeepNote, item: KeepItem, account: String, settings: 
         if (spanned != null) {
             StyledText(
                 spanned, palette, settings.textSizeSp.toFloat(), alpha = if (item.checked) 0.55f else 1f,
-                modifier = GlanceModifier.defaultWeight().padding(top = pad, bottom = pad),
+                modifier = GlanceModifier.defaultWeight().padding(top = pad, bottom = pad).let { if (textClick) it.clickable(textAction!!) else it },
             )
             return@Row
         }
@@ -125,7 +127,7 @@ internal fun ItemRow(note: KeepNote, item: KeepItem, account: String, settings: 
                 fontSize = settings.textSizeSp.sp,
                 textDecoration = if (item.checked) TextDecoration.LineThrough else TextDecoration.None,
             ).withFlags(if (item.checked) flags or RichNotes.STRIKE else flags, settings.textSizeSp),
-            modifier = GlanceModifier.defaultWeight().padding(top = pad, bottom = pad),
+            modifier = GlanceModifier.defaultWeight().padding(top = pad, bottom = pad).let { if (textClick) it.clickable(textAction!!) else it },
         )
     }
 }
@@ -142,6 +144,7 @@ internal fun ChecklistBody(
     palette: TextPalette,
     collapsed: Boolean,
     rowLimit: Int = 0,
+    textAction: androidx.glance.action.Action? = null,
 ) {
     val context = LocalContext.current
     val groups = Categories.groups(note.items, RichNotes.of(context, account, note.id))
@@ -165,7 +168,7 @@ internal fun ChecklistBody(
             ) {
                 val folded = group.name != null && CategoryFolds.key(account, note.id, group.name) in folds
                 if (group.name != null) CategoryHeaderRow(note, account, group.name, Categories.progress(group.items), folded, settings, palette)
-                if (!folded) group.rows(settings).forEach { item -> if (left > 0) { ItemRow(note, item, account, settings, palette, inCategory = group.name != null); left-- } else hidden++ }
+                if (!folded) group.rows(settings).forEach { item -> if (left > 0) { ItemRow(note, item, account, settings, palette, inCategory = group.name != null, textAction = textAction); left-- } else hidden++ }
             } }
         }
         if (hidden > 0) {
@@ -184,7 +187,7 @@ internal fun ChecklistBody(
     // With the setting on, a numbered list counts again in the order shown here.
     val renumber = AppSettingsStore.load(context).renumberDisplay
 
-    ListNumbering.display(note.items, shown, renumber).forEach { ItemRow(note, it, account, settings, palette) }
+    ListNumbering.display(note.items, shown, renumber).forEach { ItemRow(note, it, account, settings, palette, textAction = textAction) }
     if (shown.size < unchecked.size) {
         Text(
             context.resources.getQuantityString(R.plurals.items_more, unchecked.size - shown.size, unchecked.size - shown.size),
@@ -195,7 +198,7 @@ internal fun ChecklistBody(
     AddItemRow(note, account, settings, palette)
     if (checked.isNotEmpty()) {
         CheckedHeader(note, account, settings, palette, collapsed, checked.size)
-        if (!collapsed) ListNumbering.display(note.items, checked, renumber, startAt = shown.size + 1).forEach { ItemRow(note, it, account, settings, palette) }
+        if (!collapsed) ListNumbering.display(note.items, checked, renumber, startAt = shown.size + 1).forEach { ItemRow(note, it, account, settings, palette, textAction = textAction) }
     }
 }
 

@@ -114,7 +114,7 @@ data class WidgetSettings(
     val pinBottom: Set<String> = emptySet(),
     val manualOrder: List<String> = emptyList(),
     /** Look of the checklist checkboxes: one of the CB_* constants. */
-    val checkboxStyle: Int = CB_ROUNDED,
+    val checkboxStyle: Int = CB_CIRCLE,
     /** Size of the checkbox in dp, independent of the text size. */
     val checkboxSizeDp: Int = 28,
     /** Ticks an item when its whole row is tapped, not only the checkbox. */

@@ -456,4 +456,6 @@
     <string name="item_swipe_tick">チェック</string>
     <string name="item_swipe_remove">削除</string>
     <string name="item_swipe_hint">カテゴリの見出しをスワイプすると、そのすべての項目に同じ操作をします。</string>
+    <string name="editor_btn_title_field">タイトル</string>
+    <string name="quote_add">引用を追加</string>
 </resources>

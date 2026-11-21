@@ -27,7 +27,10 @@ class SyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
         }
         // Nothing to update when no widget is placed, unless the app itself asked.
         if (!inputData.getBoolean(FORCE, false) && !WidgetRefresh.hasWidgets(applicationContext)) return Result.success()
-        val ok = KeepRepository.syncAll(applicationContext)
+        // The worker only runs with a connection, so the red arrow of an earlier refresh without one is over.
+        SyncState.setOffline(applicationContext, false)
+        SyncState.set(applicationContext, true)
+        val ok = try { KeepRepository.syncAll(applicationContext) } finally { SyncState.set(applicationContext, false) }
         SyncPolicy.markResult(applicationContext, ok)
         return if (ok) Result.success() else Result.retry()
     }

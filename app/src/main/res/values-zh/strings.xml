@@ -456,4 +456,6 @@
     <string name="item_swipe_tick">勾选</string>
     <string name="item_swipe_remove">移除</string>
     <string name="item_swipe_hint">滑动类别标题会对其所有项目执行相同操作。</string>
+    <string name="editor_btn_title_field">标题</string>
+    <string name="quote_add">添加引用</string>
 </resources>

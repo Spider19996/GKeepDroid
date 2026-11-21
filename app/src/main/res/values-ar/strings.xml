@@ -501,4 +501,6 @@
     <string name="item_swipe_tick">تحديد</string>
     <string name="item_swipe_remove">إزالة</string>
     <string name="item_swipe_hint">سحب عنوان الفئة يطبّق ذلك على جميع عناصرها.</string>
+    <string name="editor_btn_title_field">العنوان</string>
+    <string name="quote_add">إضافة اقتباس</string>
 </resources>

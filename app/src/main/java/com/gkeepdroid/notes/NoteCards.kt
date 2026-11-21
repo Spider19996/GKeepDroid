@@ -26,6 +26,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -367,13 +371,38 @@ internal fun NoteTile(
                 Spacer(Modifier.height(4.dp))
             }
         } else if (note.text.isNotBlank()) {
-            Text(
-                highlightMatches(RichNotes.style(NoteLinks.annotate(note.text, linkColor), rich?.docs?.values?.firstOrNull()), query, markColor),
-                color = textColor,
-                style = MaterialTheme.typography.bodyMedium.copy(hyphens = Hyphens.Auto),
-                maxLines = lines,
-                overflow = TextOverflow.Ellipsis,
-            )
+            // Lines that start with "> " are blocks that fold into their first line; the ">" itself is not shown.
+            QuoteBlocks.version.intValue
+            val quoteFolds = remember(QuoteBlocks.version.intValue) { QuoteBlocks.load(context) }
+            val blocks = remember(note.text) { QuoteBlocks.find(note.text) }
+            val doc = rich?.docs?.values?.firstOrNull()
+            val bodyStyle = MaterialTheme.typography.bodyMedium.copy(hyphens = Hyphens.Auto)
+            fun shown(built: QuoteBlocks.Built) = highlightMatches(RichNotes.style(NoteLinks.annotate(built.text, linkColor), built.doc(doc)), query, markColor)
+            if (blocks.isEmpty()) {
+                Text(
+                    highlightMatches(RichNotes.style(NoteLinks.annotate(note.text, linkColor), doc), query, markColor),
+                    color = textColor, style = bodyStyle, maxLines = lines, overflow = TextOverflow.Ellipsis,
+                )
+            } else {
+                var left = lines
+                QuoteBlocks.parts(note.text, blocks) { QuoteBlocks.key(account, note.id, it.key) in quoteFolds }.forEach { part ->
+                    if (left <= 0) return@forEach
+                    when (part) {
+                        is QuoteBlocks.Part.Plain -> {
+                            Text(shown(part.text), color = textColor, style = bodyStyle, maxLines = left, overflow = TextOverflow.Ellipsis)
+                            left -= part.text.text.count { it == '\n' } + 1
+                        }
+                        is QuoteBlocks.Part.Quote -> {
+                            QuoteBlockView(
+                                shown(part.head), part.body?.let { shown(it) }, part.folded, textColor, linkColor, bodyStyle,
+                                { QuoteBlocks.set(context, account, note.id, part.block.key, !part.folded) },
+                                bodyMaxLines = (left - 1).coerceAtLeast(1),
+                            )
+                            left -= 1 + (part.body?.text?.count { it == '\n' }?.plus(1) ?: 0)
+                        }
+                    }
+                }
+            }
         } else if (note.title.isBlank() && thumb == null) {
             Text(stringResource(R.string.note_empty), color = textColor.copy(alpha = 0.65f), style = MaterialTheme.typography.bodyMedium)
         }

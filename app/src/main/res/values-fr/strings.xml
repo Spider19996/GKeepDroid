@@ -474,4 +474,6 @@
     <string name="item_swipe_tick">Cocher</string>
     <string name="item_swipe_remove">Retirer</string>
     <string name="item_swipe_hint">Balayer l’en-tête d’une catégorie fait de même pour tous ses éléments.</string>
+    <string name="editor_btn_title_field">Titre</string>
+    <string name="quote_add">Ajouter une citation</string>
 </resources>

@@ -43,12 +43,11 @@ internal fun EditorPreview(state: ButtonPreviewState, align: Int) {
     val inline: Map<String, @Composable (Boolean) -> Unit> = NOTE_INLINE.associateWith { id ->
         if (id == "format") { hl -> FormatBar(styles, hl) } else { hl -> InlinePlaceholder(byId.getValue(id), hl) }
     }
-    val noteAt = noteZone.indexOfFirst { it.id == NOTE_ID }.coerceAtLeast(0)
     val highlighted = state.items.firstOrNull { it.id == state.highlightId }
     val shape = RoundedCornerShape(16.dp)
     Box(Modifier.fillMaxSize().clip(shape).border(BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant), shape).background(MaterialTheme.colorScheme.background)) {
         Column(Modifier.fillMaxSize()) {
-            EditorBar(inZone(ZONE_TOP_LEFT), inZone(ZONE_TOP_RIGHT), states, highlightId = state.highlightId)
+            EditorBar(inZone(ZONE_TOP_LEFT), inZone(ZONE_TOP_RIGHT), states, highlightId = state.highlightId, titleField = { SketchTitle(it, state.highlightId == TITLE_ID) })
             Column(
                 Modifier.weight(1f).fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalArrangement = when (align) {
@@ -57,11 +56,13 @@ internal fun EditorPreview(state: ButtonPreviewState, align: Int) {
                     else -> Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
                 },
             ) {
-                NoteActionButtons(noteZone.take(noteAt), states, state.highlightId, inline)
-                ExampleNote(state.highlightId == NOTE_ID)
-                NoteActionButtons(noteZone.drop(noteAt + 1), states, state.highlightId, inline)
+                NoteZoneContent(
+                    noteZone, states, state.highlightId, inline,
+                    title = { SketchTitle(Modifier.fillMaxWidth(), state.highlightId == TITLE_ID) },
+                    body = { ExampleNote(state.highlightId == NOTE_ID) },
+                )
             }
-            EditorBar(inZone(ZONE_BOTTOM_LEFT), inZone(ZONE_BOTTOM_RIGHT), states, highlightId = state.highlightId)
+            EditorBar(inZone(ZONE_BOTTOM_LEFT), inZone(ZONE_BOTTOM_RIGHT), states, highlightId = state.highlightId, titleField = { SketchTitle(it, state.highlightId == TITLE_ID) })
         }
         // A button of the menu is shown in the menu, as it would be opened from the top bar.
         if (highlighted?.zone == ZONE_MENU) Column(
@@ -87,7 +88,20 @@ internal fun EditorPreview(state: ButtonPreviewState, align: Int) {
     }
 }
 
-/** A note as a sketch: the title field and a few lines, so that one sees how much room it takes. */
+/** The title field as a sketch, in the note's place or in a bar. */
+@Composable
+private fun SketchTitle(modifier: Modifier, highlighted: Boolean) {
+    val shape = RoundedCornerShape(8.dp)
+    Box(
+        modifier.height(44.dp)
+            .then(if (highlighted) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp)) else Modifier.border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), shape)),
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        Text(stringResource(R.string.title_hint), Modifier.padding(start = 12.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
+    }
+}
+
+/** The text of a note as a sketch: a few lines, so that one sees how much room it takes. */
 @Composable
 private fun ExampleNote(highlighted: Boolean) {
     val shape = RoundedCornerShape(8.dp)
@@ -95,9 +109,6 @@ private fun ExampleNote(highlighted: Boolean) {
         Modifier.fillMaxWidth().then(if (highlighted) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp)).padding(4.dp) else Modifier),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Box(Modifier.fillMaxWidth().height(44.dp).border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), shape), contentAlignment = Alignment.CenterStart) {
-            Text(stringResource(R.string.title_hint), Modifier.padding(start = 12.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
-        }
         listOf(0.9f, 0.6f, 0.75f).forEach { w ->
             Box(Modifier.fillMaxWidth().height(34.dp).border(BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant), shape)) {
                 Box(Modifier.fillMaxWidth(w).padding(10.dp).height(10.dp).background(MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(5.dp)))

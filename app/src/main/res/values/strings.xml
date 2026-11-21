@@ -466,4 +466,6 @@
     <string name="item_swipe_tick">Tick</string>
     <string name="item_swipe_remove">Remove</string>
     <string name="item_swipe_hint">Swiping a category\'s header does the same for all its items.</string>
+    <string name="editor_btn_title_field">Title</string>
+    <string name="quote_add">Add quote</string>
 </resources>

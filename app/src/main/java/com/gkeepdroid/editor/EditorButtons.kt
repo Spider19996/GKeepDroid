@@ -117,6 +117,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextRange
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.launch
 
@@ -230,6 +232,27 @@ internal fun editorButtons(
         states["format"] = EditorActionState(
             R.drawable.ic_text_format, stringResource(R.string.format_title), { formatMenuOpen = true }, visible = canFormat && canEdit,
             popup = { GroupedMenu(expanded = formatMenuOpen, onDismissRequest = { formatMenuOpen = false }, groups = listOf(formatEntries)) },
+        )
+        states["quote_add"] = EditorActionState(
+            R.drawable.ic_format_quote, stringResource(R.string.quote_add),
+            {
+                // The lines of the selection (or the line of the cursor) get "> " in front, and the cursor goes to the end of them.
+                val t = text
+                val sel = model.textSel
+                val start = sel.min.coerceIn(0, t.length)
+                val end = sel.max.coerceIn(0, t.length)
+                val lineStart = if (start == 0) 0 else t.lastIndexOf('\n', start - 1) + 1
+                val lineEnd = t.indexOf('\n', end).let { if (it < 0) t.length else it }
+                val quoted = t.substring(lineStart, lineEnd).split('\n').joinToString("\n") { if (it.startsWith("> ") || it == ">") it else "> $it" }
+                val changed = t.substring(0, lineStart) + quoted + t.substring(lineEnd)
+                format.edited("text", t, changed)
+                text = changed
+                val caret = TextRange(lineStart + quoted.length)
+                format.selection["text"] = caret
+                model.textSel = caret
+                model.textComp = null
+            },
+            visible = !isList && canEdit,
         )
         states["undo"] = EditorActionState(R.drawable.ic_undo, stringResource(R.string.undo), undo, visible = canEdit, enabled = history.canUndo)
         states["redo"] = EditorActionState(R.drawable.ic_redo, stringResource(R.string.redo), redo, visible = canEdit, enabled = history.canRedo)

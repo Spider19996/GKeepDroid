@@ -85,10 +85,12 @@ internal fun EditorCategoryHeader(
     var nameRange by androidx.compose.runtime.remember { mutableStateOf(0f to 0f) }
     var toolsRange by androidx.compose.runtime.remember { mutableStateOf(0f to 0f) }
     val gapPx = with(density) { 4.dp.toPx() }
+    // Read here, in the composition: a read inside the SideEffect is not tracked, so a name measured after the last
+    // recomposition left the line unbroken through the name.
+    // No gap for the name where there is none (the group without a category).
+    val nameGap = if (nameRange.second > nameRange.first) nameRange.first - gapPx to nameRange.second + gapPx else 0f to 0f
+    val wanted = listOf(nameGap, toolsRange.first - gapPx to toolsRange.second + gapPx)
     SideEffect {
-        // No gap for the name where there is none (the group without a category).
-        val nameGap = if (nameRange.second > nameRange.first) nameRange.first - gapPx to nameRange.second + gapPx else 0f to 0f
-        val wanted = listOf(nameGap, toolsRange.first - gapPx to toolsRange.second + gapPx)
         if (notches.toList() != wanted) { notches.clear(); notches.addAll(wanted) }
     }
     val labelStyle = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)

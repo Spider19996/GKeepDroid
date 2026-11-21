@@ -432,7 +432,7 @@ internal fun EditorScreen(
     }) {
     Column(Modifier.fillMaxSize()) {
     // The bar stays on screen while the note scrolls: discard, the note's switches, save.
-        EditorBar(editorLayout.inZone(ZONE_TOP_LEFT), editorLayout.inZone(ZONE_TOP_RIGHT), states, snapBack = barSnapBack)
+        EditorBar(editorLayout.inZone(ZONE_TOP_LEFT), editorLayout.inZone(ZONE_TOP_RIGHT), states, snapBack = barSnapBack, titleField = { EditorTitleField(model, it, compact = true) })
     // A short note sits in the middle of the screen between the bars; with the keyboard open, at the top, where one types.
     val imeVisible = WindowInsets.isImeVisible
     BoxWithConstraints(Modifier.weight(1f)) {
@@ -442,46 +442,21 @@ internal fun EditorScreen(
         EditorNoteHeader(model, existing, account, allAccounts, unsent, remote, offline, images, scope, onReload, { leaveNote(it) })
         // Where a short note sits is a setting; with the keyboard open it is at the top, where one types.
         if (!imeVisible && editorLayout.option != EDITOR_ALIGN_TOP) Spacer(Modifier.weight(1f))
-        // The buttons the layout sets before the note show above its fields, those after it below them.
-        val noteZone = editorLayout.inZone(ZONE_NOTE)
-        val noteAt = noteZone.indexOfFirst { it.id == NOTE_ID }.coerceAtLeast(0)
-        NoteActionButtons(noteZone.take(noteAt), states, inline = inlineBlocks)
-        // The rounder fields of Material 3 Expressive; the frame of a category is rounded to match (see categoryFrame). The
-        // title has a thicker line than the rest, so it stands out from the items below it.
-        run {
-            val titleInteraction = remember { MutableInteractionSource() }
-            val titleColors = OutlinedTextFieldDefaults.colors()
-            val titleStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-            BasicTextField(
-                value = title, onValueChange = { title = it }, readOnly = !canEdit, singleLine = false,
-                textStyle = titleStyle, interactionSource = titleInteraction,
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                modifier = Modifier.fillMaxWidth(),
-            ) { inner ->
-                OutlinedTextFieldDefaults.DecorationBox(
-                    value = title, innerTextField = inner, enabled = true, singleLine = false,
-                    visualTransformation = VisualTransformation.None, interactionSource = titleInteraction,
-                    label = { Text(stringResource(R.string.title_hint)) }, colors = titleColors,
-                    container = {
-                        OutlinedTextFieldDefaults.Container(
-                            enabled = true, isError = false, interactionSource = titleInteraction, colors = titleColors,
-                            shape = MaterialTheme.shapes.medium, focusedBorderThickness = 3.dp, unfocusedBorderThickness = 2.dp,
-                        )
-                    },
-                )
-            }
-        }
-
-        if (isList) {
-            EditorChecklist(
-                model, categories, format, itemSwipe, account, noteKey, canFormat, styleLabels, applyStyle,
-                { ids, action -> swipeItems(ids, action) }, { addInCategory(it) }, scroll, scope,
-            )
-        } else {
-            EditorTextBody(model, format, existing, canFormat, styleLabels, applyStyle, convertKey, convertPrefs) { requestConvert() }
-        }
-
-        NoteActionButtons(editorLayout.inZone(ZONE_NOTE).dropWhile { it.id != NOTE_ID }.drop(1), states, inline = inlineBlocks)
+        // The note's place holds the title, the text (or the items) and the buttons and blocks between them, in the order of the layout.
+        NoteZoneContent(
+            editorLayout.inZone(ZONE_NOTE), states, inline = inlineBlocks,
+            title = { EditorTitleField(model) },
+            body = {
+                if (isList) {
+                    EditorChecklist(
+                        model, categories, format, itemSwipe, account, noteKey, canFormat, styleLabels, applyStyle,
+                        { ids, action -> swipeItems(ids, action) }, { addInCategory(it) }, scroll, scope,
+                    )
+                } else {
+                    EditorTextBody(model, format, existing, canFormat, styleLabels, applyStyle, convertKey, convertPrefs, { requestConvert() }, account, noteKey)
+                }
+            },
+        )
         if (imeVisible || editorLayout.option != EDITOR_ALIGN_BOTTOM) Spacer(Modifier.weight(1f))
 
         // Web addresses, e-mail addresses and phone numbers in the note can be opened with one tap.
@@ -533,7 +508,7 @@ internal fun EditorScreen(
     }
     }
     // The bottom bar sits above the keyboard, where the thumb is while typing, and stays when the note scrolls.
-    EditorBar(editorLayout.inZone(ZONE_BOTTOM_LEFT), editorLayout.inZone(ZONE_BOTTOM_RIGHT), states, snapBack = barSnapBack)
+    EditorBar(editorLayout.inZone(ZONE_BOTTOM_LEFT), editorLayout.inZone(ZONE_BOTTOM_RIGHT), states, snapBack = barSnapBack, titleField = { EditorTitleField(model, it, compact = true) })
     }
     if (paletteOpen) EditorSheet({ paletteOpen = false }) {
         AppearanceSection(

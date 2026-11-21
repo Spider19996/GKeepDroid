@@ -483,4 +483,6 @@
     <string name="item_swipe_tick">Отметить</string>
     <string name="item_swipe_remove">Удалить</string>
     <string name="item_swipe_hint">Смахивание заголовка категории делает то же со всеми её пунктами.</string>
+    <string name="editor_btn_title_field">Заголовок</string>
+    <string name="quote_add">Добавить цитату</string>
 </resources>

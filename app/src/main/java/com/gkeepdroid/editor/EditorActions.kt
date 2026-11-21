@@ -114,12 +114,16 @@ internal fun Modifier.longPressFirst(onLongPress: (() -> Unit)?): Modifier = if 
 internal fun EditorBar(
     left: List<ButtonSpec>, right: List<ButtonSpec>, states: Map<String, EditorActionState>, sidePadding: Dp = 12.dp,
     highlightId: String? = null, snapBack: Boolean = true,
+    /** The title field, for when the layout puts the title in this bar: it takes the room the buttons leave. */
+    titleField: (@Composable (Modifier) -> Unit)? = null,
 ) {
-    val shown = (left + right).count { states[it.id]?.visible == true }
-    if (shown == 0) return
+    val hasTitle = titleField != null && (left + right).any { it.id == TITLE_ID }
+    val shown = (left + right).count { it.id != TITLE_ID && states[it.id]?.visible == true }
+    if (shown == 0 && !hasTitle) return
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         // A button is 40 dp wide with 2 dp between (the save button a little more); squeezed, down to 32 dp with nothing between.
-        val slot = (maxWidth - sidePadding * 2) / shown
+        // A title field in the bar is given at least 120 dp before the buttons share what is left.
+        val slot = (maxWidth - sidePadding * 2 - (if (hasTitle) 120.dp else 0.dp)) / shown.coerceAtLeast(1)
         if (slot >= 32.dp) {
             val width = if (slot >= 44.dp) 40.dp else slot
             val gap = if (slot >= 44.dp) 2.dp else 0.dp
@@ -127,9 +131,9 @@ internal fun EditorBar(
                 Modifier.fillMaxWidth().padding(horizontal = sidePadding, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(gap),
             ) {
-                left.forEach { EditorActionButton(it, states[it.id], it.id == highlightId, width) }
-                Spacer(Modifier.weight(1f))
-                right.forEach { EditorActionButton(it, states[it.id], it.id == highlightId, width) }
+                left.forEach { if (it.id == TITLE_ID) titleField?.invoke(Modifier.weight(1f).padding(horizontal = 4.dp)) else EditorActionButton(it, states[it.id], it.id == highlightId, width) }
+                if (!hasTitle) Spacer(Modifier.weight(1f))
+                right.forEach { if (it.id == TITLE_ID) titleField?.invoke(Modifier.weight(1f).padding(horizontal = 4.dp)) else EditorActionButton(it, states[it.id], it.id == highlightId, width) }
             }
         } else {
             // Too many for one line: the left and the right ones in a row that is pushed sideways, a gap between the two sides.
@@ -170,10 +174,10 @@ internal fun EditorBar(
                     Row(
                         Modifier.onSizeChanged { leftWidth = it.width },
                         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp),
-                    ) { left.forEach { EditorActionButton(it, withReturn(states[it.id]), it.id == highlightId) } }
+                    ) { left.forEach { if (it.id == TITLE_ID) titleField?.invoke(Modifier.width(160.dp)) else EditorActionButton(it, withReturn(states[it.id]), it.id == highlightId) } }
                     Spacer(Modifier.width(gapWidth))
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                        right.forEach { EditorActionButton(it, withReturn(states[it.id]), it.id == highlightId) }
+                        right.forEach { if (it.id == TITLE_ID) titleField?.invoke(Modifier.width(160.dp)) else EditorActionButton(it, withReturn(states[it.id]), it.id == highlightId) }
                     }
                 }
                 val hint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -251,6 +255,29 @@ internal fun menuGroups(
         groups.last().add(entry)
     }
     return groups
+}
+
+/**
+ * What the note's place holds, in the order of the layout: the buttons and blocks between, and the [title] field and the [body] (the
+ * text or the items) where the layout puts them. The title may be missing here: it can be in a bar.
+ */
+@Composable
+internal fun NoteZoneContent(
+    specs: List<ButtonSpec>, states: Map<String, EditorActionState>, highlightId: String? = null,
+    inline: Map<String, @Composable (Boolean) -> Unit> = emptyMap(), title: @Composable () -> Unit, body: @Composable () -> Unit,
+) {
+    val run = mutableListOf<ButtonSpec>()
+    fun flushNeeded() = run.isNotEmpty()
+    specs.forEach { spec ->
+        when (spec.id) {
+            TITLE_ID, NOTE_ID -> {
+                if (flushNeeded()) { NoteActionButtons(run.toList(), states, highlightId, inline); run.clear() }
+                if (spec.id == TITLE_ID) title() else body()
+            }
+            else -> run += spec
+        }
+    }
+    if (flushNeeded()) NoteActionButtons(run.toList(), states, highlightId, inline)
 }
 
 /**

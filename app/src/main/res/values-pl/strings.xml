@@ -483,4 +483,6 @@
     <string name="item_swipe_tick">Zaznacz</string>
     <string name="item_swipe_remove">Usuń</string>
     <string name="item_swipe_hint">Przesunięcie nagłówka kategorii robi to samo dla wszystkich jej pozycji.</string>
+    <string name="editor_btn_title_field">Tytuł</string>
+    <string name="quote_add">Dodaj cytat</string>
 </resources>

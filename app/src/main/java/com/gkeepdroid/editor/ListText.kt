@@ -107,6 +107,8 @@ internal object NoteLinks {
 internal object ListContinue {
     private val numbered = Regex("""^(\s*)(\d{1,3})([.)])\s(.*)$""")
     private val bulleted = Regex("""^(\s*)([-*•])\s(.*)$""")
+    // A line of a block of quoted lines: Enter goes on with the quote, on an empty one it ends.
+    private val quoted = Regex("""^>(?: (.*))?$""")
 
     fun apply(old: String, typed: TextFieldValue): TextFieldValue {
         val text = typed.text
@@ -129,6 +131,10 @@ internal object ListContinue {
             b != null -> {
                 marker = b.groupValues[1] + b.groupValues[2] + " "
                 empty = b.groupValues[3].isBlank()
+            }
+            quoted.matchEntire(line) != null -> {
+                marker = "> "
+                empty = quoted.matchEntire(line)!!.groupValues[1].isBlank()
             }
             else -> return typed
         }

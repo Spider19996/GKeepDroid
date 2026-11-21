@@ -474,4 +474,6 @@
     <string name="item_swipe_tick">Marcar</string>
     <string name="item_swipe_remove">Remover</string>
     <string name="item_swipe_hint">Deslizar o cabeçalho de uma categoria faz o mesmo a todos os seus itens.</string>
+    <string name="editor_btn_title_field">Título</string>
+    <string name="quote_add">Adicionar citação</string>
 </resources>

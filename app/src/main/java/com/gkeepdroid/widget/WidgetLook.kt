@@ -4,6 +4,7 @@ import androidx.glance.color.ColorProvider as DayNightColorProvider
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.glance.background
 import androidx.glance.text.Text
@@ -64,6 +65,12 @@ internal class TextPalette(private val day: Color, private val night: Color) {
                 views.setTextColor(viewId, if (night) nightColor else dayColor)
             }
         }
+    }
+
+    /** The color of a link on this text: light blue on light text (dark ground), dark blue on dark text. */
+    fun link(): TextPalette {
+        fun pick(text: Color) = if (text.luminance() > 0.5f) Color(0xFF8AB4F8) else Color(0xFF0B57D0)
+        return TextPalette(pick(day), pick(night))
     }
 
     fun provider(alpha: Float = 1f): ColorProvider =

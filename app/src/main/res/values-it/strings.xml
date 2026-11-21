@@ -474,4 +474,6 @@
     <string name="item_swipe_tick">Spunta</string>
     <string name="item_swipe_remove">Rimuovi</string>
     <string name="item_swipe_hint">Scorrere l’intestazione di una categoria fa lo stesso per tutti i suoi elementi.</string>
+    <string name="editor_btn_title_field">Titolo</string>
+    <string name="quote_add">Aggiungi citazione</string>
 </resources>

@@ -108,6 +108,19 @@ class ToggleCategoryAction : ActionCallback {
     }
 }
 
+internal val QuoteKey = ActionParameters.Key<String>("quote")
+
+/** Folds or unfolds one block of "> " lines in a text note (on this device). */
+class ToggleQuoteAction : ActionCallback {
+    override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
+        val account = parameters[AccountKey] ?: return
+        val noteId = parameters[NoteIdKey] ?: return
+        val block = parameters[QuoteKey] ?: return
+        QuoteBlocks.set(context, account, noteId, block, parameters[CollapsedKey] ?: return)
+        WidgetRefresh.all(context)
+    }
+}
+
 class ToggleCollapseAction : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         val account = parameters[AccountKey] ?: return
@@ -142,6 +155,15 @@ class MoveNoteAction : ActionCallback {
 
 class RefreshAction : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
+        // Without a connection the fetch would only wait for one: the arrow turns red instead of turning round. The fetch is still
+        // queued, so it runs (and the arrow is normal again) once there is a connection.
+        if (!SyncState.connected(context)) {
+            SyncState.setOffline(context, true)
+        } else {
+            // The arrow starts turning at once, not only when the worker has started.
+            SyncState.setOffline(context, false)
+            SyncState.set(context, true)
+        }
         SyncWorker.syncNow(context)
     }
 }

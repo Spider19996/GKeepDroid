@@ -465,4 +465,6 @@
     <string name="item_swipe_tick">टिक करें</string>
     <string name="item_swipe_remove">हटाएँ</string>
     <string name="item_swipe_hint">किसी श्रेणी के शीर्षक पर स्वाइप करने से उसके सभी आइटम पर यही होता है।</string>
+    <string name="editor_btn_title_field">शीर्षक</string>
+    <string name="quote_add">उद्धरण जोड़ें</string>
 </resources>

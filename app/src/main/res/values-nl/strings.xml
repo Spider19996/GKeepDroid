@@ -465,4 +465,6 @@
     <string name="item_swipe_tick">Afvinken</string>
     <string name="item_swipe_remove">Verwijderen</string>
     <string name="item_swipe_hint">Vegen over de kop van een categorie doet hetzelfde voor al haar items.</string>
+    <string name="editor_btn_title_field">Titel</string>
+    <string name="quote_add">Citaat toevoegen</string>
 </resources>

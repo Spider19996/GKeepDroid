@@ -465,4 +465,6 @@
     <string name="item_swipe_tick">İşaretle</string>
     <string name="item_swipe_remove">Kaldır</string>
     <string name="item_swipe_hint">Bir kategorinin başlığını kaydırmak aynısını tüm öğelerine yapar.</string>
+    <string name="editor_btn_title_field">Başlık</string>
+    <string name="quote_add">Alıntı ekle</string>
 </resources>

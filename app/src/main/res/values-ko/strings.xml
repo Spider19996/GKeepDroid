@@ -456,4 +456,6 @@
     <string name="item_swipe_tick">체크</string>
     <string name="item_swipe_remove">삭제</string>
     <string name="item_swipe_hint">카테고리 제목을 스와이프하면 모든 항목에 똑같이 적용됩니다.</string>
+    <string name="editor_btn_title_field">제목</string>
+    <string name="quote_add">인용 추가</string>
 </resources>

@@ -219,13 +219,15 @@ class NotesWidget : GlanceAppWidget() {
         val cornerExtra = if (hasTitleRow) 0 else (if (pinned) 24 else 0) + (if (showProgress) 36 else 0)
         Column(GlanceModifier.fillMaxWidth().padding(bottom = 6.dp)) {
             // A box, so the fold arrow can float over the corner without making the title line taller.
-            Box(
-                outerModifier.clickable(
-                    actionStartActivity<EditNoteActivity>(
-                        actionParametersOf(NoteIdKey to note.id, AccountKey to account, WidgetIdKey to appWidgetId)
-                    )
-                )
-            ) {
+            // A tappable checklist item inside a clickable card lost its tap to the card (the editor opened instead of ticking),
+            // so an open checklist leaves the card itself unclickable: its title and the items' texts open the editor instead.
+            val openEditor = actionStartActivity<EditNoteActivity>(
+                actionParametersOf(NoteIdKey to note.id, AccountKey to account, WidgetIdKey to appWidgetId)
+            )
+            // Folding a block of "> " lines in a text note is a tap target inside the card, so that card is no tap target either.
+            val hasQuotes = !note.isList && QuoteBlocks.find(note.text).isNotEmpty()
+            val listOpen = (note.isList || hasQuotes) && !folded && !isPrivate
+            Box(if (listOpen) outerModifier else outerModifier.clickable(openEditor)) {
               Box(innerModifier) {
                 Column(
                     GlanceModifier.fillMaxWidth().padding(
@@ -237,7 +239,7 @@ class NotesWidget : GlanceAppWidget() {
                     // Inside the padding, so the image stays within the note and its border stays visible.
                     if (thumb != null && !isPrivate) Box(GlanceModifier.padding(bottom = 6.dp)) { NoteImage(thumb, contentWidth) }
                     if (hasTitleRow) {
-                        Row(GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+                        Row(if (listOpen) GlanceModifier.fillMaxWidth().clickable(openEditor) else GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
                             if (note.title.isNotBlank()) {
                                 Text(
                                     note.title,
@@ -289,19 +291,22 @@ class NotesWidget : GlanceAppWidget() {
                     } else if (isPrivate) {
                         PrivateHint(settings, palette)
                     } else {
-                        LabelsLine(note, settings, palette)
+                        // Where the card itself takes no taps (see listOpen), these lines open the note on their own.
+                        val lineTap = if (listOpen) GlanceModifier.fillMaxWidth().clickable(openEditor) else GlanceModifier
+                        Box(lineTap) { LabelsLine(note, settings, palette) }
                         ReminderLine(note, account, settings, palette)
-                        if (thumb == null && note.hasNoContent()) EmptyNoteHint(settings, palette)
+                        if (thumb == null && note.hasNoContent()) Box(lineTap) { EmptyNoteHint(settings, palette) }
                         if (note.isList) {
                             val collapsed = collapsedByNote[CollapseStore.key(account, note.id)] ?: settings.collapseChecked
-                            ChecklistBody(note, account, settings, palette, collapsed, rowLimit = settings.maxLines)
+                            ChecklistBody(note, account, settings, palette, collapsed, rowLimit = settings.maxLines, textAction = openEditor)
                         } else if (note.text.isNotBlank()) {
                             RichBody(
                                 note, account, TextStyle(color = textColor, fontSize = settings.textSizeSp.sp), settings.textSizeSp,
                                 maxLines = settings.maxLines, palette = palette,
+                                modifier = if (hasQuotes) GlanceModifier.fillMaxWidth().clickable(openEditor) else GlanceModifier,
                             )
                         }
-                        EditedTime(note, settings, palette)
+                        Box(lineTap) { EditedTime(note, settings, palette) }
                     }
                 }
                 if (foldable || cornerExtra > 0) {

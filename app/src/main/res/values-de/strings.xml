@@ -465,4 +465,6 @@
     <string name="item_swipe_tick">Abhaken</string>
     <string name="item_swipe_remove">Entfernen</string>
     <string name="item_swipe_hint">Wischen über die Überschrift einer Kategorie macht das für alle ihre Einträge.</string>
+    <string name="editor_btn_title_field">Titel</string>
+    <string name="quote_add">Zitat hinzufügen</string>
 </resources>
