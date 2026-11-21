@@ -6,6 +6,7 @@ import android.widget.Toast
 import android.content.Intent
 import android.text.format.DateUtils
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -205,14 +206,16 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
                 mdEnabled = on
             }
         }
-        if (mdFolder != null) FolderRow(R.string.md_sync_folder, mdFolder.orEmpty(), R.string.md_sync_choose, mdEnabled, R.string.md_sync_now,
+        if (mdFolder != null) FolderRow(R.string.md_sync_folder, mdFolder.orEmpty(), R.string.md_sync_choose, mdEnabled, mdBusy, R.string.md_sync_now,
             onChoose = { folderLauncher.launch(null) },
             onSync = {
                 scope.launch {
+                    mdBusy = true
                     status = runCatching { MarkdownSync.syncNow(context) }.fold(
                         onSuccess = { context.resources.getQuantityString(R.plurals.md_sync_done, it, it) },
                         onFailure = { context.getString(R.string.md_sync_failed, it.message ?: it.javaClass.simpleName) },
                     )
+                    mdBusy = false
                 }
             },
         )
@@ -242,17 +245,59 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
             }
         }
         if (dsEnabled || dsFolder != null) FolderRow(
-            R.string.device_sync_folder, if (dsMode == DeviceSync.MODE_FOLDER) dsFolder else null, R.string.device_sync_choose, dsEnabled, R.string.device_sync_now,
+            R.string.device_sync_folder, if (dsMode == DeviceSync.MODE_FOLDER) dsFolder else null, R.string.device_sync_choose, dsEnabled, dsBusy, R.string.device_sync_now,
             onChoose = { deviceFolderLauncher.launch(null) },
             onSync = {
                 scope.launch {
+                    dsBusy = true
+                    dsStatus = ""
                     dsStatus = runCatching { DeviceSync.syncNow(context) }.fold(
                         onSuccess = { context.getString(R.string.device_sync_done, it) },
                         onFailure = { context.getString(R.string.device_sync_failed, it.message ?: it.javaClass.simpleName) },
                     )
+                    dsBusy = false
                 }
             },
         )
+        if (dsEnabled) TextButton(
+            onClick = {
+                scope.launch {
+                    dsBusy = true
+                    runCatching { DeviceSync.contents(context) }.fold(
+                        onSuccess = { dsFiles = it },
+                        onFailure = { dsStatus = context.getString(R.string.device_sync_failed, it.message ?: it.javaClass.simpleName) },
+                    )
+                    dsBusy = false
+                }
+            },
+            enabled = !dsBusy,
+            modifier = Modifier.fillMaxWidth(),
+            shapes = ButtonDefaults.shapes(),
+        ) { Text(stringResource(R.string.device_sync_contents)) }
+        dsFiles?.let { files ->
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = { dsFiles = null },
+                title = { Text(stringResource(R.string.device_sync_title)) },
+                text = {
+                    if (files.isEmpty()) {
+                        Text(stringResource(R.string.device_sync_contents_empty))
+                    } else {
+                        Column(Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            files.sortedBy { it.name }.forEach { f ->
+                                Column {
+                                    Text(f.name.removePrefix("gkd-sync-"), style = MaterialTheme.typography.bodyMedium)
+                                    if (f.modified > 0) Text(
+                                        DateUtils.formatDateTime(context, f.modified, DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_ABBREV_ALL),
+                                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            }
+                        }
+                    }
+                },
+                confirmButton = { TextButton(onClick = { dsFiles = null }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.ok)) } },
+            )
+        }
         if (dsEnabled) SwitchRow(R.string.device_sync_reminders, dsReminders) { on ->
             DeviceSync.setRemindersEnabled(context, on)
             dsReminders = on
@@ -287,12 +332,16 @@ private fun RadioRow(label: Int, selected: Boolean, onClick: () -> Unit) {
 
 /** The chosen folder of a sync, with a button to change it, and the button that syncs now. */
 @Composable
-private fun FolderRow(folder: Int, name: String?, choose: Int, enabled: Boolean, now: Int, onChoose: () -> Unit, onSync: () -> Unit) {
+private fun FolderRow(folder: Int, name: String?, choose: Int, enabled: Boolean, busy: Boolean, now: Int, onChoose: () -> Unit, onSync: () -> Unit) {
     if (name != null) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text(stringResource(folder, name), Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, maxLines = 2)
         TextButton(onClick = onChoose, shapes = ButtonDefaults.shapes()) { Text(stringResource(choose)) }
     }
-    OutlinedButton(enabled = enabled, onClick = onSync, modifier = Modifier.fillMaxWidth(), shapes = ButtonDefaults.shapes()) { Text(stringResource(now)) }
+    OutlinedButton(enabled = enabled && !busy, onClick = onSync, modifier = Modifier.fillMaxWidth(), shapes = ButtonDefaults.shapes()) {
+        // Something visible while it runs, so a tap is never met with silence.
+        if (busy) androidx.compose.material3.CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+        Text(stringResource(if (busy) R.string.device_sync_busy else now), Modifier.padding(start = if (busy) 8.dp else 0.dp))
+    }
 }
 
 internal val swipeChoices = listOf(

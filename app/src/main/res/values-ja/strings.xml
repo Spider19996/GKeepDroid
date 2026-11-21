@@ -471,4 +471,7 @@
     <string name="device_sync_via_drive">Google ドライブ経由(自動)</string>
     <string name="device_sync_via_folder">フォルダ経由(Syncthing、Nextcloud など)</string>
     <string name="device_sync_account">アカウント: %1$s</string>
+    <string name="device_sync_busy">同期中 …</string>
+    <string name="device_sync_contents">保存されているファイルを表示</string>
+    <string name="device_sync_contents_empty">まだ何も保存されていません。</string>
 </resources>

@@ -516,4 +516,7 @@
     <string name="device_sync_via_drive">عبر Google Drive (تلقائيًا)</string>
     <string name="device_sync_via_folder">عبر مجلد (Syncthing أو Nextcloud، …)</string>
     <string name="device_sync_account">الحساب: %1$s</string>
+    <string name="device_sync_busy">جارٍ المزامنة …</string>
+    <string name="device_sync_contents">عرض الملفات المحفوظة</string>
+    <string name="device_sync_contents_empty">لم يُحفظ أي شيء بعد.</string>
 </resources>

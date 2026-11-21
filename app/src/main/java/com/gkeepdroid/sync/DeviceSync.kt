@@ -203,6 +203,9 @@ object DeviceSync {
 
     // ---- the sync itself -------------------------------------------------------------------------
 
+    /** The files stored in the place where the phones meet, for the user to look at. */
+    suspend fun contents(context: Context): List<StoredFile> = withContext(Dispatchers.IO) { storage(context.applicationContext)?.list().orEmpty() }
+
     /** Syncs once; returns how many values of other phones were taken over. */
     suspend fun syncNow(context: Context): Int = mutex.withLock {
         withContext(Dispatchers.IO) {

@@ -471,4 +471,7 @@
     <string name="device_sync_via_drive">通过 Google 云端硬盘(自动)</string>
     <string name="device_sync_via_folder">通过文件夹(Syncthing、Nextcloud 等)</string>
     <string name="device_sync_account">账号:%1$s</string>
+    <string name="device_sync_busy">正在同步 …</string>
+    <string name="device_sync_contents">显示已保存的文件</string>
+    <string name="device_sync_contents_empty">尚未保存任何内容。</string>
 </resources>

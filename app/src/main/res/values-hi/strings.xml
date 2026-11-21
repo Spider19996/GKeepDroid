@@ -480,4 +480,7 @@
     <string name="device_sync_via_drive">Google Drive के ज़रिए (अपने-आप)</string>
     <string name="device_sync_via_folder">फ़ोल्डर के ज़रिए (Syncthing, Nextcloud, …)</string>
     <string name="device_sync_account">खाता: %1$s</string>
+    <string name="device_sync_busy">सिंक हो रहा है …</string>
+    <string name="device_sync_contents">सहेजी गई फ़ाइलें दिखाएँ</string>
+    <string name="device_sync_contents_empty">अभी कुछ सहेजा नहीं गया है।</string>
 </resources>

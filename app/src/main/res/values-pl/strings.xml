@@ -498,4 +498,7 @@
     <string name="device_sync_via_drive">Przez Dysk Google (automatycznie)</string>
     <string name="device_sync_via_folder">Przez folder (Syncthing, Nextcloud, …)</string>
     <string name="device_sync_account">Konto: %1$s</string>
+    <string name="device_sync_busy">Synchronizowanie …</string>
+    <string name="device_sync_contents">Pokaż zapisane pliki</string>
+    <string name="device_sync_contents_empty">Nic jeszcze nie zapisano.</string>
 </resources>

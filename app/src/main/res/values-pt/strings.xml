@@ -489,4 +489,7 @@
     <string name="device_sync_via_drive">Através do Google Drive (automático)</string>
     <string name="device_sync_via_folder">Através de uma pasta (Syncthing, Nextcloud, …)</string>
     <string name="device_sync_account">Conta: %1$s</string>
+    <string name="device_sync_busy">A sincronizar …</string>
+    <string name="device_sync_contents">Mostrar ficheiros guardados</string>
+    <string name="device_sync_contents_empty">Ainda não há nada guardado.</string>
 </resources>

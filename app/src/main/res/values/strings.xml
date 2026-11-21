@@ -481,4 +481,7 @@
     <string name="device_sync_via_drive">Via Google Drive (automatic)</string>
     <string name="device_sync_via_folder">Via a folder (Syncthing, Nextcloud, …)</string>
     <string name="device_sync_account">Account: %1$s</string>
+    <string name="device_sync_busy">Syncing …</string>
+    <string name="device_sync_contents">Show stored files</string>
+    <string name="device_sync_contents_empty">Nothing is stored yet.</string>
 </resources>

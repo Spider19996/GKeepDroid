@@ -498,4 +498,7 @@
     <string name="device_sync_via_drive">Через Google Диск (автоматически)</string>
     <string name="device_sync_via_folder">Через папку (Syncthing, Nextcloud, …)</string>
     <string name="device_sync_account">Аккаунт: %1$s</string>
+    <string name="device_sync_busy">Синхронизация …</string>
+    <string name="device_sync_contents">Показать сохранённые файлы</string>
+    <string name="device_sync_contents_empty">Пока ничего не сохранено.</string>
 </resources>

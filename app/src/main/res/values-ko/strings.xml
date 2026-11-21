@@ -471,4 +471,7 @@
     <string name="device_sync_via_drive">Google 드라이브로 (자동)</string>
     <string name="device_sync_via_folder">폴더로 (Syncthing, Nextcloud 등)</string>
     <string name="device_sync_account">계정: %1$s</string>
+    <string name="device_sync_busy">동기화 중 …</string>
+    <string name="device_sync_contents">저장된 파일 보기</string>
+    <string name="device_sync_contents_empty">아직 저장된 것이 없습니다.</string>
 </resources>

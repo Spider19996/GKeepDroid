@@ -480,4 +480,7 @@
     <string name="device_sync_via_drive">Via Google Drive (automatisch)</string>
     <string name="device_sync_via_folder">Via een map (Syncthing, Nextcloud, …)</string>
     <string name="device_sync_account">Account: %1$s</string>
+    <string name="device_sync_busy">Synchroniseren …</string>
+    <string name="device_sync_contents">Opgeslagen bestanden tonen</string>
+    <string name="device_sync_contents_empty">Nog niets opgeslagen.</string>
 </resources>

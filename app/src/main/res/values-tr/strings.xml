@@ -480,4 +480,7 @@
     <string name="device_sync_via_drive">Google Drive üzerinden (otomatik)</string>
     <string name="device_sync_via_folder">Klasör üzerinden (Syncthing, Nextcloud, …)</string>
     <string name="device_sync_account">Hesap: %1$s</string>
+    <string name="device_sync_busy">Eşitleniyor …</string>
+    <string name="device_sync_contents">Kayıtlı dosyaları göster</string>
+    <string name="device_sync_contents_empty">Henüz bir şey kaydedilmedi.</string>
 </resources>
