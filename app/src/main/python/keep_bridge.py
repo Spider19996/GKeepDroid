@@ -692,6 +692,21 @@ def add_list_item(email, master_token, state_path, note_id, text, bold_length=0)
     return _finish(keep, state_path)
 
 
+def set_note_labels(email, master_token, state_path, note_id, labels_json):
+    """Make a note carry exactly these labels (used to take the old "hidden" mark off)."""
+    keep = _login(email, master_token, state_path)
+    note = keep.get(note_id)
+    if note is None:
+        raise ValueError("Note not found")
+    _set_labels(keep, note, labels_json)
+    # The old "hidden" mark: once no note carries it any more, the label itself goes.
+    stale = keep.findLabel("GKeepDroid hidden")
+    if stale is not None and not any(stale.id in [l.id for l in n.labels.all()] for n in keep.all()):
+        keep.deleteLabel(stale.id)
+    keep.sync()
+    return _finish(keep, state_path)
+
+
 def archive_note(email, master_token, state_path, note_id):
     """Archive a note, like the archive button in the Keep app."""
     keep = _login(email, master_token, state_path)

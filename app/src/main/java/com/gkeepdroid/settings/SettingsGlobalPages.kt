@@ -230,6 +230,48 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
             shapes = ButtonDefaults.shapes(),
         ) { Text(stringResource(R.string.md_sync_now)) }
 
+        // What Keep has no place for, kept in step on all phones through a folder.
+        HorizontalDivider(Modifier.padding(vertical = 8.dp))
+        SectionTitle(stringResource(R.string.device_sync_title))
+        Text(
+            stringResource(R.string.device_sync_hint),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        SwitchRow(R.string.device_sync_enable, dsEnabled) { on ->
+            if (on && DeviceSync.treeUri(context) == null) {
+                deviceFolderLauncher.launch(null)
+            } else {
+                DeviceSync.setEnabled(context, on)
+                dsEnabled = on
+            }
+        }
+        dsFolder?.let { Text(stringResource(R.string.device_sync_folder, it)) }
+        OutlinedButton(
+            onClick = { deviceFolderLauncher.launch(null) },
+            modifier = Modifier.fillMaxWidth(),
+            shapes = ButtonDefaults.shapes(),
+        ) { Text(stringResource(R.string.device_sync_choose)) }
+        SwitchRow(R.string.device_sync_reminders, dsReminders) { on ->
+            DeviceSync.setRemindersEnabled(context, on)
+            dsReminders = on
+        }
+        Hint(R.string.device_sync_reminders_hint)
+        Button(
+            enabled = dsEnabled,
+            onClick = {
+                scope.launch {
+                    dsStatus = runCatching { DeviceSync.syncNow(context) }.fold(
+                        onSuccess = { context.getString(R.string.device_sync_done, it) },
+                        onFailure = { context.getString(R.string.device_sync_failed, it.message ?: it.javaClass.simpleName) },
+                    )
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            shapes = ButtonDefaults.shapes(),
+        ) { Text(stringResource(R.string.device_sync_now)) }
+        if (dsStatus.isNotEmpty()) Text(dsStatus)
+
         // Settings: one file with everything except accounts and tokens.
         HorizontalDivider(Modifier.padding(vertical = 8.dp))
         Text(stringResource(R.string.backup_note), Modifier.searchFlash(R.string.backup_note))

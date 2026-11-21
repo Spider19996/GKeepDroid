@@ -24,11 +24,9 @@ internal class NotesActions(
             val privateKeys = PrivateNotes.load(context)
             targets.forEach { (note, account) ->
                 val n = change(note, account)
-                val args = KeepRepository.updateNoteArgs(
-                    n.id, n.title, n.text, n.items, n.color, n.pinned, emptyList(),
-                    withHiddenLabel(n.labels, PrivateNotes.isPrivate(note, account, privateKeys)),
-                )
-                PrivateNotes.set(context, account, n.id, false)
+                val args = KeepRepository.updateNoteArgs(n.id, n.title, n.text, n.items, n.color, n.pinned, emptyList(), n.labels)
+                // A note that still carries the old mark in Keep becomes private on this phone before the edit takes the mark off.
+                if (note.hidden && PrivateNotes.isPrivate(note, account, privateKeys)) PrivateNotes.set(context, account, n.id, true)
                 KeepRepository.queueEdit(context, PendingEdit(account, "update_note", args))
             }
         }
@@ -44,12 +42,15 @@ internal class NotesActions(
         act {
             val privateKeys = PrivateNotes.load(context)
             targets.forEach { (n, account) ->
-                val args = KeepRepository.createNoteArgs(
-                    n.title, n.text, n.isList, n.items, n.color, n.pinned,
-                    withHiddenLabel(n.labels, PrivateNotes.isPrivate(n, account, privateKeys)),
-                )
-                if (CredentialStore.isLocal(account)) KeepRepository.run(context, account, "create_note", args)
-                else KeepRepository.queueEdit(context, PendingEdit(account, "create_note", args))
+                val args = KeepRepository.createNoteArgs(n.title, n.text, n.isList, n.items, n.color, n.pinned, n.labels)
+                val edit = PendingEdit(account, "create_note", args, hidden = PrivateNotes.isPrivate(n, account, privateKeys))
+                if (CredentialStore.isLocal(account)) {
+                    val before = Reminders.noteIds(context, account)
+                    KeepRepository.run(context, account, "create_note", args)
+                    Reminders.attachToNew(context, edit, before)
+                } else {
+                    KeepRepository.queueEdit(context, edit)
+                }
             }
         }
     }
@@ -67,9 +68,9 @@ internal class NotesActions(
         fun editNote(pinned: Boolean, hide: Boolean) {
             act {
                 val args = KeepRepository.updateNoteArgs(
-                    note.id, note.title, note.text, note.items, note.color, pinned, emptyList(), withHiddenLabel(note.labels, hide),
+                    note.id, note.title, note.text, note.items, note.color, pinned, emptyList(), note.labels,
                 )
-                PrivateNotes.set(context, account, note.id, false)
+                PrivateNotes.set(context, account, note.id, hide)
                 KeepRepository.queueEdit(context, PendingEdit(account, "update_note", args))
             }
         }

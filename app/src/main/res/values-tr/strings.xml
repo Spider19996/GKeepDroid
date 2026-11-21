@@ -467,4 +467,14 @@
     <string name="item_swipe_hint">Bir kategorinin başlığını kaydırmak aynısını tüm öğelerine yapar.</string>
     <string name="editor_btn_title_field">Başlık</string>
     <string name="quote_add">Alıntı ekle</string>
+    <string name="device_sync_title">Telefonlar arası eşitleme</string>
+    <string name="device_sync_enable">Telefonlar arasında eşitle</string>
+    <string name="device_sync_hint">Keep’in saklayamadığı şeyleri tüm telefonlarında aynı tutar: özel notlar, bir notun kendi metin rengi ve fotoğrafı, katlanmış notlar, kategoriler ve alıntılar ve (istersen) hatırlatıcılar. Her telefon bir klasöre kendine ait küçük bir dosya yazar, başka bir uygulama (Syncthing, Nextcloud, bir bulut uygulaması, …) klasörü telefondan telefona taşır. Her telefonda aynı eşitlenen klasörü seç.</string>
+    <string name="device_sync_folder">Klasör: %1$s</string>
+    <string name="device_sync_choose">Klasör seç</string>
+    <string name="device_sync_reminders">Diğer telefonlardaki hatırlatıcıları al</string>
+    <string name="device_sync_reminders_hint">Kapalı: her telefon kendi hatırlatıcılarını tutar. Açık: bir telefonda kurulan hatırlatıcı hepsinde çalar.</string>
+    <string name="device_sync_now">Şimdi eşitle</string>
+    <string name="device_sync_done">Eşitlendi, %1$d değişiklik alındı</string>
+    <string name="device_sync_failed">Eşitleme başarısız: %1$s</string>
 </resources>

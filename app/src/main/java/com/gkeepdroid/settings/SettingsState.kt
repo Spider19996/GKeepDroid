@@ -25,6 +25,7 @@ internal class SettingsState(val context: SettingsActivity) {
     lateinit var scope: CoroutineScope
     lateinit var loginLauncher: ActivityResultLauncher<Intent>
     lateinit var folderLauncher: ActivityResultLauncher<Uri?>
+    lateinit var deviceFolderLauncher: ActivityResultLauncher<Uri?>
     lateinit var exportLauncher: ActivityResultLauncher<String>
     lateinit var importLauncher: ActivityResultLauncher<Array<String>>
     var credentialsRequired = ""
@@ -150,6 +151,10 @@ internal class SettingsState(val context: SettingsActivity) {
     var showTokenForm by mutableStateOf(false)
     var mdEnabled by mutableStateOf(MarkdownSync.isEnabled(context))
     var mdFolder by mutableStateOf(MarkdownSync.treeUri(context)?.let { MarkdownSync.folderLabel(it) })
+    var dsEnabled by mutableStateOf(DeviceSync.isEnabled(context))
+    var dsFolder by mutableStateOf(DeviceSync.treeUri(context)?.let { DeviceSync.folderLabel(it) })
+    var dsReminders by mutableStateOf(DeviceSync.remindersEnabled(context))
+    var dsStatus by mutableStateOf("")
     var confirmRemoveLocal by mutableStateOf(false)
     var confirmSettingsButtonOff by mutableStateOf(false)
     var confirmLayoutReset by mutableStateOf(false)

@@ -144,6 +144,17 @@ class SettingsActivity : ComponentActivity() {
                 }
             }
 
+            deviceFolderLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
+                if (uri != null) {
+                    context.contentResolver.takePersistableUriPermission(
+                        uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
+                    )
+                    DeviceSync.setFolder(context, uri)
+                    dsEnabled = true
+                    dsFolder = DeviceSync.folderLabel(uri)
+                }
+            }
+
             // A new widget counts as configured as soon as the screen is open; every change is saved right away.
             LaunchedEffect(Unit) {
                 if (context.appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {

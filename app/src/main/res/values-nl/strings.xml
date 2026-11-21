@@ -467,4 +467,14 @@
     <string name="item_swipe_hint">Vegen over de kop van een categorie doet hetzelfde voor al haar items.</string>
     <string name="editor_btn_title_field">Titel</string>
     <string name="quote_add">Citaat toevoegen</string>
+    <string name="device_sync_title">Sync tussen telefoons</string>
+    <string name="device_sync_enable">Synchroniseren tussen telefoons</string>
+    <string name="device_sync_hint">Houdt alles wat Keep niet kan opslaan gelijk op al je telefoons: privénotities, eigen tekstkleur en eigen foto van een notitie, ingeklapte notities, categorieën en citaten en (als je wilt) herinneringen. Elke telefoon zet één eigen klein bestand in een map, en een andere app (Syncthing, Nextcloud, een cloud-app, …) brengt de map van telefoon naar telefoon. Kies op elke telefoon dezelfde gesynchroniseerde map.</string>
+    <string name="device_sync_folder">Map: %1$s</string>
+    <string name="device_sync_choose">Map kiezen</string>
+    <string name="device_sync_reminders">Herinneringen van andere telefoons overnemen</string>
+    <string name="device_sync_reminders_hint">Uit: elke telefoon houdt zijn eigen herinneringen. Aan: een herinnering van één telefoon gaat op alle af.</string>
+    <string name="device_sync_now">Nu synchroniseren</string>
+    <string name="device_sync_done">Gesynchroniseerd, %1$d wijzigingen overgenomen</string>
+    <string name="device_sync_failed">Synchronisatie mislukt: %1$s</string>
 </resources>

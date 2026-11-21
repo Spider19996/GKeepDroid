@@ -476,4 +476,14 @@
     <string name="item_swipe_hint">Balayer l’en-tête d’une catégorie fait de même pour tous ses éléments.</string>
     <string name="editor_btn_title_field">Titre</string>
     <string name="quote_add">Ajouter une citation</string>
+    <string name="device_sync_title">Synchronisation entre téléphones</string>
+    <string name="device_sync_enable">Synchroniser entre téléphones</string>
+    <string name="device_sync_hint">Garde identique sur tous vos téléphones ce que Keep ne peut pas stocker : notes privées, couleur de texte et photo propres à une note, notes repliées, catégories et citations et, si vous le souhaitez, les rappels. Chaque téléphone dépose un petit fichier à lui dans un dossier, et une autre application (Syncthing, Nextcloud, une appli cloud, …) transporte le dossier d’un téléphone à l’autre. Choisissez le même dossier synchronisé sur chaque téléphone.</string>
+    <string name="device_sync_folder">Dossier : %1$s</string>
+    <string name="device_sync_choose">Choisir le dossier</string>
+    <string name="device_sync_reminders">Reprendre les rappels des autres téléphones</string>
+    <string name="device_sync_reminders_hint">Désactivé : chaque téléphone garde ses propres rappels. Activé : un rappel créé sur un téléphone sonne sur tous.</string>
+    <string name="device_sync_now">Synchroniser maintenant</string>
+    <string name="device_sync_done">Synchronisé, %1$d modifications reprises</string>
+    <string name="device_sync_failed">Échec de la synchronisation : %1$s</string>
 </resources>

@@ -485,4 +485,14 @@
     <string name="item_swipe_hint">Смахивание заголовка категории делает то же со всеми её пунктами.</string>
     <string name="editor_btn_title_field">Заголовок</string>
     <string name="quote_add">Добавить цитату</string>
+    <string name="device_sync_title">Синхронизация между телефонами</string>
+    <string name="device_sync_enable">Синхронизировать между телефонами</string>
+    <string name="device_sync_hint">Поддерживает одинаковым на всех ваших телефонах то, для чего в Keep нет места: личные заметки, собственный цвет текста и собственное фото заметки, свёрнутые заметки, категории и цитаты и (по желанию) напоминания. Каждый телефон кладёт в папку один свой небольшой файл, а другое приложение (Syncthing, Nextcloud, облачное приложение, …) переносит папку с телефона на телефон. Выберите на каждом телефоне одну и ту же синхронизируемую папку.</string>
+    <string name="device_sync_folder">Папка: %1$s</string>
+    <string name="device_sync_choose">Выбрать папку</string>
+    <string name="device_sync_reminders">Принимать напоминания с других телефонов</string>
+    <string name="device_sync_reminders_hint">Выкл.: каждый телефон хранит свои напоминания. Вкл.: напоминание, созданное на одном телефоне, звучит на всех.</string>
+    <string name="device_sync_now">Синхронизировать сейчас</string>
+    <string name="device_sync_done">Синхронизировано, принято изменений: %1$d</string>
+    <string name="device_sync_failed">Ошибка синхронизации: %1$s</string>
 </resources>

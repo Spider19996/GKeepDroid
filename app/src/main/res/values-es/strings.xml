@@ -476,4 +476,14 @@
     <string name="item_swipe_hint">Deslizar el encabezado de una categoría hace lo mismo con todos sus elementos.</string>
     <string name="editor_btn_title_field">Título</string>
     <string name="quote_add">Añadir cita</string>
+    <string name="device_sync_title">Sincronización entre móviles</string>
+    <string name="device_sync_enable">Sincronizar entre móviles</string>
+    <string name="device_sync_hint">Mantiene igual en todos tus móviles lo que Keep no puede guardar: notas privadas, el color de texto y la foto propios de una nota, notas plegadas, categorías y citas y, si quieres, los recordatorios. Cada móvil deja un pequeño archivo propio en una carpeta, y otra aplicación (Syncthing, Nextcloud, una app en la nube, …) lleva la carpeta de un móvil a otro. Elige en cada móvil la misma carpeta sincronizada.</string>
+    <string name="device_sync_folder">Carpeta: %1$s</string>
+    <string name="device_sync_choose">Elegir carpeta</string>
+    <string name="device_sync_reminders">Adoptar recordatorios de otros móviles</string>
+    <string name="device_sync_reminders_hint">Desactivado: cada móvil conserva sus propios recordatorios. Activado: un recordatorio creado en un móvil suena en todos.</string>
+    <string name="device_sync_now">Sincronizar ahora</string>
+    <string name="device_sync_done">Sincronizado, %1$d cambios adoptados</string>
+    <string name="device_sync_failed">Error de sincronización: %1$s</string>
 </resources>

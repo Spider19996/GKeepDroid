@@ -503,4 +503,14 @@
     <string name="item_swipe_hint">سحب عنوان الفئة يطبّق ذلك على جميع عناصرها.</string>
     <string name="editor_btn_title_field">العنوان</string>
     <string name="quote_add">إضافة اقتباس</string>
+    <string name="device_sync_title">المزامنة بين الهواتف</string>
+    <string name="device_sync_enable">المزامنة بين الهواتف</string>
+    <string name="device_sync_hint">يُبقي على جميع هواتفك متطابقًا ما لا يستطيع Keep حفظه: الملاحظات الخاصة، ولون النص والصورة الخاصان بالملاحظة، والملاحظات المطوية، والفئات والاقتباسات، و(إن أردت) التذكيرات. يضع كل هاتف ملفًا صغيرًا خاصًا به في مجلد، ويقوم تطبيق آخر (Syncthing أو Nextcloud أو تطبيق سحابي، …) بنقل المجلد من هاتف إلى آخر. اختر على كل هاتف المجلد المتزامن نفسه.</string>
+    <string name="device_sync_folder">المجلد: %1$s</string>
+    <string name="device_sync_choose">اختيار المجلد</string>
+    <string name="device_sync_reminders">استلام التذكيرات من الهواتف الأخرى</string>
+    <string name="device_sync_reminders_hint">متوقف: يحتفظ كل هاتف بتذكيراته. قيد التشغيل: التذكير الذي يُضبط على هاتف يرنّ على جميع الهواتف.</string>
+    <string name="device_sync_now">زامن الآن</string>
+    <string name="device_sync_done">تمت المزامنة، تم استلام %1$d تغييرات</string>
+    <string name="device_sync_failed">فشلت المزامنة: %1$s</string>
 </resources>

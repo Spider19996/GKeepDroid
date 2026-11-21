@@ -216,6 +216,14 @@ object CustomBackgrounds {
         return File(File(context.filesDir, "custom_backgrounds").apply { mkdirs() }, "$name.jpg")
     }
 
+    fun fileOf(context: Context, account: String, noteId: String): File = file(context, account, noteId)
+
+    /** Keeps a photo that arrived from another phone as it is (it was shrunk and saved as a JPEG there). */
+    fun store(context: Context, account: String, noteId: String, bytes: ByteArray) {
+        file(context, account, noteId).writeBytes(bytes)
+        version.intValue++
+    }
+
     /** Changes whenever the note's photo changes; 0 if it has none. */
     fun stamp(context: Context, account: String, noteId: String): Long = file(context, account, noteId).let { if (it.exists()) it.lastModified() else 0L }
 
@@ -228,6 +236,7 @@ object CustomBackgrounds {
     fun remove(context: Context, account: String, noteId: String) {
         file(context, account, noteId).delete()
         version.intValue++
+        DeviceSync.changed(context)
     }
 
     /** Keeps the photo behind [uri] as the note's background, shrunk to a size that is enough for a screen. */
@@ -235,6 +244,7 @@ object CustomBackgrounds {
         val bitmap = decode(context, uri) ?: return false
         val saved = runCatching { file(context, account, noteId).outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 88, it) } }.getOrDefault(false)
         version.intValue++
+        DeviceSync.changed(context)
         return saved
     }
 
@@ -318,6 +328,27 @@ object NoteLook {
         prefs(context).edit {
             if (textColor == null) remove("$key|text") else putInt("$key|text", textColor)
             if (dark == null) remove("$key|dark") else putBoolean("$key|dark", dark)
+        }
+        version.intValue++
+        DeviceSync.changed(context)
+    }
+
+    /** Every look as text, named "account|note|look.text" or "account|note|look.dark", for the sync between phones. */
+    fun all(context: Context): Map<String, String> = prefs(context).all.mapNotNull { (k, v) ->
+        val (account, rest) = k.split("|", limit = 2).takeIf { it.size == 2 } ?: return@mapNotNull null
+        val (note, field) = rest.split("|", limit = 2).takeIf { it.size == 2 } ?: return@mapNotNull null
+        if (field != "text" && field != "dark") null else "$account|$note|look.$field" to v.toString()
+    }.toMap()
+
+    /** Sets one part of a look from its text form; null takes it away. */
+    fun setField(context: Context, account: String, noteId: String, field: String, value: String?) {
+        val key = "${key(account, noteId)}|$field"
+        prefs(context).edit {
+            when {
+                value == null -> remove(key)
+                field == "text" -> putInt(key, value.toInt())
+                field == "dark" -> putBoolean(key, value.toBoolean())
+            }
         }
         version.intValue++
     }

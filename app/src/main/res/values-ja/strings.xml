@@ -458,4 +458,14 @@
     <string name="item_swipe_hint">カテゴリの見出しをスワイプすると、そのすべての項目に同じ操作をします。</string>
     <string name="editor_btn_title_field">タイトル</string>
     <string name="quote_add">引用を追加</string>
+    <string name="device_sync_title">端末間の同期</string>
+    <string name="device_sync_enable">端末間で同期</string>
+    <string name="device_sync_hint">Keep に保存できないものを、すべての端末で同じに保ちます: 非公開メモ、メモ固有の文字色と写真、折りたたんだメモ、カテゴリと引用、そして(必要なら)リマインダー。各端末はフォルダに自分用の小さなファイルを1つ置き、別のアプリ(Syncthing、Nextcloud、クラウドアプリなど)がそのフォルダを端末から端末へ運びます。どの端末でも同じ同期フォルダを選んでください。</string>
+    <string name="device_sync_folder">フォルダ: %1$s</string>
+    <string name="device_sync_choose">フォルダを選択</string>
+    <string name="device_sync_reminders">他の端末のリマインダーを取り込む</string>
+    <string name="device_sync_reminders_hint">オフ: 各端末は自分のリマインダーだけを持ちます。オン: 1台で設定したリマインダーがすべての端末で鳴ります。</string>
+    <string name="device_sync_now">今すぐ同期</string>
+    <string name="device_sync_done">同期しました(%1$d 件の変更を取り込み)</string>
+    <string name="device_sync_failed">同期に失敗しました: %1$s</string>
 </resources>

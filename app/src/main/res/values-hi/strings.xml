@@ -467,4 +467,14 @@
     <string name="item_swipe_hint">किसी श्रेणी के शीर्षक पर स्वाइप करने से उसके सभी आइटम पर यही होता है।</string>
     <string name="editor_btn_title_field">शीर्षक</string>
     <string name="quote_add">उद्धरण जोड़ें</string>
+    <string name="device_sync_title">फ़ोनों के बीच सिंक</string>
+    <string name="device_sync_enable">फ़ोनों के बीच सिंक करें</string>
+    <string name="device_sync_hint">जो चीज़ें Keep में नहीं रखी जा सकतीं, उन्हें आपके सभी फ़ोनों पर एक जैसा रखता है: निजी नोट, नोट का अपना टेक्स्ट रंग और फ़ोटो, समेटे हुए नोट, श्रेणियाँ और उद्धरण, और (चाहें तो) रिमाइंडर। हर फ़ोन एक फ़ोल्डर में अपनी एक छोटी फ़ाइल रखता है, और कोई दूसरा ऐप (Syncthing, Nextcloud, क्लाउड ऐप, …) फ़ोल्डर को फ़ोन से फ़ोन तक पहुँचाता है। हर फ़ोन पर वही सिंक होने वाला फ़ोल्डर चुनें।</string>
+    <string name="device_sync_folder">फ़ोल्डर: %1$s</string>
+    <string name="device_sync_choose">फ़ोल्डर चुनें</string>
+    <string name="device_sync_reminders">दूसरे फ़ोनों के रिमाइंडर अपनाएँ</string>
+    <string name="device_sync_reminders_hint">बंद: हर फ़ोन अपने रिमाइंडर रखता है। चालू: एक फ़ोन पर लगा रिमाइंडर सभी पर बजता है।</string>
+    <string name="device_sync_now">अभी सिंक करें</string>
+    <string name="device_sync_done">सिंक हो गया, %1$d बदलाव अपनाए गए</string>
+    <string name="device_sync_failed">सिंक विफल: %1$s</string>
 </resources>

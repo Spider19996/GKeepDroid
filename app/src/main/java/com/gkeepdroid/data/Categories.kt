@@ -89,11 +89,19 @@ object CategoryHistory {
 
     fun remove(context: Context, account: String, noteId: String, name: String) {
         prefs(context).edit { putString("$account|$noteId", org.json.JSONArray(load(context, account, noteId) - name).toString()) }
+        DeviceSync.changed(context)
+    }
+
+    /** The history of every checklist, by "account|note", for the sync between phones. */
+    fun all(context: Context): Map<String, List<String>> = prefs(context).all.keys.associateWith { k ->
+        val (account, note) = k.split("|", limit = 2).let { it[0] to it.getOrElse(1) { "" } }
+        load(context, account, note)
     }
 
     fun add(context: Context, account: String, noteId: String, names: Collection<String>) {
         val all = (load(context, account, noteId) + names.map { it.trim() }.filter { it.isNotEmpty() }).distinct()
         prefs(context).edit { putString("$account|$noteId", org.json.JSONArray(all).toString()) }
+        DeviceSync.changed(context)
     }
 }
 
@@ -113,5 +121,6 @@ object CategoryFolds {
         if (folded) all.add(key(account, noteId, name)) else all.remove(key(account, noteId, name))
         prefs(context).edit { putStringSet("keys", all) }
         version.intValue++
+        DeviceSync.changed(context)
     }
 }

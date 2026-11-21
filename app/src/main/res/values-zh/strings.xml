@@ -458,4 +458,14 @@
     <string name="item_swipe_hint">滑动类别标题会对其所有项目执行相同操作。</string>
     <string name="editor_btn_title_field">标题</string>
     <string name="quote_add">添加引用</string>
+    <string name="device_sync_title">手机间同步</string>
+    <string name="device_sync_enable">在手机间同步</string>
+    <string name="device_sync_hint">让 Keep 无法保存的内容在你所有手机上保持一致:私密笔记、笔记自己的文字颜色和照片、已折叠的笔记、分类和引用,以及(如果需要)提醒。每部手机会在文件夹里放一个自己的小文件,再由另一个应用(Syncthing、Nextcloud、云盘应用等)把文件夹在手机之间传递。请在每部手机上选择同一个同步文件夹。</string>
+    <string name="device_sync_folder">文件夹:%1$s</string>
+    <string name="device_sync_choose">选择文件夹</string>
+    <string name="device_sync_reminders">接收其他手机的提醒</string>
+    <string name="device_sync_reminders_hint">关闭:每部手机只保留自己的提醒。开启:在一部手机上设置的提醒会在所有手机上响起。</string>
+    <string name="device_sync_now">立即同步</string>
+    <string name="device_sync_done">已同步,接收了 %1$d 项更改</string>
+    <string name="device_sync_failed">同步失败:%1$s</string>
 </resources>

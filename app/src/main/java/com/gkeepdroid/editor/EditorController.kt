@@ -252,15 +252,15 @@ internal class EditorController(
         val function = if (existing != null && !converting) "update_note" else "create_note"
         val args = if (existing != null && !converting) {
             KeepRepository.updateNoteArgs(
-                existing.id, title, text, outItems(), color, pinned, removedImages.toList(), withHiddenLabel(labels, hiddenInWidgets),
+                existing.id, title, text, outItems(), color, pinned, removedImages.toList(), labels,
                 // Only a changed picture of Keep's is sent; "default" takes it away.
                 if (isLocal || galleryNow == originalGallery) "" else galleryNow.ifEmpty { "default" },
             )
         } else {
-            KeepRepository.createNoteArgs(title, text, isList, outItems(), color, pinned, withHiddenLabel(labels, hiddenInWidgets), galleryNow, formatJson().orEmpty())
+            KeepRepository.createNoteArgs(title, text, isList, outItems(), color, pinned, labels, galleryNow, formatJson().orEmpty())
         }
-        // The mark in Keep replaces the older one that only this phone knew.
-        if (existing != null) PrivateNotes.set(activity, account, existing.id, false)
+        // The mark lives on the phones (and is synced between them), not in Keep.
+        if (existing != null) PrivateNotes.set(activity, account, existing.id, hiddenInWidgets)
         if (!CredentialStore.isLocal(target) || converting) {
             // The change is stored and sent in the background: the editor closes at once, and a failure
             // shows up as a notification instead of losing the change.
@@ -270,9 +270,9 @@ internal class EditorController(
                     val old = convertFrom!!
                     val moved = Reminders.list(activity, account, old.id)
                     moved.forEach { Reminders.remove(activity, account, old.id, it.id) }
-                    PendingEdit(target, function, args, reminders = moved, trashAfter = old.id)
+                    PendingEdit(target, function, args, reminders = moved, hidden = hiddenInWidgets, trashAfter = old.id)
                 } else {
-                    PendingEdit(target, function, args, reminders = if (existing == null) draftReminders else emptyList())
+                    PendingEdit(target, function, args, reminders = if (existing == null) draftReminders else emptyList(), hidden = existing == null && hiddenInWidgets)
                 },
             )
             // Sent after the change of the text, so the styles meet the text Keep has by then.
@@ -294,7 +294,7 @@ internal class EditorController(
                 val styles = if (existing != null) formatJson() else null
                 KeepRepository.run(activity, target, function, args)
                 if (styles != null) KeepRepository.run(activity, target, "format_note", listOf(existing!!.id, styles))
-                if (existing == null) Reminders.attachToNew(activity, PendingEdit(target, function, args, reminders = draftReminders), before)
+                if (existing == null) Reminders.attachToNew(activity, PendingEdit(target, function, args, reminders = draftReminders, hidden = hiddenInWidgets), before)
                 Toast.makeText(activity.applicationContext, R.string.note_saved, Toast.LENGTH_SHORT).show()
                 activity.finish()
             } catch (e: Exception) {

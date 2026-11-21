@@ -110,12 +110,22 @@ object Reminders {
         write(context, account, noteId, list(context, account, noteId).filter { it.id != reminder.id } + reminder)
         schedule(context, account, noteId, reminder)
         refreshWidgets(context)
+        DeviceSync.changed(context)
     }
 
     fun remove(context: Context, account: String, noteId: String, reminderId: String) {
         write(context, account, noteId, list(context, account, noteId).filter { it.id != reminderId })
         context.getSystemService(AlarmManager::class.java).cancel(pending(context, account, noteId, reminderId))
         refreshWidgets(context)
+        DeviceSync.changed(context)
+    }
+
+    /** Every reminder as text, named "account|note|rem:id", for the sync between phones. */
+    fun all(context: Context): Map<String, String> = buildMap {
+        prefs(context).all.keys.forEach { k ->
+            val (account, noteId) = k.split("|", limit = 2).takeIf { it.size == 2 } ?: return@forEach
+            list(context, account, noteId).forEach { put("$account|$noteId|rem:${it.id}", it.toJson().toString()) }
+        }
     }
 
     /** Sets every stored alarm again; one that fell due while the phone was off fires at once. */

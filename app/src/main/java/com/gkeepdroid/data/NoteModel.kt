@@ -31,16 +31,16 @@ data class KeepNote(
     val state: String = "active",
     /** Without the hidden mark, which is not a label for the user (see [HIDDEN_LABEL]). */
     val labels: List<String> = emptyList(),
-    /** Marked "hide content": the note carries [HIDDEN_LABEL] in Keep, so every device hides it. */
+    /** Still carries [HIDDEN_LABEL] in Keep: the mark of an older version, taken over into [PrivateNotes] at the next sync. */
     val hidden: Boolean = false,
 )
 
-/** The special label that marks hidden notes in Keep, so devices with the same account share the mark. It never shows as a label. */
+/**
+ * The special label that once marked hidden notes in Keep. It is no longer written: the mark lives on the phones now and is synced
+ * between them (see [DeviceSync]). It is still read, to take over the mark of notes that carry it, and then taken off in Keep.
+ */
 const val HIDDEN_LABEL = "GKeepDroid hidden"
 
-/** The labels to send to Keep: the note's own, plus the hidden mark when it is hidden. */
-fun withHiddenLabel(labels: List<String>, hidden: Boolean): List<String> =
-    if (hidden) (labels + HIDDEN_LABEL).distinct() else labels
 
 /** Keep's note colors, as named by gkeepapi, mapped to ARGB values. */
 object NoteColors {

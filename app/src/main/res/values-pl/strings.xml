@@ -485,4 +485,14 @@
     <string name="item_swipe_hint">Przesunięcie nagłówka kategorii robi to samo dla wszystkich jej pozycji.</string>
     <string name="editor_btn_title_field">Tytuł</string>
     <string name="quote_add">Dodaj cytat</string>
+    <string name="device_sync_title">Synchronizacja między telefonami</string>
+    <string name="device_sync_enable">Synchronizuj między telefonami</string>
+    <string name="device_sync_hint">Utrzymuje na wszystkich Twoich telefonach to, czego Keep nie przechowuje: notatki prywatne, własny kolor tekstu i własne zdjęcie notatki, zwinięte notatki, kategorie i cytaty oraz (jeśli chcesz) przypomnienia. Każdy telefon zapisuje w folderze jeden własny, mały plik, a inna aplikacja (Syncthing, Nextcloud, aplikacja chmurowa, …) przenosi folder z telefonu na telefon. Wybierz na każdym telefonie ten sam synchronizowany folder.</string>
+    <string name="device_sync_folder">Folder: %1$s</string>
+    <string name="device_sync_choose">Wybierz folder</string>
+    <string name="device_sync_reminders">Przejmuj przypomnienia z innych telefonów</string>
+    <string name="device_sync_reminders_hint">Wyłączone: każdy telefon zachowuje własne przypomnienia. Włączone: przypomnienie ustawione na jednym telefonie dzwoni na wszystkich.</string>
+    <string name="device_sync_now">Synchronizuj teraz</string>
+    <string name="device_sync_done">Zsynchronizowano, przejęto zmian: %1$d</string>
+    <string name="device_sync_failed">Synchronizacja nie powiodła się: %1$s</string>
 </resources>

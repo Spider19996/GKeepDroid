@@ -476,4 +476,14 @@
     <string name="item_swipe_hint">Scorrere l’intestazione di una categoria fa lo stesso per tutti i suoi elementi.</string>
     <string name="editor_btn_title_field">Titolo</string>
     <string name="quote_add">Aggiungi citazione</string>
+    <string name="device_sync_title">Sincronizzazione tra telefoni</string>
+    <string name="device_sync_enable">Sincronizza tra telefoni</string>
+    <string name="device_sync_hint">Mantiene uguale su tutti i tuoi telefoni ciò che Keep non può salvare: note private, colore del testo e foto propri di una nota, note ripiegate, categorie e citazioni e, se vuoi, i promemoria. Ogni telefono lascia in una cartella un piccolo file suo, e un’altra app (Syncthing, Nextcloud, un’app cloud, …) porta la cartella da un telefono all’altro. Scegli su ogni telefono la stessa cartella sincronizzata.</string>
+    <string name="device_sync_folder">Cartella: %1$s</string>
+    <string name="device_sync_choose">Scegli cartella</string>
+    <string name="device_sync_reminders">Importa i promemoria degli altri telefoni</string>
+    <string name="device_sync_reminders_hint">Disattivato: ogni telefono tiene i propri promemoria. Attivato: un promemoria creato su un telefono suona su tutti.</string>
+    <string name="device_sync_now">Sincronizza ora</string>
+    <string name="device_sync_done">Sincronizzato, %1$d modifiche importate</string>
+    <string name="device_sync_failed">Sincronizzazione non riuscita: %1$s</string>
 </resources>

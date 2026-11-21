@@ -47,6 +47,7 @@ object FoldStore {
         if (folded) all.addAll(keys) else all.removeAll(keys.toSet())
         prefs(context).edit { putStringSet("keys", all) }
         version.intValue++
+        DeviceSync.changed(context)
     }
 
     fun set(context: Context, account: String, noteId: String, folded: Boolean) = setAll(context, listOf(key(account, noteId)), folded)
@@ -71,5 +72,6 @@ object PrivateNotes {
         val keys = load(context).toMutableSet()
         if (hidden) keys.add(key(account, noteId)) else keys.remove(key(account, noteId))
         prefs(context).edit { putStringSet("keys", keys) }
+        DeviceSync.changed(context)
     }
 }

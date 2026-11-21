@@ -476,4 +476,14 @@
     <string name="item_swipe_hint">Deslizar o cabeçalho de uma categoria faz o mesmo a todos os seus itens.</string>
     <string name="editor_btn_title_field">Título</string>
     <string name="quote_add">Adicionar citação</string>
+    <string name="device_sync_title">Sincronização entre telemóveis</string>
+    <string name="device_sync_enable">Sincronizar entre telemóveis</string>
+    <string name="device_sync_hint">Mantém igual em todos os teus telemóveis o que o Keep não consegue guardar: notas privadas, cor do texto e foto próprias de uma nota, notas recolhidas, categorias e citações e, se quiseres, lembretes. Cada telemóvel deixa um pequeno ficheiro seu numa pasta, e outra aplicação (Syncthing, Nextcloud, uma app na nuvem, …) leva a pasta de telemóvel para telemóvel. Escolhe em cada telemóvel a mesma pasta sincronizada.</string>
+    <string name="device_sync_folder">Pasta: %1$s</string>
+    <string name="device_sync_choose">Escolher pasta</string>
+    <string name="device_sync_reminders">Receber lembretes de outros telemóveis</string>
+    <string name="device_sync_reminders_hint">Desligado: cada telemóvel mantém os seus lembretes. Ligado: um lembrete criado num telemóvel toca em todos.</string>
+    <string name="device_sync_now">Sincronizar agora</string>
+    <string name="device_sync_done">Sincronizado, %1$d alterações recebidas</string>
+    <string name="device_sync_failed">Falha na sincronização: %1$s</string>
 </resources>

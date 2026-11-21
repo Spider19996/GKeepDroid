@@ -69,6 +69,7 @@ object QuoteBlocks {
         if (folded) all.add(key(account, noteId, blockKey)) else all.remove(key(account, noteId, blockKey))
         prefs(context).edit { putStringSet("keys", all) }
         version.intValue++
+        DeviceSync.changed(context)
     }
 
     /** Forgets which blocks of a note are folded: a note that is not saved yet shares the key "new" with every other new one. */
@@ -78,6 +79,7 @@ object QuoteBlocks {
         if (all.none { it.startsWith(prefix) }) return
         prefs(context).edit { putStringSet("keys", all.filterNot { it.startsWith(prefix) }.toSet()) }
         version.intValue++
+        DeviceSync.changed(context)
     }
 
     /** The part of [doc] that lies in [from] until [to] of its text, moved to begin at 0 (null without a doc). */

@@ -467,4 +467,14 @@
     <string name="item_swipe_hint">Wischen über die Überschrift einer Kategorie macht das für alle ihre Einträge.</string>
     <string name="editor_btn_title_field">Titel</string>
     <string name="quote_add">Zitat hinzufügen</string>
+    <string name="device_sync_title">Sync zwischen Handys</string>
+    <string name="device_sync_enable">Zwischen Handys synchronisieren</string>
+    <string name="device_sync_hint">Hält alles, wofür Keep keinen Platz hat, auf all deinen Handys gleich: private Notizen, eigene Textfarbe und eigenes Foto einer Notiz, eingeklappte Notizen, Kategorien und Zitate und (wenn du willst) Erinnerungen. Jedes Handy legt eine kleine eigene Datei in einem Ordner ab, und eine andere App (Syncthing, Nextcloud, eine Cloud-App, …) trägt den Ordner von Handy zu Handy. Wähle auf jedem Handy denselben synchronisierten Ordner.</string>
+    <string name="device_sync_folder">Ordner: %1$s</string>
+    <string name="device_sync_choose">Ordner wählen</string>
+    <string name="device_sync_reminders">Erinnerungen von anderen Handys übernehmen</string>
+    <string name="device_sync_reminders_hint">Aus: Jedes Handy behält seine eigenen Erinnerungen. An: Eine Erinnerung von einem Handy klingelt auf allen.</string>
+    <string name="device_sync_now">Jetzt synchronisieren</string>
+    <string name="device_sync_done">Synchronisiert, %1$d Änderungen übernommen</string>
+    <string name="device_sync_failed">Sync fehlgeschlagen: %1$s</string>
 </resources>

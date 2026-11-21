@@ -22,6 +22,10 @@ class SyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
         if (MarkdownSync.isEnabled(applicationContext)) {
             try { MarkdownSync.syncNow(applicationContext) } catch (_: Exception) {}
         }
+        // Meets the other phones, whether or not a widget is placed.
+        if (DeviceSync.isEnabled(applicationContext)) {
+            try { DeviceSync.syncNow(applicationContext) } catch (_: Exception) {}
+        }
         if (PendingEdits.all(applicationContext).isNotEmpty() && PendingEdits.flush(applicationContext)) {
             PendingEditsWorker.schedule(applicationContext)
         }

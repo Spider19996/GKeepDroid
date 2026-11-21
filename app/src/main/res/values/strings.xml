@@ -468,4 +468,14 @@
     <string name="item_swipe_hint">Swiping a category\'s header does the same for all its items.</string>
     <string name="editor_btn_title_field">Title</string>
     <string name="quote_add">Add quote</string>
+    <string name="device_sync_title">Sync between phones</string>
+    <string name="device_sync_enable">Sync between phones</string>
+    <string name="device_sync_hint">Keeps what Keep has no place for in step on all your phones: private notes, a note\'s own text color and photo, folded notes, categories and quotes, and (if you want) reminders. Each phone writes one small file of its own into a folder, and another app (Syncthing, Nextcloud, a cloud app, …) carries the folder from phone to phone. Choose the same synced folder on every phone.</string>
+    <string name="device_sync_folder">Folder: %1$s</string>
+    <string name="device_sync_choose">Choose folder</string>
+    <string name="device_sync_reminders">Take over reminders from other phones</string>
+    <string name="device_sync_reminders_hint">Off: every phone keeps its own reminders. On: a reminder set on one phone rings on all of them.</string>
+    <string name="device_sync_now">Sync now</string>
+    <string name="device_sync_done">Synced, %1$d changes taken over</string>
+    <string name="device_sync_failed">Sync failed: %1$s</string>
 </resources>
