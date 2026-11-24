@@ -35,6 +35,7 @@ object Backup {
                     .put("themeMode", global.themeMode)
                     .put("syncIntervalMin", global.syncIntervalMin)
                     .put("syncOnUnlock", global.syncOnUnlock)
+                    .put("unlockMinAgeMin", global.unlockMinAgeMin)
                     .put("syncOnOpen", global.syncOnOpen)
                     .put("minGapSec", global.minGapSec)
                     .put("backgroundSync", global.backgroundSync)
@@ -92,6 +93,7 @@ object Backup {
                 themeMode = g.optInt("themeMode", dg.themeMode).coerceIn(THEME_SYSTEM, THEME_OLED),
                 syncIntervalMin = g.optInt("syncIntervalMin", dg.syncIntervalMin).coerceAtLeast(0),
                 syncOnUnlock = g.optBoolean("syncOnUnlock", dg.syncOnUnlock),
+                unlockMinAgeMin = g.optInt("unlockMinAgeMin", dg.unlockMinAgeMin).coerceAtLeast(0),
                 syncOnOpen = g.optBoolean("syncOnOpen", dg.syncOnOpen),
                 minGapSec = g.optInt("minGapSec", dg.minGapSec).coerceAtLeast(0),
                 backgroundSync = g.optBoolean("backgroundSync", dg.backgroundSync),

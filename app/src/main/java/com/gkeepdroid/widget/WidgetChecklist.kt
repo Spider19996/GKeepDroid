@@ -14,6 +14,7 @@ import androidx.glance.action.clickable
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.background
+import androidx.glance.appwidget.cornerRadius
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -109,7 +110,9 @@ internal fun ItemRow(note: KeepNote, item: KeepItem, account: String, settings: 
             }
         }
         // Under a category's header the item shows without its category.
-        val (shownText, doc) = RichNotes.of(context, account, note.id)?.docs?.get(item.id).let { if (inCategory) Categories.rest(item, it) else item.text to it }
+        val (named, namedDoc) = RichNotes.of(context, account, note.id)?.docs?.get(item.id).let { if (inCategory) Categories.rest(item, it) else item.text to it }
+        // A number in the item ("2x Tortellini") shows as a small pill after the name, as in the app.
+        val (count, shownText, doc) = if (AppSettingsStore.load(context).listQuantities) Quantities.strip(named, namedDoc) else Triple(1, named, namedDoc)
         // Styles inside the item (a bold word) need a text view of their own; a plain item stays a plain text.
         val spanned = RichNotes.spanned(shownText, doc, if (item.checked) RichNotes.STRIKE else 0)
         if (spanned != null) {
@@ -117,6 +120,7 @@ internal fun ItemRow(note: KeepNote, item: KeepItem, account: String, settings: 
                 spanned, palette, settings.textSizeSp.toFloat(), alpha = if (item.checked) 0.55f else 1f,
                 modifier = GlanceModifier.defaultWeight().padding(top = pad, bottom = pad).let { if (textClick) it.clickable(textAction!!) else it },
             )
+            if (count > 1) QuantityChip(count, palette, settings.textSizeSp, item.checked)
             return@Row
         }
         val flags = RichNotes.uniformFlags(doc, shownText)
@@ -129,6 +133,21 @@ internal fun ItemRow(note: KeepNote, item: KeepItem, account: String, settings: 
             ).withFlags(if (item.checked) flags or RichNotes.STRIKE else flags, settings.textSizeSp),
             modifier = GlanceModifier.defaultWeight().padding(top = pad, bottom = pad).let { if (textClick) it.clickable(textAction!!) else it },
         )
+        if (count > 1) QuantityChip(count, palette, settings.textSizeSp, item.checked)
+    }
+}
+
+/** The number of an item: its text color, bold, on a faint pill of the same color. */
+@Composable
+private fun QuantityChip(count: Int, palette: TextPalette, textSizeSp: Int, checked: Boolean) {
+    // Glance draws a background under the whole view, paddings included: the gap to the text is a box of its own.
+    Box(GlanceModifier.padding(start = 6.dp)) {
+        Box(GlanceModifier.background(palette.provider(if (checked) 0.08f else 0.14f)).cornerRadius(50.dp).padding(horizontal = 7.dp, vertical = 1.dp)) {
+            Text(
+                "$count×",
+                style = TextStyle(color = palette.provider(if (checked) 0.55f else 1f), fontSize = (textSizeSp * 0.85f).sp, fontWeight = androidx.glance.text.FontWeight.Bold),
+            )
+        }
     }
 }
 

@@ -144,7 +144,7 @@ object LogReport {
             appendLine()
             appendLine("== Settings (no personal values) ==")
             appendLine("Theme: ${global.themeMode}, demo mode: ${global.demoMode}")
-            appendLine("Sync: every ${global.syncIntervalMin} min, on unlock ${global.syncOnUnlock}, on open ${global.syncOnOpen}, min gap ${global.minGapSec} s, background ${global.backgroundSync} (${global.backgroundIntervalMin} min), Wi-Fi only ${global.wifiOnly}")
+            appendLine("Sync: every ${global.syncIntervalMin} min, on unlock ${global.syncOnUnlock} (if older than ${global.unlockMinAgeMin} min), on open ${global.syncOnOpen}, min gap ${global.minGapSec} s, background ${global.backgroundSync} (${global.backgroundIntervalMin} min), Wi-Fi only ${global.wifiOnly}")
             appendLine("Locks: app ${app.lockApp}, edit ${app.lockEdit}, widget tick ${app.lockWidgetTick}, private notes ${app.lockPrivateNotes}, grace ${app.lockGraceSec} s")
             appendLine("Cards: layout ${app.layout}, sort ${app.sortMode}, lines ${app.previewLines}")
             appendLine()

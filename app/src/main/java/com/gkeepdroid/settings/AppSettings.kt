@@ -69,6 +69,8 @@ data class AppSettings(
     /** What swiping an item of a checklist in the editor (or a category's header, for all its items) does: one of ITEM_SWIPE_*. */
     val itemSwipeRight: Int = ITEM_SWIPE_TICK,
     val itemSwipeLeft: Int = ITEM_SWIPE_REMOVE,
+    /** A number written into a checklist item ("2x Tortellini") shows as a pill that counts up and down. */
+    val listQuantities: Boolean = true,
 )
 
 const val ITEM_SWIPE_NONE = 0
@@ -144,6 +146,7 @@ object AppSettingsStore {
             editorBarSnapBack = p.getBoolean("editor_bar_snap_back", d.editorBarSnapBack),
             itemSwipeRight = p.getInt("item_swipe_right", d.itemSwipeRight),
             itemSwipeLeft = p.getInt("item_swipe_left", d.itemSwipeLeft),
+            listQuantities = p.getBoolean("list_quantities", d.listQuantities),
             editorLayout = if (p.contains("editor_layout")) ButtonLayout.fromJson(EDITOR_CATALOG, p.getString("editor_layout", null)) else d.editorLayout,
         )
     }
@@ -215,6 +218,7 @@ object AppSettingsStore {
             putBoolean("editor_bar_snap_back", s.editorBarSnapBack)
             putInt("item_swipe_right", s.itemSwipeRight)
             putInt("item_swipe_left", s.itemSwipeLeft)
+            putBoolean("list_quantities", s.listQuantities)
         }
     }
 }

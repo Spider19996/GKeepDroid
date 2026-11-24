@@ -151,6 +151,8 @@ data class GlobalSettings(
     val syncIntervalMin: Int = 15,
     /** Sync when the phone is unlocked. */
     val syncOnUnlock: Boolean = true,
+    /** On unlock, sync only when the last good sync is at least this many minutes old (0 = always). */
+    val unlockMinAgeMin: Int = 15,
     /** Sync when the app is opened. */
     val syncOnOpen: Boolean = true,
     /** Automatic syncs are at least this many seconds apart, so frequent unlocking does not flood Google. */
@@ -193,6 +195,7 @@ object SettingsStore {
             themeMode = p.getInt("theme_mode", d.themeMode),
             syncIntervalMin = p.getInt("sync_interval_min", d.syncIntervalMin),
             syncOnUnlock = p.getBoolean("sync_on_unlock", d.syncOnUnlock),
+            unlockMinAgeMin = p.getInt("unlock_min_age_min", d.unlockMinAgeMin),
             syncOnOpen = p.getBoolean("sync_on_open", d.syncOnOpen),
             minGapSec = p.getInt("min_gap_sec", d.minGapSec),
             backgroundSync = p.getBoolean("background_sync", d.backgroundSync),
@@ -215,6 +218,7 @@ object SettingsStore {
             putInt("theme_mode", s.themeMode)
             putInt("sync_interval_min", s.syncIntervalMin)
             putBoolean("sync_on_unlock", s.syncOnUnlock)
+            putInt("unlock_min_age_min", s.unlockMinAgeMin)
             putBoolean("sync_on_open", s.syncOnOpen)
             putInt("min_gap_sec", s.minGapSec)
             putBoolean("background_sync", s.backgroundSync)

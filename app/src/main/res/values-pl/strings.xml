@@ -514,4 +514,11 @@
     <string name="device_sync_name_use">Użyj mimo to</string>
     <string name="device_sync_name_change">Zmień nazwę</string>
     <string name="device_sync_share">Udostępnij</string>
+    <string name="sync_unlock_min_age">Tylko jeśli ostatnia synchronizacja jest starsza niż</string>
+    <string name="sync_unlock_min_age_hint">Przy częstym odblokowywaniu aplikacja pyta Google tylko wtedy, gdy to, co pokazują widżety, jest starsze (0 = przy każdym odblokowaniu, w ramach minimalnego odstępu).</string>
+    <string name="sync_group_limits">Ograniczenia</string>
+    <string name="list_quantities">Ilości na listach</string>
+    <string name="list_quantities_hint">Liczba wpisana w element, np. „2x Tortellini” lub „Tortellini x2”, pojawia się jako mała pigułka, którą możesz zwiększać i zmniejszać. W Keep pozostaje zwykłym tekstem.</string>
+    <string name="quantity_less">Mniej</string>
+    <string name="quantity_more">Więcej</string>
 </resources>

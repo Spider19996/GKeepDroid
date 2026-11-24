@@ -64,6 +64,7 @@ internal class SettingsState(val context: SettingsActivity) {
     var appListSpacing by mutableIntStateOf(initialApp.listSpacingDp)
     var appListCheckInApp by mutableStateOf(initialApp.listCheckInApp)
     var appListDeleteChecked by mutableStateOf(initialApp.listDeleteChecked)
+    var appListQuantities by mutableStateOf(initialApp.listQuantities)
     var appConvertPrefix by mutableIntStateOf(initialApp.convertPrefix)
     var appRenumberDisplay by mutableStateOf(initialApp.renumberDisplay)
     var appTrimEmptyEdges by mutableStateOf(initialApp.trimEmptyEdges)
@@ -135,6 +136,7 @@ internal class SettingsState(val context: SettingsActivity) {
     var pendingPopup by mutableStateOf<String?>(null)
     var interval by mutableIntStateOf(initialGlobal.syncIntervalMin)
     var syncOnUnlock by mutableStateOf(initialGlobal.syncOnUnlock)
+    var unlockMinAgeMin by mutableIntStateOf(initialGlobal.unlockMinAgeMin)
     var syncOnOpen by mutableStateOf(initialGlobal.syncOnOpen)
     var minGapSec by mutableIntStateOf(initialGlobal.minGapSec)
     var backgroundSync by mutableStateOf(initialGlobal.backgroundSync)
@@ -229,7 +231,7 @@ internal class SettingsState(val context: SettingsActivity) {
     }
 
     fun currentGlobal() = GlobalSettings(
-        themeMode = themeMode, syncIntervalMin = interval, syncOnUnlock = syncOnUnlock, syncOnOpen = syncOnOpen,
+        themeMode = themeMode, syncIntervalMin = interval, syncOnUnlock = syncOnUnlock, unlockMinAgeMin = unlockMinAgeMin, syncOnOpen = syncOnOpen,
         minGapSec = minGapSec, backgroundSync = backgroundSync, backgroundIntervalMin = backgroundInterval, wifiOnly = wifiOnly,
         demoMode = demoMode, language = language,
         reminderSound = reminderSound, reminderVibrate = reminderVibrate, reminderOverride = reminderOverride,
@@ -258,14 +260,14 @@ internal class SettingsState(val context: SettingsActivity) {
         appLockWidgetTick = a.lockWidgetTick; appSwipeRight = a.swipeRight; appSwipeLeft = a.swipeLeft; appFoldNotes = a.foldNotes
         appFilterBar = a.filterBar; appFilterChips = a.filterChips; appPullToRefresh = a.pullToRefresh; appEditorLayout = a.editorLayout
         appEditorInRecents = a.editorInRecents; appEditorBarSnapBack = a.editorBarSnapBack
-        appItemSwipeRight = a.itemSwipeRight; appItemSwipeLeft = a.itemSwipeLeft
+        appItemSwipeRight = a.itemSwipeRight; appItemSwipeLeft = a.itemSwipeLeft; appListQuantities = a.listQuantities
     }
 
     fun currentApp() = AppSettings(
         appLayout, appSort, appPinnedSection, appShowImages, appShowColors, appPlainStyle, appPreviewLines, appShowEdited, appEditedAsDate, appShowLabels, appShowProgress, appLockPrivate, appLockApp, appLockEdit, appLockGrace,
         appShowReminders, appListCheckedToEnd, appListCollapseChecked, appListCheckboxStyle, appListCheckboxSize, appListSpacing,
         appListCheckInApp, appListDeleteChecked, appConvertPrefix, appRenumberDisplay, appTrimEmptyEdges, appWidgetGrace, appWidgetTitlesOnly, appLockWidgetTick, appSwipeRight, appSwipeLeft, appFoldNotes, appFilterBar, appFilterChips, appPullToRefresh, appEditorLayout,
-        appEditorInRecents, appEditorBarSnapBack, appItemSwipeRight, appItemSwipeLeft,
+        appEditorInRecents, appEditorBarSnapBack, appItemSwipeRight, appItemSwipeLeft, listQuantities = appListQuantities,
     )
 
     /** Opens a page; the security page asks for the lock first (whenever the phone has one). */

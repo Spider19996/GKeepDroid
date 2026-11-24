@@ -17,7 +17,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -30,6 +32,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +44,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
@@ -110,6 +119,13 @@ internal fun ChecklistRow(
     val swipe = rememberSwipeState()
     val offsetX = swipe.offset
     var handle by remember { mutableStateOf<LayoutCoordinates?>(null) }
+    // A number written into the item ("2x Tortellini") stands in a pill at its end instead of in the text.
+    val appContext = androidx.compose.ui.platform.LocalContext.current
+    val quantities = remember { AppSettingsStore.load(appContext).listQuantities } && !item.isDivider()
+    val quantity = if (quantities) Quantities.find(item.text) else null
+    var focused by remember { mutableStateOf(false) }
+    val showPill = quantity != null || (quantities && editable && focused && item.text.isNotBlank())
+    var pillOpen by remember { mutableStateOf(false) }
     // The handle stays in the middle of the row; when the text wraps to another line (or loses one) it glides there instead of
     // jumping. The first height is taken as it is, so a long item does not slide into place when the editor opens.
     val handleTop = remember { Animatable(0f) }
@@ -145,12 +161,26 @@ internal fun ChecklistRow(
         if (offsetX != 0f) {
             val toRight = offsetX > 0f
             val (color, icon, tint) = swipeLook(if (toRight) swipeRight else swipeLeft)
+            // The color fills exactly what the row has uncovered: the row's place less the row where it is now, both with the row's
+            // rounding. So it looks like the row sliding off the color (the color follows its rounded corners), not like a second
+            // box beside it, and on a note's own color, where the row is see-through, nothing shines through the row.
+            val shape = MaterialTheme.shapes.medium
             Box(
-                Modifier.matchParentSize().clip(MaterialTheme.shapes.medium)
-                    .background(color).padding(horizontal = 20.dp),
+                Modifier.matchParentSize().drawBehind {
+                    val r = CornerRadius(shape.topStart.toPx(size, this))
+                    val outer = Path().apply { addRoundRect(RoundRect(0f, 0f, size.width, size.height, r)) }
+                    val inner = Path().apply { addRoundRect(RoundRect(offsetX, 0f, offsetX + size.width, size.height, r)) }
+                    drawPath(Path.combine(PathOperation.Difference, outer, inner), color)
+                },
                 contentAlignment = if (toRight) Alignment.CenterStart else Alignment.CenterEnd,
             ) {
-                Icon(painterResource(icon), contentDescription = null, tint = tint)
+                Box(
+                    Modifier.fillMaxHeight().width(with(LocalDensity.current) { kotlin.math.abs(offsetX).toDp() }).clipToBounds()
+                        .padding(horizontal = 20.dp),
+                    contentAlignment = if (toRight) Alignment.CenterStart else Alignment.CenterEnd,
+                ) {
+                    Icon(painterResource(icon), contentDescription = null, tint = tint, modifier = Modifier.requiredWidth(24.dp))
+                }
             }
         }
         Box(
@@ -200,7 +230,13 @@ internal fun ChecklistRow(
                     onSelection(typed.selection)
                     if (typed.text != item.text) onText(typed.text)
                 },
-                visualTransformation = if (flags != null) remember(flags, flagsVersion, item.text) { FlagsTransformation(flags) } else VisualTransformation.None,
+                visualTransformation = (if (flags != null) remember(flags, flagsVersion, item.text) { FlagsTransformation(flags) } else VisualTransformation.None)
+                    .let { if (quantities) QuantityTransformation(it) else it },
+                // The pill: the number when there is one, and on the item being typed into a quiet "1×" to start counting.
+                // Room for the pill, which lies above the row's end (see below), so the text never runs under it.
+                trailingIcon = if (showPill) {
+                    { Spacer(Modifier.width(animateDpAsState(if (pillOpen) 120.dp else 64.dp, label = "pill").value)) }
+                } else null,
                 placeholder = { Text(stringResource(R.string.item_hint)) },
                 // The text starts 48 dp from the left edge (16 dp content padding plus this room), where the strip with the
                 // capsule ends; the strip is drawn on top. In a numbered list the number stands in front of the text and is
@@ -219,8 +255,13 @@ internal fun ChecklistRow(
                 } else {
                     LocalTextStyle.current
                 },
-                modifier = Modifier.fillMaxWidth().focusRequester(focusRequester).onFocusChanged { if (it.isFocused) onFocus() }.then(modifier),
+                modifier = Modifier.fillMaxWidth().focusRequester(focusRequester).onFocusChanged { focused = it.isFocused; if (it.isFocused) onFocus() }.then(modifier),
             )
+            // The pill above the end of the field: a slot of the field would cut off the taps of the opened − and +.
+            if (showPill) Box(Modifier.align(Alignment.CenterEnd).padding(end = 8.dp)) {
+                if (editable) QuantityPill(quantity?.count ?: 1, offer = quantity == null, open = pillOpen, onOpen = { pillOpen = it }) { onText(Quantities.withCount(item.text, it)) }
+                else QuantityBadge(quantity?.count ?: 1, MaterialTheme.colorScheme.onSurface)
+            }
             // One button for both jobs: a tap switches the item between done and open, holding it and dragging moves the row.
             // The whole strip at the left is the touch area, 48 dp wide as Material asks; the capsule in it is the housing of the
             // check (green) or cross (red), with the grip below it as a hint that it can be dragged. Both sit in the middle of
@@ -311,7 +352,9 @@ internal fun Modifier.animatePlacement(): Modifier = composed {
 /** How a swipe looks under the row: ticking green, removing red, moving to a category in the primary color. */
 @Composable
 internal fun swipeLook(action: Int): Triple<Color, Int, Color> = when (action) {
-    ITEM_SWIPE_TICK -> Triple(MaterialTheme.colorScheme.tertiary, R.drawable.ic_done, MaterialTheme.colorScheme.onTertiary)
+    // On a note's own color the theme's accent is the note's text color, which says nothing here: a fixed green.
+    ITEM_SWIPE_TICK -> if (LocalOnNote.current) Triple(Color(0xFF2E7D32), R.drawable.ic_done, Color.White)
+        else Triple(MaterialTheme.colorScheme.tertiary, R.drawable.ic_done, MaterialTheme.colorScheme.onTertiary)
     ITEM_SWIPE_CATEGORY -> Triple(MaterialTheme.colorScheme.primary, R.drawable.ic_category, MaterialTheme.colorScheme.onPrimary)
     else -> Triple(MaterialTheme.colorScheme.error, R.drawable.ic_close, MaterialTheme.colorScheme.onError)
 }

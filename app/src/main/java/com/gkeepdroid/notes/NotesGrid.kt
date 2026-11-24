@@ -75,6 +75,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.zIndex
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemScope
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -127,6 +130,7 @@ internal fun NotesGrid(
     }
     // Drag and drop: long-press a card and move it; the other cards make room while you drag.
     val gridState = rememberLazyStaggeredGridState()
+    val scope = rememberCoroutineScope()
     var gridBounds by remember { mutableStateOf(Rect.Zero) }
     var dragKey by remember { mutableStateOf<String?>(null) }
     var pointer by remember { mutableStateOf(Offset.Zero) }
@@ -153,7 +157,11 @@ internal fun NotesGrid(
         // Pinned and other notes keep their own sections (only the notes screen has them).
         if (screen == AppScreen.Notes && app.pinnedSection && current[from].first.pinned != current[to].first.pinned) return
         lastMove = now
+        // The grid keeps its place by the first card it shows; when that card is part of the move, it would jump along with it.
+        val index = gridState.firstVisibleItemIndex
+        val offset = gridState.firstVisibleItemScrollOffset
         dragOrder = current.toMutableList().also { it.add(to, it.removeAt(from)) }
+        scope.launch { gridState.scrollToItem(index, offset) }
     }
 
     fun drop() {
@@ -204,17 +212,28 @@ internal fun NotesGrid(
         // Without a place to drag to, a long press chooses the note.
         if (!canReorder) return Modifier.pointerInput(key) { detectTapGestures(onLongPress = { toggle() }) }
         val coords = remember { arrayOfNulls<LayoutCoordinates>(1) }
+        // Where the card sits without its own shift, and where in it the finger took hold: the held card follows the finger
+        // (as a row does in the editor) while the others glide to their new places.
+        // [0, 1] are state: when the card's place changes under a finger that holds still, its shift has to follow at once.
+        val origin = remember { androidx.compose.runtime.mutableStateListOf(0f, 0f, 0f, 0f) }
         // The long press chooses the card at once, so it shows what is happening; dragging it on turns that back into a move.
         var chosenByPress by remember { mutableStateOf(false) }
+        val lift = if (dragKey == key) Modifier.graphicsLayer {
+            translationX = pointer.x - origin[2] - origin[0]
+            translationY = pointer.y - origin[3] - origin[1]
+            shadowElevation = 16f; scaleX = 1.03f; scaleY = 1.03f
+        } else Modifier
+        // The gesture and the measuring sit outside the shift of the held card: inside it, the finger's position would be read
+        // against the moved card, and every move would feed back into the next one.
         return Modifier
-            .onGloballyPositioned { coords[0] = it; cardBounds[key] = it.boundsInRoot() }
-            .alpha(if (dragKey == key) 0.4f else 1f)
+            .onGloballyPositioned { coords[0] = it; val r = it.boundsInRoot(); cardBounds[key] = r; if (origin[0] != r.left) origin[0] = r.left; if (origin[1] != r.top) origin[1] = r.top }
             .pointerInput(key) {
                 detectDragGesturesAfterLongPress(
                     onDragStart = { start ->
                         if (selected.isEmpty()) { toggle(); chosenByPress = true }
                         dragKey = key
                         pointer = coords[0]?.localToRoot(start) ?: Offset.Zero
+                        origin[2] = pointer.x - origin[0]; origin[3] = pointer.y - origin[1]
                     },
                     onDrag = { change, _ ->
                         change.consume()
@@ -229,7 +248,12 @@ internal fun NotesGrid(
                     onDragCancel = { dragKey = null; dragOrder = null; if (chosenByPress) onToggle(key); chosenByPress = false },
                 )
             }
+            .then(lift)
     }
+
+    /** The held card does not glide to its new place (it is under the finger) and lies above the others. */
+    fun LazyStaggeredGridItemScope.heldItem(held: Boolean): Modifier =
+        if (held) Modifier.animateItem(placementSpec = null).zIndex(1f) else Modifier.animateItem()
 
     fun cardClick(note: KeepNote, account: String) {
         if (selected.isNotEmpty()) onToggle(account + "|" + note.id) else open(note, account, false)
@@ -265,7 +289,7 @@ internal fun NotesGrid(
         if (pinned.isNotEmpty()) {
             item(span = StaggeredGridItemSpan.FullLine) { SectionLabel(stringResource(R.string.pinned_section)) }
             items(pinned, key = { it.second + "|" + it.first.id }) { (note, account) ->
-                SwipeCard(app, screen == AppScreen.Notes, { onSwiped(note, account, it) }, Modifier.animateItem()) {
+                SwipeCard(app, screen == AppScreen.Notes, { onSwiped(note, account, it) }, heldItem(dragKey == account + "|" + note.id)) {
                     NoteTile(activity, resumeKey, unlocker, note, account, app, query, onClick = { cardClick(note, account) }, modifier = cardModifier(note, account))
                 }
             }
@@ -274,7 +298,7 @@ internal fun NotesGrid(
             }
         }
         items(others, key = { it.second + "|" + it.first.id }) { (note, account) ->
-            SwipeCard(app, screen == AppScreen.Notes, { onSwiped(note, account, it) }, Modifier.animateItem()) {
+            SwipeCard(app, screen == AppScreen.Notes, { onSwiped(note, account, it) }, heldItem(dragKey == account + "|" + note.id)) {
             NoteTile(activity, resumeKey, unlocker, note, account, app, query, onClick = { cardClick(note, account) }, modifier = cardModifier(note, account)) {
                 // Archive and trash get their own actions below the note.
                 if (screen == AppScreen.Archive) {

@@ -505,4 +505,11 @@
     <string name="device_sync_name_use">Usa comunque</string>
     <string name="device_sync_name_change">Cambia nome</string>
     <string name="device_sync_share">Condividi</string>
+    <string name="sync_unlock_min_age">Solo se l’ultima sincronizzazione è più vecchia di</string>
+    <string name="sync_unlock_min_age_hint">Sbloccando spesso, l’app interroga Google solo quando ciò che mostrano i widget è più vecchio (0 = a ogni sblocco, nel rispetto dell’intervallo minimo).</string>
+    <string name="sync_group_limits">Limiti</string>
+    <string name="list_quantities">Quantità nelle liste</string>
+    <string name="list_quantities_hint">Un numero scritto in un elemento, come «2x Tortellini» o «Tortellini x2», appare in una piccola pillola che puoi aumentare e diminuire. In Keep resta testo normale.</string>
+    <string name="quantity_less">Meno</string>
+    <string name="quantity_more">Più</string>
 </resources>

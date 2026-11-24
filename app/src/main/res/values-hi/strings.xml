@@ -496,4 +496,11 @@
     <string name="device_sync_name_use">फिर भी इस्तेमाल करें</string>
     <string name="device_sync_name_change">नाम बदलें</string>
     <string name="device_sync_share">साझा करें</string>
+    <string name="sync_unlock_min_age">केवल तभी जब आख़िरी सिंक इससे पुराना हो</string>
+    <string name="sync_unlock_min_age_hint">बार-बार अनलॉक करने पर ऐप Google से तभी पूछता है जब विजेट में दिखी जानकारी इससे पुरानी हो (0 = हर अनलॉक पर, न्यूनतम अंतराल के भीतर)।</string>
+    <string name="sync_group_limits">सीमाएँ</string>
+    <string name="list_quantities">सूचियों में मात्रा</string>
+    <string name="list_quantities_hint">किसी आइटम में लिखी संख्या, जैसे “2x Tortellini” या “Tortellini x2”, एक छोटी पिल के रूप में दिखती है जिसे आप घटा-बढ़ा सकते हैं। Keep में यह सामान्य टेक्स्ट रहता है।</string>
+    <string name="quantity_less">कम</string>
+    <string name="quantity_more">ज़्यादा</string>
 </resources>

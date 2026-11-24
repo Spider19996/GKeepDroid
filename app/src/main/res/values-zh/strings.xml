@@ -487,4 +487,11 @@
     <string name="device_sync_name_use">仍然使用</string>
     <string name="device_sync_name_change">更改名称</string>
     <string name="device_sync_share">分享</string>
+    <string name="sync_unlock_min_age">仅当上次同步早于</string>
+    <string name="sync_unlock_min_age_hint">频繁解锁时，只有当小部件显示的内容早于此时间才会询问 Google（0 = 每次解锁，受最小间隔限制）。</string>
+    <string name="sync_group_limits">限制</string>
+    <string name="list_quantities">清单中的数量</string>
+    <string name="list_quantities_hint">在条目中写的数字，如“2x Tortellini”或“Tortellini x2”，会显示为可增减的小药丸。在 Keep 中仍是普通文本。</string>
+    <string name="quantity_less">减少</string>
+    <string name="quantity_more">增加</string>
 </resources>

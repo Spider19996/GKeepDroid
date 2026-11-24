@@ -487,4 +487,11 @@
     <string name="device_sync_name_use">それでも使う</string>
     <string name="device_sync_name_change">名前を変更</string>
     <string name="device_sync_share">共有</string>
+    <string name="sync_unlock_min_age">前回の同期がこれより古い場合のみ</string>
+    <string name="sync_unlock_min_age_hint">頻繁にロック解除しても、ウィジェットの内容がこれより古いときだけ Google に問い合わせます（0 = 毎回、最小間隔の範囲内）。</string>
+    <string name="sync_group_limits">制限</string>
+    <string name="list_quantities">リストの数量</string>
+    <string name="list_quantities_hint">「2x Tortellini」や「Tortellini x2」のように項目に書いた数は、増減できる小さなピルとして表示されます。Keep では通常のテキストのままです。</string>
+    <string name="quantity_less">減らす</string>
+    <string name="quantity_more">増やす</string>
 </resources>

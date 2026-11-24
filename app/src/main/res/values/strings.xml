@@ -497,4 +497,11 @@
     <string name="device_sync_name_use">Use anyway</string>
     <string name="device_sync_name_change">Change name</string>
     <string name="device_sync_share">Share</string>
+    <string name="sync_unlock_min_age">Only if the last sync is older than</string>
+    <string name="sync_unlock_min_age_hint">A frequent unlock asks Google only when what the widgets show is older than this (0 = every unlock, within the minimum gap).</string>
+    <string name="sync_group_limits">Limits</string>
+    <string name="list_quantities">Quantities in checklists</string>
+    <string name="list_quantities_hint">A number written into an item, such as “2x Tortellini” or “Tortellini x2”, shows as a small pill that you can count up and down. In Keep it stays plain text.</string>
+    <string name="quantity_less">Fewer</string>
+    <string name="quantity_more">More</string>
 </resources>

@@ -532,4 +532,11 @@
     <string name="device_sync_name_use">استخدمه على أي حال</string>
     <string name="device_sync_name_change">تغيير الاسم</string>
     <string name="device_sync_share">مشاركة</string>
+    <string name="sync_unlock_min_age">فقط إذا كانت آخر مزامنة أقدم من</string>
+    <string name="sync_unlock_min_age_hint">عند فتح القفل كثيرًا لا يسأل التطبيق Google إلا إذا كان ما تعرضه الأدوات أقدم من ذلك (0 = عند كل فتح، ضمن الحد الأدنى للفاصل).</string>
+    <string name="sync_group_limits">الحدود</string>
+    <string name="list_quantities">الكميات في القوائم</string>
+    <string name="list_quantities_hint">الرقم المكتوب في العنصر مثل «2x Tortellini» أو «Tortellini x2» يظهر كحبة صغيرة يمكنك زيادتها وإنقاصها. في Keep يبقى نصًا عاديًا.</string>
+    <string name="quantity_less">أقل</string>
+    <string name="quantity_more">أكثر</string>
 </resources>

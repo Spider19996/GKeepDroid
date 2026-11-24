@@ -514,4 +514,11 @@
     <string name="device_sync_name_use">Всё равно использовать</string>
     <string name="device_sync_name_change">Изменить название</string>
     <string name="device_sync_share">Поделиться</string>
+    <string name="sync_unlock_min_age">Только если последняя синхронизация старше</string>
+    <string name="sync_unlock_min_age_hint">При частой разблокировке приложение обращается к Google, только если то, что показывают виджеты, старше этого (0 = при каждой разблокировке, с учётом минимального интервала).</string>
+    <string name="sync_group_limits">Ограничения</string>
+    <string name="list_quantities">Количество в списках</string>
+    <string name="list_quantities_hint">Число в пункте, например «2x Tortellini» или «Tortellini x2», показывается маленькой плашкой, которую можно увеличивать и уменьшать. В Keep это остаётся обычным текстом.</string>
+    <string name="quantity_less">Меньше</string>
+    <string name="quantity_more">Больше</string>
 </resources>

@@ -36,6 +36,8 @@ object SyncPolicy {
         if (reason != Reason.APP_OPEN && !SyncAlarm.hasWidgets(context)) return false
         val now = System.currentTimeMillis()
         val p = prefs(context)
+        // Unlocking is frequent; it only asks Google when what the widgets show is getting old.
+        if (reason == Reason.UNLOCK && now - p.getLong("last_ok", 0) < settings.unlockMinAgeMin * 60_000L) return false
         val gap = maxOf(
             settings.minGapSec * 1000L,
             if (now - p.getLong("last_failure", 0) < FAILURE_PAUSE_MS) FAILURE_PAUSE_MS else 0L,

@@ -139,6 +139,8 @@ internal fun ColumnScope.AppChecklistsPage(s: SettingsState) {
     with(s) {
         SwitchRow(R.string.check_on_card, appListCheckInApp) { appListCheckInApp = it }
         if (appListCheckInApp) SwitchRow(R.string.delete_checked, appListDeleteChecked) { appListDeleteChecked = it }
+        SwitchRow(R.string.list_quantities, appListQuantities) { appListQuantities = it }
+        Hint(R.string.list_quantities_hint)
         SwitchRow(R.string.checked_to_end, appListCheckedToEnd) { appListCheckedToEnd = it }
         if (appListCheckedToEnd) SwitchRow(R.string.collapse_checked, appListCollapseChecked) { appListCollapseChecked = it }
         // What the lines of a checklist start with when it is turned into a note.

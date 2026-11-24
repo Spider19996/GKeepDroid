@@ -496,4 +496,11 @@
     <string name="device_sync_name_use">Toch gebruiken</string>
     <string name="device_sync_name_change">Naam wijzigen</string>
     <string name="device_sync_share">Delen</string>
+    <string name="sync_unlock_min_age">Alleen als de laatste sync ouder is dan</string>
+    <string name="sync_unlock_min_age_hint">Bij vaak ontgrendelen vraagt de app Google alleen iets als wat de widgets tonen ouder is (0 = bij elke ontgrendeling, binnen de minimale tussentijd).</string>
+    <string name="sync_group_limits">Grenzen</string>
+    <string name="list_quantities">Hoeveelheden in lijsten</string>
+    <string name="list_quantities_hint">Een getal in een item, zoals ‘2x Tortellini’ of ‘Tortellini x2’, verschijnt als een klein pilletje dat je op en af kunt tellen. In Keep blijft het gewone tekst.</string>
+    <string name="quantity_less">Minder</string>
+    <string name="quantity_more">Meer</string>
 </resources>

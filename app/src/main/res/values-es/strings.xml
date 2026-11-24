@@ -505,4 +505,11 @@
     <string name="device_sync_name_use">Usar de todos modos</string>
     <string name="device_sync_name_change">Cambiar nombre</string>
     <string name="device_sync_share">Compartir</string>
+    <string name="sync_unlock_min_age">Solo si la última sincronización tiene más de</string>
+    <string name="sync_unlock_min_age_hint">Al desbloquear a menudo, solo se consulta a Google cuando lo que muestran los widgets es más antiguo (0 = en cada desbloqueo, respetando el intervalo mínimo).</string>
+    <string name="sync_group_limits">Límites</string>
+    <string name="list_quantities">Cantidades en listas</string>
+    <string name="list_quantities_hint">Un número escrito en un elemento, como «2x Tortellini» o «Tortellini x2», aparece como una pequeña píldora que puedes aumentar y disminuir. En Keep sigue siendo texto normal.</string>
+    <string name="quantity_less">Menos</string>
+    <string name="quantity_more">Más</string>
 </resources>

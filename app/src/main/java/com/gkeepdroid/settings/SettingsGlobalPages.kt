@@ -145,54 +145,65 @@ internal fun ColumnScope.AccountsPage(s: SettingsState) {
 @Composable
 internal fun ColumnScope.SyncPage(s: SettingsState) {
     with(s) {
-        OutlinedButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {
-                SyncWorker.syncNow(context)
-                Toast.makeText(context, R.string.sync_started, Toast.LENGTH_SHORT).show()
-            },
-            shapes = ButtonDefaults.shapes(),
-        ) { Text(stringResource(R.string.sync_now)) }
-        // When the last sync worked, and what went wrong if the last one failed.
+        // The state at a glance: when the last sync worked, what went wrong, and how much Google was asked.
         val lastOk = SyncPolicy.lastSuccess(context)
         val lastError = SyncPolicy.lastError(context)
-        Text(
-            if (lastOk == 0L) stringResource(R.string.sync_never)
-            else stringResource(
-                R.string.sync_last_ok,
-                DateUtils.getRelativeTimeSpanString(lastOk, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS)
-                    .toString().replaceFirstChar { it.lowercase() },
-            ),
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        if (lastError != null) {
-            Text(
-                stringResource(R.string.sync_last_error, lastError),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.error,
-            )
+        androidx.compose.material3.Surface(
+            shape = MaterialTheme.shapes.large,
+            color = if (lastError != null) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    if (lastOk == 0L) stringResource(R.string.sync_never)
+                    else stringResource(
+                        R.string.sync_last_ok,
+                        DateUtils.getRelativeTimeSpanString(lastOk, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS)
+                            .toString().replaceFirstChar { it.lowercase() },
+                    ),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                if (lastError != null) Text(stringResource(R.string.sync_last_error, lastError), style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    stringResource(R.string.sync_requests_24h, RequestStats.rememberLast24h(context)),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                Button(
+                    onClick = {
+                        SyncWorker.syncNow(context)
+                        Toast.makeText(context, R.string.sync_started, Toast.LENGTH_SHORT).show()
+                    },
+                    shapes = ButtonDefaults.shapes(),
+                    modifier = Modifier.padding(top = 8.dp),
+                ) { Text(stringResource(R.string.sync_now)) }
+            }
         }
 
-        // Every call to Keep's servers of the last 24 hours, so the load on Google can be judged.
-        Text(
-            stringResource(R.string.sync_requests_24h, RequestStats.rememberLast24h(context)),
-            style = MaterialTheme.typography.bodyMedium,
+        SectionTitle(stringResource(R.string.sync_group_display))
+        SettingsGroup(
+            buildList<@Composable (androidx.compose.material3.ListItemShapes) -> Unit> {
+                add { NumberItem(R.string.sync_every, interval, "min", it) { v -> interval = v } }
+                add { SwitchItem(R.string.sync_on_open, syncOnOpen, it) { v -> syncOnOpen = v } }
+                add { SwitchItem(R.string.sync_on_unlock, syncOnUnlock, it) { v -> syncOnUnlock = v } }
+                if (syncOnUnlock) add {
+                    NumberItem(R.string.sync_unlock_min_age, unlockMinAgeMin, "min", it, stringResource(R.string.sync_unlock_min_age_hint)) { v -> unlockMinAgeMin = v }
+                }
+            },
         )
 
-        SectionTitle(stringResource(R.string.sync_group_display))
-        NumberRow(R.string.sync_every, interval, "min") { interval = it }
-        SwitchRow(R.string.sync_on_unlock, syncOnUnlock) { syncOnUnlock = it }
-        SwitchRow(R.string.sync_on_open, syncOnOpen) { syncOnOpen = it }
-        NumberRow(R.string.sync_min_gap, minGapSec, "s") { minGapSec = it }
-        Hint(R.string.sync_min_gap_hint)
-
         SectionTitle(stringResource(R.string.sync_group_background))
-        SwitchRow(R.string.sync_background, backgroundSync) { backgroundSync = it }
-        if (backgroundSync) NumberRow(R.string.sync_every, backgroundInterval, "min") { backgroundInterval = it.coerceAtLeast(1) }
-        Hint(R.string.sync_background_hint)
+        SettingsGroup(
+            buildList<@Composable (androidx.compose.material3.ListItemShapes) -> Unit> {
+                add { SwitchItem(R.string.sync_background, backgroundSync, it, stringResource(R.string.sync_background_hint)) { v -> backgroundSync = v } }
+                if (backgroundSync) add { NumberItem(R.string.sync_every, backgroundInterval, "min", it) { v -> backgroundInterval = v.coerceAtLeast(1) } }
+            },
+        )
 
         SectionTitle(stringResource(R.string.sync_group_network))
-        SwitchRow(R.string.sync_wifi_only, wifiOnly) { wifiOnly = it }
+        SettingsGroup(listOf { SwitchItem(R.string.sync_wifi_only, wifiOnly, it) { v -> wifiOnly = v } })
+
+        SectionTitle(stringResource(R.string.sync_group_limits))
+        SettingsGroup(listOf { NumberItem(R.string.sync_min_gap, minGapSec, "s", it, stringResource(R.string.sync_min_gap_hint)) { v -> minGapSec = v } })
     }
 }
 

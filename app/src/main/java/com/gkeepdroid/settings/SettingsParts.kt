@@ -276,3 +276,38 @@ internal fun Modifier.searchFlash(label: Int): Modifier {
         if (glow.value > 0f) drawRoundRect(color.copy(alpha = glow.value), cornerRadius = CornerRadius(12.dp.toPx()))
     }
 }
+
+/** An on/off setting as one entry of a [SettingsGroup]: tapping anywhere on the row switches it. */
+@Composable
+internal fun SwitchItem(label: Int, checked: Boolean, shapes: ListItemShapes, summary: String? = null, onChange: (Boolean) -> Unit) {
+    SegmentedListItem(
+        onClick = { onChange(!checked) },
+        shapes = shapes,
+        colors = ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+        modifier = Modifier.searchFlash(label),
+        supportingContent = summary?.let { { Text(it) } },
+        trailingContent = { Switch(checked = checked, onCheckedChange = onChange) },
+    ) { Text(stringResource(label)) }
+}
+
+/** A whole number as one entry of a [SettingsGroup]: the name on the left, a small field with its unit on the right. */
+@Composable
+internal fun NumberItem(label: Int, value: Int, unit: String, shapes: ListItemShapes, summary: String? = null, onChange: (Int) -> Unit) {
+    SegmentedListItem(
+        onClick = {},
+        shapes = shapes,
+        colors = ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+        modifier = Modifier.searchFlash(label),
+        supportingContent = summary?.let { { Text(it) } },
+        trailingContent = {
+            OutlinedTextField(
+                value = value.toString(),
+                onValueChange = { typed -> onChange(typed.filter { it.isDigit() }.take(5).toIntOrNull() ?: 0) },
+                suffix = { Text(unit) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.width(112.dp),
+            )
+        },
+    ) { Text(stringResource(label)) }
+}

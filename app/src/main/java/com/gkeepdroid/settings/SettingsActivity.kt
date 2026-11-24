@@ -203,6 +203,7 @@ class SettingsActivity : ComponentActivity() {
                     themeMode = imported.global.themeMode
                     interval = imported.global.syncIntervalMin
                     syncOnUnlock = imported.global.syncOnUnlock
+                    unlockMinAgeMin = imported.global.unlockMinAgeMin
                     syncOnOpen = imported.global.syncOnOpen
                     minGapSec = imported.global.minGapSec
                     backgroundSync = imported.global.backgroundSync

@@ -290,7 +290,9 @@ internal fun NoteTile(
                     HorizontalDivider(Modifier.padding(vertical = rowGap + 4.dp), color = textColor.copy(alpha = 0.4f))
                     return
                 }
-                val (shown, doc) = if (inCategory) Categories.rest(item, rich?.docs?.get(item.id)) else item.text to rich?.docs?.get(item.id)
+                val (named, namedDoc) = if (inCategory) Categories.rest(item, rich?.docs?.get(item.id)) else item.text to rich?.docs?.get(item.id)
+                // A number in the item ("2x Tortellini") shows as a pill after the name.
+                val (count, shown, doc) = if (app.listQuantities) Quantities.strip(named, namedDoc) else Triple(1, named, namedDoc)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         Modifier.clickable(enabled = app.listCheckInApp) { toggleItem(item) }
@@ -304,8 +306,9 @@ internal fun NoteTile(
                         style = MaterialTheme.typography.bodyMedium.copy(hyphens = Hyphens.Auto),
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(vertical = rowGap),
+                        modifier = Modifier.padding(vertical = rowGap).weight(1f, fill = false),
                     )
+                    if (count > 1) QuantityBadge(count, if (item.checked) textColor.copy(alpha = 0.55f) else textColor)
                 }
             }
             // Grouping reads the bold start of every item; it is redone only when the items or their formatting change.

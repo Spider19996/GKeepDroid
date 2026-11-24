@@ -83,7 +83,7 @@ internal fun settingEntries(isSingleNote: Boolean): List<SettingEntry> = buildLi
     add(SettingEntry(R.string.lock_widget_tick, Page.Security))
     add(SettingEntry(R.string.widget_titles_only, Page.Security))
     add(SettingEntry(R.string.list_section, Page.AppChecklists))
-    listOf(R.string.check_on_card, R.string.delete_checked, R.string.checked_to_end, R.string.collapse_checked, R.string.convert_prefix_title, R.string.renumber_display, R.string.trim_empty_edges, R.string.item_swipe_right, R.string.item_swipe_left)
+    listOf(R.string.check_on_card, R.string.delete_checked, R.string.list_quantities, R.string.checked_to_end, R.string.collapse_checked, R.string.convert_prefix_title, R.string.renumber_display, R.string.trim_empty_edges, R.string.item_swipe_right, R.string.item_swipe_left)
         .forEach { add(SettingEntry(it, Page.AppChecklists)) }
     listOf(R.string.list_spacing, R.string.checkbox_style, R.string.checkbox_size).forEach { add(SettingEntry(it, Page.AppCheckbox)) }
     add(SettingEntry(R.string.reminder_show_widget, Page.AppCards))
@@ -129,6 +129,7 @@ internal fun settingEntries(isSingleNote: Boolean): List<SettingEntry> = buildLi
     add(SettingEntry(R.string.sync_every, Page.Sync))
     add(SettingEntry(R.string.sync_on_open, Page.Sync))
     add(SettingEntry(R.string.sync_on_unlock, Page.Sync))
+    add(SettingEntry(R.string.sync_unlock_min_age, Page.Sync))
     add(SettingEntry(R.string.sync_min_gap, Page.Sync))
     add(SettingEntry(R.string.sync_background, Page.Sync))
     add(SettingEntry(R.string.sync_wifi_only, Page.Sync))

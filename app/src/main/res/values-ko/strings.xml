@@ -487,4 +487,11 @@
     <string name="device_sync_name_use">그래도 사용</string>
     <string name="device_sync_name_change">이름 변경</string>
     <string name="device_sync_share">공유</string>
+    <string name="sync_unlock_min_age">마지막 동기화가 이보다 오래된 경우에만</string>
+    <string name="sync_unlock_min_age_hint">자주 잠금 해제해도 위젯 내용이 이보다 오래되었을 때만 Google에 요청합니다(0 = 매번, 최소 간격 내에서).</string>
+    <string name="sync_group_limits">제한</string>
+    <string name="list_quantities">목록의 수량</string>
+    <string name="list_quantities_hint">“2x Tortellini” 또는 “Tortellini x2”처럼 항목에 적은 숫자는 늘리고 줄일 수 있는 작은 알약 모양으로 표시됩니다. Keep에서는 일반 텍스트로 남습니다.</string>
+    <string name="quantity_less">줄이기</string>
+    <string name="quantity_more">늘리기</string>
 </resources>
