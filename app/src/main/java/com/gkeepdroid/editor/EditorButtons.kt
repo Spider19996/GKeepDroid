@@ -292,6 +292,17 @@ internal fun editorButtons(
             },
             visible = isList,
         )
+        val quantitiesOn = remember { AppSettingsStore.load(activity).listQuantities }
+        states["list_quantity"] = EditorActionState(
+            R.drawable.ic_add, stringResource(R.string.quantity_action),
+            {
+                // The item last typed into; without one there is nothing to count.
+                val id = format.focus?.takeIf { f -> items.any { it.id == f && !it.isDivider() } }
+                if (id == null) Toast.makeText(activity, R.string.quantity_pick_item, Toast.LENGTH_SHORT).show()
+                else model.quantityItem = id
+            },
+            visible = isList && quantitiesOn,
+        )
         val hasCategories = isList && canFormat && (sessionCategories.isNotEmpty() || Categories.names(items, editorRich()).isNotEmpty())
         states["list_categories"] = EditorActionState(
             R.drawable.ic_category, stringResource(if (hasCategories) R.string.list_uncategorize else R.string.list_categorize),

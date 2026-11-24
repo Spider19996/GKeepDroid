@@ -500,7 +500,27 @@
     <string name="sync_unlock_min_age_hint">Beim häufigen Entsperren fragt die App Google nur, wenn das, was die Widgets zeigen, älter ist (0 = bei jedem Entsperren, im Rahmen des Mindestabstands).</string>
     <string name="sync_group_limits">Begrenzungen</string>
     <string name="list_quantities">Mengen in Listen</string>
-    <string name="list_quantities_hint">Eine Zahl im Eintrag, etwa „2x Tortellini“ oder „Tortellini x2“, erscheint als kleine Pille, die du hoch- und runterzählen kannst. In Keep bleibt es normaler Text.</string>
+    <string name="list_quantities_hint">Eine Zahl im Eintrag, etwa „2x Tortellini“ oder „Tortellini x2“, steht im Editor am Knopf des Eintrags, wo du sie hoch- und runterzählen kannst. Karten und Widgets zeigen sie vor dem Text. In Keep bleibt es normaler Text.</string>
     <string name="quantity_less">Weniger</string>
     <string name="quantity_more">Mehr</string>
+    <string name="group_card_content">Was eine Karte zeigt</string>
+    <string name="group_card_details">Details</string>
+    <string name="group_checkboxes">Kästchen</string>
+    <string name="group_convert">Umwandeln in eine Notiz</string>
+    <string name="group_filter_chips">Filter-Knöpfe</string>
+    <string name="group_in_editor">Im Editor</string>
+    <string name="group_locks">Sperren</string>
+    <string name="group_look">Aussehen</string>
+    <string name="group_notes">Notizen</string>
+    <string name="group_on_cards">Auf den Karten</string>
+    <string name="group_order">Reihenfolge</string>
+    <string name="group_quantities">Mengen</string>
+    <string name="group_settings_file">Einstellungsdatei</string>
+    <string name="group_text">Text</string>
+    <string name="group_ticking">Abhaken</string>
+    <string name="group_widget_background">Hintergrund</string>
+    <string name="group_widgets">Widgets</string>
+    <string name="quantity_action">Menge</string>
+    <string name="quantity_pick_item">Tippe zuerst den Eintrag an, den du zählen willst.</string>
+    <string name="list_quantity_one">„1x“ bei Einträgen ohne Menge anzeigen</string>
 </resources>

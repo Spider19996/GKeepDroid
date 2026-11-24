@@ -491,7 +491,27 @@
     <string name="sync_unlock_min_age_hint">频繁解锁时，只有当小部件显示的内容早于此时间才会询问 Google（0 = 每次解锁，受最小间隔限制）。</string>
     <string name="sync_group_limits">限制</string>
     <string name="list_quantities">清单中的数量</string>
-    <string name="list_quantities_hint">在条目中写的数字，如“2x Tortellini”或“Tortellini x2”，会显示为可增减的小药丸。在 Keep 中仍是普通文本。</string>
+    <string name="list_quantities_hint">条目中写的数字，如“2x Tortellini”或“Tortellini x2”，在编辑器中显示在条目的按钮上，可在那里增减。卡片和小部件将其显示在文本前面。在 Keep 中仍是普通文本。</string>
     <string name="quantity_less">减少</string>
     <string name="quantity_more">增加</string>
+    <string name="group_card_content">卡片显示的内容</string>
+    <string name="group_card_details">详细信息</string>
+    <string name="group_checkboxes">复选框</string>
+    <string name="group_convert">转换为笔记</string>
+    <string name="group_filter_chips">筛选按钮</string>
+    <string name="group_in_editor">在编辑器中</string>
+    <string name="group_locks">锁定</string>
+    <string name="group_look">外观</string>
+    <string name="group_notes">笔记</string>
+    <string name="group_on_cards">在卡片上</string>
+    <string name="group_order">顺序</string>
+    <string name="group_quantities">数量</string>
+    <string name="group_settings_file">设置文件</string>
+    <string name="group_text">文本</string>
+    <string name="group_ticking">勾选</string>
+    <string name="group_widget_background">背景</string>
+    <string name="group_widgets">小部件</string>
+    <string name="quantity_action">数量</string>
+    <string name="quantity_pick_item">请先点按要计数的条目。</string>
+    <string name="list_quantity_one">为没有数量的条目显示“1x”</string>
 </resources>

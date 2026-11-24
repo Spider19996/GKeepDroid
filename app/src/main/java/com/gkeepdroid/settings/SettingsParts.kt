@@ -14,6 +14,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -293,13 +294,12 @@ internal fun SwitchItem(label: Int, checked: Boolean, shapes: ListItemShapes, su
 /** A whole number as one entry of a [SettingsGroup]: the name on the left, a small field with its unit on the right. */
 @Composable
 internal fun NumberItem(label: Int, value: Int, unit: String, shapes: ListItemShapes, summary: String? = null, onChange: (Int) -> Unit) {
-    SegmentedListItem(
-        onClick = {},
-        shapes = shapes,
-        colors = ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-        modifier = Modifier.searchFlash(label),
-        supportingContent = summary?.let { { Text(it) } },
-        trailingContent = {
+    PlainItem(shapes, label) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f).padding(end = 12.dp)) {
+                Text(stringResource(label), style = MaterialTheme.typography.bodyLarge)
+                summary?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            }
             OutlinedTextField(
                 value = value.toString(),
                 onValueChange = { typed -> onChange(typed.filter { it.isDigit() }.take(5).toIntOrNull() ?: 0) },
@@ -308,6 +308,58 @@ internal fun NumberItem(label: Int, value: Int, unit: String, shapes: ListItemSh
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.width(112.dp),
             )
-        },
-    ) { Text(stringResource(label)) }
+        }
+    }
+}
+
+/**
+ * An entry of a [SettingsGroup] that is not tapped as a whole (a slider, a row of buttons, a preview): the group's shape and
+ * color around [content], with the padding of the other entries.
+ */
+@Composable
+internal fun PlainItem(shapes: ListItemShapes, flash: Int? = null, content: @Composable ColumnScope.() -> Unit) {
+    androidx.compose.material3.Surface(
+        shape = shapes.shape,
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        modifier = Modifier.fillMaxWidth().let { if (flash != null) it.searchFlash(flash) else it },
+    ) {
+        Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp), content = content)
+    }
+}
+
+/** A value on a scale as one entry of a [SettingsGroup]: [title] (with the value in it) above a slider. */
+@Composable
+internal fun SliderItem(title: String, flash: Int, value: Int, range: IntRange, shapes: ListItemShapes, steps: Int = 0, onChange: (Int) -> Unit) {
+    PlainItem(shapes, flash) {
+        Text(title, style = MaterialTheme.typography.bodyLarge)
+        ValueSlider(value = value.toFloat(), onValueChange = { onChange(it.toInt()) }, valueRange = range.first.toFloat()..range.last.toFloat(), steps = steps)
+    }
+}
+
+/** One choice out of a list as one entry of a [SettingsGroup]: the current one under the name, the others in a menu. */
+@Composable
+internal fun <T> ChoiceItem(label: Int, options: List<Pair<T, String>>, selected: T, shapes: ListItemShapes, summary: String? = null, onSelect: (T) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    Box(Modifier.searchFlash(label)) {
+        val current = options.firstOrNull { it.first == selected }?.second
+        MenuRow(stringResource(label), listOfNotNull(current, summary).joinToString("\n").ifEmpty { null }, chevron = R.drawable.ic_arrow_drop_down, shapes = shapes) { expanded = true }
+        GroupedMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            groups = listOf(options.map { (value, text) -> MenuEntry(text, selected = value == selected) { expanded = false; onSelect(value) } }),
+        )
+    }
+}
+
+/** Collects the entries of a [Group]; an entry can sit behind an if, and the group still rounds its first and last. */
+internal class GroupRows {
+    val rows = mutableListOf<@Composable (ListItemShapes) -> Unit>()
+    fun item(row: @Composable (ListItemShapes) -> Unit) { rows += row }
+}
+
+/** A [SettingsGroup] written as a list of item { shapes -> ... }, with a [title] above it if given. */
+@Composable
+internal fun Group(title: String? = null, build: GroupRows.() -> Unit) {
+    title?.let { SectionTitle(it) }
+    SettingsGroup(GroupRows().apply(build).rows)
 }

@@ -39,6 +39,19 @@ object Quantities {
         return Triple(f.count, rest, runs?.let { RichDoc(rest, it) })
     }
 
+    /**
+     * How cards and widgets write an item: the number in front as text ("2x Tortellini", also for "Tortellini x2"), and with
+     * [one] a "1x" for an item without one. The styles move along.
+     */
+    fun display(text: String, doc: RichDoc?, one: Boolean): Pair<String, RichDoc?> {
+        if (text.isBlank()) return text to doc
+        val (count, rest, restDoc) = strip(text, doc)
+        if (count <= 1 && !one) return text to doc
+        val head = "${count}x "
+        val shown = head + rest
+        return shown to restDoc?.let { d -> RichDoc(shown, d.runs.map { (a, b, f) -> intArrayOf(a + head.length, b + head.length, f) }) }
+    }
+
     /** [text] with [count] written in: the old number replaced where it stood, a new one in front; 1 removes it. */
     fun withCount(text: String, count: Int): String {
         val f = find(text)

@@ -65,6 +65,7 @@ internal class SettingsState(val context: SettingsActivity) {
     var appListCheckInApp by mutableStateOf(initialApp.listCheckInApp)
     var appListDeleteChecked by mutableStateOf(initialApp.listDeleteChecked)
     var appListQuantities by mutableStateOf(initialApp.listQuantities)
+    var appListQuantityOne by mutableStateOf(initialApp.listQuantityOne)
     var appConvertPrefix by mutableIntStateOf(initialApp.convertPrefix)
     var appRenumberDisplay by mutableStateOf(initialApp.renumberDisplay)
     var appTrimEmptyEdges by mutableStateOf(initialApp.trimEmptyEdges)
@@ -260,14 +261,14 @@ internal class SettingsState(val context: SettingsActivity) {
         appLockWidgetTick = a.lockWidgetTick; appSwipeRight = a.swipeRight; appSwipeLeft = a.swipeLeft; appFoldNotes = a.foldNotes
         appFilterBar = a.filterBar; appFilterChips = a.filterChips; appPullToRefresh = a.pullToRefresh; appEditorLayout = a.editorLayout
         appEditorInRecents = a.editorInRecents; appEditorBarSnapBack = a.editorBarSnapBack
-        appItemSwipeRight = a.itemSwipeRight; appItemSwipeLeft = a.itemSwipeLeft; appListQuantities = a.listQuantities
+        appItemSwipeRight = a.itemSwipeRight; appItemSwipeLeft = a.itemSwipeLeft; appListQuantities = a.listQuantities; appListQuantityOne = a.listQuantityOne
     }
 
     fun currentApp() = AppSettings(
         appLayout, appSort, appPinnedSection, appShowImages, appShowColors, appPlainStyle, appPreviewLines, appShowEdited, appEditedAsDate, appShowLabels, appShowProgress, appLockPrivate, appLockApp, appLockEdit, appLockGrace,
         appShowReminders, appListCheckedToEnd, appListCollapseChecked, appListCheckboxStyle, appListCheckboxSize, appListSpacing,
         appListCheckInApp, appListDeleteChecked, appConvertPrefix, appRenumberDisplay, appTrimEmptyEdges, appWidgetGrace, appWidgetTitlesOnly, appLockWidgetTick, appSwipeRight, appSwipeLeft, appFoldNotes, appFilterBar, appFilterChips, appPullToRefresh, appEditorLayout,
-        appEditorInRecents, appEditorBarSnapBack, appItemSwipeRight, appItemSwipeLeft, listQuantities = appListQuantities,
+        appEditorInRecents, appEditorBarSnapBack, appItemSwipeRight, appItemSwipeLeft, listQuantities = appListQuantities, listQuantityOne = appListQuantityOne,
     )
 
     /** Opens a page; the security page asks for the lock first (whenever the phone has one). */

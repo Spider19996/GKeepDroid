@@ -71,6 +71,8 @@ data class AppSettings(
     val itemSwipeLeft: Int = ITEM_SWIPE_REMOVE,
     /** A number written into a checklist item ("2x Tortellini") shows as a pill that counts up and down. */
     val listQuantities: Boolean = true,
+    /** Items without a number count as one: "1x" on cards and in widgets, and a 1 on their button in the editor. */
+    val listQuantityOne: Boolean = false,
 )
 
 const val ITEM_SWIPE_NONE = 0
@@ -147,6 +149,7 @@ object AppSettingsStore {
             itemSwipeRight = p.getInt("item_swipe_right", d.itemSwipeRight),
             itemSwipeLeft = p.getInt("item_swipe_left", d.itemSwipeLeft),
             listQuantities = p.getBoolean("list_quantities", d.listQuantities),
+            listQuantityOne = p.getBoolean("list_quantity_one", d.listQuantityOne),
             editorLayout = if (p.contains("editor_layout")) ButtonLayout.fromJson(EDITOR_CATALOG, p.getString("editor_layout", null)) else d.editorLayout,
         )
     }
@@ -219,6 +222,7 @@ object AppSettingsStore {
             putInt("item_swipe_right", s.itemSwipeRight)
             putInt("item_swipe_left", s.itemSwipeLeft)
             putBoolean("list_quantities", s.listQuantities)
+            putBoolean("list_quantity_one", s.listQuantityOne)
         }
     }
 }

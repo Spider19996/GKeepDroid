@@ -500,7 +500,27 @@
     <string name="sync_unlock_min_age_hint">Bij vaak ontgrendelen vraagt de app Google alleen iets als wat de widgets tonen ouder is (0 = bij elke ontgrendeling, binnen de minimale tussentijd).</string>
     <string name="sync_group_limits">Grenzen</string>
     <string name="list_quantities">Hoeveelheden in lijsten</string>
-    <string name="list_quantities_hint">Een getal in een item, zoals ‘2x Tortellini’ of ‘Tortellini x2’, verschijnt als een klein pilletje dat je op en af kunt tellen. In Keep blijft het gewone tekst.</string>
+    <string name="list_quantities_hint">Een getal in een item, zoals ‘2x Tortellini’ of ‘Tortellini x2’, staat in de editor op de knop van het item, waar je het op en af kunt tellen. Kaarten en widgets tonen het vóór de tekst. In Keep blijft het gewone tekst.</string>
     <string name="quantity_less">Minder</string>
     <string name="quantity_more">Meer</string>
+    <string name="group_card_content">Wat een kaart toont</string>
+    <string name="group_card_details">Details</string>
+    <string name="group_checkboxes">Selectievakjes</string>
+    <string name="group_convert">Omzetten naar een notitie</string>
+    <string name="group_filter_chips">Filterknoppen</string>
+    <string name="group_in_editor">In de editor</string>
+    <string name="group_locks">Vergrendelingen</string>
+    <string name="group_look">Uiterlijk</string>
+    <string name="group_notes">Notities</string>
+    <string name="group_on_cards">Op de kaarten</string>
+    <string name="group_order">Volgorde</string>
+    <string name="group_quantities">Hoeveelheden</string>
+    <string name="group_settings_file">Instellingenbestand</string>
+    <string name="group_text">Tekst</string>
+    <string name="group_ticking">Afvinken</string>
+    <string name="group_widget_background">Achtergrond</string>
+    <string name="group_widgets">Widgets</string>
+    <string name="quantity_action">Hoeveelheid</string>
+    <string name="quantity_pick_item">Tik eerst op het item dat je wilt tellen.</string>
+    <string name="list_quantity_one">‘1x’ tonen bij items zonder hoeveelheid</string>
 </resources>

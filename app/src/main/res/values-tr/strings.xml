@@ -500,7 +500,27 @@
     <string name="sync_unlock_min_age_hint">Sık kilit açmada uygulama, widget’ların gösterdiği bundan eskiyse Google’a sorar (0 = her kilit açmada, en kısa aralık içinde).</string>
     <string name="sync_group_limits">Sınırlar</string>
     <string name="list_quantities">Listelerde miktarlar</string>
-    <string name="list_quantities_hint">Bir öğeye yazılan sayı, ör. “2x Tortellini” veya “Tortellini x2”, artırıp azaltabileceğin küçük bir hap olarak görünür. Keep’te düz metin olarak kalır.</string>
+    <string name="list_quantities_hint">Bir öğeye yazılan sayı, ör. “2x Tortellini” veya “Tortellini x2”, düzenleyicide öğenin düğmesinde görünür ve orada artırıp azaltabilirsin. Kartlar ve widget’lar onu metnin önünde gösterir. Keep’te düz metin olarak kalır.</string>
     <string name="quantity_less">Azalt</string>
     <string name="quantity_more">Artır</string>
+    <string name="group_card_content">Kartın gösterdikleri</string>
+    <string name="group_card_details">Ayrıntılar</string>
+    <string name="group_checkboxes">Onay kutuları</string>
+    <string name="group_convert">Nota dönüştürme</string>
+    <string name="group_filter_chips">Filtre düğmeleri</string>
+    <string name="group_in_editor">Düzenleyicide</string>
+    <string name="group_locks">Kilitler</string>
+    <string name="group_look">Görünüm</string>
+    <string name="group_notes">Notlar</string>
+    <string name="group_on_cards">Kartlarda</string>
+    <string name="group_order">Sıra</string>
+    <string name="group_quantities">Miktarlar</string>
+    <string name="group_settings_file">Ayar dosyası</string>
+    <string name="group_text">Metin</string>
+    <string name="group_ticking">İşaretleme</string>
+    <string name="group_widget_background">Arka plan</string>
+    <string name="group_widgets">Widget’lar</string>
+    <string name="quantity_action">Miktar</string>
+    <string name="quantity_pick_item">Önce saymak istediğin öğeye dokun.</string>
+    <string name="list_quantity_one">Miktarı olmayan öğelerde “1x” göster</string>
 </resources>

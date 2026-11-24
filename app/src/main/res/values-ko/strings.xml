@@ -491,7 +491,27 @@
     <string name="sync_unlock_min_age_hint">자주 잠금 해제해도 위젯 내용이 이보다 오래되었을 때만 Google에 요청합니다(0 = 매번, 최소 간격 내에서).</string>
     <string name="sync_group_limits">제한</string>
     <string name="list_quantities">목록의 수량</string>
-    <string name="list_quantities_hint">“2x Tortellini” 또는 “Tortellini x2”처럼 항목에 적은 숫자는 늘리고 줄일 수 있는 작은 알약 모양으로 표시됩니다. Keep에서는 일반 텍스트로 남습니다.</string>
+    <string name="list_quantities_hint">“2x Tortellini” 또는 “Tortellini x2”처럼 항목에 적은 숫자는 편집기에서 항목 버튼에 표시되며 늘리고 줄일 수 있습니다. 카드와 위젯은 텍스트 앞에 표시합니다. Keep에서는 일반 텍스트로 남습니다.</string>
     <string name="quantity_less">줄이기</string>
     <string name="quantity_more">늘리기</string>
+    <string name="group_card_content">카드에 표시할 내용</string>
+    <string name="group_card_details">세부 정보</string>
+    <string name="group_checkboxes">체크박스</string>
+    <string name="group_convert">메모로 변환</string>
+    <string name="group_filter_chips">필터 버튼</string>
+    <string name="group_in_editor">편집기에서</string>
+    <string name="group_locks">잠금</string>
+    <string name="group_look">모양</string>
+    <string name="group_notes">메모</string>
+    <string name="group_on_cards">카드에서</string>
+    <string name="group_order">순서</string>
+    <string name="group_quantities">수량</string>
+    <string name="group_settings_file">설정 파일</string>
+    <string name="group_text">텍스트</string>
+    <string name="group_ticking">체크하기</string>
+    <string name="group_widget_background">배경</string>
+    <string name="group_widgets">위젯</string>
+    <string name="quantity_action">수량</string>
+    <string name="quantity_pick_item">먼저 셀 항목을 탭하세요.</string>
+    <string name="list_quantity_one">수량이 없는 항목에 “1x” 표시</string>
 </resources>

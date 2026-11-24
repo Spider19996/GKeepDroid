@@ -40,43 +40,32 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun ColumnScope.AppLayoutPage(s: SettingsState) {
     with(s) {
-        Text(stringResource(R.string.layout_label), Modifier.searchFlash(R.string.layout_label), style = MaterialTheme.typography.titleMedium)
-        ChoiceGroup(
-            listOf(LAYOUT_GRID to stringResource(R.string.layout_grid), LAYOUT_LIST to stringResource(R.string.layout_list)),
-            appLayout,
-        ) { appLayout = it }
-
-        Text(stringResource(R.string.sort_by), Modifier.searchFlash(R.string.sort_by), style = MaterialTheme.typography.titleMedium)
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(
-                SORT_KEEP to R.string.sort_keep,
-                SORT_EDITED to R.string.sort_edited,
-                SORT_CREATED to R.string.sort_created,
-                SORT_TITLE to R.string.sort_title,
-            ).forEach { (mode, label) ->
-                FilterChip(
-                    selected = appSort == mode,
-                    onClick = { appSort = mode },
-                    label = { Text(stringResource(label)) },
-                )
+        Group(stringResource(R.string.group_order)) {
+            item { ChoiceItem(R.string.layout_label, listOf(LAYOUT_GRID to stringResource(R.string.layout_grid), LAYOUT_LIST to stringResource(R.string.layout_list)), appLayout, it) { v -> appLayout = v } }
+            item {
+                ChoiceItem(
+                    R.string.sort_by,
+                    listOf(
+                        SORT_KEEP to stringResource(R.string.sort_keep), SORT_EDITED to stringResource(R.string.sort_edited),
+                        SORT_CREATED to stringResource(R.string.sort_created), SORT_TITLE to stringResource(R.string.sort_title),
+                    ),
+                    appSort, it,
+                ) { v -> appSort = v }
+            }
+            item { SwitchItem(R.string.pinned_section_switch, appPinnedSection, it) { v -> appPinnedSection = v } }
+            item { SwitchItem(R.string.pull_to_refresh_switch, appPullToRefresh, it) { v -> appPullToRefresh = v } }
+        }
+        Group(stringResource(R.string.group_look)) {
+            item { ChoiceItem(R.string.plain_style, plainStyles(), appPlainStyle, it) { v -> appPlainStyle = v } }
+            // 0 shows every line of a note and every item of a checklist.
+            item {
+                SliderItem(
+                    if (appPreviewLines == 0) stringResource(R.string.max_lines_unlimited)
+                    else pluralStringResource(R.plurals.preview_lines, appPreviewLines, appPreviewLines),
+                    R.string.preview_length, appPreviewLines, 0..30, it, steps = 29,
+                ) { v -> appPreviewLines = v }
             }
         }
-        SwitchRow(R.string.pinned_section_switch, appPinnedSection) { appPinnedSection = it }
-        SwitchRow(R.string.pull_to_refresh_switch, appPullToRefresh) { appPullToRefresh = it }
-
-        Text(stringResource(R.string.plain_style), Modifier.searchFlash(R.string.plain_style))
-        ChoiceGroup(plainStyles(), appPlainStyle) { appPlainStyle = it }
-
-        // 0 shows every line of a note and every item of a checklist.
-        Text(
-            if (appPreviewLines == 0) stringResource(R.string.max_lines_unlimited)
-            else pluralStringResource(R.plurals.preview_lines, appPreviewLines, appPreviewLines),
-            Modifier.searchFlash(R.string.preview_length),
-        )
-        ValueSlider(
-            value = appPreviewLines.toFloat(), onValueChange = { appPreviewLines = it.toInt() },
-            valueRange = 0f..30f, steps = 29,
-        )
     }
 }
 
@@ -84,14 +73,18 @@ internal fun ColumnScope.AppLayoutPage(s: SettingsState) {
 @Composable
 internal fun ColumnScope.AppCardsPage(s: SettingsState) {
     with(s) {
-        SwitchRow(R.string.show_images, appShowImages) { appShowImages = it }
-        SwitchRow(R.string.show_note_colors, appShowColors) { appShowColors = it }
-        SwitchRow(R.string.show_edited_time, appShowEdited) { appShowEdited = it }
-        if (appShowEdited) SwitchRow(R.string.edited_as_date, appEditedAsDate) { appEditedAsDate = it }
-        SwitchRow(R.string.show_labels, appShowLabels) { appShowLabels = it }
-        SwitchRow(R.string.show_progress, appShowProgress) { appShowProgress = it }
-        SwitchRow(R.string.reminder_show_widget, appShowReminders) { appShowReminders = it }
-        SwitchRow(R.string.fold_notes_app, appFoldNotes) { appFoldNotes = it }
+        Group(stringResource(R.string.group_card_content)) {
+            item { SwitchItem(R.string.show_images, appShowImages, it) { v -> appShowImages = v } }
+            item { SwitchItem(R.string.show_note_colors, appShowColors, it) { v -> appShowColors = v } }
+            item { SwitchItem(R.string.show_labels, appShowLabels, it) { v -> appShowLabels = v } }
+            item { SwitchItem(R.string.show_progress, appShowProgress, it) { v -> appShowProgress = v } }
+            item { SwitchItem(R.string.reminder_show_widget, appShowReminders, it) { v -> appShowReminders = v } }
+        }
+        Group(stringResource(R.string.group_card_details)) {
+            item { SwitchItem(R.string.show_edited_time, appShowEdited, it) { v -> appShowEdited = v } }
+            if (appShowEdited) item { SwitchItem(R.string.edited_as_date, appEditedAsDate, it) { v -> appEditedAsDate = v } }
+            item { SwitchItem(R.string.fold_notes_app, appFoldNotes, it) { v -> appFoldNotes = v } }
+        }
     }
 }
 
@@ -99,29 +92,22 @@ internal fun ColumnScope.AppCardsPage(s: SettingsState) {
 @Composable
 internal fun ColumnScope.AppSwipePage(s: SettingsState) {
     with(s) {
-        listOf(R.string.swipe_right to true, R.string.swipe_left to false).forEach { (label, right) ->
-            Text(stringResource(label), style = MaterialTheme.typography.titleMedium)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                swipeChoices.forEach { (action, name) ->
-                    FilterChip(
-                        selected = (if (right) appSwipeRight else appSwipeLeft) == action,
-                        onClick = { if (right) appSwipeRight = action else appSwipeLeft = action },
-                        label = { Text(stringResource(name)) },
-                    )
-                }
-            }
+        val choices = swipeChoices.map { (action, name) -> action to stringResource(name) }
+        Group {
+            item { ChoiceItem(R.string.swipe_right, choices, appSwipeRight, it) { v -> appSwipeRight = v } }
+            item { ChoiceItem(R.string.swipe_left, choices, appSwipeLeft, it, stringResource(R.string.swipe_hint)) { v -> appSwipeLeft = v } }
         }
-        Hint(R.string.swipe_hint)
     }
 }
 
 @Composable
 internal fun ColumnScope.FilterBarOptions(bar: Boolean, chips: Int, onBar: (Boolean) -> Unit, onChips: (Int) -> Unit) {
-    SwitchRow(R.string.filter_bar_show, bar, onBar)
-    if (bar) filterChoices.forEach { (bit, label) ->
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = chips and bit != 0, onCheckedChange = { on -> onChips(if (on) chips or bit else chips and bit.inv()) })
-            Text(stringResource(label))
+    Group {
+        item { SwitchItem(R.string.filter_bar_show, bar, it, onChange = onBar) }
+    }
+    if (bar) Group(stringResource(R.string.group_filter_chips)) {
+        filterChoices.forEach { (bit, label) ->
+            item { SwitchItem(label, chips and bit != 0, it) { on -> onChips(if (on) chips or bit else chips and bit.inv()) } }
         }
     }
 }
@@ -133,67 +119,67 @@ internal fun ColumnScope.AppFiltersPage(s: SettingsState) {
     }
 }
 
-/** The checklists on the cards of the app: order, hidden checked items, box style and spacing. */
+/** Checklists: on the cards, in the editor, their quantities and what they turn into. */
 @Composable
 internal fun ColumnScope.AppChecklistsPage(s: SettingsState) {
     with(s) {
-        SwitchRow(R.string.check_on_card, appListCheckInApp) { appListCheckInApp = it }
-        if (appListCheckInApp) SwitchRow(R.string.delete_checked, appListDeleteChecked) { appListDeleteChecked = it }
-        SwitchRow(R.string.list_quantities, appListQuantities) { appListQuantities = it }
-        Hint(R.string.list_quantities_hint)
-        SwitchRow(R.string.checked_to_end, appListCheckedToEnd) { appListCheckedToEnd = it }
-        if (appListCheckedToEnd) SwitchRow(R.string.collapse_checked, appListCollapseChecked) { appListCollapseChecked = it }
-        // What the lines of a checklist start with when it is turned into a note.
-        Text(stringResource(R.string.convert_prefix_title), Modifier.searchFlash(R.string.convert_prefix_title), style = MaterialTheme.typography.titleMedium)
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(
-                PREFIX_NONE to R.string.prefix_none, PREFIX_DASH to R.string.prefix_dash, PREFIX_STAR to R.string.prefix_star,
-                PREFIX_BOX to R.string.prefix_box, PREFIX_NUMBER to R.string.prefix_number,
-            ).forEach { (prefix, label) ->
-                FilterChip(selected = appConvertPrefix == prefix, onClick = { appConvertPrefix = prefix }, label = { Text(stringResource(label)) })
-            }
+        Group(stringResource(R.string.group_on_cards)) {
+            item { SwitchItem(R.string.check_on_card, appListCheckInApp, it) { v -> appListCheckInApp = v } }
+            if (appListCheckInApp) item { SwitchItem(R.string.delete_checked, appListDeleteChecked, it) { v -> appListDeleteChecked = v } }
+            item { SwitchItem(R.string.checked_to_end, appListCheckedToEnd, it) { v -> appListCheckedToEnd = v } }
+            if (appListCheckedToEnd) item { SwitchItem(R.string.collapse_checked, appListCollapseChecked, it) { v -> appListCollapseChecked = v } }
+            item { SwitchItem(R.string.renumber_display, appRenumberDisplay, it, stringResource(R.string.renumber_display_hint)) { v -> appRenumberDisplay = v } }
+            item { MenuRow(stringResource(R.string.checkbox_style), null, shapes = it) { page = Page.AppCheckbox } }
         }
-        Hint(R.string.convert_prefix_hint)
-        SwitchRow(R.string.renumber_display, appRenumberDisplay) { appRenumberDisplay = it }
-        Hint(R.string.renumber_display_hint)
-        SwitchRow(R.string.trim_empty_edges, appTrimEmptyEdges) { appTrimEmptyEdges = it }
-        Hint(R.string.trim_empty_edges_hint)
         // What swiping an item in the editor does (and a category's header, for all its items).
-        listOf(R.string.item_swipe_right to true, R.string.item_swipe_left to false).forEach { (label, right) ->
-            Text(stringResource(label), Modifier.searchFlash(label), style = MaterialTheme.typography.titleMedium)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf(
-                    ITEM_SWIPE_NONE to R.string.swipe_none, ITEM_SWIPE_TICK to R.string.item_swipe_tick,
-                    ITEM_SWIPE_REMOVE to R.string.item_swipe_remove, ITEM_SWIPE_CATEGORY to R.string.category_move,
-                ).forEach { (action, name) ->
-                    FilterChip(
-                        selected = (if (right) appItemSwipeRight else appItemSwipeLeft) == action,
-                        onClick = { if (right) appItemSwipeRight = action else appItemSwipeLeft = action },
-                        label = { Text(stringResource(name)) },
-                    )
-                }
+        val itemChoices = listOf(
+            ITEM_SWIPE_NONE to stringResource(R.string.swipe_none), ITEM_SWIPE_TICK to stringResource(R.string.item_swipe_tick),
+            ITEM_SWIPE_REMOVE to stringResource(R.string.item_swipe_remove), ITEM_SWIPE_CATEGORY to stringResource(R.string.category_move),
+        )
+        Group(stringResource(R.string.group_in_editor)) {
+            item { ChoiceItem(R.string.item_swipe_right, itemChoices, appItemSwipeRight, it) { v -> appItemSwipeRight = v } }
+            item { ChoiceItem(R.string.item_swipe_left, itemChoices, appItemSwipeLeft, it, stringResource(R.string.item_swipe_hint)) { v -> appItemSwipeLeft = v } }
+            item { SwitchItem(R.string.trim_empty_edges, appTrimEmptyEdges, it, stringResource(R.string.trim_empty_edges_hint)) { v -> appTrimEmptyEdges = v } }
+        }
+        Group(stringResource(R.string.group_quantities)) {
+            item { SwitchItem(R.string.list_quantities, appListQuantities, it, stringResource(R.string.list_quantities_hint)) { v -> appListQuantities = v } }
+            if (appListQuantities) item { SwitchItem(R.string.list_quantity_one, appListQuantityOne, it) { v -> appListQuantityOne = v } }
+        }
+        // What the lines of a checklist start with when it is turned into a note.
+        Group(stringResource(R.string.group_convert)) {
+            item {
+                ChoiceItem(
+                    R.string.convert_prefix_title,
+                    listOf(
+                        PREFIX_NONE to stringResource(R.string.prefix_none), PREFIX_DASH to stringResource(R.string.prefix_dash),
+                        PREFIX_STAR to stringResource(R.string.prefix_star), PREFIX_BOX to stringResource(R.string.prefix_box),
+                        PREFIX_NUMBER to stringResource(R.string.prefix_number),
+                    ),
+                    appConvertPrefix, it, stringResource(R.string.convert_prefix_hint),
+                ) { v -> appConvertPrefix = v }
             }
         }
-        Hint(R.string.item_swipe_hint)
-        MenuRow(stringResource(R.string.checkbox_style), null) { page = Page.AppCheckbox }
     }
 }
 
-/** How the boxes of a checklist look on the cards: style, size and spacing. */
+/** How the boxes of a checklist look on the cards: style, size and spacing, with a preview. */
 @Composable
 internal fun ColumnScope.AppCheckboxPage(s: SettingsState) {
     with(s) {
-        Text("${stringResource(R.string.list_spacing)}: $appListSpacing dp", Modifier.searchFlash(R.string.list_spacing))
-        ValueSlider(value = appListSpacing.toFloat(), onValueChange = { appListSpacing = it.toInt() }, valueRange = 0f..24f)
-        Text(stringResource(R.string.checkbox_style), Modifier.searchFlash(R.string.checkbox_style), style = MaterialTheme.typography.titleMedium)
-        ChoiceGroup(checkboxStyles(), appListCheckboxStyle) { appListCheckboxStyle = it }
-        Text(stringResource(R.string.checkbox_size, appListCheckboxSize), Modifier.searchFlash(R.string.checkbox_size))
-        ValueSlider(value = appListCheckboxSize.toFloat(), onValueChange = { appListCheckboxSize = it.toInt() }, valueRange = 12f..40f)
-        // Live preview of both states with the chosen style, size and spacing.
-        listOf(false, true).forEach { checked ->
-            Row(Modifier.padding(vertical = (appListSpacing / 2).dp), verticalAlignment = Alignment.CenterVertically) {
-                CheckboxPreview(appListCheckboxStyle, checked, appListCheckboxSize)
-                Text(stringResource(R.string.item_hint), Modifier.padding(start = 8.dp))
+        Group {
+            item { ChoiceItem(R.string.checkbox_style, checkboxStyles(), appListCheckboxStyle, it) { v -> appListCheckboxStyle = v } }
+            item { SliderItem(stringResource(R.string.checkbox_size, appListCheckboxSize), R.string.checkbox_size, appListCheckboxSize, 12..40, it) { v -> appListCheckboxSize = v } }
+            item { SliderItem("${stringResource(R.string.list_spacing)}: $appListSpacing dp", R.string.list_spacing, appListSpacing, 0..24, it) { v -> appListSpacing = v } }
+            // Live preview of both states with the chosen style, size and spacing.
+            item {
+                PlainItem(it) {
+                    listOf(false, true).forEach { checked ->
+                        Row(Modifier.padding(vertical = (appListSpacing / 2).dp), verticalAlignment = Alignment.CenterVertically) {
+                            CheckboxPreview(appListCheckboxStyle, checked, appListCheckboxSize)
+                            Text(stringResource(R.string.item_hint), Modifier.padding(start = 8.dp))
+                        }
+                    }
+                }
             }
         }
     }
@@ -228,10 +214,10 @@ internal fun ColumnScope.EditorButtonsPage(s: SettingsState) {
 @Composable
 internal fun ColumnScope.EditorPage(s: SettingsState) {
     with(s) {
-        MenuRow(stringResource(R.string.editor_buttons_title), null) { page = Page.EditorButtons }
-        SwitchRow(R.string.editor_in_recents, appEditorInRecents) { appEditorInRecents = it }
-        Hint(R.string.editor_in_recents_hint)
-        SwitchRow(R.string.editor_bar_snap_back, appEditorBarSnapBack) { appEditorBarSnapBack = it }
-        Hint(R.string.editor_bar_snap_back_hint)
+        Group {
+            item { MenuRow(stringResource(R.string.editor_buttons_title), null, shapes = it) { page = Page.EditorButtons } }
+            item { SwitchItem(R.string.editor_in_recents, appEditorInRecents, it, stringResource(R.string.editor_in_recents_hint)) { v -> appEditorInRecents = v } }
+            item { SwitchItem(R.string.editor_bar_snap_back, appEditorBarSnapBack, it, stringResource(R.string.editor_bar_snap_back_hint)) { v -> appEditorBarSnapBack = v } }
+        }
     }
 }

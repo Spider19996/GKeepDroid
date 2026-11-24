@@ -47,64 +47,55 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun ColumnScope.AppearancePage(s: SettingsState) {
     with(s) {
-        Text(stringResource(R.string.bg_opacity, (backgroundAlpha * 100).toInt()), Modifier.searchFlash(R.string.bg_opacity))
-        ValueSlider(value = backgroundAlpha, onValueChange = { backgroundAlpha = it })
-
-        Text(stringResource(R.string.text_size, textSize), Modifier.searchFlash(R.string.text_size))
-        ValueSlider(
-            value = textSize.toFloat(), onValueChange = { textSize = it.toInt() },
-            valueRange = 10f..24f,
-        )
-
-        SwitchRow(R.string.text_color_auto, textColorAuto) { textColorAuto = it }
-        if (!textColorAuto) {
-        Text(stringResource(R.string.text_color), Modifier.searchFlash(R.string.text_color))
-        // Every circle sits in a 48 dp touch area, which also sets the distance between the circles.
-        FlowRow {
-            TEXT_COLORS.forEach { color ->
-                RoundTouchTarget(onClick = { textColor = color }) {
-                    Box(
-                        Modifier.size(if (color == textColor) 44.dp else 36.dp)
-                            .clip(CircleShape).background(Color(color))
-                            .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape),
-                    )
+        Group(stringResource(R.string.group_widget_background)) {
+            item { SliderItem(stringResource(R.string.bg_opacity, (backgroundAlpha * 100).toInt()), R.string.bg_opacity, (backgroundAlpha * 100).toInt(), 0..100, it) { v -> backgroundAlpha = v / 100f } }
+        }
+        Group(stringResource(R.string.group_text)) {
+            item { SliderItem(stringResource(R.string.text_size, textSize), R.string.text_size, textSize, 10..24, it) { v -> textSize = v } }
+            item { SwitchItem(R.string.text_color_auto, textColorAuto, it) { v -> textColorAuto = v } }
+            if (!textColorAuto) item {
+                PlainItem(it, R.string.text_color) {
+                    Text(stringResource(R.string.text_color), style = MaterialTheme.typography.bodyLarge)
+                // Every circle sits in a 48 dp touch area, which also sets the distance between the circles.
+                FlowRow {
+                    TEXT_COLORS.forEach { color ->
+                        RoundTouchTarget(onClick = { textColor = color }) {
+                            Box(
+                                Modifier.size(if (color == textColor) 44.dp else 36.dp)
+                                    .clip(CircleShape).background(Color(color))
+                                    .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape),
+                            )
+                        }
+                    }
+                    // Opens the color picker; shows the current color when it is a custom one.
+                    val isCustom = textColor !in TEXT_COLORS
+                    RoundTouchTarget(onClick = { showColorPicker = true }) {
+                        Box(
+                            Modifier.size(if (isCustom) 44.dp else 36.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    if (isCustom) Brush.linearGradient(listOf(Color(textColor), Color(textColor)))
+                                    else Brush.sweepGradient(
+                                        listOf(Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red)
+                                    )
+                                )
+                                .border(
+                                    if (isCustom) 3.dp else 1.dp,
+                                    if (isCustom) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                                    CircleShape,
+                                ),
+                            contentAlignment = Alignment.Center,
+                        ) { if (!isCustom) Icon(painterResource(R.drawable.ic_add), contentDescription = null, tint = Color.White) }
+                    }
+                }
                 }
             }
-            // Opens the color picker; shows the current color when it is a custom one.
-            val isCustom = textColor !in TEXT_COLORS
-            RoundTouchTarget(onClick = { showColorPicker = true }) {
-                Box(
-                    Modifier.size(if (isCustom) 44.dp else 36.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (isCustom) Brush.linearGradient(listOf(Color(textColor), Color(textColor)))
-                            else Brush.sweepGradient(
-                                listOf(Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red)
-                            )
-                        )
-                        .border(
-                            if (isCustom) 3.dp else 1.dp,
-                            if (isCustom) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                            CircleShape,
-                        ),
-                    contentAlignment = Alignment.Center,
-                ) { if (!isCustom) Icon(painterResource(R.drawable.ic_add), contentDescription = null, tint = Color.White) }
-            }
         }
-
+        Group(stringResource(R.string.group_notes)) {
+            item { SwitchItem(R.string.show_note_colors, showNoteColors, it) { v -> showNoteColors = v } }
+            item { SliderItem(stringResource(R.string.note_opacity, (noteAlpha * 100).toInt()), R.string.note_opacity, (noteAlpha * 100).toInt(), 0..100, it) { v -> noteAlpha = v / 100f } }
+            item { ChoiceItem(R.string.plain_style, plainStyles(), plainStyle, it) { v -> plainStyle = v } }
         }
-
-        HorizontalDivider(Modifier.padding(vertical = 4.dp))
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.show_note_colors), Modifier.weight(1f).searchFlash(R.string.show_note_colors))
-            Switch(checked = showNoteColors, onCheckedChange = { showNoteColors = it })
-        }
-        Text(stringResource(R.string.note_opacity, (noteAlpha * 100).toInt()), Modifier.searchFlash(R.string.note_opacity))
-        ValueSlider(value = noteAlpha, onValueChange = { noteAlpha = it })
-
-        Text(stringResource(R.string.plain_style), Modifier.searchFlash(R.string.plain_style))
-        ChoiceGroup(plainStyles(), plainStyle) { plainStyle = it }
     }
 }
 
@@ -112,60 +103,51 @@ internal fun ColumnScope.AppearancePage(s: SettingsState) {
 internal fun ColumnScope.NotesPage(s: SettingsState) {
     with(s) {
         if (!isSingleNote) {
-            Text(stringResource(R.string.sort_by), Modifier.searchFlash(R.string.sort_by), style = MaterialTheme.typography.titleMedium)
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                listOf(
-                    SORT_KEEP to R.string.sort_keep,
-                    SORT_EDITED to R.string.sort_edited,
-                    SORT_CREATED to R.string.sort_created,
-                    SORT_TITLE to R.string.sort_title,
-                    SORT_MANUAL to R.string.sort_manual,
-                ).forEach { (mode, label) ->
-                    FilterChip(
-                        selected = sortMode == mode,
-                        onClick = { sortMode = mode },
-                        label = { Text(stringResource(label)) },
-                    )
-                }
-            }
-            HorizontalDivider(Modifier.padding(vertical = 4.dp))
-        }
-        SwitchRow(R.string.show_images, showImages) { showImages = it }
-        SwitchRow(R.string.show_edited_time, showEditedTime) { showEditedTime = it }
-        SwitchRow(R.string.show_labels, showLabels) { showLabels = it }
-        SwitchRow(R.string.reminder_show_widget, showReminders) { showReminders = it }
-        if (!isSingleNote) {
             // Only the notes with one label: the labels of the account this widget shows.
             val labelChoices = remember(widgetAccount, accounts.size) {
                 NotesCache.labels(context, CredentialStore.resolve(context, widgetAccount))
             }
-            PopupRow(
-                pendingPopup == "labelfilter", { pendingPopup = null },
-                stringResource(R.string.label_filter),
-                labelFilter.ifEmpty { stringResource(R.string.all_notes) },
-                listOf(
-                    MenuEntry(stringResource(R.string.all_notes), selected = labelFilter.isEmpty()) { labelFilter = "" },
-                ) + labelChoices.map { name ->
-                    MenuEntry(name, selected = name == labelFilter) { labelFilter = name }
-                },
-            )
+            Group(stringResource(R.string.group_order)) {
+                item {
+                    ChoiceItem(
+                        R.string.sort_by,
+                        listOf(
+                            SORT_KEEP to stringResource(R.string.sort_keep), SORT_EDITED to stringResource(R.string.sort_edited),
+                            SORT_CREATED to stringResource(R.string.sort_created), SORT_TITLE to stringResource(R.string.sort_title),
+                            SORT_MANUAL to stringResource(R.string.sort_manual),
+                        ),
+                        sortMode, it,
+                    ) { v -> sortMode = v }
+                }
+                item {
+                    PopupRow(
+                        pendingPopup == "labelfilter", { pendingPopup = null },
+                        stringResource(R.string.label_filter),
+                        labelFilter.ifEmpty { stringResource(R.string.all_notes) },
+                        listOf(
+                            MenuEntry(stringResource(R.string.all_notes), selected = labelFilter.isEmpty()) { labelFilter = "" },
+                        ) + labelChoices.map { name ->
+                            MenuEntry(name, selected = name == labelFilter) { labelFilter = name }
+                        },
+                        shapes = it,
+                    )
+                }
+                // 0 means unlimited. Longer notes are cut off in the list; the editor shows everything.
+                item {
+                    SliderItem(
+                        if (maxLines == 0) stringResource(R.string.max_lines_unlimited) else stringResource(R.string.max_lines, maxLines),
+                        R.string.max_lines, maxLines, 0..30, it, steps = 29,
+                    ) { v -> maxLines = v }
+                }
+            }
         }
-        if (!isSingleNote) SwitchRow(R.string.show_progress, showProgress) { showProgress = it }
-        if (!isSingleNote) SwitchRow(R.string.fold_notes_widget, foldable) { foldable = it }
-        if (!isSingleNote) {
-            // 0 means unlimited. Longer notes are cut off in the list; the editor shows everything.
-            Text(
-                if (maxLines == 0) stringResource(R.string.max_lines_unlimited)
-                else stringResource(R.string.max_lines, maxLines),
-                Modifier.searchFlash(R.string.max_lines),
-            )
-            ValueSlider(
-                value = maxLines.toFloat(), onValueChange = { maxLines = it.toInt() },
-                valueRange = 0f..30f, steps = 29,
-            )
+        Group(stringResource(R.string.group_card_content)) {
+            item { SwitchItem(R.string.show_images, showImages, it) { v -> showImages = v } }
+            item { SwitchItem(R.string.show_labels, showLabels, it) { v -> showLabels = v } }
+            if (!isSingleNote) item { SwitchItem(R.string.show_progress, showProgress, it) { v -> showProgress = v } }
+            item { SwitchItem(R.string.reminder_show_widget, showReminders, it) { v -> showReminders = v } }
+            item { SwitchItem(R.string.show_edited_time, showEditedTime, it) { v -> showEditedTime = v } }
+            if (!isSingleNote) item { SwitchItem(R.string.fold_notes_widget, foldable, it) { v -> foldable = v } }
         }
     }
 }
@@ -224,57 +206,27 @@ internal fun ColumnScope.ManageNotesPage(s: SettingsState) {
 @Composable
 internal fun ColumnScope.ChecklistsPage(s: SettingsState) {
     with(s) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.check_in_widget), Modifier.weight(1f).searchFlash(R.string.check_in_widget))
-            Switch(checked = checkable, onCheckedChange = { checkable = it })
+        Group(stringResource(R.string.group_ticking)) {
+            item { SwitchItem(R.string.check_in_widget, checkable, it) { v -> checkable = v } }
+            if (checkable) item { SwitchItem(R.string.delete_checked, deleteChecked, it) { v -> deleteChecked = v } }
+            if (checkable) item { SwitchItem(R.string.tap_whole_row, tapWholeRow, it) { v -> tapWholeRow = v } }
+            item { SwitchItem(R.string.checked_to_end, checkedToEnd, it) { v -> checkedToEnd = v } }
+            if (checkedToEnd) item { SwitchItem(R.string.collapse_checked, collapseChecked, it) { v -> collapseChecked = v } }
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.checked_to_end), Modifier.weight(1f).searchFlash(R.string.checked_to_end))
-            Switch(checked = checkedToEnd, onCheckedChange = { checkedToEnd = it })
-        }
-        if (checkedToEnd) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.collapse_checked), Modifier.weight(1f).searchFlash(R.string.collapse_checked))
-                Switch(checked = collapseChecked, onCheckedChange = { collapseChecked = it })
-            }
-        }
-        if (checkable) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.delete_checked), Modifier.weight(1f).searchFlash(R.string.delete_checked))
-                Switch(checked = deleteChecked, onCheckedChange = { deleteChecked = it })
-            }
-        }
-        HorizontalDivider(Modifier.padding(vertical = 4.dp))
-        Text("${stringResource(R.string.list_spacing)}: $listSpacingDp dp", Modifier.searchFlash(R.string.list_spacing))
-        ValueSlider(
-            value = listSpacingDp.toFloat(), onValueChange = { listSpacingDp = it.toInt() },
-            valueRange = 0f..24f,
-        )
-
-        HorizontalDivider(Modifier.padding(vertical = 4.dp))
-        Text(stringResource(R.string.checkbox_style), Modifier.searchFlash(R.string.checkbox_style), style = MaterialTheme.typography.titleMedium)
-        ChoiceGroup(checkboxStyles(), checkboxStyle) { checkboxStyle = it }
-        Text(stringResource(R.string.checkbox_size, checkboxSizeDp), Modifier.searchFlash(R.string.checkbox_size))
-        ValueSlider(
-            value = checkboxSizeDp.toFloat(), onValueChange = { checkboxSizeDp = it.toInt() },
-            valueRange = 14f..56f,
-        )
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.tap_whole_row), Modifier.weight(1f).searchFlash(R.string.tap_whole_row))
-            Switch(checked = tapWholeRow, onCheckedChange = { tapWholeRow = it })
-        }
-        // Live preview of both states with the chosen style, size and spacing.
-        listOf(false, true).forEach { checked ->
-            Row(
-                Modifier.padding(vertical = listSpacingDp.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                CheckboxPreview(checkboxStyle, checked, checkboxSizeDp)
-                Text(
-                    stringResource(R.string.item_hint),
-                    Modifier.padding(start = 12.dp),
-                    fontSize = textSize.sp,
-                )
+        Group(stringResource(R.string.group_checkboxes)) {
+            item { ChoiceItem(R.string.checkbox_style, checkboxStyles(), checkboxStyle, it) { v -> checkboxStyle = v } }
+            item { SliderItem(stringResource(R.string.checkbox_size, checkboxSizeDp), R.string.checkbox_size, checkboxSizeDp, 14..56, it) { v -> checkboxSizeDp = v } }
+            item { SliderItem("${stringResource(R.string.list_spacing)}: $listSpacingDp dp", R.string.list_spacing, listSpacingDp, 0..24, it) { v -> listSpacingDp = v } }
+            // Live preview of both states with the chosen style, size and spacing.
+            item {
+                PlainItem(it) {
+                    listOf(false, true).forEach { checked ->
+                        Row(Modifier.padding(vertical = listSpacingDp.dp), verticalAlignment = Alignment.CenterVertically) {
+                            CheckboxPreview(checkboxStyle, checked, checkboxSizeDp)
+                            Text(stringResource(R.string.item_hint), Modifier.padding(start = 12.dp), fontSize = textSize.sp)
+                        }
+                    }
+                }
             }
         }
     }
@@ -299,22 +251,28 @@ internal fun ColumnScope.ButtonBarPage(s: SettingsState) {
             if (id == BTN_SETTINGS && zone == BAR_HIDDEN) confirmSettingsButtonOff = true
             else buttonLayout = buttonLayout.moved(id, zone, beforeId)
         }
-        Text(stringResource(R.string.header_size, headerSize), Modifier.searchFlash(R.string.header_size))
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            ValueSlider(
-                value = headerSize.toFloat(), onValueChange = { headerSize = it.toInt() },
-                valueRange = 16f..40f,
-                modifier = Modifier.weight(1f),
-            )
-            // The real icon in its real size; the outline is the touch area (8 dp of padding on each side).
-            Box(Modifier.size(56.dp), contentAlignment = Alignment.Center) {
-                Box(
-                    Modifier
-                        .size((headerSize + 16).dp)
-                        .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant), MaterialTheme.shapes.small),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(painterResource(R.drawable.ic_settings), null, Modifier.size(headerSize.dp))
+        Group {
+            item {
+                PlainItem(it, R.string.header_size) {
+                    Text(stringResource(R.string.header_size, headerSize), style = MaterialTheme.typography.bodyLarge)
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        ValueSlider(
+                            value = headerSize.toFloat(), onValueChange = { headerSize = it.toInt() },
+                            valueRange = 16f..40f,
+                            modifier = Modifier.weight(1f),
+                        )
+                        // The real icon in its real size; the outline is the touch area (8 dp of padding on each side).
+                        Box(Modifier.size(56.dp), contentAlignment = Alignment.Center) {
+                            Box(
+                                Modifier
+                                    .size((headerSize + 16).dp)
+                                    .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant), MaterialTheme.shapes.small),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(painterResource(R.drawable.ic_settings), null, Modifier.size(headerSize.dp))
+                            }
+                        }
+                    }
                 }
             }
         }

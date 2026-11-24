@@ -536,7 +536,27 @@
     <string name="sync_unlock_min_age_hint">عند فتح القفل كثيرًا لا يسأل التطبيق Google إلا إذا كان ما تعرضه الأدوات أقدم من ذلك (0 = عند كل فتح، ضمن الحد الأدنى للفاصل).</string>
     <string name="sync_group_limits">الحدود</string>
     <string name="list_quantities">الكميات في القوائم</string>
-    <string name="list_quantities_hint">الرقم المكتوب في العنصر مثل «2x Tortellini» أو «Tortellini x2» يظهر كحبة صغيرة يمكنك زيادتها وإنقاصها. في Keep يبقى نصًا عاديًا.</string>
+    <string name="list_quantities_hint">الرقم المكتوب في العنصر، مثل «2x Tortellini» أو «Tortellini x2»، يظهر على زر العنصر في المحرر حيث يمكنك زيادته وإنقاصه. تعرضه البطاقات والأدوات قبل النص. في Keep يبقى نصًا عاديًا.</string>
     <string name="quantity_less">أقل</string>
     <string name="quantity_more">أكثر</string>
+    <string name="group_card_content">ما تعرضه البطاقة</string>
+    <string name="group_card_details">التفاصيل</string>
+    <string name="group_checkboxes">مربعات الاختيار</string>
+    <string name="group_convert">التحويل إلى ملاحظة</string>
+    <string name="group_filter_chips">أزرار التصفية</string>
+    <string name="group_in_editor">في المحرر</string>
+    <string name="group_locks">الأقفال</string>
+    <string name="group_look">المظهر</string>
+    <string name="group_notes">الملاحظات</string>
+    <string name="group_on_cards">على البطاقات</string>
+    <string name="group_order">الترتيب</string>
+    <string name="group_quantities">الكميات</string>
+    <string name="group_settings_file">ملف الإعدادات</string>
+    <string name="group_text">النص</string>
+    <string name="group_ticking">وضع العلامة</string>
+    <string name="group_widget_background">الخلفية</string>
+    <string name="group_widgets">الأدوات</string>
+    <string name="quantity_action">الكمية</string>
+    <string name="quantity_pick_item">انقر أولًا على العنصر الذي تريد عدّه.</string>
+    <string name="list_quantity_one">إظهار «1x» للعناصر بلا كمية</string>
 </resources>

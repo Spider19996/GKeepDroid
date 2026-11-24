@@ -40,6 +40,8 @@ val EDITOR_ACTIONS = listOf(
     ButtonSpec("list_check_all", R.drawable.ic_done_all, R.string.list_check_all, 0, ZONE_MENU),
     ButtonSpec("list_uncheck_all", R.drawable.ic_remove_done, R.string.list_uncheck_all, 0, ZONE_MENU),
     ButtonSpec("list_sort", R.drawable.ic_sort, R.string.list_sort_alpha, 0, ZONE_MENU),
+    // Opens the counter of the item being edited ("2x Tortellini").
+    ButtonSpec("list_quantity", R.drawable.ic_add, R.string.quantity_action, 0, ZONE_MENU),
     // Gives an ordinary checklist categories (its first one, empty), or takes them all away again.
     ButtonSpec("list_categories", R.drawable.ic_category, R.string.list_categorize, 0, ZONE_MENU),
     // Puts "> " before the lines of the selection (or the line of the cursor): a block that can be folded.
@@ -61,7 +63,7 @@ val EDITOR_ACTIONS = listOf(
 )
 
 /** The checklist tools; in the menu they share one entry that opens a page of their own. */
-private val LIST_TOOLS = setOf("list_number", "list_check_all", "list_uncheck_all", "list_sort", "list_categories", "list_delete_checked", "add_item", "add_divider")
+private val LIST_TOOLS = setOf("list_number", "list_check_all", "list_uncheck_all", "list_sort", "list_quantity", "list_categories", "list_delete_checked", "add_item", "add_divider")
 
 fun isListTool(id: String) = id in LIST_TOOLS
 

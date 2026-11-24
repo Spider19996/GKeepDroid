@@ -509,7 +509,27 @@
     <string name="sync_unlock_min_age_hint">Sbloccando spesso, l’app interroga Google solo quando ciò che mostrano i widget è più vecchio (0 = a ogni sblocco, nel rispetto dell’intervallo minimo).</string>
     <string name="sync_group_limits">Limiti</string>
     <string name="list_quantities">Quantità nelle liste</string>
-    <string name="list_quantities_hint">Un numero scritto in un elemento, come «2x Tortellini» o «Tortellini x2», appare in una piccola pillola che puoi aumentare e diminuire. In Keep resta testo normale.</string>
+    <string name="list_quantities_hint">Un numero scritto in un elemento, come «2x Tortellini» o «Tortellini x2», appare sul pulsante dell’elemento nell’editor, dove puoi aumentarlo e diminuirlo. Schede e widget lo mostrano davanti al testo. In Keep resta testo normale.</string>
     <string name="quantity_less">Meno</string>
     <string name="quantity_more">Più</string>
+    <string name="group_card_content">Cosa mostra una scheda</string>
+    <string name="group_card_details">Dettagli</string>
+    <string name="group_checkboxes">Caselle</string>
+    <string name="group_convert">Conversione in nota</string>
+    <string name="group_filter_chips">Pulsanti filtro</string>
+    <string name="group_in_editor">Nell’editor</string>
+    <string name="group_locks">Blocchi</string>
+    <string name="group_look">Aspetto</string>
+    <string name="group_notes">Note</string>
+    <string name="group_on_cards">Sulle schede</string>
+    <string name="group_order">Ordine</string>
+    <string name="group_quantities">Quantità</string>
+    <string name="group_settings_file">File delle impostazioni</string>
+    <string name="group_text">Testo</string>
+    <string name="group_ticking">Spuntare</string>
+    <string name="group_widget_background">Sfondo</string>
+    <string name="group_widgets">Widget</string>
+    <string name="quantity_action">Quantità</string>
+    <string name="quantity_pick_item">Tocca prima l’elemento che vuoi contare.</string>
+    <string name="list_quantity_one">Mostra «1x» per gli elementi senza quantità</string>
 </resources>

@@ -500,7 +500,27 @@
     <string name="sync_unlock_min_age_hint">बार-बार अनलॉक करने पर ऐप Google से तभी पूछता है जब विजेट में दिखी जानकारी इससे पुरानी हो (0 = हर अनलॉक पर, न्यूनतम अंतराल के भीतर)।</string>
     <string name="sync_group_limits">सीमाएँ</string>
     <string name="list_quantities">सूचियों में मात्रा</string>
-    <string name="list_quantities_hint">किसी आइटम में लिखी संख्या, जैसे “2x Tortellini” या “Tortellini x2”, एक छोटी पिल के रूप में दिखती है जिसे आप घटा-बढ़ा सकते हैं। Keep में यह सामान्य टेक्स्ट रहता है।</string>
+    <string name="list_quantities_hint">आइटम में लिखी संख्या, जैसे “2x Tortellini” या “Tortellini x2”, एडिटर में आइटम के बटन पर दिखती है, जहाँ आप उसे घटा-बढ़ा सकते हैं। कार्ड और विजेट इसे टेक्स्ट से पहले दिखाते हैं। Keep में यह सामान्य टेक्स्ट रहता है।</string>
     <string name="quantity_less">कम</string>
     <string name="quantity_more">ज़्यादा</string>
+    <string name="group_card_content">कार्ड क्या दिखाता है</string>
+    <string name="group_card_details">विवरण</string>
+    <string name="group_checkboxes">चेकबॉक्स</string>
+    <string name="group_convert">नोट में बदलना</string>
+    <string name="group_filter_chips">फ़िल्टर बटन</string>
+    <string name="group_in_editor">एडिटर में</string>
+    <string name="group_locks">लॉक</string>
+    <string name="group_look">रूप</string>
+    <string name="group_notes">नोट</string>
+    <string name="group_on_cards">कार्ड पर</string>
+    <string name="group_order">क्रम</string>
+    <string name="group_quantities">मात्राएँ</string>
+    <string name="group_settings_file">सेटिंग फ़ाइल</string>
+    <string name="group_text">टेक्स्ट</string>
+    <string name="group_ticking">टिक करना</string>
+    <string name="group_widget_background">पृष्ठभूमि</string>
+    <string name="group_widgets">विजेट</string>
+    <string name="quantity_action">मात्रा</string>
+    <string name="quantity_pick_item">पहले वह आइटम टैप करें जिसे आप गिनना चाहते हैं।</string>
+    <string name="list_quantity_one">बिना मात्रा वाले आइटम पर “1x” दिखाएँ</string>
 </resources>

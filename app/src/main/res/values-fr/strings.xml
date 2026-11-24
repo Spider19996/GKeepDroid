@@ -509,7 +509,27 @@
     <string name="sync_unlock_min_age_hint">En déverrouillant souvent, l’app n’interroge Google que si ce qu’affichent les widgets est plus ancien (0 = à chaque déverrouillage, dans la limite de l’écart minimal).</string>
     <string name="sync_group_limits">Limites</string>
     <string name="list_quantities">Quantités dans les listes</string>
-    <string name="list_quantities_hint">Un nombre écrit dans un élément, comme « 2x Tortellini » ou « Tortellini x2 », s’affiche dans une petite pastille que vous pouvez augmenter ou diminuer. Dans Keep, cela reste du texte normal.</string>
+    <string name="list_quantities_hint">Un nombre écrit dans un élément, comme « 2x Tortellini » ou « Tortellini x2 », s’affiche sur le bouton de l’élément dans l’éditeur, où vous pouvez l’augmenter ou le diminuer. Les cartes et les widgets l’affichent devant le texte. Dans Keep, cela reste du texte normal.</string>
     <string name="quantity_less">Moins</string>
     <string name="quantity_more">Plus</string>
+    <string name="group_card_content">Ce qu’affiche une carte</string>
+    <string name="group_card_details">Détails</string>
+    <string name="group_checkboxes">Cases à cocher</string>
+    <string name="group_convert">Conversion en note</string>
+    <string name="group_filter_chips">Boutons de filtre</string>
+    <string name="group_in_editor">Dans l’éditeur</string>
+    <string name="group_locks">Verrous</string>
+    <string name="group_look">Apparence</string>
+    <string name="group_notes">Notes</string>
+    <string name="group_on_cards">Sur les cartes</string>
+    <string name="group_order">Ordre</string>
+    <string name="group_quantities">Quantités</string>
+    <string name="group_settings_file">Fichier de réglages</string>
+    <string name="group_text">Texte</string>
+    <string name="group_ticking">Cocher</string>
+    <string name="group_widget_background">Arrière-plan</string>
+    <string name="group_widgets">Widgets</string>
+    <string name="quantity_action">Quantité</string>
+    <string name="quantity_pick_item">Touchez d’abord l’élément à compter.</string>
+    <string name="list_quantity_one">Afficher « 1x » pour les éléments sans quantité</string>
 </resources>

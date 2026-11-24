@@ -501,7 +501,27 @@
     <string name="sync_unlock_min_age_hint">A frequent unlock asks Google only when what the widgets show is older than this (0 = every unlock, within the minimum gap).</string>
     <string name="sync_group_limits">Limits</string>
     <string name="list_quantities">Quantities in checklists</string>
-    <string name="list_quantities_hint">A number written into an item, such as “2x Tortellini” or “Tortellini x2”, shows as a small pill that you can count up and down. In Keep it stays plain text.</string>
+    <string name="list_quantities_hint">A number written into an item, such as “2x Tortellini” or “Tortellini x2”, shows on the item’s button in the editor, where you can count it up and down. Cards and widgets show it in front of the text. In Keep it stays plain text.</string>
     <string name="quantity_less">Fewer</string>
     <string name="quantity_more">More</string>
+    <string name="group_card_content">What a card shows</string>
+    <string name="group_card_details">Details</string>
+    <string name="group_checkboxes">Checkboxes</string>
+    <string name="group_convert">Turning into a note</string>
+    <string name="group_filter_chips">Filter buttons</string>
+    <string name="group_in_editor">In the editor</string>
+    <string name="group_locks">Locks</string>
+    <string name="group_look">Look</string>
+    <string name="group_notes">Notes</string>
+    <string name="group_on_cards">On the cards</string>
+    <string name="group_order">Order</string>
+    <string name="group_quantities">Quantities</string>
+    <string name="group_settings_file">Settings file</string>
+    <string name="group_text">Text</string>
+    <string name="group_ticking">Ticking</string>
+    <string name="group_widget_background">Background</string>
+    <string name="group_widgets">Widgets</string>
+    <string name="quantity_action">Quantity</string>
+    <string name="quantity_pick_item">Tap the item you want to count first.</string>
+    <string name="list_quantity_one">Show “1x” for items without a quantity</string>
 </resources>

@@ -32,7 +32,6 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -96,6 +95,8 @@ internal fun ChecklistRow(
     swipeRight: Int = ITEM_SWIPE_TICK, swipeLeft: Int = ITEM_SWIPE_REMOVE, onSwipe: ((Boolean) -> Unit)? = null,
     /** An item in a category: a second frame around it shows that it belongs to one. */
     framed: Boolean = false,
+    /** The editor's "Quantity" action chose this item: its counter opens. */
+    quantityRequested: Boolean = false, onQuantityShown: () -> Unit = {},
     /** Moved along by something else (its category is held): it does not glide on its own then. */
     carried: Boolean = false,
 ) {
@@ -121,10 +122,11 @@ internal fun ChecklistRow(
     var handle by remember { mutableStateOf<LayoutCoordinates?>(null) }
     // A number written into the item ("2x Tortellini") stands in a pill at its end instead of in the text.
     val appContext = androidx.compose.ui.platform.LocalContext.current
-    val quantities = remember { AppSettingsStore.load(appContext).listQuantities } && !item.isDivider()
+    val quantitySettings = remember { AppSettingsStore.load(appContext).let { it.listQuantities to it.listQuantityOne } }
+    val quantities = quantitySettings.first && !item.isDivider()
+    // With the setting on, an item without a number shows a 1 as well.
+    val showOne = quantities && quantitySettings.second && item.text.isNotBlank()
     val quantity = if (quantities) Quantities.find(item.text) else null
-    var focused by remember { mutableStateOf(false) }
-    val showPill = quantity != null || (quantities && editable && focused && item.text.isNotBlank())
     var pillOpen by remember { mutableStateOf(false) }
     // The handle stays in the middle of the row; when the text wraps to another line (or loses one) it glides there instead of
     // jumping. The first height is taken as it is, so a long item does not slide into place when the editor opens.
@@ -233,10 +235,6 @@ internal fun ChecklistRow(
                 visualTransformation = (if (flags != null) remember(flags, flagsVersion, item.text) { FlagsTransformation(flags) } else VisualTransformation.None)
                     .let { if (quantities) QuantityTransformation(it) else it },
                 // The pill: the number when there is one, and on the item being typed into a quiet "1×" to start counting.
-                // Room for the pill, which lies above the row's end (see below), so the text never runs under it.
-                trailingIcon = if (showPill) {
-                    { Spacer(Modifier.width(animateDpAsState(if (pillOpen) 120.dp else 64.dp, label = "pill").value)) }
-                } else null,
                 placeholder = { Text(stringResource(R.string.item_hint)) },
                 // The text starts 48 dp from the left edge (16 dp content padding plus this room), where the strip with the
                 // capsule ends; the strip is drawn on top. In a numbered list the number stands in front of the text and is
@@ -255,12 +253,29 @@ internal fun ChecklistRow(
                 } else {
                     LocalTextStyle.current
                 },
-                modifier = Modifier.fillMaxWidth().focusRequester(focusRequester).onFocusChanged { focused = it.isFocused; if (it.isFocused) onFocus() }.then(modifier),
+                modifier = Modifier.fillMaxWidth().focusRequester(focusRequester).onFocusChanged { if (it.isFocused) onFocus() }.then(modifier),
             )
-            // The pill above the end of the field: a slot of the field would cut off the taps of the opened − and +.
-            if (showPill) Box(Modifier.align(Alignment.CenterEnd).padding(end = 8.dp)) {
-                if (editable) QuantityPill(quantity?.count ?: 1, offer = quantity == null, open = pillOpen, onOpen = { pillOpen = it }) { onText(Quantities.withCount(item.text, it)) }
-                else QuantityBadge(quantity?.count ?: 1, MaterialTheme.colorScheme.onSurface)
+            // The number of the item sits on the top right corner of its button, and a tap on it (or the editor's "Quantity" action)
+            // opens a small counter beside it.
+            androidx.compose.runtime.LaunchedEffect(quantityRequested) { if (quantityRequested) { pillOpen = true; onQuantityShown() } }
+            if (quantity != null || pillOpen || showOne) Box(
+                Modifier.align(Alignment.TopStart).offset { IntOffset(0, handleTop.value.toInt()) }
+                    // The tag has a 48 dp touch area with the tag in its middle; that middle sits on the capsule's top right corner
+                    // (37 dp from the left, 8 dp from the top of the 56 dp strip).
+                    .offset(x = 13.dp, y = (-16).dp).size(48.dp).zIndex(1f),
+                // A fixed size, so the counter keeps its place when the tag appears or goes.
+                contentAlignment = Alignment.Center,
+            ) {
+                if (quantity != null || showOne) QuantityTag(quantity?.count ?: 1) { if (editable) pillOpen = true }
+                if (pillOpen && editable) androidx.compose.ui.window.Popup(
+                    alignment = Alignment.CenterStart,
+                    // Beside the tag, level with the middle of the row's button.
+                    offset = with(LocalDensity.current) { IntOffset(40.dp.roundToPx(), 20.dp.roundToPx()) },
+                    onDismissRequest = { pillOpen = false },
+                    properties = androidx.compose.ui.window.PopupProperties(focusable = true),
+                ) {
+                    QuantityStepper(quantity?.count ?: 1) { onText(Quantities.withCount(item.text, it)) }
+                }
             }
             // One button for both jobs: a tap switches the item between done and open, holding it and dragging moves the row.
             // The whole strip at the left is the touch area, 48 dp wide as Material asks; the capsule in it is the housing of the

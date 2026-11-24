@@ -30,6 +30,8 @@ internal class EditorModel {
     var focusItemId by mutableStateOf<String?>(null)
     var addMenuOpen by mutableStateOf<Boolean>(false)
     var newCategoryDialog by mutableStateOf<Boolean>(false)
+    /** The item whose counter the "Quantity" action asked to open. */
+    var quantityItem by mutableStateOf<String?>(null)
     var newCategoryFor by mutableStateOf<String?>(null)
     var newCategoryEmpty by mutableStateOf<Boolean>(false)
     var moveItems by mutableStateOf<List<String>?>(null)

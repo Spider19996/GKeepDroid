@@ -509,7 +509,27 @@
     <string name="sync_unlock_min_age_hint">Al desbloquear a menudo, solo se consulta a Google cuando lo que muestran los widgets es más antiguo (0 = en cada desbloqueo, respetando el intervalo mínimo).</string>
     <string name="sync_group_limits">Límites</string>
     <string name="list_quantities">Cantidades en listas</string>
-    <string name="list_quantities_hint">Un número escrito en un elemento, como «2x Tortellini» o «Tortellini x2», aparece como una pequeña píldora que puedes aumentar y disminuir. En Keep sigue siendo texto normal.</string>
+    <string name="list_quantities_hint">Un número escrito en un elemento, como «2x Tortellini» o «Tortellini x2», aparece en el botón del elemento en el editor, donde puedes aumentarlo y disminuirlo. Las tarjetas y los widgets lo muestran delante del texto. En Keep sigue siendo texto normal.</string>
     <string name="quantity_less">Menos</string>
     <string name="quantity_more">Más</string>
+    <string name="group_card_content">Qué muestra una tarjeta</string>
+    <string name="group_card_details">Detalles</string>
+    <string name="group_checkboxes">Casillas</string>
+    <string name="group_convert">Convertir en nota</string>
+    <string name="group_filter_chips">Botones de filtro</string>
+    <string name="group_in_editor">En el editor</string>
+    <string name="group_locks">Bloqueos</string>
+    <string name="group_look">Aspecto</string>
+    <string name="group_notes">Notas</string>
+    <string name="group_on_cards">En las tarjetas</string>
+    <string name="group_order">Orden</string>
+    <string name="group_quantities">Cantidades</string>
+    <string name="group_settings_file">Archivo de ajustes</string>
+    <string name="group_text">Texto</string>
+    <string name="group_ticking">Marcar</string>
+    <string name="group_widget_background">Fondo</string>
+    <string name="group_widgets">Widgets</string>
+    <string name="quantity_action">Cantidad</string>
+    <string name="quantity_pick_item">Toca primero el elemento que quieres contar.</string>
+    <string name="list_quantity_one">Mostrar «1x» en elementos sin cantidad</string>
 </resources>

@@ -42,57 +42,40 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun ColumnScope.AccountsPage(s: SettingsState) {
     with(s) {
-        accounts.forEach { account ->
-            val local = CredentialStore.isLocal(account)
-            Row(
-                Modifier.fillMaxWidth().clickable(enabled = !local) {
-                    // Updating the token of an account means using the master token form.
-                    email = account
-                    showTokenForm = true
-                },
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(Modifier.weight(1f)) {
-                    Text(CredentialStore.displayName(context, account, demoMode))
-                    if (!CredentialStore.isUsable(context, account)) {
-                        Text(
-                            stringResource(R.string.token_missing),
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    }
-                }
-                TextButton(onClick = {
-                    if (local) {
-                        confirmRemoveLocal = true
-                    } else {
-                        CredentialStore.remove(context, account)
-                        refreshAccounts()
-                        scope.launch { WidgetRefresh.all(context) }
-                    }
-                }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.remove_account)) }
-            }
-        }
-
-        if (hasWidget && accounts.size > 1) {
-            HorizontalDivider()
-            Text(stringResource(R.string.account_for_widget), Modifier.searchFlash(R.string.account_for_widget), style = MaterialTheme.typography.titleMedium)
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                val selected = CredentialStore.resolve(context, widgetAccount)
-                accounts.forEach { account ->
-                    FilterChip(
-                        selected = selected == account,
-                        onClick = { widgetAccount = account },
-                        label = { Text(CredentialStore.displayName(context, account, demoMode)) },
-                    )
+        if (accounts.isNotEmpty()) Group {
+            accounts.forEach { account ->
+                item { shapes ->
+                    val local = CredentialStore.isLocal(account)
+                    androidx.compose.material3.SegmentedListItem(
+                        // Updating the token of an account means using the master token form.
+                        onClick = { if (!local) { email = account; showTokenForm = true } },
+                        shapes = shapes,
+                        colors = androidx.compose.material3.ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                        supportingContent = if (!CredentialStore.isUsable(context, account)) {
+                            { Text(stringResource(R.string.token_missing), color = MaterialTheme.colorScheme.error) }
+                        } else null,
+                        trailingContent = {
+                            TextButton(onClick = {
+                                if (local) {
+                                    confirmRemoveLocal = true
+                                } else {
+                                    CredentialStore.remove(context, account)
+                                    refreshAccounts()
+                                    scope.launch { WidgetRefresh.all(context) }
+                                }
+                            }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.remove_account)) }
+                        },
+                    ) { Text(CredentialStore.displayName(context, account, demoMode)) }
                 }
             }
+            if (hasWidget && accounts.size > 1) item {
+                ChoiceItem(
+                    R.string.account_for_widget,
+                    accounts.map { it to CredentialStore.displayName(context, it, demoMode) },
+                    CredentialStore.resolve(context, widgetAccount).orEmpty(), it,
+                ) { v -> widgetAccount = v }
+            }
         }
-
-        if (accounts.isNotEmpty()) HorizontalDivider()
 
         // Google sign-in is the normal way; the master token stays as an alternative.
         Button(
@@ -211,57 +194,119 @@ internal fun ColumnScope.SyncPage(s: SettingsState) {
 internal fun ColumnScope.BackupPage(s: SettingsState) {
     with(s) {
         // Notes: the Markdown folder, synced both ways, is the continuous copy of all notes.
-        SectionTitle(stringResource(R.string.md_sync_title))
-        SwitchRow(R.string.md_sync_enable, mdEnabled) { on ->
-            if (on && MarkdownSync.treeUri(context) == null) {
-                folderLauncher.launch(null)
-            } else {
-                MarkdownSync.setEnabled(context, on)
-                mdEnabled = on
-            }
-        }
-        if (mdFolder != null) FolderRow(R.string.md_sync_folder, mdFolder.orEmpty(), R.string.md_sync_choose, mdEnabled, mdBusy, R.string.md_sync_now,
-            onChoose = { folderLauncher.launch(null) },
-            onSync = {
-                scope.launch {
-                    mdBusy = true
-                    status = runCatching { MarkdownSync.syncNow(context) }.fold(
-                        onSuccess = { context.resources.getQuantityString(R.plurals.md_sync_done, it, it) },
-                        onFailure = { context.getString(R.string.md_sync_failed, it.message ?: it.javaClass.simpleName) },
-                    )
-                    mdBusy = false
+        Group(stringResource(R.string.md_sync_title)) {
+            item {
+                SwitchItem(R.string.md_sync_enable, mdEnabled, it, stringResource(R.string.md_sync_hint)) { on ->
+                    if (on && MarkdownSync.treeUri(context) == null) {
+                        folderLauncher.launch(null)
+                    } else {
+                        MarkdownSync.setEnabled(context, on)
+                        mdEnabled = on
+                    }
                 }
-            },
-        )
+            }
+            if (mdFolder != null) item {
+                PlainItem(it) {
+                    FolderRow(R.string.md_sync_folder, mdFolder.orEmpty(), R.string.md_sync_choose, mdEnabled, mdBusy, R.string.md_sync_now,
+                        onChoose = { folderLauncher.launch(null) },
+                        onSync = {
+                            scope.launch {
+                                mdBusy = true
+                                status = runCatching { MarkdownSync.syncNow(context) }.fold(
+                                    onSuccess = { context.resources.getQuantityString(R.plurals.md_sync_done, it, it) },
+                                    onFailure = { context.getString(R.string.md_sync_failed, it.message ?: it.javaClass.simpleName) },
+                                )
+                                mdBusy = false
+                            }
+                        },
+                    )
+                }
+            }
+        }
 
-        // What Keep has no place for, kept in step on all phones through a folder.
-        HorizontalDivider(Modifier.padding(vertical = 8.dp))
-        SectionTitle(stringResource(R.string.device_sync_title))
-        SwitchRow(R.string.device_sync_enable, dsEnabled) { on ->
-            if (on && dsMode == DeviceSync.MODE_FOLDER && DeviceSync.treeUri(context) == null) {
-                deviceFolderLauncher.launch(null)
-            } else {
-                DeviceSync.setEnabled(context, on)
-                dsEnabled = on
+        // What Keep has no place for, kept in step on all phones through Google Drive or a folder.
+        Group(stringResource(R.string.device_sync_title)) {
+            item {
+                SwitchItem(R.string.device_sync_enable, dsEnabled, it, stringResource(R.string.device_sync_hint)) { on ->
+                    if (on && dsMode == DeviceSync.MODE_FOLDER && DeviceSync.treeUri(context) == null) {
+                        deviceFolderLauncher.launch(null)
+                    } else {
+                        DeviceSync.setEnabled(context, on)
+                        dsEnabled = on
+                    }
+                }
+            }
+            if (dsEnabled) item {
+                PlainItem(it) {
+                    RadioRow(R.string.device_sync_via_drive, dsMode == DeviceSync.MODE_DRIVE) {
+                        DeviceSync.setMode(context, DeviceSync.MODE_DRIVE)
+                        dsMode = DeviceSync.MODE_DRIVE
+                    }
+                    RadioRow(R.string.device_sync_via_folder, dsMode == DeviceSync.MODE_FOLDER) {
+                        dsMode = DeviceSync.MODE_FOLDER
+                        if (DeviceSync.treeUri(context) == null) deviceFolderLauncher.launch(null) else DeviceSync.setMode(context, DeviceSync.MODE_FOLDER)
+                    }
+                    if (dsMode == DeviceSync.MODE_DRIVE) {
+                        DeviceSync.driveAccount(context)?.let { Text(stringResource(R.string.device_sync_account, it), style = MaterialTheme.typography.bodyMedium) }
+                    }
+                }
+            }
+            if (dsEnabled) item { MenuRow(stringResource(R.string.device_sync_name), dsName, shapes = it) { dsNameEdit = dsName } }
+            if (dsEnabled) item {
+                SwitchItem(R.string.device_sync_reminders, dsReminders, it, stringResource(R.string.device_sync_reminders_hint)) { on ->
+                    DeviceSync.setRemindersEnabled(context, on)
+                    dsReminders = on
+                }
+            }
+            if (dsEnabled) item {
+                SwitchItem(R.string.device_sync_auto_delete, dsAutoDelete, it) { on ->
+                    DeviceSync.setAutoDelete(context, on)
+                    dsAutoDelete = on
+                }
+            }
+            if (dsEnabled && dsAutoDelete) item {
+                NumberItem(R.string.device_sync_auto_delete_after, dsAutoDays, stringResource(R.string.device_sync_days), it) { v ->
+                    dsAutoDays = v
+                    // Saved as typed, but never below two weeks: the value used is the one shown after the next visit.
+                    DeviceSync.setAutoDeleteDays(context, v)
+                }
+            }
+            if (dsEnabled || dsFolder != null) item {
+                PlainItem(it) {
+                    FolderRow(
+                        R.string.device_sync_folder, if (dsMode == DeviceSync.MODE_FOLDER) dsFolder else null, R.string.device_sync_choose, dsEnabled, dsBusy, R.string.device_sync_now,
+                        onChoose = { deviceFolderLauncher.launch(null) },
+                        onSync = {
+                            scope.launch {
+                                dsBusy = true
+                                dsStatus = ""
+                                dsStatus = runCatching { DeviceSync.syncNow(context) }.fold(
+                                    onSuccess = { context.getString(R.string.device_sync_done, it) },
+                                    onFailure = { context.getString(R.string.device_sync_failed, it.message ?: it.javaClass.simpleName) },
+                                )
+                                dsBusy = false
+                            }
+                        },
+                    )
+                    if (dsEnabled) TextButton(
+                        onClick = {
+                            scope.launch {
+                                dsBusy = true
+                                runCatching { DeviceSync.contents(context) }.fold(
+                                    onSuccess = { dsFiles = it },
+                                    onFailure = { dsStatus = context.getString(R.string.device_sync_failed, it.message ?: it.javaClass.simpleName) },
+                                )
+                                dsBusy = false
+                            }
+                        },
+                        enabled = !dsBusy,
+                        modifier = Modifier.fillMaxWidth(),
+                        shapes = ButtonDefaults.shapes(),
+                    ) { Text(stringResource(R.string.device_sync_contents)) }
+                }
             }
         }
-        if (dsEnabled) {
-            RadioRow(R.string.device_sync_via_drive, dsMode == DeviceSync.MODE_DRIVE) {
-                DeviceSync.setMode(context, DeviceSync.MODE_DRIVE)
-                dsMode = DeviceSync.MODE_DRIVE
-            }
-            RadioRow(R.string.device_sync_via_folder, dsMode == DeviceSync.MODE_FOLDER) {
-                dsMode = DeviceSync.MODE_FOLDER
-                if (DeviceSync.treeUri(context) == null) deviceFolderLauncher.launch(null) else DeviceSync.setMode(context, DeviceSync.MODE_FOLDER)
-            }
-            if (dsMode == DeviceSync.MODE_DRIVE) {
-                DeviceSync.driveAccount(context)?.let { Text(stringResource(R.string.device_sync_account, it), style = MaterialTheme.typography.bodyMedium) }
-            }
-        }
-        if (dsEnabled) Column(Modifier.fillMaxWidth().clickable { dsNameEdit = dsName }) {
-            Text(stringResource(R.string.device_sync_name), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(dsName, style = MaterialTheme.typography.bodyLarge)
-        }
+        if (dsStatus.isNotEmpty()) Text(dsStatus, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         dsNameEdit?.let { edit ->
             androidx.compose.material3.AlertDialog(
                 onDismissRequest = { dsNameEdit = null },
@@ -319,47 +364,6 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
                 },
             )
         }
-        if (dsEnabled) {
-            SwitchRow(R.string.device_sync_auto_delete, dsAutoDelete) { on ->
-                DeviceSync.setAutoDelete(context, on)
-                dsAutoDelete = on
-            }
-            if (dsAutoDelete) NumberRow(R.string.device_sync_auto_delete_after, dsAutoDays, stringResource(R.string.device_sync_days)) {
-                dsAutoDays = it
-                // Saved as typed, but never below two weeks: the value used is the one shown after the next visit.
-                DeviceSync.setAutoDeleteDays(context, it)
-            }
-        }
-        if (dsEnabled || dsFolder != null) FolderRow(
-            R.string.device_sync_folder, if (dsMode == DeviceSync.MODE_FOLDER) dsFolder else null, R.string.device_sync_choose, dsEnabled, dsBusy, R.string.device_sync_now,
-            onChoose = { deviceFolderLauncher.launch(null) },
-            onSync = {
-                scope.launch {
-                    dsBusy = true
-                    dsStatus = ""
-                    dsStatus = runCatching { DeviceSync.syncNow(context) }.fold(
-                        onSuccess = { context.getString(R.string.device_sync_done, it) },
-                        onFailure = { context.getString(R.string.device_sync_failed, it.message ?: it.javaClass.simpleName) },
-                    )
-                    dsBusy = false
-                }
-            },
-        )
-        if (dsEnabled) TextButton(
-            onClick = {
-                scope.launch {
-                    dsBusy = true
-                    runCatching { DeviceSync.contents(context) }.fold(
-                        onSuccess = { dsFiles = it },
-                        onFailure = { dsStatus = context.getString(R.string.device_sync_failed, it.message ?: it.javaClass.simpleName) },
-                    )
-                    dsBusy = false
-                }
-            },
-            enabled = !dsBusy,
-            modifier = Modifier.fillMaxWidth(),
-            shapes = ButtonDefaults.shapes(),
-        ) { Text(stringResource(R.string.device_sync_contents)) }
         dsDelete?.let { item ->
             val title = item.label ?: stringResource(R.string.device_sync_photo)
             androidx.compose.material3.AlertDialog(
@@ -451,25 +455,26 @@ internal fun ColumnScope.BackupPage(s: SettingsState) {
                 confirmButton = { TextButton(onClick = { dsFiles = null }, shapes = ButtonDefaults.shapes()) { Text(stringResource(android.R.string.ok)) } },
             )
         }
-        if (dsEnabled) SwitchRow(R.string.device_sync_reminders, dsReminders) { on ->
-            DeviceSync.setRemindersEnabled(context, on)
-            dsReminders = on
-        }
-        if (dsStatus.isNotEmpty()) Text(dsStatus, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
         // Settings: one file with everything except accounts and tokens.
-        HorizontalDivider(Modifier.padding(vertical = 8.dp))
-        Row(Modifier.fillMaxWidth().searchFlash(R.string.backup_note), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(
-                modifier = Modifier.weight(1f),
-                onClick = { exportLauncher.launch("gkeepdroid-settings.json") },
-                shapes = ButtonDefaults.shapes(),
-            ) { Text(stringResource(R.string.export_settings)) }
-            OutlinedButton(
-                modifier = Modifier.weight(1f),
-                onClick = { importLauncher.launch(arrayOf("*/*")) },
-                shapes = ButtonDefaults.shapes(),
-            ) { Text(stringResource(R.string.import_settings)) }
+        Group(stringResource(R.string.group_settings_file)) {
+            item {
+                PlainItem(it, R.string.backup_note) {
+                    Hint(R.string.backup_note)
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(
+                            modifier = Modifier.weight(1f),
+                            onClick = { exportLauncher.launch("gkeepdroid-settings.json") },
+                            shapes = ButtonDefaults.shapes(),
+                        ) { Text(stringResource(R.string.export_settings)) }
+                        OutlinedButton(
+                            modifier = Modifier.weight(1f),
+                            onClick = { importLauncher.launch(arrayOf("*/*")) },
+                            shapes = ButtonDefaults.shapes(),
+                        ) { Text(stringResource(R.string.import_settings)) }
+                    }
+                }
+            }
         }
     }
 }
@@ -513,27 +518,18 @@ internal val filterChoices = listOf(
 @Composable
 internal fun ColumnScope.SecurityPage(s: SettingsState) {
     with(s) {
-        SwitchRow(R.string.lock_private, appLockPrivate) { appLockPrivate = it }
-        Hint(R.string.lock_private_hint)
-        SwitchRow(R.string.app_lock_title, appLockApp) { appLockApp = it }
-        Hint(R.string.app_lock_hint)
-        // With the whole app locked, unlocking it already allows editing, so this one would only repeat it.
-        if (appLockApp) {
-            Hint(R.string.lock_edit_app_hint)
-        } else {
-            SwitchRow(R.string.lock_edit_title, appLockEdit) { appLockEdit = it }
-            Hint(R.string.lock_edit_hint)
+        Group(stringResource(R.string.group_locks)) {
+            item { SwitchItem(R.string.lock_private, appLockPrivate, it, stringResource(R.string.lock_private_hint)) { v -> appLockPrivate = v } }
+            item { SwitchItem(R.string.app_lock_title, appLockApp, it, stringResource(R.string.app_lock_hint)) { v -> appLockApp = v } }
+            // With the whole app locked, unlocking it already allows editing, so this one would only repeat it.
+            if (!appLockApp) item { SwitchItem(R.string.lock_edit_title, appLockEdit, it, stringResource(R.string.lock_edit_hint)) { v -> appLockEdit = v } }
+            if (appLockApp || appLockEdit) item { NumberItem(R.string.app_lock_grace, appLockGrace, "s", it) { v -> appLockGrace = v } }
         }
-        SwitchRow(R.string.lock_widget_tick, appLockWidgetTick) { appLockWidgetTick = it }
-        if (appLockApp || appLockEdit) NumberRow(R.string.app_lock_grace, appLockGrace, "s") { appLockGrace = it }
-        if (appLockWidgetTick) {
-            NumberRow(R.string.lock_widget_grace, appWidgetGrace, "s") { appWidgetGrace = it }
-            Hint(R.string.lock_widget_grace_hint)
+        if (appLockApp) Hint(R.string.lock_edit_app_hint)
+        Group(stringResource(R.string.group_widgets)) {
+            item { SwitchItem(R.string.lock_widget_tick, appLockWidgetTick, it) { v -> appLockWidgetTick = v } }
+            if (appLockWidgetTick) item { NumberItem(R.string.lock_widget_grace, appWidgetGrace, "s", it, stringResource(R.string.lock_widget_grace_hint)) { v -> appWidgetGrace = v } }
+            if (appLockApp) item { SwitchItem(R.string.widget_titles_only, appWidgetTitlesOnly, it, stringResource(R.string.widget_titles_only_hint)) { v -> appWidgetTitlesOnly = v } }
         }
-        if (appLockApp) {
-            SwitchRow(R.string.widget_titles_only, appWidgetTitlesOnly) { appWidgetTitlesOnly = it }
-            Hint(R.string.widget_titles_only_hint)
-        }
-
     }
 }
