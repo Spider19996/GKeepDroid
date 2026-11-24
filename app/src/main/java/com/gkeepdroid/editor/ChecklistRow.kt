@@ -169,7 +169,8 @@ internal fun ChecklistRow(
     if (!topShown && counterWidth != 0) counterWidth = 0
     val notchTop by androidx.compose.animation.core.animateDpAsState(if (topShown) 12.dp else 0.dp, label = "top")
     val notchBottom = 12.dp
-    // The check sits on the left line with half its 24 dp; the same room at the right keeps the row in the middle.
+    // The check's 24 dp symbol sits on the left line, centered on it: the line 12 dp in, so the symbol starts at the row's edge and
+    // keeps the same 8 dp from a category's frame as the row's right side. The row reaches to the right edge, as the title field does.
     val notchStart = 12.dp
     Box(
         Modifier.fillMaxWidth()
@@ -203,7 +204,7 @@ internal fun ChecklistRow(
                     val l = if (item.isDivider()) 0f else notchStart.toPx()
                     val t = if (item.isDivider()) 0f else notchTop.toPx()
                     val b = size.height - if (item.isDivider()) 0f else notchBottom.toPx()
-                    val e = size.width - l
+                    val e = size.width
                     val outer = Path().apply { addRoundRect(RoundRect(l, t, e, b, r)) }
                     val inner = Path().apply { addRoundRect(RoundRect(l + offsetX, t, offsetX + e, b, r)) }
                     drawPath(Path.combine(PathOperation.Difference, outer, inner), color)
@@ -244,7 +245,7 @@ internal fun ChecklistRow(
                     HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.outline)
                 }
             } else Box(
-                Modifier.fillMaxWidth().padding(start = notchStart, end = notchStart, top = notchTop, bottom = notchBottom)
+                Modifier.fillMaxWidth().padding(start = notchStart, top = notchTop, bottom = notchBottom)
                     // On a note's own color or picture the rows show it instead of covering it; the change fades like the rest.
                     .background(
                         androidx.compose.animation.animateColorAsState(
@@ -269,7 +270,7 @@ internal fun ChecklistRow(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.Transparent, unfocusedBorderColor = Color.Transparent, disabledBorderColor = Color.Transparent,
                     ),
-                    // The text starts 16 dp in, as in the title field, 4 dp from the check's inner half. In a numbered list the
+                    // The text starts 16 dp in, as in the title field, 4 dp from the check. In a numbered list the
                     // number stands in front of the text and is not part of what is edited.
                     prefix = number?.let { n -> { Text("$n. ", color = MaterialTheme.colorScheme.onSurfaceVariant) } },
                     textStyle = if (item.checked) {
@@ -301,7 +302,7 @@ internal fun ChecklistRow(
                             // the corners stay whole. The counter and the grip begin 12 dp in, behind the corner's arc.
                             val start = 12.dp.toPx()
                             if (counterWidth > 0) clear(start, -w, counterWidth.toFloat(), 3 * w)
-                            clear(-w, size.height / 2 - 12.dp.toPx(), 3 * w, 24.dp.toPx())
+                            clear(-w, size.height / 2 - 14.dp.toPx(), 3 * w, 28.dp.toPx())
                             clear(start, size.height - 2 * w, 24.dp.toPx(), 3 * w)
                         },
                 )
@@ -329,7 +330,7 @@ internal fun ChecklistRow(
                 }
                 // At the left, on the line in the middle: the check, a cross while open and a green check once done. A tap switches it.
                 Box(
-                    Modifier.align(Alignment.CenterStart).offset(y = (notchTop - notchBottom) / 2).size(24.dp)
+                    Modifier.align(Alignment.CenterStart).offset(x = (-2).dp, y = (notchTop - notchBottom) / 2).size(28.dp)
                         .clip(CircleShape)
                         .pointerInput(item.id, editable) {
                             if (!editable) return@pointerInput
@@ -337,7 +338,7 @@ internal fun ChecklistRow(
                         },
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close), contentDescription = null, tint = mark, modifier = Modifier.size(20.dp))
+                    Icon(painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close), contentDescription = null, tint = mark, modifier = Modifier.size(24.dp))
                 }
             }
             // Bottom left on the line (a divider: at its left): the grip. Holding it and dragging moves the row.
