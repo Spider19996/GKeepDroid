@@ -322,7 +322,7 @@ internal fun ChecklistRow(
                 val count = quantity?.count ?: 1
                 fun press() { pressedAt = System.currentTimeMillis() }
                 if (topShown) Row(
-                    Modifier.align(Alignment.TopStart).offset(x = notchStart + 12.dp).height(24.dp)
+                    Modifier.align(Alignment.TopStart).offset(x = notchStart + 12.dp).height(24.dp).zIndex(1f)
                         .onSizeChanged { counterWidth = it.width },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -348,64 +348,47 @@ internal fun ChecklistRow(
                 val lightCapsule = capsuleColor.luminance() > 0.5f
                 val markOnCapsule = if (item.checked) (if (lightCapsule) Color(0xFF2E7D32) else Color(0xFFA5D6A7))
                     else (if (lightCapsule) Color(0xFFC62828) else Color(0xFFEF9A9A))
-                var topCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
-                var bottomCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
-                Column(
+                var capsuleCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
+                // One button that only looks like two: the whole capsule, and a margin around it (6 dp above and below, 13 dp to the
+                // right, inside the row's 60 dp; the counter above lies over it), takes a tap to tick the item; holding it and dragging moves the row.
+                Box(
                     Modifier.align(Alignment.CenterStart).offset(x = notchStart - 13.dp, y = (notchTop - notchBottom) / 2)
-                        .size(width = 26.dp, height = 36.dp).clip(CircleShape).background(capsuleColor),
+                        .size(width = 39.dp, height = 48.dp)
+                        .onGloballyPositioned { capsuleCoords = it }
+                        .pointerInput(item.id, editable) {
+                            if (!editable) return@pointerInput
+                            detectTapGestures(onTap = { toggleNow() })
+                        }
+                        .pointerInput(item.id, editable) {
+                            if (!editable) return@pointerInput
+                            detectDragGesturesAfterLongPress(
+                                onDragStart = { start ->
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    capsuleCoords?.localToRoot(start)?.y?.let { fingerY = it; grab = it - rowTop }
+                                    dragStart()
+                                },
+                                onDrag = { change, _ ->
+                                    change.consume()
+                                    capsuleCoords?.localToRoot(change.position)?.y?.let { fingerY = it; dragTo(it) }
+                                },
+                                onDragEnd = { release(); dragEnd() },
+                                onDragCancel = { release(); dragEnd() },
+                            )
+                        }
+                        .semantics { contentDescription = dragDescription },
                 ) {
-                    Box(
-                        Modifier.weight(1f).fillMaxWidth().onGloballyPositioned { topCoords = it }
-                            .pointerInput(item.id, editable) {
-                                if (!editable) return@pointerInput
-                                detectTapGestures(onTap = { toggleNow() })
-                            }
-                            // Holding the cross or check and dragging moves the row as well.
-                            .pointerInput(item.id, editable) {
-                                if (!editable) return@pointerInput
-                                detectDragGesturesAfterLongPress(
-                                    onDragStart = { start ->
-                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        topCoords?.localToRoot(start)?.y?.let { fingerY = it; grab = it - rowTop }
-                                        dragStart()
-                                    },
-                                    onDrag = { change, _ ->
-                                        change.consume()
-                                        topCoords?.localToRoot(change.position)?.y?.let { fingerY = it; dragTo(it) }
-                                    },
-                                    onDragEnd = { release(); dragEnd() },
-                                    onDragCancel = { release(); dragEnd() },
-                                )
-                            },
-                        contentAlignment = Alignment.Center,
+                    Column(
+                        Modifier.align(Alignment.CenterStart).size(width = 26.dp, height = 36.dp).clip(CircleShape).background(capsuleColor),
                     ) {
-                        Icon(painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close), contentDescription = null, tint = markOnCapsule, modifier = Modifier.size(16.dp))
-                    }
-                    // The line between the check and the grip.
-                    Box(Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(1.dp).background(onCapsule.copy(alpha = 0.35f)))
-                    Box(
-                        Modifier.weight(1f).fillMaxWidth().onGloballyPositioned { bottomCoords = it }
-                            .pointerInput(item.id, editable) {
-                                if (!editable) return@pointerInput
-                                detectDragGestures(
-                                    onDragStart = { start ->
-                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        bottomCoords?.localToRoot(start)?.y?.let { fingerY = it; grab = it - rowTop }
-                                        dragStart()
-                                    },
-                                    onDrag = { change, _ ->
-                                        change.consume()
-                                        bottomCoords?.localToRoot(change.position)?.y?.let { fingerY = it; dragTo(it) }
-                                    },
-                                    onDragEnd = { release(); dragEnd() },
-                                    onDragCancel = { release(); dragEnd() },
-                                )
+                        Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            Icon(painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close), contentDescription = null, tint = markOnCapsule, modifier = Modifier.size(16.dp))
+                        }
+                        // The line between the check and the grip.
+                        Box(Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(1.dp).background(onCapsule.copy(alpha = 0.35f)))
+                        Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                repeat(3) { Box(Modifier.size(width = 12.dp, height = 1.5.dp).background(onCapsule)) }
                             }
-                            .semantics { contentDescription = dragDescription },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            repeat(3) { Box(Modifier.size(width = 12.dp, height = 1.5.dp).background(onCapsule)) }
                         }
                     }
                 }
