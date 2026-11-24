@@ -272,9 +272,14 @@ internal fun ChecklistRow(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.Transparent, unfocusedBorderColor = Color.Transparent, disabledBorderColor = Color.Transparent,
                     ),
-                    // The text starts 16 dp in, as in the title field, 4 dp from the check. In a numbered list the
+                    // The text starts 24 dp in: 11 dp from the capsule, whose right edge is 13 dp in. In a numbered list the
                     // number stands in front of the text and is not part of what is edited.
-                    prefix = number?.let { n -> { Text("$n. ", color = MaterialTheme.colorScheme.onSurfaceVariant) } },
+                    prefix = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Spacer(Modifier.width(8.dp))
+                            number?.let { n -> Text("$n. ", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                        }
+                    },
                     textStyle = if (item.checked) {
                         LocalTextStyle.current.copy(
                             textDecoration = TextDecoration.LineThrough,
@@ -334,10 +339,10 @@ internal fun ChecklistRow(
                 // At the left, on the line in the middle: one capsule, as it was at the start. Above the cross (open) or check (done),
                 // a tap switches it; below, the grip: holding it and dragging moves the row. The capsule is as high as the line is
                 // straight between the corners (36 dp), so the line's rounding stays whole.
-                val capsuleColor by androidx.compose.animation.animateColorAsState(
-                    if (item.checked) MaterialTheme.colorScheme.tertiary.copy(alpha = 0.28f) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f),
-                    label = "capsule",
-                )
+                // The color of the editor's save button (primary, with its own content color on it), so the capsule follows the
+                // note's color like the bars do.
+                val capsuleColor = MaterialTheme.colorScheme.primary
+                val onCapsule = MaterialTheme.colorScheme.onPrimary
                 var topCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
                 var bottomCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
                 Column(
@@ -369,10 +374,10 @@ internal fun ChecklistRow(
                             },
                         contentAlignment = Alignment.Center,
                     ) {
-                        Icon(painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close), contentDescription = null, tint = mark, modifier = Modifier.size(16.dp))
+                        Icon(painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close), contentDescription = null, tint = onCapsule, modifier = Modifier.size(16.dp))
                     }
                     // The line between the check and the grip.
-                    Box(Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outlineVariant))
+                    Box(Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(1.dp).background(onCapsule.copy(alpha = 0.35f)))
                     Box(
                         Modifier.weight(1f).fillMaxWidth().onGloballyPositioned { bottomCoords = it }
                             .pointerInput(item.id, editable) {
@@ -395,7 +400,7 @@ internal fun ChecklistRow(
                         contentAlignment = Alignment.Center,
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            repeat(3) { Box(Modifier.size(width = 12.dp, height = 1.5.dp).background(MaterialTheme.colorScheme.onSurfaceVariant)) }
+                            repeat(3) { Box(Modifier.size(width = 12.dp, height = 1.5.dp).background(onCapsule)) }
                         }
                     }
                 }
@@ -403,7 +408,7 @@ internal fun ChecklistRow(
                 // A divider has no frame and no check: only the grip, in a capsule of its own at the left of the line.
                 Box(
                     Modifier.align(Alignment.CenterStart).offset(x = 12.dp).size(width = 26.dp, height = 22.dp)
-                        .clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f))
+                        .clip(CircleShape).background(MaterialTheme.colorScheme.primary)
                         .onGloballyPositioned { handle = it }
                         .pointerInput(item.id, editable) {
                             if (!editable) return@pointerInput
@@ -425,7 +430,7 @@ internal fun ChecklistRow(
                     contentAlignment = Alignment.Center,
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        repeat(3) { Box(Modifier.size(width = 12.dp, height = 1.5.dp).background(MaterialTheme.colorScheme.onSurfaceVariant)) }
+                        repeat(3) { Box(Modifier.size(width = 12.dp, height = 1.5.dp).background(MaterialTheme.colorScheme.onPrimary)) }
                     }
                 }
             }

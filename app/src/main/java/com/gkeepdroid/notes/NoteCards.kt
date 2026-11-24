@@ -353,7 +353,9 @@ internal fun NoteTile(
                         }
                             .then(swipeModifier)
                             .border(1.dp, textColor.copy(alpha = 0.35f), MaterialTheme.shapes.medium)
-                            .padding(start = 6.dp, end = 2.dp, bottom = 2.dp),
+                            // Without a header the first item has the frame's top line right above it; the 2 dp that the last
+                            // one has below it go above the first one as well, so both sides look alike.
+                            .padding(start = 6.dp, end = 2.dp, top = if (group.name == null) 2.dp else 0.dp, bottom = 2.dp),
                     ) {
                         val folded = group.name != null && CategoryFolds.key(account, note.id, group.name) in folds
                         if (group.name != null) CategoryHeader(group.name, if (app.showProgress) Categories.progress(group.items) else null, folded, textColor) {
