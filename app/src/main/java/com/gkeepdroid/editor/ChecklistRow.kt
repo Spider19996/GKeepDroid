@@ -66,6 +66,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.onSizeChanged
@@ -148,8 +149,38 @@ internal fun ChecklistRow(
         fingerY = null
         if (y != null) settleScope.launch { settle.snapTo(y - grab - rowTop); settle.animateTo(0f, spring(dampingRatio = 0.8f, stiffness = 500f)) }
     }
+    // Room around the frame for what is set into its line: the counter above, the grip below, the check at the left.
+    // The counter and the grip are 24 dp high, centered on the line; so is the check at the left.
+    var focused by remember { mutableStateOf(false) }
+    var counterWidth by remember { mutableStateOf(0) }
+    // − and + show while the item is typed into, or for a moment after the number or one of them was tapped; otherwise the line
+    // holds only the number, and an item without one has nothing up there, so the rows stay close together.
+    var pressedAt by remember { mutableStateOf(0L) }
+    var recent by remember { mutableStateOf(false) }
+    androidx.compose.runtime.LaunchedEffect(pressedAt) {
+        if (pressedAt == 0L) return@LaunchedEffect
+        recent = true
+        kotlinx.coroutines.delay(3000)
+        recent = false
+    }
+    val showButtons = editable && quantities && (focused || recent)
+    val showNumber = quantity != null || showOne
+    val topShown = quantities && (showNumber || showButtons)
+    if (!topShown && counterWidth != 0) counterWidth = 0
+    val notchTop by androidx.compose.animation.core.animateDpAsState(if (topShown) 12.dp else 0.dp, label = "top")
+    val notchBottom = 12.dp
+    // The check sits on the left line with half its 24 dp; the same room at the right keeps the row in the middle.
+    val notchStart = 12.dp
     Box(
         Modifier.fillMaxWidth()
+            // The room above and below for the counter and the grip reaches into the editor's gap between the rows instead of
+            // adding to it: the row counts as that much shorter, so frames are as far apart as other fields, number or not.
+            .layout { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                val above = if (item.isDivider()) 0 else notchTop.roundToPx()
+                val below = if (item.isDivider()) 0 else notchBottom.roundToPx()
+                layout(placeable.width, (placeable.height - above - below).coerceAtLeast(0)) { placeable.place(0, -above) }
+            }
             .onGloballyPositioned { val bounds = it.boundsInRoot(); rowTop = bounds.top; onBounds(bounds) }
             .then(if (dragged || settle.isRunning) Modifier.zIndex(1f) else if (carried) Modifier else Modifier.animatePlacement())
             .graphicsLayer {
@@ -158,27 +189,6 @@ internal fun ChecklistRow(
                 if (dragged) { shadowElevation = 12f; scaleX = 1.02f; scaleY = 1.02f }
             },
     ) {
-        // Room around the frame for what is set into its line: the counter above, the grip below, the check at the left.
-        // The counter and the grip are 24 dp high, centered on the line; the check at the left is a 32 dp touch area.
-        var focused by remember { mutableStateOf(false) }
-        var counterWidth by remember { mutableStateOf(0) }
-        // − and + show while the item is typed into, or for a moment after the number or one of them was tapped; otherwise the line
-        // holds only the number, and an item without one has nothing up there, so the rows stay close together.
-        var pressedAt by remember { mutableStateOf(0L) }
-        var recent by remember { mutableStateOf(false) }
-        androidx.compose.runtime.LaunchedEffect(pressedAt) {
-            if (pressedAt == 0L) return@LaunchedEffect
-            recent = true
-            kotlinx.coroutines.delay(3000)
-            recent = false
-        }
-        val showButtons = editable && quantities && (focused || recent)
-        val showNumber = quantity != null || showOne
-        val topShown = quantities && (showNumber || showButtons)
-        if (!topShown && counterWidth != 0) counterWidth = 0
-        val notchTop by androidx.compose.animation.core.animateDpAsState(if (topShown) 12.dp else 0.dp, label = "top")
-        val notchBottom = 12.dp
-        val notchStart = 16.dp
         if (offsetX != 0f) {
             val toRight = offsetX > 0f
             val (color, icon, tint) = swipeLook(if (toRight) swipeRight else swipeLeft)
@@ -193,8 +203,9 @@ internal fun ChecklistRow(
                     val l = if (item.isDivider()) 0f else notchStart.toPx()
                     val t = if (item.isDivider()) 0f else notchTop.toPx()
                     val b = size.height - if (item.isDivider()) 0f else notchBottom.toPx()
-                    val outer = Path().apply { addRoundRect(RoundRect(l, t, size.width, b, r)) }
-                    val inner = Path().apply { addRoundRect(RoundRect(l + offsetX, t, offsetX + size.width, b, r)) }
+                    val e = size.width - l
+                    val outer = Path().apply { addRoundRect(RoundRect(l, t, e, b, r)) }
+                    val inner = Path().apply { addRoundRect(RoundRect(l + offsetX, t, offsetX + e, b, r)) }
                     drawPath(Path.combine(PathOperation.Difference, outer, inner), color)
                 },
                 contentAlignment = if (toRight) Alignment.CenterStart else Alignment.CenterEnd,
@@ -233,7 +244,7 @@ internal fun ChecklistRow(
                     HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.outline)
                 }
             } else Box(
-                Modifier.fillMaxWidth().padding(start = notchStart, top = notchTop, bottom = notchBottom)
+                Modifier.fillMaxWidth().padding(start = notchStart, end = notchStart, top = notchTop, bottom = notchBottom)
                     // On a note's own color or picture the rows show it instead of covering it; the change fades like the rest.
                     .background(
                         androidx.compose.animation.animateColorAsState(
@@ -258,14 +269,9 @@ internal fun ChecklistRow(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.Transparent, unfocusedBorderColor = Color.Transparent, disabledBorderColor = Color.Transparent,
                     ),
-                    // The text keeps 4 dp from the check, whose inner half reaches 16 dp into the frame. In a numbered list the
+                    // The text starts 16 dp in, as in the title field, 4 dp from the check's inner half. In a numbered list the
                     // number stands in front of the text and is not part of what is edited.
-                    prefix = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Spacer(Modifier.width(4.dp))
-                            number?.let { Text("$it. ", color = MaterialTheme.colorScheme.onSurfaceVariant) }
-                        }
-                    },
+                    prefix = number?.let { n -> { Text("$n. ", color = MaterialTheme.colorScheme.onSurfaceVariant) } },
                     textStyle = if (item.checked) {
                         LocalTextStyle.current.copy(
                             textDecoration = TextDecoration.LineThrough,
@@ -295,7 +301,7 @@ internal fun ChecklistRow(
                             // the corners stay whole. The counter and the grip begin 12 dp in, behind the corner's arc.
                             val start = 12.dp.toPx()
                             if (counterWidth > 0) clear(start, -w, counterWidth.toFloat(), 3 * w)
-                            clear(-w, size.height / 2 - 16.dp.toPx(), 3 * w, 32.dp.toPx())
+                            clear(-w, size.height / 2 - 12.dp.toPx(), 3 * w, 24.dp.toPx())
                             clear(start, size.height - 2 * w, 24.dp.toPx(), 3 * w)
                         },
                 )
@@ -323,7 +329,7 @@ internal fun ChecklistRow(
                 }
                 // At the left, on the line in the middle: the check, a cross while open and a green check once done. A tap switches it.
                 Box(
-                    Modifier.align(Alignment.CenterStart).offset(y = (notchTop - notchBottom) / 2).size(32.dp)
+                    Modifier.align(Alignment.CenterStart).offset(y = (notchTop - notchBottom) / 2).size(24.dp)
                         .clip(CircleShape)
                         .pointerInput(item.id, editable) {
                             if (!editable) return@pointerInput
@@ -331,7 +337,7 @@ internal fun ChecklistRow(
                         },
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close), contentDescription = null, tint = mark, modifier = Modifier.size(24.dp))
+                    Icon(painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close), contentDescription = null, tint = mark, modifier = Modifier.size(20.dp))
                 }
             }
             // Bottom left on the line (a divider: at its left): the grip. Holding it and dragging moves the row.
