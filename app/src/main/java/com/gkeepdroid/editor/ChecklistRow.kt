@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -168,9 +169,10 @@ internal fun ChecklistRow(
     val topShown = quantities && (showNumber || showButtons)
     if (!topShown && counterWidth != 0) counterWidth = 0
     val notchTop by androidx.compose.animation.core.animateDpAsState(if (topShown) 12.dp else 0.dp, label = "top")
-    val notchBottom = 12.dp
-    // The check's 24 dp symbol sits on the left line, centered on it: the line 12 dp in, so the symbol starts at the row's edge and
-    // keeps the same 8 dp from a category's frame as the row's right side. The row reaches to the right edge, as the title field does.
+    // Nothing sits on the bottom line any more: the grip is in the capsule at the left, with the check.
+    val notchBottom = 0.dp
+    // The capsule (26 dp wide) sits on the left line, centered on it: the line 12 dp in, so the capsule starts 1 dp left of the row's
+    // edge. The row reaches to the right edge, as the title field does.
     val notchStart = 12.dp
     Box(
         Modifier.fillMaxWidth()
@@ -281,7 +283,9 @@ internal fun ChecklistRow(
                     } else {
                         LocalTextStyle.current
                     },
-                    modifier = Modifier.fillMaxWidth().focusRequester(focusRequester)
+                    // 60 dp: 12 dp of rounding at both corners leave 36 dp of straight line, the height of the capsule at the left,
+                    // so both corners stay whole.
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 60.dp).focusRequester(focusRequester)
                         .onFocusChanged { focused = it.isFocused; if (it.isFocused) onFocus() }.then(modifier),
                 )
                 // The frame, as the field would draw it, with its line left out where the counter, the check and the grip sit on it
@@ -302,8 +306,7 @@ internal fun ChecklistRow(
                             // the corners stay whole. The counter and the grip begin 12 dp in, behind the corner's arc.
                             val start = 12.dp.toPx()
                             if (counterWidth > 0) clear(start, -w, counterWidth.toFloat(), 3 * w)
-                            clear(-w, size.height / 2 - 14.dp.toPx(), 3 * w, 28.dp.toPx())
-                            clear(start, size.height - 2 * w, 24.dp.toPx(), 3 * w)
+                            clear(-w, size.height / 2 - 18.dp.toPx(), 3 * w, 36.dp.toPx())
                         },
                 )
             }
@@ -328,47 +331,102 @@ internal fun ChecklistRow(
                         NotchButton(R.drawable.ic_add, R.string.quantity_more) { press(); onText(Quantities.withCount(item.text, count + 1)) }
                     }
                 }
-                // At the left, on the line in the middle: the check, a cross while open and a green check once done. A tap switches it.
+                // At the left, on the line in the middle: one capsule, as it was at the start. Above the cross (open) or check (done),
+                // a tap switches it; below, the grip: holding it and dragging moves the row. The capsule is as high as the line is
+                // straight between the corners (36 dp), so the line's rounding stays whole.
+                val capsuleColor by androidx.compose.animation.animateColorAsState(
+                    if (item.checked) MaterialTheme.colorScheme.tertiary.copy(alpha = 0.28f) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f),
+                    label = "capsule",
+                )
+                var topCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
+                var bottomCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
+                Column(
+                    Modifier.align(Alignment.CenterStart).offset(x = notchStart - 13.dp, y = (notchTop - notchBottom) / 2)
+                        .size(width = 26.dp, height = 36.dp).clip(CircleShape).background(capsuleColor),
+                ) {
+                    Box(
+                        Modifier.weight(1f).fillMaxWidth().onGloballyPositioned { topCoords = it }
+                            .pointerInput(item.id, editable) {
+                                if (!editable) return@pointerInput
+                                detectTapGestures(onTap = { toggleNow() })
+                            }
+                            // Holding the cross or check and dragging moves the row as well.
+                            .pointerInput(item.id, editable) {
+                                if (!editable) return@pointerInput
+                                detectDragGesturesAfterLongPress(
+                                    onDragStart = { start ->
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        topCoords?.localToRoot(start)?.y?.let { fingerY = it; grab = it - rowTop }
+                                        dragStart()
+                                    },
+                                    onDrag = { change, _ ->
+                                        change.consume()
+                                        topCoords?.localToRoot(change.position)?.y?.let { fingerY = it; dragTo(it) }
+                                    },
+                                    onDragEnd = { release(); dragEnd() },
+                                    onDragCancel = { release(); dragEnd() },
+                                )
+                            },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close), contentDescription = null, tint = mark, modifier = Modifier.size(16.dp))
+                    }
+                    // The line between the check and the grip.
+                    Box(Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outlineVariant))
+                    Box(
+                        Modifier.weight(1f).fillMaxWidth().onGloballyPositioned { bottomCoords = it }
+                            .pointerInput(item.id, editable) {
+                                if (!editable) return@pointerInput
+                                detectDragGestures(
+                                    onDragStart = { start ->
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        bottomCoords?.localToRoot(start)?.y?.let { fingerY = it; grab = it - rowTop }
+                                        dragStart()
+                                    },
+                                    onDrag = { change, _ ->
+                                        change.consume()
+                                        bottomCoords?.localToRoot(change.position)?.y?.let { fingerY = it; dragTo(it) }
+                                    },
+                                    onDragEnd = { release(); dragEnd() },
+                                    onDragCancel = { release(); dragEnd() },
+                                )
+                            }
+                            .semantics { contentDescription = dragDescription },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            repeat(3) { Box(Modifier.size(width = 12.dp, height = 1.5.dp).background(MaterialTheme.colorScheme.onSurfaceVariant)) }
+                        }
+                    }
+                }
+            } else {
+                // A divider has no frame and no check: only the grip, in a capsule of its own at the left of the line.
                 Box(
-                    Modifier.align(Alignment.CenterStart).offset(x = (-2).dp, y = (notchTop - notchBottom) / 2).size(28.dp)
-                        .clip(CircleShape)
+                    Modifier.align(Alignment.CenterStart).offset(x = 12.dp).size(width = 26.dp, height = 22.dp)
+                        .clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f))
+                        .onGloballyPositioned { handle = it }
                         .pointerInput(item.id, editable) {
                             if (!editable) return@pointerInput
-                            detectTapGestures(onTap = { toggleNow() })
-                        },
+                            detectDragGestures(
+                                onDragStart = { start ->
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    handle?.localToRoot(start)?.y?.let { fingerY = it; grab = it - rowTop }
+                                    dragStart()
+                                },
+                                onDrag = { change, _ ->
+                                    change.consume()
+                                    handle?.localToRoot(change.position)?.y?.let { fingerY = it; dragTo(it) }
+                                },
+                                onDragEnd = { release(); dragEnd() },
+                                onDragCancel = { release(); dragEnd() },
+                            )
+                        }
+                        .semantics { contentDescription = dragDescription },
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close), contentDescription = null, tint = mark, modifier = Modifier.size(24.dp))
-                }
-            }
-            // Bottom left on the line (a divider: at its left): the grip. Holding it and dragging moves the row.
-            Box(
-                Modifier.align(if (item.isDivider()) Alignment.CenterStart else Alignment.BottomStart)
-                    .offset(x = if (item.isDivider()) 12.dp else notchStart + 12.dp).size(24.dp)
-                    .clip(CircleShape)
-                    .onGloballyPositioned { handle = it }
-                    .pointerInput(item.id, editable) {
-                        if (!editable) return@pointerInput
-                        detectDragGestures(
-                            onDragStart = { start ->
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                handle?.localToRoot(start)?.y?.let { fingerY = it; grab = it - rowTop }
-                                dragStart()
-                            },
-                            onDrag = { change, _ ->
-                                change.consume()
-                                handle?.localToRoot(change.position)?.y?.let { fingerY = it; dragTo(it) }
-                            },
-                            onDragEnd = { release(); dragEnd() },
-                            onDragCancel = { release(); dragEnd() },
-                        )
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        repeat(3) { Box(Modifier.size(width = 12.dp, height = 1.5.dp).background(MaterialTheme.colorScheme.onSurfaceVariant)) }
                     }
-                    .semantics { contentDescription = dragDescription },
-                contentAlignment = Alignment.Center,
-            ) {
-                // Three short lines, drawn like a 20 dp symbol (16 dp wide, 2 dp thick, 3 dp apart).
-                Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                    repeat(3) { Box(Modifier.size(width = 16.dp, height = 2.dp).background(LocalContentColor.current)) }
                 }
             }
         }
