@@ -529,7 +529,5 @@
     <string name="group_ticking">Cocher</string>
     <string name="group_widget_background">Arrière-plan</string>
     <string name="group_widgets">Widgets</string>
-    <string name="quantity_action">Quantité</string>
-    <string name="quantity_pick_item">Touchez d’abord l’élément à compter.</string>
     <string name="list_quantity_one">Afficher « 1x » pour les éléments sans quantité</string>
 </resources>

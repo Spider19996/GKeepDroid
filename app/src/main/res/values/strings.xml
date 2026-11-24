@@ -521,7 +521,5 @@
     <string name="group_ticking">Ticking</string>
     <string name="group_widget_background">Background</string>
     <string name="group_widgets">Widgets</string>
-    <string name="quantity_action">Quantity</string>
-    <string name="quantity_pick_item">Tap the item you want to count first.</string>
     <string name="list_quantity_one">Show “1x” for items without a quantity</string>
 </resources>

@@ -538,7 +538,5 @@
     <string name="group_ticking">Odhaczanie</string>
     <string name="group_widget_background">Tło</string>
     <string name="group_widgets">Widżety</string>
-    <string name="quantity_action">Ilość</string>
-    <string name="quantity_pick_item">Najpierw dotknij elementu, który chcesz liczyć.</string>
     <string name="list_quantity_one">Pokazuj „1x” przy elementach bez ilości</string>
 </resources>

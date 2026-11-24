@@ -556,7 +556,5 @@
     <string name="group_ticking">وضع العلامة</string>
     <string name="group_widget_background">الخلفية</string>
     <string name="group_widgets">الأدوات</string>
-    <string name="quantity_action">الكمية</string>
-    <string name="quantity_pick_item">انقر أولًا على العنصر الذي تريد عدّه.</string>
     <string name="list_quantity_one">إظهار «1x» للعناصر بلا كمية</string>
 </resources>

@@ -520,7 +520,5 @@
     <string name="group_ticking">Afvinken</string>
     <string name="group_widget_background">Achtergrond</string>
     <string name="group_widgets">Widgets</string>
-    <string name="quantity_action">Hoeveelheid</string>
-    <string name="quantity_pick_item">Tik eerst op het item dat je wilt tellen.</string>
     <string name="list_quantity_one">‘1x’ tonen bij items zonder hoeveelheid</string>
 </resources>

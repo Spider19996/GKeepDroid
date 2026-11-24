@@ -511,7 +511,5 @@
     <string name="group_ticking">勾选</string>
     <string name="group_widget_background">背景</string>
     <string name="group_widgets">小部件</string>
-    <string name="quantity_action">数量</string>
-    <string name="quantity_pick_item">请先点按要计数的条目。</string>
     <string name="list_quantity_one">为没有数量的条目显示“1x”</string>
 </resources>

@@ -529,7 +529,5 @@
     <string name="group_ticking">Marcar</string>
     <string name="group_widget_background">Fundo</string>
     <string name="group_widgets">Widgets</string>
-    <string name="quantity_action">Quantidade</string>
-    <string name="quantity_pick_item">Toque primeiro no item que quer contar.</string>
     <string name="list_quantity_one">Mostrar “1x” em itens sem quantidade</string>
 </resources>

@@ -529,7 +529,5 @@
     <string name="group_ticking">Spuntare</string>
     <string name="group_widget_background">Sfondo</string>
     <string name="group_widgets">Widget</string>
-    <string name="quantity_action">Quantità</string>
-    <string name="quantity_pick_item">Tocca prima l’elemento che vuoi contare.</string>
     <string name="list_quantity_one">Mostra «1x» per gli elementi senza quantità</string>
 </resources>

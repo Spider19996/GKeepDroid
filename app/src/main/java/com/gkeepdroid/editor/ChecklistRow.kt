@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -39,6 +40,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.alpha
@@ -95,8 +102,6 @@ internal fun ChecklistRow(
     swipeRight: Int = ITEM_SWIPE_TICK, swipeLeft: Int = ITEM_SWIPE_REMOVE, onSwipe: ((Boolean) -> Unit)? = null,
     /** An item in a category: a second frame around it shows that it belongs to one. */
     framed: Boolean = false,
-    /** The editor's "Quantity" action chose this item: its counter opens. */
-    quantityRequested: Boolean = false, onQuantityShown: () -> Unit = {},
     /** Moved along by something else (its category is held): it does not glide on its own then. */
     carried: Boolean = false,
 ) {
@@ -120,20 +125,13 @@ internal fun ChecklistRow(
     val swipe = rememberSwipeState()
     val offsetX = swipe.offset
     var handle by remember { mutableStateOf<LayoutCoordinates?>(null) }
-    // A number written into the item ("2x Tortellini") stands in a pill at its end instead of in the text.
+    // A number written into the item ("2x Tortellini") stands in the counter on the frame instead of in the text.
     val appContext = androidx.compose.ui.platform.LocalContext.current
     val quantitySettings = remember { AppSettingsStore.load(appContext).let { it.listQuantities to it.listQuantityOne } }
     val quantities = quantitySettings.first && !item.isDivider()
     // With the setting on, an item without a number shows a 1 as well.
     val showOne = quantities && quantitySettings.second && item.text.isNotBlank()
     val quantity = if (quantities) Quantities.find(item.text) else null
-    var pillOpen by remember { mutableStateOf(false) }
-    // The handle stays in the middle of the row; when the text wraps to another line (or loses one) it glides there instead of
-    // jumping. The first height is taken as it is, so a long item does not slide into place when the editor opens.
-    val handleTop = remember { Animatable(0f) }
-    var measured by remember { mutableStateOf(false) }
-    val handleHeightPx = with(LocalDensity.current) { 56.dp.toPx() }
-    val scope = androidx.compose.runtime.rememberCoroutineScope()
     val green = MaterialTheme.colorScheme.tertiary
     val red = MaterialTheme.colorScheme.error
     // While the row is held it follows the finger: where the finger is now, less where it took hold of the row, less where the
@@ -170,8 +168,12 @@ internal fun ChecklistRow(
             Box(
                 Modifier.matchParentSize().drawBehind {
                     val r = CornerRadius(shape.topStart.toPx(size, this))
-                    val outer = Path().apply { addRoundRect(RoundRect(0f, 0f, size.width, size.height, r)) }
-                    val inner = Path().apply { addRoundRect(RoundRect(offsetX, 0f, offsetX + size.width, size.height, r)) }
+                    // The frame of an item lies inside the room left for what sits on its line; a divider has no such room.
+                    val l = if (item.isDivider()) 0f else 20.dp.toPx()
+                    val t = if (item.isDivider()) 0f else 14.dp.toPx()
+                    val b = size.height - if (item.isDivider()) 0f else 12.dp.toPx()
+                    val outer = Path().apply { addRoundRect(RoundRect(l, t, size.width, b, r)) }
+                    val inner = Path().apply { addRoundRect(RoundRect(l + offsetX, t, offsetX + size.width, b, r)) }
                     drawPath(Path.combine(PathOperation.Difference, outer, inner), color)
                 },
                 contentAlignment = if (toRight) Alignment.CenterStart else Alignment.CenterEnd,
@@ -185,6 +187,15 @@ internal fun ChecklistRow(
                 }
             }
         }
+        // Room around the frame for what is set into its line: the counter above, the grip below, the check at the left.
+        // Each of them is a 32 dp touch area with a 24 dp symbol, as in a category's header, centered on the line.
+        val notchTop = 16.dp
+        val notchBottom = 16.dp
+        val notchStart = 16.dp
+        var focused by remember { mutableStateOf(false) }
+        var counterWidth by remember { mutableStateOf(0) }
+        val haptic = LocalHapticFeedback.current
+        val dragDescription = stringResource(R.string.drag_handle)
         Box(
             Modifier
                 .offset { IntOffset(offsetX.toInt(), 0) }
@@ -192,24 +203,6 @@ internal fun ChecklistRow(
                 .then(
                     if (framed) Modifier.border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), MaterialTheme.shapes.medium).padding(4.dp)
                     else Modifier,
-                )
-                .onSizeChanged { size ->
-                    val target = ((size.height - handleHeightPx) / 2f).coerceAtLeast(0f)
-                    if (!measured) {
-                        measured = true
-                        scope.launch { handleTop.snapTo(target) }
-                    } else if (target != handleTop.targetValue) {
-                        scope.launch { handleTop.animateTo(target, spring(dampingRatio = 0.8f, stiffness = 500f)) }
-                    }
-                }
-                // On a note's own color or picture the rows show it instead of covering it; the change fades like the rest.
-                .background(
-                    androidx.compose.animation.animateColorAsState(
-                        MaterialTheme.colorScheme.background.let { if (LocalOnNote.current) it.copy(alpha = 0f) else it },
-                        tween(450), label = "row",
-                    ).value,
-                    // Rounded like the frame, so a swipe's color is not covered at the corners behind the line.
-                    MaterialTheme.shapes.medium,
                 )
                 // A direction that does nothing does not move; a divider cannot be ticked.
                 .swipeDrag(
@@ -219,81 +212,117 @@ internal fun ChecklistRow(
                     if (onSwipe != null) onSwipe(toRight) else if (toRight) onToggle() else onRemove()
                 }
         ) {
-            // Handle and checkbox sit in the left corners, one above the other and small. Every gap to an edge is 8 dp:
-            // the handle to the top and left, the checkbox to the left and bottom, and the text to the checkbox.
             val mark = if (item.checked) green else red
-            if (item.isDivider()) Box(Modifier.fillMaxWidth().height(56.dp).padding(start = 56.dp, end = 16.dp), contentAlignment = Alignment.Center) {
-                HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.outline)
-            } else OutlinedTextField(
-                shape = MaterialTheme.shapes.medium,
-                value = shownField, readOnly = !editable,
-                onValueChange = { typed ->
-                    field = typed
-                    onSelection(typed.selection)
-                    if (typed.text != item.text) onText(typed.text)
-                },
-                visualTransformation = (if (flags != null) remember(flags, flagsVersion, item.text) { FlagsTransformation(flags) } else VisualTransformation.None)
-                    .let { if (quantities) QuantityTransformation(it) else it },
-                // The pill: the number when there is one, and on the item being typed into a quiet "1×" to start counting.
-                placeholder = { Text(stringResource(R.string.item_hint)) },
-                // The text starts 48 dp from the left edge (16 dp content padding plus this room), where the strip with the
-                // capsule ends; the strip is drawn on top. In a numbered list the number stands in front of the text and is
-                // not part of what is edited.
-                prefix = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Spacer(Modifier.width(32.dp))
-                        number?.let { Text("$it. ", color = MaterialTheme.colorScheme.onSurfaceVariant) }
-                    }
-                },
-                textStyle = if (item.checked) {
-                    LocalTextStyle.current.copy(
-                        textDecoration = TextDecoration.LineThrough,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
-                    )
-                } else {
-                    LocalTextStyle.current
-                },
-                modifier = Modifier.fillMaxWidth().focusRequester(focusRequester).onFocusChanged { if (it.isFocused) onFocus() }.then(modifier),
-            )
-            // The number of the item sits on the top right corner of its button, and a tap on it (or the editor's "Quantity" action)
-            // opens a small counter beside it.
-            androidx.compose.runtime.LaunchedEffect(quantityRequested) { if (quantityRequested) { pillOpen = true; onQuantityShown() } }
-            if (quantity != null || pillOpen || showOne) Box(
-                Modifier.align(Alignment.TopStart).offset { IntOffset(0, handleTop.value.toInt()) }
-                    // The tag has a 48 dp touch area with the tag in its middle; that middle sits on the capsule's top right corner
-                    // (37 dp from the left, 8 dp from the top of the 56 dp strip).
-                    .offset(x = 13.dp, y = (-16).dp).size(48.dp).zIndex(1f),
-                // A fixed size, so the counter keeps its place when the tag appears or goes.
-                contentAlignment = Alignment.Center,
+            if (item.isDivider()) {
+                // A divider has no frame and no check: a line, and the grip at its left to move it.
+                Box(Modifier.fillMaxWidth().height(56.dp).padding(start = 56.dp, end = 16.dp), contentAlignment = Alignment.Center) {
+                    HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.outline)
+                }
+            } else Box(
+                Modifier.fillMaxWidth().padding(start = notchStart, top = notchTop, bottom = notchBottom)
+                    // On a note's own color or picture the rows show it instead of covering it; the change fades like the rest.
+                    .background(
+                        androidx.compose.animation.animateColorAsState(
+                            MaterialTheme.colorScheme.background.let { if (LocalOnNote.current) it.copy(alpha = 0f) else it },
+                            tween(450), label = "row",
+                        ).value,
+                        MaterialTheme.shapes.medium,
+                    ),
             ) {
-                if (quantity != null || showOne) QuantityTag(quantity?.count ?: 1) { if (editable) pillOpen = true }
-                if (pillOpen && editable) androidx.compose.ui.window.Popup(
-                    alignment = Alignment.CenterStart,
-                    // Beside the tag, level with the middle of the row's button.
-                    offset = with(LocalDensity.current) { IntOffset(40.dp.roundToPx(), 20.dp.roundToPx()) },
-                    onDismissRequest = { pillOpen = false },
-                    properties = androidx.compose.ui.window.PopupProperties(focusable = true),
+                OutlinedTextField(
+                    shape = MaterialTheme.shapes.medium,
+                    value = shownField, readOnly = !editable,
+                    onValueChange = { typed ->
+                        field = typed
+                        onSelection(typed.selection)
+                        if (typed.text != item.text) onText(typed.text)
+                    },
+                    visualTransformation = (if (flags != null) remember(flags, flagsVersion, item.text) { FlagsTransformation(flags) } else VisualTransformation.None)
+                        .let { if (quantities) QuantityTransformation(it) else it },
+                    placeholder = { Text(stringResource(R.string.item_hint)) },
+                    // The frame is drawn below (with gaps for what sits on its line), not by the field.
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Transparent, unfocusedBorderColor = Color.Transparent, disabledBorderColor = Color.Transparent,
+                    ),
+                    // The text keeps 4 dp from the check, whose inner half reaches 16 dp into the frame. In a numbered list the
+                    // number stands in front of the text and is not part of what is edited.
+                    prefix = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Spacer(Modifier.width(4.dp))
+                            number?.let { Text("$it. ", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                        }
+                    },
+                    textStyle = if (item.checked) {
+                        LocalTextStyle.current.copy(
+                            textDecoration = TextDecoration.LineThrough,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
+                        )
+                    } else {
+                        LocalTextStyle.current
+                    },
+                    modifier = Modifier.fillMaxWidth().focusRequester(focusRequester)
+                        .onFocusChanged { focused = it.isFocused; if (it.isFocused) onFocus() }.then(modifier),
+                )
+                // The frame, as the field would draw it, with its line left out where the counter, the check and the grip sit on it
+                // (as the title field leaves it out for its label). Drawn in a layer of its own, so the gaps only clear the line.
+                val lineColor = if (focused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+                val lineWidth = if (focused) 2.dp else 1.dp
+                val frameShape = MaterialTheme.shapes.medium
+                Box(
+                    Modifier.matchParentSize()
+                        .graphicsLayer { compositingStrategy = androidx.compose.ui.graphics.CompositingStrategy.Offscreen }
+                        .drawBehind {
+                            val w = lineWidth.toPx()
+                            val r = CornerRadius(frameShape.topStart.toPx(size, this))
+                            drawRoundRect(lineColor, topLeft = Offset(w / 2, w / 2), size = Size(size.width - w, size.height - w), cornerRadius = r, style = Stroke(w))
+                            fun clear(x: Float, y: Float, cw: Float, ch: Float) =
+                                drawRect(Color.Black, Offset(x, y), Size(cw, ch), blendMode = androidx.compose.ui.graphics.BlendMode.Clear)
+                            // Where the line meets what sits on it, it leaves out exactly that piece (its 32 dp box), as a category's
+                            // header does; the corners stay whole. The counter and the grip begin 12 dp in, so their symbols start 16 dp
+                            // in, behind the corner's arc, where the title field's label starts.
+                            val box = 32.dp.toPx()
+                            val start = 12.dp.toPx()
+                            if (counterWidth > 0) clear(start, -w, counterWidth.toFloat(), 3 * w)
+                            clear(-w, size.height / 2 - box / 2, 3 * w, box)
+                            clear(start, size.height - 2 * w, box, 3 * w)
+                        },
+                )
+            }
+            if (!item.isDivider()) {
+                // Top left on the line: − 2x +. Without a number just a +, or − 1x + with "1x" switched on; read-only only the number.
+                val count = quantity?.count ?: 1
+                if (quantities) Row(
+                    Modifier.align(Alignment.TopStart).offset(x = notchStart + 12.dp).height(32.dp)
+                        .onSizeChanged { counterWidth = it.width },
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    QuantityStepper(quantity?.count ?: 1) { onText(Quantities.withCount(item.text, it)) }
+                    val full = quantity != null || showOne
+                    if (editable && full) NotchButton(R.drawable.ic_remove, R.string.quantity_less, enabled = count > 1) { onText(Quantities.withCount(item.text, count - 1)) }
+                    if (full) Text("${count}x", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(horizontal = 4.dp))
+                    if (editable) NotchButton(R.drawable.ic_add, R.string.quantity_more) { onText(Quantities.withCount(item.text, count + 1)) }
+                }
+                // At the left, on the line in the middle: the check, a cross while open and a green check once done. A tap switches it.
+                Box(
+                    Modifier.align(Alignment.CenterStart).offset(y = (notchTop - notchBottom) / 2).size(32.dp)
+                        .clip(CircleShape)
+                        .pointerInput(item.id, editable) {
+                            if (!editable) return@pointerInput
+                            detectTapGestures(onTap = { toggleNow() })
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close), contentDescription = null, tint = mark, modifier = Modifier.size(24.dp))
                 }
             }
-            // One button for both jobs: a tap switches the item between done and open, holding it and dragging moves the row.
-            // The whole strip at the left is the touch area, 48 dp wide as Material asks; the capsule in it is the housing of the
-            // check (green) or cross (red), with the grip below it as a hint that it can be dragged. Both sit in the middle of
-            // their half, and the capsule has the same 11 dp to the left edge and to the text.
-            val haptic = LocalHapticFeedback.current
-            val dragDescription = stringResource(R.string.drag_handle)
+            // Bottom left on the line (a divider: at its left): the grip. Holding it and dragging moves the row.
             Box(
-                Modifier
-                    .align(Alignment.TopStart).offset { IntOffset(0, handleTop.value.toInt()) }.width(48.dp).height(56.dp)
+                Modifier.align(if (item.isDivider()) Alignment.CenterStart else Alignment.BottomStart)
+                    .offset(x = if (item.isDivider()) 12.dp else notchStart + 12.dp).size(32.dp)
+                    .clip(CircleShape)
                     .onGloballyPositioned { handle = it }
                     .pointerInput(item.id, editable) {
                         if (!editable) return@pointerInput
-                        detectTapGestures(onTap = { toggleNow() })
-                    }
-                    .pointerInput(item.id, editable) {
-                        if (!editable) return@pointerInput
-                        detectDragGesturesAfterLongPress(
+                        detectDragGestures(
                             onDragStart = { start ->
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 handle?.localToRoot(start)?.y?.let { fingerY = it; grab = it - rowTop }
@@ -308,39 +337,11 @@ internal fun ChecklistRow(
                         )
                     }
                     .semantics { contentDescription = dragDescription },
-                contentAlignment = Alignment.CenterStart,
+                contentAlignment = Alignment.Center,
             ) {
-                Column(
-                    Modifier
-                        .padding(start = 11.dp).size(width = 26.dp, height = if (item.isDivider()) 22.dp else 40.dp)
-                        // A filled capsule as Material 3 Expressive has it, see-through in the text's color, so it suits every
-                        // note color and picture; once done it takes on the check's color.
-                        .clip(CircleShape)
-                        .background(
-                            androidx.compose.animation.animateColorAsState(
-                                if (item.checked && !item.isDivider()) MaterialTheme.colorScheme.tertiary.copy(alpha = 0.28f)
-                                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f),
-                                label = "capsule",
-                            ).value,
-                        )
-                        .padding(vertical = 2.dp),
-                ) {
-                    // A divider has no check, only the grip to move it.
-                    if (!item.isDivider()) {
-                    Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        Icon(
-                            painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close),
-                            contentDescription = null, tint = mark, modifier = Modifier.size(14.dp),
-                        )
-                    }
-                    // The line between the check and the grip.
-                    Box(Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outlineVariant))
-                    }
-                    Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            repeat(3) { Box(Modifier.size(width = 12.dp, height = 1.5.dp).background(MaterialTheme.colorScheme.onSurfaceVariant)) }
-                        }
-                    }
+                // Three short lines, drawn like a 24 dp symbol (18 dp wide, 2 dp thick, 4 dp apart).
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    repeat(3) { Box(Modifier.size(width = 18.dp, height = 2.dp).background(LocalContentColor.current)) }
                 }
             }
         }
@@ -375,3 +376,17 @@ internal fun swipeLook(action: Int): Triple<Color, Int, Color> = when (action) {
 }
 
 private fun swipeAllowed(action: Int, item: KeepItem) = action != ITEM_SWIPE_NONE && !(item.isDivider() && action == ITEM_SWIPE_TICK)
+
+/** A − or + set into a row's frame line, sized like the symbols of a category's header. */
+@Composable
+private fun NotchButton(icon: Int, label: Int, enabled: Boolean = true, onClick: () -> Unit) {
+    Box(
+        Modifier.size(32.dp).clip(CircleShape).clickable(enabled = enabled, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            painterResource(icon), contentDescription = stringResource(label), modifier = Modifier.size(24.dp),
+            tint = LocalContentColor.current.copy(alpha = if (enabled) 1f else 0.38f),
+        )
+    }
+}

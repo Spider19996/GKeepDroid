@@ -520,7 +520,5 @@
     <string name="group_ticking">टिक करना</string>
     <string name="group_widget_background">पृष्ठभूमि</string>
     <string name="group_widgets">विजेट</string>
-    <string name="quantity_action">मात्रा</string>
-    <string name="quantity_pick_item">पहले वह आइटम टैप करें जिसे आप गिनना चाहते हैं।</string>
     <string name="list_quantity_one">बिना मात्रा वाले आइटम पर “1x” दिखाएँ</string>
 </resources>

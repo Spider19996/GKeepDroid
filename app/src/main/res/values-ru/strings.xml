@@ -538,7 +538,5 @@
     <string name="group_ticking">Отметка</string>
     <string name="group_widget_background">Фон</string>
     <string name="group_widgets">Виджеты</string>
-    <string name="quantity_action">Количество</string>
-    <string name="quantity_pick_item">Сначала нажмите на пункт, который хотите посчитать.</string>
     <string name="list_quantity_one">Показывать «1x» у пунктов без количества</string>
 </resources>

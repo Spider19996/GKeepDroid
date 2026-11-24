@@ -520,7 +520,5 @@
     <string name="group_ticking">Abhaken</string>
     <string name="group_widget_background">Hintergrund</string>
     <string name="group_widgets">Widgets</string>
-    <string name="quantity_action">Menge</string>
-    <string name="quantity_pick_item">Tippe zuerst den Eintrag an, den du zählen willst.</string>
     <string name="list_quantity_one">„1x“ bei Einträgen ohne Menge anzeigen</string>
 </resources>

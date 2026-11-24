@@ -520,7 +520,5 @@
     <string name="group_ticking">İşaretleme</string>
     <string name="group_widget_background">Arka plan</string>
     <string name="group_widgets">Widget’lar</string>
-    <string name="quantity_action">Miktar</string>
-    <string name="quantity_pick_item">Önce saymak istediğin öğeye dokun.</string>
     <string name="list_quantity_one">Miktarı olmayan öğelerde “1x” göster</string>
 </resources>

@@ -246,7 +246,6 @@ internal fun ColumnScope.EditorChecklist(
                         flags = fullFlags?.let { if (cut > 0 && it.flags.size >= cut) DocFlags(it.flags.copyOfRange(cut, it.flags.size)) else it },
                         flagsVersion = format.version,
                         onFocus = { format.focus = item.id },
-                        quantityRequested = model.quantityItem == item.id, onQuantityShown = { model.quantityItem = null },
                         modifier = if (canFormat && canEdit) Modifier.textStyleMenu(styleLabels, applyStyle) else Modifier,
                         onSelection = { format.selection[item.id] = TextRange(it.start + cut, it.end + cut) },
                         onToggle = { items.indexOfFirst { it.id == item.id }.let { i -> if (i >= 0 && !items[i].isDivider()) items[i] = items[i].copy(checked = !items[i].checked) } },

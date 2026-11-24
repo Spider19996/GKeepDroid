@@ -511,7 +511,5 @@
     <string name="group_ticking">체크하기</string>
     <string name="group_widget_background">배경</string>
     <string name="group_widgets">위젯</string>
-    <string name="quantity_action">수량</string>
-    <string name="quantity_pick_item">먼저 셀 항목을 탭하세요.</string>
     <string name="list_quantity_one">수량이 없는 항목에 “1x” 표시</string>
 </resources>
