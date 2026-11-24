@@ -158,6 +158,27 @@ internal fun ChecklistRow(
                 if (dragged) { shadowElevation = 12f; scaleX = 1.02f; scaleY = 1.02f }
             },
     ) {
+        // Room around the frame for what is set into its line: the counter above, the grip below, the check at the left.
+        // The counter and the grip are 24 dp high, centered on the line; the check at the left is a 32 dp touch area.
+        var focused by remember { mutableStateOf(false) }
+        var counterWidth by remember { mutableStateOf(0) }
+        // − and + show while the item is typed into, or for a moment after the number or one of them was tapped; otherwise the line
+        // holds only the number, and an item without one has nothing up there, so the rows stay close together.
+        var pressedAt by remember { mutableStateOf(0L) }
+        var recent by remember { mutableStateOf(false) }
+        androidx.compose.runtime.LaunchedEffect(pressedAt) {
+            if (pressedAt == 0L) return@LaunchedEffect
+            recent = true
+            kotlinx.coroutines.delay(3000)
+            recent = false
+        }
+        val showButtons = editable && quantities && (focused || recent)
+        val showNumber = quantity != null || showOne
+        val topShown = quantities && (showNumber || showButtons)
+        if (!topShown && counterWidth != 0) counterWidth = 0
+        val notchTop by androidx.compose.animation.core.animateDpAsState(if (topShown) 12.dp else 0.dp, label = "top")
+        val notchBottom = 12.dp
+        val notchStart = 16.dp
         if (offsetX != 0f) {
             val toRight = offsetX > 0f
             val (color, icon, tint) = swipeLook(if (toRight) swipeRight else swipeLeft)
@@ -169,9 +190,9 @@ internal fun ChecklistRow(
                 Modifier.matchParentSize().drawBehind {
                     val r = CornerRadius(shape.topStart.toPx(size, this))
                     // The frame of an item lies inside the room left for what sits on its line; a divider has no such room.
-                    val l = if (item.isDivider()) 0f else 20.dp.toPx()
-                    val t = if (item.isDivider()) 0f else 14.dp.toPx()
-                    val b = size.height - if (item.isDivider()) 0f else 12.dp.toPx()
+                    val l = if (item.isDivider()) 0f else notchStart.toPx()
+                    val t = if (item.isDivider()) 0f else notchTop.toPx()
+                    val b = size.height - if (item.isDivider()) 0f else notchBottom.toPx()
                     val outer = Path().apply { addRoundRect(RoundRect(l, t, size.width, b, r)) }
                     val inner = Path().apply { addRoundRect(RoundRect(l + offsetX, t, offsetX + size.width, b, r)) }
                     drawPath(Path.combine(PathOperation.Difference, outer, inner), color)
@@ -187,13 +208,6 @@ internal fun ChecklistRow(
                 }
             }
         }
-        // Room around the frame for what is set into its line: the counter above, the grip below, the check at the left.
-        // Each of them is a 32 dp touch area with a 24 dp symbol, as in a category's header, centered on the line.
-        val notchTop = 16.dp
-        val notchBottom = 16.dp
-        val notchStart = 16.dp
-        var focused by remember { mutableStateOf(false) }
-        var counterWidth by remember { mutableStateOf(0) }
         val haptic = LocalHapticFeedback.current
         val dragDescription = stringResource(R.string.drag_handle)
         Box(
@@ -277,29 +291,35 @@ internal fun ChecklistRow(
                             drawRoundRect(lineColor, topLeft = Offset(w / 2, w / 2), size = Size(size.width - w, size.height - w), cornerRadius = r, style = Stroke(w))
                             fun clear(x: Float, y: Float, cw: Float, ch: Float) =
                                 drawRect(Color.Black, Offset(x, y), Size(cw, ch), blendMode = androidx.compose.ui.graphics.BlendMode.Clear)
-                            // Where the line meets what sits on it, it leaves out exactly that piece (its 32 dp box), as a category's
-                            // header does; the corners stay whole. The counter and the grip begin 12 dp in, so their symbols start 16 dp
-                            // in, behind the corner's arc, where the title field's label starts.
-                            val box = 32.dp.toPx()
+                            // Where the line meets what sits on it, it leaves out exactly that piece, as a category's header does;
+                            // the corners stay whole. The counter and the grip begin 12 dp in, behind the corner's arc.
                             val start = 12.dp.toPx()
                             if (counterWidth > 0) clear(start, -w, counterWidth.toFloat(), 3 * w)
-                            clear(-w, size.height / 2 - box / 2, 3 * w, box)
-                            clear(start, size.height - 2 * w, box, 3 * w)
+                            clear(-w, size.height / 2 - 16.dp.toPx(), 3 * w, 32.dp.toPx())
+                            clear(start, size.height - 2 * w, 24.dp.toPx(), 3 * w)
                         },
                 )
             }
             if (!item.isDivider()) {
-                // Top left on the line: − 2x +. Without a number just a +, or − 1x + with "1x" switched on; read-only only the number.
+                // Top left on the line: the number ("2x"), with − and + beside it while they are wanted. Without a number the +
+                // alone (or − 1x + with "1x" switched on).
                 val count = quantity?.count ?: 1
-                if (quantities) Row(
-                    Modifier.align(Alignment.TopStart).offset(x = notchStart + 12.dp).height(32.dp)
+                fun press() { pressedAt = System.currentTimeMillis() }
+                if (topShown) Row(
+                    Modifier.align(Alignment.TopStart).offset(x = notchStart + 12.dp).height(24.dp)
                         .onSizeChanged { counterWidth = it.width },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    val full = quantity != null || showOne
-                    if (editable && full) NotchButton(R.drawable.ic_remove, R.string.quantity_less, enabled = count > 1) { onText(Quantities.withCount(item.text, count - 1)) }
-                    if (full) Text("${count}x", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(horizontal = 4.dp))
-                    if (editable) NotchButton(R.drawable.ic_add, R.string.quantity_more) { onText(Quantities.withCount(item.text, count + 1)) }
+                    androidx.compose.animation.AnimatedVisibility(showButtons && showNumber) {
+                        NotchButton(R.drawable.ic_remove, R.string.quantity_less, enabled = count > 1) { press(); onText(Quantities.withCount(item.text, count - 1)) }
+                    }
+                    if (showNumber) Text(
+                        "${count}x", style = MaterialTheme.typography.labelLarge,
+                        modifier = Modifier.clip(CircleShape).clickable(enabled = editable) { press() }.padding(horizontal = 4.dp),
+                    )
+                    androidx.compose.animation.AnimatedVisibility(showButtons) {
+                        NotchButton(R.drawable.ic_add, R.string.quantity_more) { press(); onText(Quantities.withCount(item.text, count + 1)) }
+                    }
                 }
                 // At the left, on the line in the middle: the check, a cross while open and a green check once done. A tap switches it.
                 Box(
@@ -317,7 +337,7 @@ internal fun ChecklistRow(
             // Bottom left on the line (a divider: at its left): the grip. Holding it and dragging moves the row.
             Box(
                 Modifier.align(if (item.isDivider()) Alignment.CenterStart else Alignment.BottomStart)
-                    .offset(x = if (item.isDivider()) 12.dp else notchStart + 12.dp).size(32.dp)
+                    .offset(x = if (item.isDivider()) 12.dp else notchStart + 12.dp).size(24.dp)
                     .clip(CircleShape)
                     .onGloballyPositioned { handle = it }
                     .pointerInput(item.id, editable) {
@@ -339,9 +359,9 @@ internal fun ChecklistRow(
                     .semantics { contentDescription = dragDescription },
                 contentAlignment = Alignment.Center,
             ) {
-                // Three short lines, drawn like a 24 dp symbol (18 dp wide, 2 dp thick, 4 dp apart).
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    repeat(3) { Box(Modifier.size(width = 18.dp, height = 2.dp).background(LocalContentColor.current)) }
+                // Three short lines, drawn like a 20 dp symbol (16 dp wide, 2 dp thick, 3 dp apart).
+                Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                    repeat(3) { Box(Modifier.size(width = 16.dp, height = 2.dp).background(LocalContentColor.current)) }
                 }
             }
         }
@@ -377,15 +397,15 @@ internal fun swipeLook(action: Int): Triple<Color, Int, Color> = when (action) {
 
 private fun swipeAllowed(action: Int, item: KeepItem) = action != ITEM_SWIPE_NONE && !(item.isDivider() && action == ITEM_SWIPE_TICK)
 
-/** A − or + set into a row's frame line, sized like the symbols of a category's header. */
+/** A − or + set into a row's frame line: a 20 dp symbol in a 24 dp area, centered on the line. */
 @Composable
 private fun NotchButton(icon: Int, label: Int, enabled: Boolean = true, onClick: () -> Unit) {
     Box(
-        Modifier.size(32.dp).clip(CircleShape).clickable(enabled = enabled, onClick = onClick),
+        Modifier.size(24.dp).clip(CircleShape).clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            painterResource(icon), contentDescription = stringResource(label), modifier = Modifier.size(24.dp),
+            painterResource(icon), contentDescription = stringResource(label), modifier = Modifier.size(20.dp),
             tint = LocalContentColor.current.copy(alpha = if (enabled) 1f else 0.38f),
         )
     }
