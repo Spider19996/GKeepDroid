@@ -323,7 +323,9 @@ internal fun ChecklistRow(
                 fun press() { pressedAt = System.currentTimeMillis() }
                 if (topShown) Row(
                     Modifier.align(Alignment.TopStart).offset(x = notchStart + 12.dp).height(24.dp).zIndex(1f)
-                        .onSizeChanged { counterWidth = it.width },
+                        // The line stops 4 dp beyond this, as at a category's name, whose own 4 dp of padding are in its measure too:
+                        // so the number has the same 8 dp to the line on both sides as "Action" has.
+                        .onSizeChanged { counterWidth = it.width }.padding(horizontal = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     androidx.compose.animation.AnimatedVisibility(showButtons && showNumber) {
