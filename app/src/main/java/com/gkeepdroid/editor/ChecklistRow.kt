@@ -63,6 +63,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -343,6 +344,10 @@ internal fun ChecklistRow(
                 // note's color like the bars do.
                 val capsuleColor = MaterialTheme.colorScheme.primary
                 val onCapsule = MaterialTheme.colorScheme.onPrimary
+                // Red while open and green once done, in a shade that reads on the capsule's color (light or dark).
+                val lightCapsule = capsuleColor.luminance() > 0.5f
+                val markOnCapsule = if (item.checked) (if (lightCapsule) Color(0xFF2E7D32) else Color(0xFFA5D6A7))
+                    else (if (lightCapsule) Color(0xFFC62828) else Color(0xFFEF9A9A))
                 var topCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
                 var bottomCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
                 Column(
@@ -374,7 +379,7 @@ internal fun ChecklistRow(
                             },
                         contentAlignment = Alignment.Center,
                     ) {
-                        Icon(painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close), contentDescription = null, tint = onCapsule, modifier = Modifier.size(16.dp))
+                        Icon(painterResource(if (item.checked) R.drawable.ic_done else R.drawable.ic_close), contentDescription = null, tint = markOnCapsule, modifier = Modifier.size(16.dp))
                     }
                     // The line between the check and the grip.
                     Box(Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(1.dp).background(onCapsule.copy(alpha = 0.35f)))
