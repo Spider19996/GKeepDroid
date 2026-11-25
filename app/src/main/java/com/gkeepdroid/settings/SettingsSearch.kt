@@ -45,6 +45,7 @@ internal fun settingEntries(isSingleNote: Boolean): List<SettingEntry> = buildLi
     add(SettingEntry(R.string.app_layout_sort, Page.AppLayout))
     add(SettingEntry(R.string.layout_label, Page.AppLayout))
     add(SettingEntry(R.string.pinned_section_switch, Page.AppLayout))
+    add(SettingEntry(R.string.widget_order_numbers_switch, Page.AppLayout))
     add(SettingEntry(R.string.pull_to_refresh_switch, Page.AppLayout))
     add(SettingEntry(R.string.preview_length, Page.AppLayout))
     add(SettingEntry(R.string.editor_buttons_title, Page.EditorButtons))

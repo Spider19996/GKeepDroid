@@ -171,6 +171,7 @@
     <string name="layout_grid">Izgara</string>
     <string name="layout_list">Liste</string>
     <string name="pinned_section_switch">Sabitlenen notları ayrı bölümde göster</string>
+    <string name="widget_order_numbers_switch">Notları widget\'taki sıralarına göre numaralandır</string>
     <string name="pull_to_refresh_switch">Yenilemek için listeyi aşağı çek</string>
     <string name="color_background_remove">Kaldır</string>
     <string name="format_bold">Kalın</string>

@@ -117,7 +117,8 @@ object RichNotes {
     fun backgrounds(context: Context, account: String): Set<String> =
         load(context, account).values.map { it.background }.filter { it.isNotEmpty() }.toSet()
 
-    fun of(context: Context, account: String, noteId: String): RichNote? = load(context, account)[noteId]
+    fun of(context: Context, account: String, noteId: String): RichNote? =
+        if (DemoNotes.enabled(context)) DemoNotes.rich(noteId) else load(context, account)[noteId]
 
     /**
      * Writes formatting into the file the app reads it from, at once: for a local note it is the only place, for a Keep note it

@@ -172,6 +172,7 @@
     <string name="layout_grid">Grid</string>
     <string name="layout_list">List</string>
     <string name="pinned_section_switch">Show pinned notes in their own section</string>
+    <string name="widget_order_numbers_switch">Number the notes by their order in the widget</string>
     <string name="pull_to_refresh_switch">Pull down on the list to refresh</string>
     <string name="color_background_remove">Remove</string>
     <string name="format_bold">Bold</string>

@@ -168,6 +168,7 @@
     <string name="layout_grid">グリッド</string>
     <string name="layout_list">リスト</string>
     <string name="pinned_section_switch">ピン留めしたメモを別セクションに表示</string>
+    <string name="widget_order_numbers_switch">ウィジェット内の順番をメモに番号で表示</string>
     <string name="pull_to_refresh_switch">リストを下に引いて更新</string>
     <string name="color_background_remove">削除</string>
     <string name="format_bold">太字</string>

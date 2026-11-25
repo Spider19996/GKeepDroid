@@ -1,5 +1,7 @@
 package com.gkeepdroid
 
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.defaultMinSize
 import android.text.format.DateUtils
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
@@ -76,6 +78,7 @@ internal fun NoteTile(
     query: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    widgetPosition: Int? = null,
     actions: (@Composable () -> Unit)? = null,
 ) {
     val context = LocalContext.current
@@ -460,6 +463,16 @@ internal fun NoteTile(
                     tint = textColor, modifier = Modifier.size(24.dp),
                 )
             }
+        }
+    }
+    // The place in the widget sits on the card's corner, where it covers nothing of the note.
+    if (widgetPosition != null) {
+        Box(
+            Modifier.align(Alignment.TopStart).offset(x = (-6).dp, y = (-6).dp).defaultMinSize(minWidth = 22.dp, minHeight = 22.dp)
+                .background(MaterialTheme.colorScheme.primary, CircleShape).padding(horizontal = 5.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text("$widgetPosition", color = MaterialTheme.colorScheme.onPrimary, style = MaterialTheme.typography.labelMedium)
         }
     }
     }

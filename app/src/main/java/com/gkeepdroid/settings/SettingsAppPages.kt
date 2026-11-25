@@ -53,6 +53,7 @@ internal fun ColumnScope.AppLayoutPage(s: SettingsState) {
                 ) { v -> appSort = v }
             }
             item { SwitchItem(R.string.pinned_section_switch, appPinnedSection, it) { v -> appPinnedSection = v } }
+            item { SwitchItem(R.string.widget_order_numbers_switch, appWidgetOrderNumbers, it) { v -> appWidgetOrderNumbers = v } }
             item { SwitchItem(R.string.pull_to_refresh_switch, appPullToRefresh, it) { v -> appPullToRefresh = v } }
         }
         Group(stringResource(R.string.group_look)) {

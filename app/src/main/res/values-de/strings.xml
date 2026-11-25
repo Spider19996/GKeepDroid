@@ -171,6 +171,7 @@
     <string name="layout_grid">Raster</string>
     <string name="layout_list">Liste</string>
     <string name="pinned_section_switch">Angeheftete Notizen in eigenem Abschnitt zeigen</string>
+    <string name="widget_order_numbers_switch">Notizen nach ihrer Reihenfolge im Widget nummerieren</string>
     <string name="pull_to_refresh_switch">Zum Aktualisieren die Liste herunterziehen</string>
     <string name="color_background_remove">Entfernen</string>
     <string name="format_bold">Fett</string>

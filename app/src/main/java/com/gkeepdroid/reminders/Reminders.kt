@@ -77,6 +77,7 @@ object Reminders {
 
     /** The reminders of a note, the soonest first. */
     fun list(context: Context, account: String, noteId: String): List<Reminder> {
+        if (DemoNotes.enabled(context)) return DemoNotes.reminders(noteId)
         val raw = prefs(context).getString(key(account, noteId), null) ?: return emptyList()
         return try {
             val array = JSONArray(raw)

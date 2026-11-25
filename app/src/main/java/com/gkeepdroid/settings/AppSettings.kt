@@ -9,6 +9,8 @@ data class AppSettings(
     /** One of SORT_KEEP, SORT_EDITED, SORT_CREATED, SORT_TITLE. */
     val sortMode: Int = SORT_KEEP,
     val pinnedSection: Boolean = true,
+    /** A number on every card of the notes screen: the note's place in the list widget. */
+    val widgetOrderNumbers: Boolean = false,
     val showImages: Boolean = true,
     val showNoteColors: Boolean = true,
     val plainCardStyle: Int = PLAIN_BORDER,
@@ -112,6 +114,7 @@ object AppSettingsStore {
             layout = p.getInt("layout", d.layout),
             sortMode = p.getInt("sort_mode", d.sortMode),
             pinnedSection = p.getBoolean("pinned_section", d.pinnedSection),
+            widgetOrderNumbers = p.getBoolean("widget_order_numbers", d.widgetOrderNumbers),
             showImages = p.getBoolean("show_images", d.showImages),
             showNoteColors = p.getBoolean("show_note_colors", d.showNoteColors),
             plainCardStyle = p.getInt("plain_card_style", d.plainCardStyle),
@@ -184,6 +187,7 @@ object AppSettingsStore {
             putInt("layout", s.layout)
             putInt("sort_mode", s.sortMode)
             putBoolean("pinned_section", s.pinnedSection)
+            putBoolean("widget_order_numbers", s.widgetOrderNumbers)
             putBoolean("show_images", s.showImages)
             putBoolean("show_note_colors", s.showNoteColors)
             putInt("plain_card_style", s.plainCardStyle)

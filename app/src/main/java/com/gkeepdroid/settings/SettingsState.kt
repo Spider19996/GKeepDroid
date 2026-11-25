@@ -44,6 +44,7 @@ internal class SettingsState(val context: SettingsActivity) {
     var appLayout by mutableIntStateOf(initialApp.layout)
     var appSort by mutableIntStateOf(initialApp.sortMode)
     var appPinnedSection by mutableStateOf(initialApp.pinnedSection)
+    var appWidgetOrderNumbers by mutableStateOf(initialApp.widgetOrderNumbers)
     var appShowImages by mutableStateOf(initialApp.showImages)
     var appShowColors by mutableStateOf(initialApp.showNoteColors)
     var appPlainStyle by mutableIntStateOf(initialApp.plainCardStyle)
@@ -250,7 +251,7 @@ internal class SettingsState(val context: SettingsActivity) {
 
     /** Takes over settings that were set from outside (the import of a backup file). */
     fun applyApp(a: AppSettings) {
-        appLayout = a.layout; appSort = a.sortMode; appPinnedSection = a.pinnedSection; appShowImages = a.showImages
+        appLayout = a.layout; appSort = a.sortMode; appPinnedSection = a.pinnedSection; appWidgetOrderNumbers = a.widgetOrderNumbers; appShowImages = a.showImages
         appShowColors = a.showNoteColors; appPlainStyle = a.plainCardStyle; appPreviewLines = a.previewLines
         appShowEdited = a.showEditedTime; appEditedAsDate = a.editedAsDate; appShowLabels = a.showLabels; appShowProgress = a.showProgress
         appLockPrivate = a.lockPrivateNotes; appLockApp = a.lockApp; appLockEdit = a.lockEdit; appLockGrace = a.lockGraceSec
@@ -265,7 +266,7 @@ internal class SettingsState(val context: SettingsActivity) {
     }
 
     fun currentApp() = AppSettings(
-        appLayout, appSort, appPinnedSection, appShowImages, appShowColors, appPlainStyle, appPreviewLines, appShowEdited, appEditedAsDate, appShowLabels, appShowProgress, appLockPrivate, appLockApp, appLockEdit, appLockGrace,
+        appLayout, appSort, appPinnedSection, appWidgetOrderNumbers, appShowImages, appShowColors, appPlainStyle, appPreviewLines, appShowEdited, appEditedAsDate, appShowLabels, appShowProgress, appLockPrivate, appLockApp, appLockEdit, appLockGrace,
         appShowReminders, appListCheckedToEnd, appListCollapseChecked, appListCheckboxStyle, appListCheckboxSize, appListSpacing,
         appListCheckInApp, appListDeleteChecked, appConvertPrefix, appRenumberDisplay, appTrimEmptyEdges, appWidgetGrace, appWidgetTitlesOnly, appLockWidgetTick, appSwipeRight, appSwipeLeft, appFoldNotes, appFilterBar, appFilterChips, appPullToRefresh, appEditorLayout,
         appEditorInRecents, appEditorBarSnapBack, appItemSwipeRight, appItemSwipeLeft, listQuantities = appListQuantities, listQuantityOne = appListQuantityOne,

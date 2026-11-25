@@ -140,6 +140,9 @@ internal fun NotesGrid(
     // The new order is shown until the saved one arrives.
     LaunchedEffect(shown) { dragOrder = null }
     val list = dragOrder ?: shown
+    val positions = remember(shown, resumeKey, screen, app.widgetOrderNumbers) {
+        if (app.widgetOrderNumbers && screen == AppScreen.Notes) widgetPositions(context, shown.map { it.second }.distinct()) else emptyMap()
+    }
     fun keyOf(entry: Pair<KeepNote, String>) = entry.second + "|" + entry.first.id
 
     fun moveUnderFinger() {
@@ -290,7 +293,7 @@ internal fun NotesGrid(
             item(span = StaggeredGridItemSpan.FullLine) { SectionLabel(stringResource(R.string.pinned_section)) }
             items(pinned, key = { it.second + "|" + it.first.id }) { (note, account) ->
                 SwipeCard(app, screen == AppScreen.Notes, { onSwiped(note, account, it) }, heldItem(dragKey == account + "|" + note.id)) {
-                    NoteTile(activity, resumeKey, unlocker, note, account, app, query, onClick = { cardClick(note, account) }, modifier = cardModifier(note, account))
+                    NoteTile(activity, resumeKey, unlocker, note, account, app, query, widgetPosition = positions[account + "|" + note.id], onClick = { cardClick(note, account) }, modifier = cardModifier(note, account))
                 }
             }
             if (others.isNotEmpty()) {
@@ -299,7 +302,7 @@ internal fun NotesGrid(
         }
         items(others, key = { it.second + "|" + it.first.id }) { (note, account) ->
             SwipeCard(app, screen == AppScreen.Notes, { onSwiped(note, account, it) }, heldItem(dragKey == account + "|" + note.id)) {
-            NoteTile(activity, resumeKey, unlocker, note, account, app, query, onClick = { cardClick(note, account) }, modifier = cardModifier(note, account)) {
+            NoteTile(activity, resumeKey, unlocker, note, account, app, query, widgetPosition = positions[account + "|" + note.id], onClick = { cardClick(note, account) }, modifier = cardModifier(note, account)) {
                 // Archive and trash get their own actions below the note.
                 if (screen == AppScreen.Archive) {
                     TextButton(onClick = { act({}) { KeepRepository.unarchiveNote(context, account, note.id) } }, shapes = ButtonDefaults.shapes()) {

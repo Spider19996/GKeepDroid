@@ -130,7 +130,9 @@ object NotesCache {
     /** Archived and trashed notes of an account, as last synced. */
     fun readOther(context: Context, email: String?): List<KeepNote> {
         if (email == null) return emptyList()
-        if (DemoNotes.enabled(context)) return emptyList()
+        if (DemoNotes.enabled(context)) {
+            return if (email == CredentialStore.accounts(context).firstOrNull()) DemoNotes.otherNotes() else emptyList()
+        }
         val f = otherFile(context, email)
         if (!f.exists()) return emptyList()
         return try {
@@ -148,7 +150,8 @@ object NotesCache {
 
     /** The label names stored for an account, also unused ones. */
     fun labelsOnly(context: Context, email: String?): List<String> {
-        if (email == null) return emptyList()
+        // The demo mode must not show the real labels; the samples bring their own.
+        if (email == null || DemoNotes.enabled(context)) return emptyList()
         return try {
             val f = labelsFile(context, email)
             if (f.exists()) JSONArray(f.readText()).let { a -> (0 until a.length()).map { a.getString(it) } } else emptyList()

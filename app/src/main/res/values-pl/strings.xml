@@ -177,6 +177,7 @@
     <string name="layout_grid">Siatka</string>
     <string name="layout_list">Lista</string>
     <string name="pinned_section_switch">Pokaż przypięte notatki w osobnej sekcji</string>
+    <string name="widget_order_numbers_switch">Numeruj notatki według kolejności w widżecie</string>
     <string name="pull_to_refresh_switch">Przeciągnij listę w dół, aby odświeżyć</string>
     <string name="color_background_remove">Usuń</string>
     <string name="format_bold">Pogrubienie</string>

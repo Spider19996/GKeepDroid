@@ -174,6 +174,7 @@
     <string name="layout_grid">Grade</string>
     <string name="layout_list">Lista</string>
     <string name="pinned_section_switch">Mostrar notas fixadas em uma seção própria</string>
+    <string name="widget_order_numbers_switch">Numerar as notas pela ordem no widget</string>
     <string name="pull_to_refresh_switch">Puxar a lista para baixo para atualizar</string>
     <string name="color_background_remove">Remover</string>
     <string name="format_bold">Negrito</string>

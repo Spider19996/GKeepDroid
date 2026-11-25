@@ -183,6 +183,7 @@
     <string name="layout_grid">شبكة</string>
     <string name="layout_list">قائمة</string>
     <string name="pinned_section_switch">عرض الملاحظات المثبتة في قسم مستقل</string>
+    <string name="widget_order_numbers_switch">ترقيم الملاحظات حسب ترتيبها في الأداة</string>
     <string name="pull_to_refresh_switch">اسحب القائمة للأسفل للتحديث</string>
     <string name="color_background_remove">إزالة</string>
     <string name="format_bold">غامق</string>

@@ -171,6 +171,7 @@
     <string name="layout_grid">Raster</string>
     <string name="layout_list">Lijst</string>
     <string name="pinned_section_switch">Vastgezette notities in een eigen sectie tonen</string>
+    <string name="widget_order_numbers_switch">Notities nummeren volgens hun volgorde in de widget</string>
     <string name="pull_to_refresh_switch">Lijst omlaag trekken om te vernieuwen</string>
     <string name="color_background_remove">Verwijderen</string>
     <string name="format_bold">Vet</string>

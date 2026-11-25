@@ -174,6 +174,7 @@
     <string name="layout_grid">Grille</string>
     <string name="layout_list">Liste</string>
     <string name="pinned_section_switch">Afficher les notes épinglées dans leur propre section</string>
+    <string name="widget_order_numbers_switch">Numéroter les notes selon leur ordre dans le widget</string>
     <string name="pull_to_refresh_switch">Tirer la liste vers le bas pour actualiser</string>
     <string name="color_background_remove">Retirer</string>
     <string name="format_bold">Gras</string>

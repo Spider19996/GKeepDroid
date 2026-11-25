@@ -177,6 +177,7 @@
     <string name="layout_grid">Сетка</string>
     <string name="layout_list">Список</string>
     <string name="pinned_section_switch">Показывать закреплённые заметки в отдельном разделе</string>
+    <string name="widget_order_numbers_switch">Нумеровать заметки по их порядку в виджете</string>
     <string name="pull_to_refresh_switch">Потянуть список вниз для обновления</string>
     <string name="color_background_remove">Убрать</string>
     <string name="format_bold">Жирный</string>
