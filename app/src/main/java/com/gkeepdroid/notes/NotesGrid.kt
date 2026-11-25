@@ -137,6 +137,10 @@ internal fun NotesGrid(
     var dragOrder by remember { mutableStateOf<List<Pair<KeepNote, String>>?>(null) }
     val cardBounds = remember { mutableStateMapOf<String, Rect>() }
     var lastMove by remember { mutableStateOf(0L) }
+    // The card the held one last changed places with: it has to be left before it counts again.
+    var passed by remember { mutableStateOf<String?>(null) }
+    // The cards that move: the held one, and with it the other chosen ones if it is one of them.
+    var dragGroup by remember { mutableStateOf(emptySet<String>()) }
     // The new order is shown until the saved one arrives.
     LaunchedEffect(shown) { dragOrder = null }
     val list = dragOrder ?: shown
@@ -154,9 +158,12 @@ internal fun NotesGrid(
         val now = SystemClock.uptimeMillis()
         if (now - lastMove < 250) return
         val from = current.indexOfFirst { keyOf(it) == key }
+        // With cards of different heights, the one just passed can slide right back under the finger; swapping with it again
+        // would make both jump to and fro for as long as the finger rests there.
+        if (passed?.let { cardBounds[it]?.contains(pointer) } != true) passed = null
         // Only the middle of a card counts, so the finger near an edge does not swap back and forth.
         val to = current.indexOfFirst {
-            keyOf(it) != key && cardBounds[keyOf(it)]?.let { r -> r.deflate(minOf(r.width, r.height) * 0.25f).contains(pointer) } == true
+            keyOf(it) !in dragGroup && keyOf(it) != passed && cardBounds[keyOf(it)]?.let { r -> r.deflate(minOf(r.width, r.height) * 0.25f).contains(pointer) } == true
         }
         if (from < 0 || to < 0) return
         // Pinned and other notes keep their own sections (only the notes screen has them).
@@ -165,7 +172,12 @@ internal fun NotesGrid(
         // The grid keeps its place by the first card it shows; when that card is part of the move, it would jump along with it.
         val index = gridState.firstVisibleItemIndex
         val offset = gridState.firstVisibleItemScrollOffset
-        dragOrder = current.toMutableList().also { it.add(to, it.removeAt(from)) }
+        val target = keyOf(current[to])
+        passed = target
+        val moving = current.filter { keyOf(it) in dragGroup }
+        val rest = (current - moving.toSet()).toMutableList()
+        rest.addAll(rest.indexOfFirst { keyOf(it) == target } + if (from < to) 1 else 0, moving)
+        dragOrder = rest
         scope.launch { gridState.scrollToItem(index, offset) }
     }
 
@@ -176,25 +188,28 @@ internal fun NotesGrid(
         if (key == null || order == null) return
         val entry = order.firstOrNull { keyOf(it) == key } ?: return
         val group = if (screen == AppScreen.Notes && app.pinnedSection) order.filter { it.first.pinned == entry.first.pinned } else order
-        val at = group.indexOfFirst { keyOf(it) == key }
-        val above = group.getOrNull(at - 1)?.first?.sort
-        val below = group.getOrNull(at + 1)?.first?.sort
-        // A higher value is further up; the note gets a value between its new neighbors.
-        val sort = when {
-            above != null && below != null -> (above + below) / 2
-            below != null -> below + 10_000
-            above != null -> above - 10_000
-            else -> null
-        }
-        if (sort == null || order.map(::keyOf) == shown.map(::keyOf)) {
+        // The moved cards stand together; they get values between their new neighbors.
+        val moved = group.filter { keyOf(it) in dragGroup }
+        val first = group.indexOfFirst { keyOf(it) in dragGroup }
+        val above = group.getOrNull(first - 1)?.first?.sort
+        val below = group.getOrNull(first + moved.size)?.first?.sort
+        if (moved.isEmpty() || (above == null && below == null) || order.map(::keyOf) == shown.map(::keyOf)) {
             dragOrder = null
-        } else {
-            act({ dragOrder = null }) { KeepRepository.setSort(context, entry.second, entry.first.id, sort) }
+            return
+        }
+        // A higher value is further up.
+        val step = if (above != null && below != null) (above - below) / (moved.size + 1) else 10_000L
+        val top = above ?: (below!! + step * (moved.size + 1))
+        act({ dragOrder = null }) {
+            moved.forEachIndexed { i, (note, account) -> KeepRepository.setSort(context, account, note.id, top - step * (i + 1)) }
         }
     }
 
     // The drag gesture lives longer than one composition: it must always call the current version of drop().
     val dropNow by rememberUpdatedState<() -> Unit>({ drop() })
+    val moveNow by rememberUpdatedState<() -> Unit>({ moveUnderFinger() })
+    val chosen by rememberUpdatedState(selected)
+    val shownNow by rememberUpdatedState(shown)
 
     // Near the top or bottom edge the list scrolls along with the finger.
     LaunchedEffect(dragKey) {
@@ -202,7 +217,7 @@ internal fun NotesGrid(
             val edge = 120f
             if (pointer.y < gridBounds.top + edge) gridState.scrollBy(-24f)
             else if (pointer.y > gridBounds.bottom - edge) gridState.scrollBy(24f)
-            moveUnderFinger()
+            moveNow()
             delay(16)
         }
     }
@@ -212,8 +227,6 @@ internal fun NotesGrid(
     fun dragModifier(key: String): Modifier {
         val haptic = LocalHapticFeedback.current
         val toggle = { haptic.performHapticFeedback(HapticFeedbackType.LongPress); onToggle(key) }
-        // Once notes are chosen, a tap adds or removes one, and the cards no longer move (the card being pressed keeps its gesture).
-        if (selected.isNotEmpty() && dragKey != key) return Modifier
         // Without a place to drag to, a long press chooses the note.
         if (!canReorder) return Modifier.pointerInput(key) { detectTapGestures(onLongPress = { toggle() }) }
         val coords = remember { arrayOfNulls<LayoutCoordinates>(1) }
@@ -235,7 +248,16 @@ internal fun NotesGrid(
             .pointerInput(key) {
                 detectDragGesturesAfterLongPress(
                     onDragStart = { start ->
-                        if (selected.isEmpty()) { toggle(); chosenByPress = true }
+                        // The first card is chosen by the press itself. With a choice already made, the press may be the start
+                        // of a move, so it chooses (or lets go of) the card only when it ends without one.
+                        if (chosen.isEmpty()) { toggle(); chosenByPress = true } else haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        dragGroup = if (key in chosen) {
+                            // Pinned and other notes keep their own sections.
+                            val pinned = shownNow.firstOrNull { keyOf(it) == key }?.first?.pinned
+                            shownNow.filter { keyOf(it) in chosen && (screen != AppScreen.Notes || !app.pinnedSection || it.first.pinned == pinned) }
+                                .map(::keyOf).toSet()
+                        } else setOf(key)
+                        passed = null
                         dragKey = key
                         pointer = coords[0]?.localToRoot(start) ?: Offset.Zero
                         origin[2] = pointer.x - origin[0]; origin[3] = pointer.y - origin[1]
@@ -243,11 +265,11 @@ internal fun NotesGrid(
                     onDrag = { change, _ ->
                         change.consume()
                         pointer = coords[0]?.localToRoot(change.position) ?: pointer
-                        moveUnderFinger()
+                        moveNow()
                     },
                     onDragEnd = {
-                        // Let go without having moved the card: it stays chosen.
-                        if (dragOrder == null) dragKey = null else { dropNow(); if (chosenByPress) onToggle(key) }
+                        // Let go without having moved the card: it stays chosen, or the choice changes.
+                        if (dragOrder == null) { dragKey = null; if (!chosenByPress) onToggle(key) } else { dropNow(); if (chosenByPress) onToggle(key) }
                         chosenByPress = false
                     },
                     onDragCancel = { dragKey = null; dragOrder = null; if (chosenByPress) onToggle(key); chosenByPress = false },
