@@ -78,6 +78,7 @@ internal fun NoteTile(
     query: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    frame: Modifier = Modifier,
     widgetPosition: Int? = null,
     actions: (@Composable () -> Unit)? = null,
 ) {
@@ -185,6 +186,7 @@ internal fun NoteTile(
     val cornerExtra = if (hasTitleRow) 0 else (if (note.pinned) 22 else 0) + (if (progress != null) 36 else 0)
     // The fold arrow floats over the card's corner: its touch area can be large without making the title row taller.
     Box(modifier.fillMaxWidth()) {
+    Box(frame.fillMaxWidth()) {
     Column(
         Modifier.fillMaxWidth()
             .clip(shape)
@@ -464,6 +466,7 @@ internal fun NoteTile(
                 )
             }
         }
+    }
     }
     // The place in the widget sits on the card's corner, where it covers nothing of the note.
     if (widgetPosition != null) {

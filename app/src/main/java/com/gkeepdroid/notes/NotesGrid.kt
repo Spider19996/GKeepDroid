@@ -140,8 +140,10 @@ internal fun NotesGrid(
     // The new order is shown until the saved one arrives.
     LaunchedEffect(shown) { dragOrder = null }
     val list = dragOrder ?: shown
-    val positions = remember(shown, resumeKey, screen, app.widgetOrderNumbers) {
-        if (app.widgetOrderNumbers && screen == AppScreen.Notes) widgetPositions(context, shown.map { it.second }.distinct()) else emptyMap()
+    // While a note is picked up (chosen or dragged), the numbers show even with the setting off.
+    val numbered = screen == AppScreen.Notes && (app.widgetOrderNumbers || selected.isNotEmpty() || dragKey != null)
+    val positions = remember(shown, resumeKey, numbered) {
+        if (numbered) widgetPositions(context, shown.map { it.second }.distinct()) else emptyMap()
     }
     fun keyOf(entry: Pair<KeepNote, String>) = entry.second + "|" + entry.first.id
 
@@ -262,17 +264,14 @@ internal fun NotesGrid(
         if (selected.isNotEmpty()) onToggle(account + "|" + note.id) else open(note, account, false)
     }
 
-    /** The long-press behavior of a card, and a frame around it while it is chosen. */
+    /** The frame around a chosen card; it clips, so it goes to the card alone, not to the number on its corner. */
     @Composable
-    fun cardModifier(note: KeepNote, account: String): Modifier {
-        val key = account + "|" + note.id
-        val frame = if (key in selected) {
+    fun frameModifier(key: String): Modifier =
+        if (key in selected) {
             Modifier.clip(MaterialTheme.shapes.medium).border(3.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.medium)
         } else {
             Modifier
         }
-        return dragModifier(key).then(frame)
-    }
 
     LazyVerticalStaggeredGrid(
         state = gridState,
@@ -293,7 +292,7 @@ internal fun NotesGrid(
             item(span = StaggeredGridItemSpan.FullLine) { SectionLabel(stringResource(R.string.pinned_section)) }
             items(pinned, key = { it.second + "|" + it.first.id }) { (note, account) ->
                 SwipeCard(app, screen == AppScreen.Notes, { onSwiped(note, account, it) }, heldItem(dragKey == account + "|" + note.id)) {
-                    NoteTile(activity, resumeKey, unlocker, note, account, app, query, widgetPosition = positions[account + "|" + note.id], onClick = { cardClick(note, account) }, modifier = cardModifier(note, account))
+                    NoteTile(activity, resumeKey, unlocker, note, account, app, query, widgetPosition = positions[account + "|" + note.id], onClick = { cardClick(note, account) }, modifier = dragModifier(account + "|" + note.id), frame = frameModifier(account + "|" + note.id))
                 }
             }
             if (others.isNotEmpty()) {
@@ -302,7 +301,7 @@ internal fun NotesGrid(
         }
         items(others, key = { it.second + "|" + it.first.id }) { (note, account) ->
             SwipeCard(app, screen == AppScreen.Notes, { onSwiped(note, account, it) }, heldItem(dragKey == account + "|" + note.id)) {
-            NoteTile(activity, resumeKey, unlocker, note, account, app, query, widgetPosition = positions[account + "|" + note.id], onClick = { cardClick(note, account) }, modifier = cardModifier(note, account)) {
+            NoteTile(activity, resumeKey, unlocker, note, account, app, query, widgetPosition = positions[account + "|" + note.id], onClick = { cardClick(note, account) }, modifier = dragModifier(account + "|" + note.id), frame = frameModifier(account + "|" + note.id)) {
                 // Archive and trash get their own actions below the note.
                 if (screen == AppScreen.Archive) {
                     TextButton(onClick = { act({}) { KeepRepository.unarchiveNote(context, account, note.id) } }, shapes = ButtonDefaults.shapes()) {
